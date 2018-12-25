@@ -1,0 +1,12 @@
+.DS_Store
+.project
+.settings
+test/testchain/geth
+test/testchain/geth.ipc
+test/testchain/history
+test/contracts
+rbtTest/testchain/geth
+rbtTest/testchain/geth.ipc
+rbtTest/testchain/history
+rbtTest/contracts
+private
