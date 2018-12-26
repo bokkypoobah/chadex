@@ -928,7 +928,7 @@ contract Dexz is Orders {
     constructor(address _feeAccount) public Orders(_feeAccount) {
     }
 
-    function addOrder(Orders.OrderType orderType, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, */ uint _baseTokensOnOrder, bytes32 _orderKey) {
+    function addOrder(OrderType orderType, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, */ uint _baseTokensOnOrder, bytes32 _orderKey) {
         // BK TODO - Add check for expiry
         _baseTokensOnOrder = baseTokens;
 
@@ -948,7 +948,7 @@ contract Dexz is Orders {
                 order.baseTokensFilled = order.baseTokensFilled.add(_baseTokens);
                 uint takerFeeTokens;
 
-                if (orderType == Orders.OrderType.SELL) {
+                if (orderType == OrderType.SELL) {
                     emit LogInfo("addOrder: order SELL", 0, 0x0, "", address(0));
 
                     takerFeeTokens = _quoteTokens.mul(takerFee).div(TENPOW18);
@@ -983,7 +983,8 @@ contract Dexz is Orders {
             }
         }
         if (_baseTokensOnOrder > 0) {
-            _orderKey = _addOrder(Orders.OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, price, expiry, _baseTokensOnOrder);
+            require(expiry > now);
+            _orderKey = _addOrder(orderType, msg.sender, baseToken, quoteToken, price, expiry, _baseTokensOnOrder);
         }
     }
 
@@ -993,7 +994,7 @@ contract Dexz is Orders {
 
         // // Maker buying base, needs to have amount in quote = base x price
         // // Taker selling base, needs to have amount in base
-        if (matchingOrder.orderType == Orders.OrderType.BUY) {
+        if (matchingOrder.orderType == OrderType.BUY) {
             emit LogInfo("calculateOrder Buy: matchingOrder.baseTokens", matchingOrder.baseTokens, 0x0, "", address(0));
             emit LogInfo("calculateOrder Buy: matchingOrder.baseTokensFilled", matchingOrder.baseTokensFilled, 0x0, "", address(0));
             emit LogInfo("calculateOrder Buy: amountBaseTokens", amountBaseTokens, 0x0, "", address(0));
@@ -1014,7 +1015,7 @@ contract Dexz is Orders {
             emit LogInfo("calculateOrder Buy: quoteTokens = baseTokens x price / 1e18", baseTokens.mul(matchingOrder.price).div(TENPOW18), 0x0, "", address(0));
             uint _availableQuoteTokens = availableTokens(matchingOrder.quoteToken, matchingOrder.maker);
             emit LogInfo("calculateOrder Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", matchingOrder.maker);
-            if (matchingOrder.orderType == Orders.OrderType.BUY && matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled) > _availableBaseTokens) {
+            if (matchingOrder.orderType == OrderType.BUY && matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled) > _availableBaseTokens) {
             }
             quoteTokens = baseTokens.mul(matchingOrder.price).div(TENPOW18);
             quoteTokens = quoteTokens.min(_availableQuoteTokens);
@@ -1028,14 +1029,14 @@ contract Dexz is Orders {
 
         // Maker selling base, needs to have amount in base
         // Taker buying base, needs to have amount in quote = base x price
-        } else if (matchingOrder.orderType == Orders.OrderType.SELL) {
+        } else if (matchingOrder.orderType == OrderType.SELL) {
             emit LogInfo("calculateOrder Sell: matchingOrder.baseTokens", matchingOrder.baseTokens, 0x0, "", address(0));
             emit LogInfo("calculateOrder Sell: matchingOrder.baseTokensFilled", matchingOrder.baseTokensFilled, 0x0, "", address(0));
             emit LogInfo("calculateOrder Sell: amountBaseTokens", amountBaseTokens, 0x0, "", address(0));
             uint _availableBaseTokens = availableTokens(matchingOrder.baseToken, matchingOrder.maker);
             emit LogInfo("calculateOrder Sell: availableTokens(matchingOrder.baseToken, matchingOrder.maker)", _availableBaseTokens, 0x0, "", matchingOrder.maker);
             // Update maker matchingOrder with currently available tokens
-            if (matchingOrder.orderType == Orders.OrderType.SELL && matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled) > _availableBaseTokens) {
+            if (matchingOrder.orderType == OrderType.SELL && matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled) > _availableBaseTokens) {
                 matchingOrder.baseTokens = _availableBaseTokens + matchingOrder.baseTokensFilled;
                 emit LogInfo("calculateOrder Sell: matchingOrder.baseTokens reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
                 // ordersData.orders[_matchingOrderKey].baseTokens = matchingOrder.baseTokens;
@@ -1049,7 +1050,7 @@ contract Dexz is Orders {
             emit LogInfo("calculateOrder Sell: quoteTokens = baseTokens x price / 1e18", baseTokens.mul(matchingOrder.price).div(TENPOW18), 0x0, "", address(0));
             uint _availableQuoteTokens = availableTokens(matchingOrder.quoteToken, taker);
             emit LogInfo("calculateOrder Sell: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", taker);
-            if (matchingOrder.orderType == Orders.OrderType.BUY && matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled) > _availableBaseTokens) {
+            if (matchingOrder.orderType == OrderType.BUY && matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled) > _availableBaseTokens) {
             }
             quoteTokens = baseTokens.mul(matchingOrder.price).div(TENPOW18);
             quoteTokens = quoteTokens.min(_availableQuoteTokens);
@@ -1085,10 +1086,10 @@ contract Dexz is Orders {
         emit OrderUpdated(key, baseTokens, _newBaseTokens);
     }
     function updateOrderPrice(OrderType orderType, address baseToken, address quoteToken, uint oldPrice, uint newPrice, uint expiry) public returns (uint _newBaseTokens) {
-        bytes32 oldKey = Orders.orderKey(Orders.OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, oldPrice, expiry);
+        bytes32 oldKey = Orders.orderKey(OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, oldPrice, expiry);
         Order storage oldOrder = orders[oldKey];
         require(oldOrder.maker == msg.sender);
-        bytes32 newKey = Orders.orderKey(Orders.OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, newPrice, expiry);
+        bytes32 newKey = Orders.orderKey(OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, newPrice, expiry);
         Order storage newOrder = orders[newKey];
         if (newOrder.maker != address(0)) {
             require(newOrder.maker == msg.sender);
@@ -1103,10 +1104,10 @@ contract Dexz is Orders {
         // BK TODO: Log changes
     }
     function updateOrderExpiry(OrderType orderType, address baseToken, address quoteToken, uint price, uint oldExpiry, uint newExpiry) public returns (uint _newBaseTokens) {
-        bytes32 oldKey = Orders.orderKey(Orders.OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, price, oldExpiry);
+        bytes32 oldKey = Orders.orderKey(OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, price, oldExpiry);
         Order storage oldOrder = orders[oldKey];
         require(oldOrder.maker == msg.sender);
-        bytes32 newKey = Orders.orderKey(Orders.OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, price, newExpiry);
+        bytes32 newKey = Orders.orderKey(OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, price, newExpiry);
         Order storage newOrder = orders[newKey];
         if (newOrder.maker != address(0)) {
             require(newOrder.maker == msg.sender);
