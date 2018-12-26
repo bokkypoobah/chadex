@@ -862,7 +862,7 @@ contract Orders is DexzBase {
         require(_orderQueue.exists);
 
         uint _orderType = order.orderType;
-        uint price = order.price;
+        uint _price = order.price;
 
         // Only order
         if (_orderQueue.head == _orderKey && _orderQueue.tail == _orderKey) {
@@ -891,11 +891,11 @@ contract Orders is DexzBase {
         }
         emit OrderRemoved(_orderKey);
         if (_orderQueue.head == ORDERKEY_SENTINEL && _orderQueue.tail == ORDERKEY_SENTINEL) {
-            delete orderQueue[_pairKey][_orderType][price];
+            delete orderQueue[_pairKey][_orderType][_price];
             BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_orderType];
-            if (priceKeys.exists(price)) {
-                priceKeys.remove(price);
-                emit LogInfo("orders remove RBT", price, 0x0, "", address(0));
+            if (priceKeys.exists(_price)) {
+                priceKeys.remove(_price);
+                emit LogInfo("orders remove RBT", _price, 0x0, "", address(0));
             }
         }
     }
