@@ -117,7 +117,7 @@ contract Orders is DexzBase {
     }
 
     function getOrderQueue(bytes32 _pairKey, uint _orderType, uint price) public view returns (bool _exists, bytes32 _head, bytes32 _tail) {
-        Orders.OrderQueue memory _orderQueue = orderQueue[_pairKey][uint(_orderType)][price];
+        Orders.OrderQueue memory _orderQueue = orderQueue[_pairKey][_orderType][price];
         return (_orderQueue.exists, _orderQueue.head, _orderQueue.tail);
     }
     function getOrder(bytes32 _orderKey) public view returns (bytes32 _prev, bytes32 _next, uint _orderType, address maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, uint baseTokensFilled) {
@@ -129,16 +129,16 @@ contract Orders is DexzBase {
     function _getBestMatchingOrder(uint _orderType, address baseToken, address quoteToken, uint price) internal returns (bytes32 _orderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         uint _inverseOrderType = inverseOrderType(_orderType);
-        BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = orderKeys[_pairKey][uint(_inverseOrderType)];
-        if (keys.initialised) {
-            emit LogInfo("getBestMatchingOrder: keys.initialised", 0, 0x0, "", address(0));
-            uint priceKey = (_orderType == ORDERTYPE_BUY) ? keys.first() : keys.last();
+        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_inverseOrderType];
+        if (priceKeys.initialised) {
+            emit LogInfo("getBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
+            uint priceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
             // bool priceCheck = (priceKey == PRICEKEY_SENTINEL) ? false : (_orderType == OrderType.BUY) ? priceKey <= price : priceKey >= price;
             // priceCheck = true;
             // while (priceCheck && priceKey != PRICEKEY_SENTINEL) {
             while (priceKey != PRICEKEY_SENTINEL) {
                 emit LogInfo("getBestMatchingOrder: priceKey", priceKey, 0x0, "", address(0));
-                OrderQueue storage _orderQueue = orderQueue[_pairKey][uint(_inverseOrderType)][priceKey];
+                OrderQueue storage _orderQueue = orderQueue[_pairKey][_inverseOrderType][priceKey];
                 if (_orderQueue.exists) {
                     emit LogInfo("getBestMatchingOrder: orderQueue not empty", priceKey, 0x0, "", address(0));
                     _orderKey = _orderQueue.head;
@@ -155,22 +155,22 @@ contract Orders is DexzBase {
                     emit LogInfo("getBestMatchingOrder: orderQueue empty", 0, 0x0, "", address(0));
 
                 }
-                priceKey = (_orderType == ORDERTYPE_BUY) ? keys.next(priceKey) : keys.prev(priceKey);
+                priceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.next(priceKey) : priceKeys.prev(priceKey);
             }
-            // OrderQueue storage orderQueue = self.orderQueue[_pairKey][uint(_orderType)][price];
+            // OrderQueue storage orderQueue = self.orderQueue[_pairKey][_orderType][price];
         }
         return ORDERKEY_SENTINEL;
     }
     function _updateBestMatchingOrder(uint _orderType, address baseToken, address quoteToken, uint price, bytes32 matchingOrderKey) internal returns (bytes32 _orderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         uint _inverseOrderType = inverseOrderType(_orderType);
-        BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = orderKeys[_pairKey][uint(_inverseOrderType)];
-        if (keys.initialised) {
-            emit LogInfo("updateBestMatchingOrder: keys.initialised", 0, 0x0, "", address(0));
-            uint priceKey = (_orderType == ORDERTYPE_BUY) ? keys.first() : keys.last();
+        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_inverseOrderType];
+        if (priceKeys.initialised) {
+            emit LogInfo("updateBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
+            uint priceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
             while (priceKey != PRICEKEY_SENTINEL) {
                 emit LogInfo("updateBestMatchingOrder: priceKey", priceKey, 0x0, "", address(0));
-                OrderQueue storage _orderQueue = orderQueue[_pairKey][uint(_inverseOrderType)][priceKey];
+                OrderQueue storage _orderQueue = orderQueue[_pairKey][_inverseOrderType][priceKey];
                 if (_orderQueue.exists) {
                     emit LogInfo("updateBestMatchingOrder: orderQueue not empty", priceKey, 0x0, "", address(0));
 
@@ -194,8 +194,8 @@ contract Orders is DexzBase {
                     }
                     // TODO: Clear out queue info, and prie tree if necessary
                     if (_orderQueue.head == ORDERKEY_SENTINEL) {
-                        delete orderQueue[_pairKey][uint(_inverseOrderType)][priceKey];
-                        keys.remove(priceKey);
+                        delete orderQueue[_pairKey][_inverseOrderType][priceKey];
+                        priceKeys.remove(priceKey);
                         emit LogInfo("orders remove RBT", priceKey, 0x0, "", address(0));
                     }
                 } else {
@@ -203,9 +203,9 @@ contract Orders is DexzBase {
                     emit LogInfo("updateBestMatchingOrder: orderQueue empty", 0, 0x0, "", address(0));
 
                 }
-                priceKey = (_orderType == ORDERTYPE_BUY) ? keys.next(priceKey) : keys.prev(priceKey);
+                priceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.next(priceKey) : priceKeys.prev(priceKey);
             }
-            // OrderQueue storage orderQueue = self.orderQueue[_pairKey][uint(_orderType)][price];
+            // OrderQueue storage orderQueue = self.orderQueue[_pairKey][_orderType][price];
         }
         return ORDERKEY_SENTINEL;
     }
@@ -219,22 +219,22 @@ contract Orders is DexzBase {
         addAccount(maker);
         addPair(_pairKey, baseToken, quoteToken);
 
-        BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = orderKeys[_pairKey][uint(_orderType)];
-        if (!keys.initialised) {
-            keys.init();
+        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_orderType];
+        if (!priceKeys.initialised) {
+            priceKeys.init();
         }
-        if (!keys.exists(price)) {
-            keys.insert(price);
+        if (!priceKeys.exists(price)) {
+            priceKeys.insert(price);
             emit LogInfo("orders addKey RBT adding ", price, 0x0, "", address(0));
         } else {
             emit LogInfo("orders addKey RBT exists ", price, 0x0, "", address(0));
         }
         // Above - new 148,521, existing 35,723
 
-        OrderQueue storage _orderQueue = orderQueue[_pairKey][uint(_orderType)][price];
+        OrderQueue storage _orderQueue = orderQueue[_pairKey][_orderType][price];
         if (!_orderQueue.exists) {
-            orderQueue[_pairKey][uint(_orderType)][price] = OrderQueue(true, ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
-            _orderQueue = orderQueue[_pairKey][uint(_orderType)][price];
+            orderQueue[_pairKey][_orderType][price] = OrderQueue(true, ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
+            _orderQueue = orderQueue[_pairKey][_orderType][price];
         }
         // Above - new 179,681, existing 36,234
 
@@ -260,7 +260,7 @@ contract Orders is DexzBase {
         require(order.maker == msgSender);
 
         bytes32 _pairKey = pairKey(order.baseToken, order.quoteToken);
-        OrderQueue storage _orderQueue = orderQueue[_pairKey][uint(order.orderType)][order.price];
+        OrderQueue storage _orderQueue = orderQueue[_pairKey][order.orderType][order.price];
         require(_orderQueue.exists);
 
         uint _orderType = order.orderType;
@@ -294,9 +294,9 @@ contract Orders is DexzBase {
         emit OrderRemoved(_orderKey);
         if (_orderQueue.head == ORDERKEY_SENTINEL && _orderQueue.tail == ORDERKEY_SENTINEL) {
             delete orderQueue[_pairKey][_orderType][price];
-            BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = orderKeys[_pairKey][_orderType];
-            if (keys.exists(price)) {
-                keys.remove(price);
+            BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_orderType];
+            if (priceKeys.exists(price)) {
+                priceKeys.remove(price);
                 emit LogInfo("orders remove RBT", price, 0x0, "", address(0));
             }
         }
