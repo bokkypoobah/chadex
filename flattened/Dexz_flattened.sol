@@ -11,91 +11,6 @@ pragma solidity ^0.5.0;
 // ----------------------------------------------------------------------------
 
 
-// ----------------------------------------------------------------------------
-// Safe maths
-// ----------------------------------------------------------------------------
-library SafeMath {
-    function add(uint a, uint b) internal pure returns (uint c) {
-        c = a + b;
-        require(c >= a);
-    }
-    function sub(uint a, uint b) internal pure returns (uint c) {
-        require(b <= a);
-        c = a - b;
-    }
-    function mul(uint a, uint b) internal pure returns (uint c) {
-        c = a * b;
-        require(a == 0 || c / a == b);
-    }
-    function div(uint a, uint b) internal pure returns (uint c) {
-        require(b > 0);
-        c = a / b;
-    }
-    function max(uint a, uint b) internal pure returns (uint c) {
-        c = a >= b ? a : b;
-    }
-    function min(uint a, uint b) internal pure returns (uint c) {
-        c = a <= b ? a : b;
-    }
-}
-// ----------------------------------------------------------------------------
-// End - Safe maths
-// ----------------------------------------------------------------------------
-
-// ----------------------------------------------------------------------------
-// ERC Token Standard #20 Interface
-// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
-// ----------------------------------------------------------------------------
-contract ERC20Interface {
-    event Transfer(address indexed from, address indexed to, uint tokens);
-    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-
-    function totalSupply() public view returns (uint);
-    function balanceOf(address tokenOwner) public view returns (uint balance);
-    function allowance(address tokenOwner, address spender) public view returns (uint remaining);
-    function transfer(address to, uint tokens) public returns (bool success);
-    function approve(address spender, uint tokens) public returns (bool success);
-    function transferFrom(address from, address to, uint tokens) public returns (bool success);
-}
-// ----------------------------------------------------------------------------
-// End - ERC Token Standard #20 Interface
-// ----------------------------------------------------------------------------
-
-// ----------------------------------------------------------------------------
-// Owned contract
-// ----------------------------------------------------------------------------
-contract Owned {
-    address public owner;
-    address public newOwner;
-
-    event OwnershipTransferred(address indexed _from, address indexed _to);
-
-    modifier onlyOwner {
-        require(msg.sender == owner);
-        _;
-    }
-
-    function initOwned(address _owner) internal {
-        owner = _owner;
-    }
-    function transferOwnership(address _newOwner) public onlyOwner {
-        newOwner = _newOwner;
-    }
-    function acceptOwnership() public {
-        require(msg.sender == newOwner);
-        emit OwnershipTransferred(owner, newOwner);
-        owner = newOwner;
-        newOwner = address(0);
-    }
-    function transferOwnershipImmediately(address _newOwner) public onlyOwner {
-        emit OwnershipTransferred(owner, _newOwner);
-        owner = _newOwner;
-    }
-}
-// ----------------------------------------------------------------------------
-// End - Owned contract
-// ----------------------------------------------------------------------------
-
 
 // ----------------------------------------------------------------------------
 // BokkyPooBah's Red-Black Tree Library v0.90
@@ -503,10 +418,206 @@ library BokkyPooBahsRedBlackTreeLibrary {
 // End - BokkyPooBah's Red-Black Tree Library
 // ----------------------------------------------------------------------------
 
+
+// ----------------------------------------------------------------------------
+// Safe maths
+// ----------------------------------------------------------------------------
+library SafeMath {
+    function add(uint a, uint b) internal pure returns (uint c) {
+        c = a + b;
+        require(c >= a);
+    }
+    function sub(uint a, uint b) internal pure returns (uint c) {
+        require(b <= a);
+        c = a - b;
+    }
+    function mul(uint a, uint b) internal pure returns (uint c) {
+        c = a * b;
+        require(a == 0 || c / a == b);
+    }
+    function div(uint a, uint b) internal pure returns (uint c) {
+        require(b > 0);
+        c = a / b;
+    }
+    function max(uint a, uint b) internal pure returns (uint c) {
+        c = a >= b ? a : b;
+    }
+    function min(uint a, uint b) internal pure returns (uint c) {
+        c = a <= b ? a : b;
+    }
+}
+// ----------------------------------------------------------------------------
+// End - Safe maths
+// ----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
+// ERC Token Standard #20 Interface
+// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
+// ----------------------------------------------------------------------------
+contract ERC20Interface {
+    event Transfer(address indexed from, address indexed to, uint tokens);
+    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
+
+    function totalSupply() public view returns (uint);
+    function balanceOf(address tokenOwner) public view returns (uint balance);
+    function allowance(address tokenOwner, address spender) public view returns (uint remaining);
+    function transfer(address to, uint tokens) public returns (bool success);
+    function approve(address spender, uint tokens) public returns (bool success);
+    function transferFrom(address from, address to, uint tokens) public returns (bool success);
+}
+// ----------------------------------------------------------------------------
+// End - ERC Token Standard #20 Interface
+// ----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
+// Owned contract
+// ----------------------------------------------------------------------------
+contract Owned {
+    address public owner;
+    address public newOwner;
+
+    event OwnershipTransferred(address indexed _from, address indexed _to);
+
+    modifier onlyOwner {
+        require(msg.sender == owner);
+        _;
+    }
+
+    function initOwned(address _owner) internal {
+        owner = _owner;
+    }
+    function transferOwnership(address _newOwner) public onlyOwner {
+        newOwner = _newOwner;
+    }
+    function acceptOwnership() public {
+        require(msg.sender == newOwner);
+        emit OwnershipTransferred(owner, newOwner);
+        owner = newOwner;
+        newOwner = address(0);
+    }
+    function transferOwnershipImmediately(address _newOwner) public onlyOwner {
+        emit OwnershipTransferred(owner, _newOwner);
+        owner = _newOwner;
+    }
+}
+// ----------------------------------------------------------------------------
+// End - Owned contract
+// ----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
+// DexzBase
+// ----------------------------------------------------------------------------
+contract DexzBase is Owned {
+    using SafeMath for uint;
+
+    enum TokenWhitelistStatus {
+        NONE,
+        BLACKLIST,
+        WHITELIST
+    }
+
+    uint constant public TENPOW18 = uint(10)**18;
+
+    uint public deploymentBlockNumber;
+    uint public takerFee = 10 * uint(10)**14; // 0.10%
+    address public feeAccount;
+
+    mapping(address => TokenWhitelistStatus) public tokenWhitelist;
+
+    // Data => block.number when first seen
+    mapping(address => uint) tokens;
+    mapping(address => uint) accounts;
+    mapping(bytes32 => uint) pairs;
+
+    event TokenWhitelistUpdated(address indexed token, uint oldStatus, uint newStatus);
+    event TakerFeeUpdated(uint oldTakerFee, uint newTakerFee);
+    event FeeAccountUpdated(address oldFeeAccount, address newFeeAccount);
+
+    event TokenAdded(address indexed token);
+    event AccountAdded(address indexed account);
+    event PairAdded(bytes32 indexed pairKey, address indexed baseToken, address indexed quoteToken);
+
+    event LogInfo(string topic, uint number, bytes32 data, string note, address addr);
+
+
+    constructor(address _feeAccount) public {
+        initOwned(msg.sender);
+        deploymentBlockNumber = block.number;
+        feeAccount = _feeAccount;
+        addAccount(address(this));
+    }
+
+    function getTokenBlockNumber(address token) public view returns (uint _blockNumber) {
+        _blockNumber = tokens[token];
+    }
+    function getAccountBlockNumber(address account) public view returns (uint _blockNumber) {
+        _blockNumber = accounts[account];
+    }
+    function getPairBlockNumber(bytes32 _pairKey) public view returns (uint _blockNumber) {
+        _blockNumber = pairs[_pairKey];
+    }
+
+
+    function whitelistToken(address token, uint status) public onlyOwner {
+        emit TokenWhitelistUpdated(token, uint(tokenWhitelist[token]), status);
+        tokenWhitelist[token] = TokenWhitelistStatus(status);
+    }
+    function setTakerFee(uint _takerFee) public onlyOwner {
+        emit TakerFeeUpdated(takerFee, _takerFee);
+        takerFee = _takerFee;
+    }
+    function setFeeAccount(address _feeAccount) public onlyOwner {
+        emit FeeAccountUpdated(feeAccount, _feeAccount);
+        feeAccount = _feeAccount;
+    }
+
+    function addToken(address token) internal {
+        if (tokens[token] == 0) {
+            tokens[token] = block.number;
+            emit TokenAdded(token);
+        }
+    }
+    function addAccount(address account) internal {
+        if (accounts[account] == 0) {
+            accounts[account] = block.number;
+            emit AccountAdded(account);
+        }
+    }
+    function addPair(bytes32 _pairKey, address baseToken, address quoteToken) internal {
+        if (pairs[_pairKey] == 0) {
+            pairs[_pairKey] = block.number;
+            emit PairAdded(_pairKey, baseToken, quoteToken);
+        }
+    }
+
+
+    function availableTokens(address token, address wallet) internal view returns (uint _tokens) {
+        _tokens = ERC20Interface(token).allowance(wallet, address(this));
+        _tokens = _tokens.min(ERC20Interface(token).balanceOf(wallet));
+    }
+    function transferFrom(address token, address from, address to, uint _tokens) internal {
+        TokenWhitelistStatus whitelistStatus = tokenWhitelist[token];
+        // Difference in gas for 2 x maker fills - wl 293405, no wl 326,112
+        if (whitelistStatus == TokenWhitelistStatus.WHITELIST) {
+            require(ERC20Interface(token).transferFrom(from, to, _tokens));
+        } else if (whitelistStatus == TokenWhitelistStatus.NONE) {
+            uint balanceToBefore = ERC20Interface(token).balanceOf(to);
+            require(ERC20Interface(token).transferFrom(from, to, _tokens));
+            uint balanceToAfter = ERC20Interface(token).balanceOf(to);
+            require(balanceToBefore.add(_tokens) == balanceToAfter);
+        } else {
+            revert();
+        }
+    }
+}
+// ----------------------------------------------------------------------------
+// End - DexzBase
+// ----------------------------------------------------------------------------
+
 // ----------------------------------------------------------------------------
 // Orders Data Structure
 // ----------------------------------------------------------------------------
-library Orders {
+contract Orders is DexzBase {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
     enum OrderType {
@@ -535,73 +646,103 @@ library Orders {
         bytes32 head;
         bytes32 tail;
     }
-    struct Data {
-        bool initialised;
-        // PairKey (bytes32) => BuySell (OrderType) => Price (BPBRBTL)
-        mapping(bytes32 => mapping(uint => BokkyPooBahsRedBlackTreeLibrary.Tree)) orderKeys;
-        // PairKey (bytes32) => BuySell (OrderType) => Price (uint) => OrderKey (bytes32)
-        mapping(bytes32 => mapping(uint => mapping(uint => OrderQueue))) orderQueue;
-        // OrderKey (bytes32) => Order
-        mapping(bytes32 => Order) orders;
-        // Data => block.number when first seen
-        mapping(address => uint) tokens;
-        mapping(address => uint) accounts;
-        mapping(bytes32 => uint) pairs;
-    }
 
-    event TokenAdded(address indexed token);
-    event AccountAdded(address indexed account);
-    event PairAdded(bytes32 indexed pairKey, address indexed baseToken, address indexed quoteToken);
+    // PairKey (bytes32) => BuySell (OrderType) => Price (BPBRBTL)
+    mapping(bytes32 => mapping(uint => BokkyPooBahsRedBlackTreeLibrary.Tree)) orderKeys;
+    // PairKey (bytes32) => BuySell (OrderType) => Price (uint) => OrderQueue
+    mapping(bytes32 => mapping(uint => mapping(uint => OrderQueue))) orderQueue;
+    // OrderKey (bytes32) => Order
+    mapping(bytes32 => Order) orders;
 
-    event LogInfo(string topic, uint number, bytes32 data, string note, address addr);
-
-    bytes32 private constant ORDERKEY_SENTINEL = 0x0;
+    bytes32 public constant ORDERKEY_SENTINEL = 0x0;
     uint private constant PRICEKEY_SENTINEL = 0;
 
     event OrderAdded(bytes32 indexed pairKey, bytes32 indexed key, uint orderType, address indexed maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens);
     event OrderRemoved(bytes32 indexed key);
     event OrderUpdated(bytes32 indexed key, uint baseTokens, uint newBaseTokens);
 
-    function init(Data storage self) internal {
-        require(!self.initialised);
-        self.initialised = true;
+
+    constructor(address _feeAccount) public DexzBase(_feeAccount) {
     }
+
+
+    // Price tree navigating
+    function count(bytes32 _pairKey, uint orderType) public view returns (uint _count) {
+        _count = orderKeys[_pairKey][orderType].count();
+    }
+    function first(bytes32 _pairKey, uint orderType) public view returns (uint _key) {
+        _key = orderKeys[_pairKey][orderType].first();
+    }
+    function last(bytes32 _pairKey, uint orderType) public view returns (uint _key) {
+        _key = orderKeys[_pairKey][orderType].last();
+    }
+    function next(bytes32 _pairKey, uint orderType, uint x) public view returns (uint y) {
+        y = orderKeys[_pairKey][orderType].next(x);
+    }
+    function prev(bytes32 _pairKey, uint orderType, uint x) public view returns (uint y) {
+        y = orderKeys[_pairKey][orderType].prev(x);
+    }
+    function exists(bytes32 _pairKey, uint orderType, uint key) public view returns (bool) {
+        return orderKeys[_pairKey][orderType].exists(key);
+    }
+    function getNode(bytes32 _pairKey, uint orderType, uint key) public view returns (uint _returnKey, uint _parent, uint _left, uint _right, bool _red) {
+        return orderKeys[_pairKey][orderType].getNode(key);
+    }
+    // Don't need parent, grandparent, sibling, uncle
+
+
+    // Orders navigating
     function pairKey(address baseToken, address quoteToken) internal pure returns (bytes32) {
         return keccak256(abi.encodePacked(baseToken, quoteToken));
     }
     function orderKey(OrderType orderType, address maker, address baseToken, address quoteToken, uint price, uint expiry) internal pure returns (bytes32) {
         return keccak256(abi.encodePacked(orderType, maker, baseToken, quoteToken, price, expiry));
     }
-    function exists(Data storage self, bytes32 key) internal view returns (bool) {
-        return self.orders[key].baseToken != address(0);
+    function exists(bytes32 key) internal view returns (bool) {
+        return orders[key].baseToken != address(0);
     }
     function inverseOrderType(OrderType orderType) internal pure returns (OrderType) {
         return (orderType == OrderType.BUY) ? OrderType.SELL : OrderType.BUY;
     }
 
-    function addToken(Data storage self, address token) internal {
-        if (self.tokens[token] == 0) {
-            self.tokens[token] = block.number;
-            emit TokenAdded(token);
+
+    function getBestPrice(bytes32 _pairKey, uint orderType) public view returns (uint _key) {
+        if (orderType == uint(Orders.OrderType.BUY)) {
+            _key = orderKeys[_pairKey][orderType].last();
+        } else {
+            _key = orderKeys[_pairKey][orderType].first();
         }
     }
-    function addAccount(Data storage self, address account) internal {
-        if (self.accounts[account] == 0) {
-            self.accounts[account] = block.number;
-            emit AccountAdded(account);
-        }
-    }
-    function addPair(Data storage self, bytes32 _pairKey, address baseToken, address quoteToken) internal {
-        if (self.pairs[_pairKey] == 0) {
-            self.pairs[_pairKey] = block.number;
-            emit PairAdded(_pairKey, baseToken, quoteToken);
+    function getNextBestPrice(bytes32 _pairKey, uint orderType, uint x) public view returns (uint y) {
+        if (orderType == uint(Orders.OrderType.BUY)) {
+            if (BokkyPooBahsRedBlackTreeLibrary.isSentinel(x)) {
+                y = orderKeys[_pairKey][orderType].last();
+            } else {
+                y = orderKeys[_pairKey][orderType].prev(x);
+            }
+        } else {
+            if (BokkyPooBahsRedBlackTreeLibrary.isSentinel(x)) {
+                y = orderKeys[_pairKey][orderType].first();
+            } else {
+                y = orderKeys[_pairKey][orderType].next(x);
+            }
         }
     }
 
-    function getBestMatchingOrder(Data storage self, OrderType orderType, address baseToken, address quoteToken, uint price) public returns (bytes32 _orderKey) {
+    function getOrderQueue(bytes32 _pairKey, uint orderType, uint price) public view returns (bool _exists, bytes32 _head, bytes32 _tail) {
+        Orders.OrderQueue memory _orderQueue = orderQueue[_pairKey][uint(orderType)][price];
+        return (_orderQueue.exists, _orderQueue.head, _orderQueue.tail);
+    }
+    function getOrder(bytes32 _orderKey) public view returns (bytes32 _prev, bytes32 _next, uint orderType, address maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, uint baseTokensFilled) {
+        Orders.Order memory order = orders[_orderKey];
+        return (order.prev, order.next, uint(order.orderType), order.maker, order.baseToken, order.quoteToken, order.price, order.expiry, order.baseTokens, order.baseTokensFilled);
+    }
+
+
+    function getBestMatchingOrder(OrderType orderType, address baseToken, address quoteToken, uint price) internal returns (bytes32 _orderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         OrderType _inverseOrderType = inverseOrderType(orderType);
-        BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = self.orderKeys[_pairKey][uint(_inverseOrderType)];
+        BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = orderKeys[_pairKey][uint(_inverseOrderType)];
         if (keys.initialised) {
             emit LogInfo("getBestMatchingOrder: keys.initialised", 0, 0x0, "", address(0));
             uint priceKey = (orderType == OrderType.BUY) ? keys.first() : keys.last();
@@ -610,17 +751,17 @@ library Orders {
             // while (priceCheck && priceKey != PRICEKEY_SENTINEL) {
             while (priceKey != PRICEKEY_SENTINEL) {
                 emit LogInfo("getBestMatchingOrder: priceKey", priceKey, 0x0, "", address(0));
-                OrderQueue storage orderQueue = self.orderQueue[_pairKey][uint(_inverseOrderType)][priceKey];
-                if (orderQueue.exists) {
+                OrderQueue storage _orderQueue = orderQueue[_pairKey][uint(_inverseOrderType)][priceKey];
+                if (_orderQueue.exists) {
                     emit LogInfo("getBestMatchingOrder: orderQueue not empty", priceKey, 0x0, "", address(0));
-                    _orderKey = orderQueue.head;
+                    _orderKey = _orderQueue.head;
                     while (_orderKey != ORDERKEY_SENTINEL) {
-                        Order storage order = self.orders[_orderKey];
+                        Order storage order = orders[_orderKey];
                         emit LogInfo("getBestMatchingOrder: _orderKey ", order.expiry, _orderKey, "", address(0));
                         if (order.expiry >= block.timestamp && order.baseTokens > order.baseTokensFilled) {
                             return _orderKey;
                         }
-                        _orderKey = self.orders[_orderKey].next;
+                        _orderKey = orders[_orderKey].next;
                     }
                 } else {
                     // TODO: REMOVE priceKey
@@ -633,40 +774,40 @@ library Orders {
         }
         return ORDERKEY_SENTINEL;
     }
-    function updateBestMatchingOrder(Data storage self, OrderType orderType, address baseToken, address quoteToken, uint price, bytes32 matchingOrderKey) public returns (bytes32 _orderKey) {
+    function updateBestMatchingOrder(OrderType orderType, address baseToken, address quoteToken, uint price, bytes32 matchingOrderKey) internal returns (bytes32 _orderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         OrderType _inverseOrderType = inverseOrderType(orderType);
-        BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = self.orderKeys[_pairKey][uint(_inverseOrderType)];
+        BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = orderKeys[_pairKey][uint(_inverseOrderType)];
         if (keys.initialised) {
             emit LogInfo("updateBestMatchingOrder: keys.initialised", 0, 0x0, "", address(0));
             uint priceKey = (orderType == OrderType.BUY) ? keys.first() : keys.last();
             while (priceKey != PRICEKEY_SENTINEL) {
                 emit LogInfo("updateBestMatchingOrder: priceKey", priceKey, 0x0, "", address(0));
-                OrderQueue storage orderQueue = self.orderQueue[_pairKey][uint(_inverseOrderType)][priceKey];
-                if (orderQueue.exists) {
+                OrderQueue storage _orderQueue = orderQueue[_pairKey][uint(_inverseOrderType)][priceKey];
+                if (_orderQueue.exists) {
                     emit LogInfo("updateBestMatchingOrder: orderQueue not empty", priceKey, 0x0, "", address(0));
 
-                    Order storage order = self.orders[matchingOrderKey];
+                    Order storage order = orders[matchingOrderKey];
                     // TODO: What happens when allowance or balance is lower than #baseTokens
                     if (order.baseTokens == order.baseTokensFilled) {
-                        orderQueue.head = order.next;
+                        _orderQueue.head = order.next;
                         if (order.next != ORDERKEY_SENTINEL) {
-                            self.orders[order.next].prev = ORDERKEY_SENTINEL;
+                            orders[order.next].prev = ORDERKEY_SENTINEL;
                         }
                         order.prev = ORDERKEY_SENTINEL;
-                        if (orderQueue.tail == matchingOrderKey) {
-                            orderQueue.tail = ORDERKEY_SENTINEL;
+                        if (_orderQueue.tail == matchingOrderKey) {
+                            _orderQueue.tail = ORDERKEY_SENTINEL;
                         }
-                        delete self.orders[matchingOrderKey];
+                        delete orders[matchingOrderKey];
                     // Else update head to current if not (skipped expired)
                     } else {
-                        if (orderQueue.head != matchingOrderKey) {
-                            orderQueue.head = matchingOrderKey;
+                        if (_orderQueue.head != matchingOrderKey) {
+                            _orderQueue.head = matchingOrderKey;
                         }
                     }
                     // TODO: Clear out queue info, and prie tree if necessary
-                    if (orderQueue.head == ORDERKEY_SENTINEL) {
-                        delete self.orderQueue[_pairKey][uint(_inverseOrderType)][priceKey];
+                    if (_orderQueue.head == ORDERKEY_SENTINEL) {
+                        delete orderQueue[_pairKey][uint(_inverseOrderType)][priceKey];
                         keys.remove(priceKey);
                         emit LogInfo("orders remove RBT", priceKey, 0x0, "", address(0));
                     }
@@ -681,17 +822,17 @@ library Orders {
         }
         return ORDERKEY_SENTINEL;
     }
-    function add(Data storage self, OrderType orderType, address maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens) public returns (bytes32 _orderKey) {
+    function add(OrderType orderType, address maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens) internal returns (bytes32 _orderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         _orderKey = orderKey(orderType, maker, baseToken, quoteToken, price, expiry);
-        require(self.orders[_orderKey].maker == address(0));
+        require(orders[_orderKey].maker == address(0));
 
-        addToken(self, baseToken);
-        addToken(self, quoteToken);
-        addAccount(self, maker);
-        addPair(self, _pairKey, baseToken, quoteToken);
+        addToken(baseToken);
+        addToken(quoteToken);
+        addAccount(maker);
+        addPair(_pairKey, baseToken, quoteToken);
 
-        BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = self.orderKeys[_pairKey][uint(orderType)];
+        BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = orderKeys[_pairKey][uint(orderType)];
         if (!keys.initialised) {
             keys.init();
         }
@@ -703,22 +844,22 @@ library Orders {
         }
         // Above - new 148,521, existing 35,723
 
-        OrderQueue storage orderQueue = self.orderQueue[_pairKey][uint(orderType)][price];
-        if (!orderQueue.exists) {
-            self.orderQueue[_pairKey][uint(orderType)][price] = OrderQueue(true, ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
-            orderQueue = self.orderQueue[_pairKey][uint(orderType)][price];
+        OrderQueue storage _orderQueue = orderQueue[_pairKey][uint(orderType)][price];
+        if (!_orderQueue.exists) {
+            orderQueue[_pairKey][uint(orderType)][price] = OrderQueue(true, ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
+            _orderQueue = orderQueue[_pairKey][uint(orderType)][price];
         }
         // Above - new 179,681, existing 36,234
 
-        if (orderQueue.tail == ORDERKEY_SENTINEL) {
-            orderQueue.head = _orderKey;
-            orderQueue.tail = _orderKey;
-            self.orders[_orderKey] = Order(ORDERKEY_SENTINEL, ORDERKEY_SENTINEL, orderType, maker, baseToken, quoteToken, price, expiry, baseTokens, 0);
+        if (_orderQueue.tail == ORDERKEY_SENTINEL) {
+            _orderQueue.head = _orderKey;
+            _orderQueue.tail = _orderKey;
+            orders[_orderKey] = Order(ORDERKEY_SENTINEL, ORDERKEY_SENTINEL, orderType, maker, baseToken, quoteToken, price, expiry, baseTokens, 0);
             emit LogInfo("orders addData  first", 0, _orderKey, "", address(0));
         } else {
-            self.orders[orderQueue.tail].next = _orderKey;
-            self.orders[_orderKey] = Order(orderQueue.tail, ORDERKEY_SENTINEL, orderType, maker, baseToken, quoteToken, price, expiry, baseTokens, 0);
-            orderQueue.tail = _orderKey;
+            orders[_orderQueue.tail].next = _orderKey;
+            orders[_orderKey] = Order(_orderQueue.tail, ORDERKEY_SENTINEL, orderType, maker, baseToken, quoteToken, price, expiry, baseTokens, 0);
+            _orderQueue.tail = _orderKey;
             emit LogInfo("orders addData !first", 0, _orderKey, "", address(0));
         }
         // Above saving prev and next - new 232,985, existing 84,961
@@ -726,47 +867,47 @@ library Orders {
 
         emit OrderAdded(_pairKey, _orderKey, uint(orderType), maker, baseToken, quoteToken, price, expiry, baseTokens);
     }
-    function remove(Data storage self, bytes32 _orderKey, address msgSender) public {
+    function remove(bytes32 _orderKey, address msgSender) internal {
         require(_orderKey != ORDERKEY_SENTINEL);
-        Order memory order = self.orders[_orderKey];
+        Order memory order = orders[_orderKey];
         require(order.maker == msgSender);
 
         bytes32 _pairKey = pairKey(order.baseToken, order.quoteToken);
-        OrderQueue storage orderQueue = self.orderQueue[_pairKey][uint(order.orderType)][order.price];
-        require(orderQueue.exists);
+        OrderQueue storage _orderQueue = orderQueue[_pairKey][uint(order.orderType)][order.price];
+        require(_orderQueue.exists);
 
         OrderType orderType = order.orderType;
         uint price = order.price;
 
         // Only order
-        if (orderQueue.head == _orderKey && orderQueue.tail == _orderKey) {
-            orderQueue.head = ORDERKEY_SENTINEL;
-            orderQueue.tail = ORDERKEY_SENTINEL;
-            delete self.orders[_orderKey];
+        if (_orderQueue.head == _orderKey && _orderQueue.tail == _orderKey) {
+            _orderQueue.head = ORDERKEY_SENTINEL;
+            _orderQueue.tail = ORDERKEY_SENTINEL;
+            delete orders[_orderKey];
         // First item
-        } else if (orderQueue.head == _orderKey) {
-            bytes32 next = self.orders[_orderKey].next;
-            self.orders[next].prev = ORDERKEY_SENTINEL;
-            orderQueue.head = next;
-            delete self.orders[_orderKey];
+        } else if (_orderQueue.head == _orderKey) {
+            bytes32 _next = orders[_orderKey].next;
+            orders[_next].prev = ORDERKEY_SENTINEL;
+            _orderQueue.head = _next;
+            delete orders[_orderKey];
         // Last item
-        } else if (orderQueue.tail == _orderKey) {
-            bytes32 prev = self.orders[_orderKey].prev;
-            self.orders[prev].next = ORDERKEY_SENTINEL;
-            orderQueue.tail = prev;
-            delete self.orders[_orderKey];
+        } else if (_orderQueue.tail == _orderKey) {
+            bytes32 _prev = orders[_orderKey].prev;
+            orders[_prev].next = ORDERKEY_SENTINEL;
+            _orderQueue.tail = _prev;
+            delete orders[_orderKey];
         // Item in the middle
         } else {
-            bytes32 prev = self.orders[_orderKey].prev;
-            bytes32 next = self.orders[_orderKey].next;
-            self.orders[prev].next = ORDERKEY_SENTINEL;
-            self.orders[next].prev = prev;
-            delete self.orders[_orderKey];
+            bytes32 _prev = orders[_orderKey].prev;
+            bytes32 _next = orders[_orderKey].next;
+            orders[_prev].next = ORDERKEY_SENTINEL;
+            orders[_next].prev = _prev;
+            delete orders[_orderKey];
         }
         emit OrderRemoved(_orderKey);
-        if (orderQueue.head == ORDERKEY_SENTINEL && orderQueue.tail == ORDERKEY_SENTINEL) {
-            delete self.orderQueue[_pairKey][uint(orderType)][price];
-            BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = self.orderKeys[_pairKey][uint(orderType)];
+        if (_orderQueue.head == ORDERKEY_SENTINEL && _orderQueue.tail == ORDERKEY_SENTINEL) {
+            delete orderQueue[_pairKey][uint(orderType)][price];
+            BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = orderKeys[_pairKey][uint(orderType)];
             if (keys.exists(price)) {
                 keys.remove(price);
                 emit LogInfo("orders remove RBT", price, 0x0, "", address(0));
@@ -779,164 +920,25 @@ library Orders {
 // ----------------------------------------------------------------------------
 // Dexz contract
 // ----------------------------------------------------------------------------
-contract Dexz is Owned {
-    using SafeMath for uint;
+contract Dexz is Orders {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
-    using Orders for Orders.Data;
 
-    bytes32 private constant SENTINEL = 0x0;
-
-    enum TokenWhitelistStatus {
-        NONE,
-        BLACKLIST,
-        WHITELIST
-    }
-    enum OrderType {
-        BUY,
-        SELL
-    }
-
-    struct Order {
-        OrderType orderType;
-        address maker;
-        address baseToken;
-        address quoteToken;
-        uint price;             // baseToken/quoteToken = #quoteToken per unit baseToken
-        uint expiry;
-        uint baseTokens;
-        uint baseTokensFilled;
-    }
-
-    uint constant private TENPOW18 = uint(10)**18;
-
-    uint public deploymentBlockNumber;
-    uint public takerFee = 10 * uint(10)**14; // 0.10%
-    address public feeAccount;
-
-    mapping(address => TokenWhitelistStatus) public tokenWhitelist;
-
-    Orders.Data public ordersData;
-
-    event TokenWhitelistUpdated(address indexed token, uint oldStatus, uint newStatus);
-    event TakerFeeUpdated(uint oldTakerFee, uint newTakerFee);
-    event FeeAccountUpdated(address oldFeeAccount, address newFeeAccount);
-    event TokenAdded(address indexed token);
-    event AccountAdded(address indexed account);
-    event PairAdded(bytes32 indexed pairKey, address indexed baseToken, address indexed quoteToken);
-
-    event OrderAdded(bytes32 indexed pairKey, bytes32 indexed key, uint orderType, address indexed maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens);
-    event OrderRemoved(bytes32 indexed key);
-    event OrderUpdated(bytes32 indexed key, uint baseTokens, uint newBaseTokens);
-
-    event LogInfo(string topic, uint number, bytes32 data, string note, address addr);
     event Trade(bytes32 indexed key, uint orderType, address indexed taker, address indexed maker, uint amount, address baseToken, address quoteToken, uint baseTokens, uint quoteTokens, uint feeBaseTokens, uint feeQuoteTokens, uint baseTokensFilled);
 
-    constructor(address _feeAccount) public {
-        deploymentBlockNumber = block.number;
-        initOwned(msg.sender);
-        feeAccount = _feeAccount;
-        ordersData.init();
-        ordersData.addAccount(address(this));
-    }
-    function whitelistToken(address token, uint status) public onlyOwner {
-        emit TokenWhitelistUpdated(token, uint(tokenWhitelist[token]), status);
-        tokenWhitelist[token] = TokenWhitelistStatus(status);
-    }
-    function setTakerFee(uint _takerFee) public onlyOwner {
-        emit TakerFeeUpdated(takerFee, _takerFee);
-        takerFee = _takerFee;
-    }
-    function setFeeAccount(address _feeAccount) public onlyOwner {
-        emit FeeAccountUpdated(feeAccount, _feeAccount);
-        feeAccount = _feeAccount;
-    }
-
-    function getTokenBlockNumber(address token) public view returns (uint _blockNumber) {
-        _blockNumber = ordersData.tokens[token];
-    }
-    function getAccountBlockNumber(address account) public view returns (uint _blockNumber) {
-        _blockNumber = ordersData.accounts[account];
-    }
-    function getPairBlockNumber(bytes32 _pairKey) public view returns (uint _blockNumber) {
-        _blockNumber = ordersData.pairs[_pairKey];
-    }
-
-    // Price tree navigating
-    function count(bytes32 _pairKey, uint orderType) public view returns (uint _count) {
-        _count = ordersData.orderKeys[_pairKey][orderType].count();
-    }
-    function first(bytes32 _pairKey, uint orderType) public view returns (uint _key) {
-        _key = ordersData.orderKeys[_pairKey][orderType].first();
-    }
-    function last(bytes32 _pairKey, uint orderType) public view returns (uint _key) {
-        _key = ordersData.orderKeys[_pairKey][orderType].last();
-    }
-    function next(bytes32 _pairKey, uint orderType, uint x) public view returns (uint y) {
-        y = ordersData.orderKeys[_pairKey][orderType].next(x);
-    }
-    function prev(bytes32 _pairKey, uint orderType, uint x) public view returns (uint y) {
-        y = ordersData.orderKeys[_pairKey][orderType].prev(x);
-    }
-    function exists(bytes32 _pairKey, uint orderType, uint key) public view returns (bool) {
-        return ordersData.orderKeys[_pairKey][orderType].exists(key);
-    }
-    function getNode(bytes32 _pairKey, uint orderType, uint key) public view returns (uint _returnKey, uint _parent, uint _left, uint _right, bool _red) {
-        return ordersData.orderKeys[_pairKey][orderType].getNode(key);
-    }
-    // Don't need parent, grandparent, sibling, uncle
-
-    function getBestPrice(bytes32 _pairKey, uint orderType) public view returns (uint _key) {
-        if (orderType == uint(Orders.OrderType.BUY)) {
-            _key = ordersData.orderKeys[_pairKey][orderType].last();
-        } else {
-            _key = ordersData.orderKeys[_pairKey][orderType].first();
-        }
-    }
-    function getNextBestPrice(bytes32 _pairKey, uint orderType, uint x) public view returns (uint y) {
-        if (orderType == uint(Orders.OrderType.BUY)) {
-            if (BokkyPooBahsRedBlackTreeLibrary.isSentinel(x)) {
-                y = ordersData.orderKeys[_pairKey][orderType].last();
-            } else {
-                y = ordersData.orderKeys[_pairKey][orderType].prev(x);
-            }
-        } else {
-            if (BokkyPooBahsRedBlackTreeLibrary.isSentinel(x)) {
-                y = ordersData.orderKeys[_pairKey][orderType].first();
-            } else {
-                y = ordersData.orderKeys[_pairKey][orderType].next(x);
-            }
-        }
-    }
-
-    function getNextOrder(bytes32 _pairKey, uint orderType) public view returns (uint) {
-        uint _key;
-        if (orderType == uint(Orders.OrderType.BUY)) {
-            _key = ordersData.orderKeys[_pairKey][orderType].last();
-        } else {
-            _key = ordersData.orderKeys[_pairKey][orderType].first();
-        }
-    }
-
-    function getOrderQueue(bytes32 _pairKey, uint orderType, uint price) public view returns (bool _exists, bytes32 _head, bytes32 _tail) {
-        Orders.OrderQueue memory orderQueue = ordersData.orderQueue[_pairKey][uint(orderType)][price];
-        return (orderQueue.exists, orderQueue.head, orderQueue.tail);
-    }
-    function getOrder(bytes32 orderKey) public view returns (bytes32 _prev, bytes32 _next, uint orderType, address maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, uint baseTokensFilled) {
-        Orders.Order memory order = ordersData.orders[orderKey];
-        return (order.prev, order.next, uint(order.orderType), order.maker, order.baseToken, order.quoteToken, order.price, order.expiry, order.baseTokens, order.baseTokensFilled);
+    constructor(address _feeAccount) public Orders(_feeAccount) {
     }
 
     function addOrder(Orders.OrderType orderType, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens) public returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, */ uint _baseTokensOnOrder, bytes32 _orderKey) {
         // BK TODO - Add check for expiry
         _baseTokensOnOrder = baseTokens;
 
-        bytes32 matchingOrderKey = ordersData.getBestMatchingOrder(orderType, baseToken, quoteToken, price);
+        bytes32 matchingOrderKey = getBestMatchingOrder(orderType, baseToken, quoteToken, price);
         emit LogInfo("addOrder: matchingOrderKey", 0, matchingOrderKey, "", address(0));
 
-        while (matchingOrderKey != SENTINEL && _baseTokensOnOrder > 0) {
+        while (matchingOrderKey != ORDERKEY_SENTINEL && _baseTokensOnOrder > 0) {
             uint _baseTokens;
             uint _quoteTokens;
-            Orders.Order storage order = ordersData.orders[matchingOrderKey];
+            Orders.Order storage order = orders[matchingOrderKey];
             emit LogInfo("addOrder: order", order.baseTokens, matchingOrderKey, "", order.maker);
             (_baseTokens, _quoteTokens) = calculateOrder(matchingOrderKey, _baseTokensOnOrder, msg.sender);
             emit LogInfo("addOrder: order._baseTokens", _baseTokens, matchingOrderKey, "", order.maker);
@@ -973,18 +975,18 @@ contract Dexz is Owned {
                 _baseTokensOnOrder = _baseTokensOnOrder.sub(_baseTokens);
                 // _baseTokensFilled = _baseTokensFilled.add(_baseTokens);
                 // _quoteTokensFilled = _quoteTokensFilled.add(_quoteTokens);
-                ordersData.updateBestMatchingOrder(orderType, baseToken, quoteToken, price, matchingOrderKey);
-                // matchingOrderKey = SENTINEL;
-                matchingOrderKey = ordersData.getBestMatchingOrder(orderType, baseToken, quoteToken, price);
+                updateBestMatchingOrder(orderType, baseToken, quoteToken, price, matchingOrderKey);
+                // matchingOrderKey = ORDERKEY_SENTINEL;
+                matchingOrderKey = getBestMatchingOrder(orderType, baseToken, quoteToken, price);
             }
         }
         if (_baseTokensOnOrder > 0) {
-            _orderKey = ordersData.add(Orders.OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, price, expiry, _baseTokensOnOrder);
+            _orderKey = add(Orders.OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, price, expiry, _baseTokensOnOrder);
         }
     }
 
     function calculateOrder(bytes32 _matchingOrderKey, uint amountBaseTokens, address taker) public returns (uint baseTokens, uint quoteTokens) {
-        Orders.Order storage matchingOrder = ordersData.orders[_matchingOrderKey];
+        Orders.Order storage matchingOrder = orders[_matchingOrderKey];
         require(now <= matchingOrder.expiry);
 
         // // Maker buying base, needs to have amount in quote = base x price
@@ -1122,26 +1124,6 @@ contract Dexz is Owned {
         // require(order.maker == msg.sender);
         // order.baseTokens = order.baseTokensFilled;
         // emit OrderRemoved(key);
-        ordersData.remove(key, msg.sender);
-    }
-
-    function transferFrom(address token, address from, address to, uint tokens) internal {
-        TokenWhitelistStatus whitelistStatus = tokenWhitelist[token];
-        // Difference in gas for 2 x maker fills - wl 293405, no wl 326,112
-        if (whitelistStatus == TokenWhitelistStatus.WHITELIST) {
-            require(ERC20Interface(token).transferFrom(from, to, tokens));
-        } else if (whitelistStatus == TokenWhitelistStatus.NONE) {
-            uint balanceToBefore = ERC20Interface(token).balanceOf(to);
-            require(ERC20Interface(token).transferFrom(from, to, tokens));
-            uint balanceToAfter = ERC20Interface(token).balanceOf(to);
-            require(balanceToBefore.add(tokens) == balanceToAfter);
-        } else {
-            revert();
-        }
-    }
-
-    function availableTokens(address token, address wallet) internal view returns (uint _tokens) {
-        _tokens = ERC20Interface(token).allowance(wallet, address(this));
-        _tokens = _tokens.min(ERC20Interface(token).balanceOf(wallet));
+        remove(key, msg.sender);
     }
 }

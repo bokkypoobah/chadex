@@ -1,6 +1,6 @@
 // 16 Dec 2018 11:56 AEDT ETH/USD from CMC and ethgasstation.info
-var ethPriceUSD = 84.57;
-var defaultGasPrice = web3.toWei(2.4, "gwei");
+var ethPriceUSD = 135.91;
+var defaultGasPrice = web3.toWei(5, "gwei");
 
 // -----------------------------------------------------------------------------
 // Accounts

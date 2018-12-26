@@ -125,42 +125,6 @@ console.log("RESULT: ");
 
 // -----------------------------------------------------------------------------
 var deployGroup2Message = "Deploy Group #2";
-// -----------------------------------------------------------------------------
-console.log("RESULT: ---------- " + deployGroup2Message + " ----------");
-var rbtLibName = "BokkyPooBahsRedBlackTreeLibrary.sol:BokkyPooBahsRedBlackTreeLibrary";
-var rbtLibSearchHash = "__\$" + web3.sha3(rbtLibName).substring(2, 36) + "\$__";
-// console.log("RESULT: rbtLibSearchHash='" + rbtLibSearchHash + "'");
-// console.log("RESULT: old='" + ordersLibBin + "'");
-var newOrdersLibBin = ordersLibBin.split(rbtLibSearchHash).join(rbtLibAddress.substring(2, 42));
-// console.log("RESULT: new='" + newOrdersLibBin + "'");
-var ordersLibContract = web3.eth.contract(ordersLibAbi);
-var ordersLibTx = null;
-var ordersLibAddress = null;
-var rbtLib = rbtLibContract.new({from: deployer, data: newOrdersLibBin, gas: 3000000, gasPrice: defaultGasPrice},
-  function(e, contract) {
-    if (!e) {
-      if (!contract.address) {
-        ordersLibTx = contract.transactionHash;
-      } else {
-        ordersLibAddress = contract.address;
-        addAccount(ordersLibAddress, "OrdersLib");
-        console.log("DATA: var ordersLibAddress=\"" + ordersLibAddress + "\";");
-        console.log("DATA: var ordersLibAbi=" + JSON.stringify(ordersLibAbi) + ";");
-        console.log("DATA: var rbtLib=eth.contract(ordersLibAbi).at(ordersLibAddress);");
-      }
-    }
-  }
-);
-while (txpool.status.pending > 0) {
-}
-printBalances();
-failIfTxStatusError(ordersLibTx, deployGroup2Message + " - OrdersLib");
-printTxData("ordersLibTx", ordersLibTx);
-console.log("RESULT: ");
-
-
-// -----------------------------------------------------------------------------
-var deployGroup3Message = "Deploy Group #3";
 var numberOfTokens = $NUMBEROFTOKENS;
 var _tokenSymbols = "$TOKENSYMBOLS".split(":");
 var _tokenNames = "$TOKENNAMES".split(":");
@@ -173,12 +137,12 @@ var _tokenInitialDistributions = "$TOKENINITIALDISTRIBUTION".split(":");
 // console.log("RESULT: _tokenInitialSupplies = " + JSON.stringify(_tokenInitialSupplies));
 // console.log("RESULT: _tokenInitialDistributions = " + JSON.stringify(_tokenInitialDistributions));
 // -----------------------------------------------------------------------------
-console.log("RESULT: ---------- " + deployGroup3Message + " ----------");
-var ordersLibName = "Orders.sol:Orders";
-var ordersLibSearchHash = "__\$" + web3.sha3(ordersLibName).substring(2, 36) + "\$__";
-// console.log("RESULT: ordersLibSearchHash='" + ordersLibSearchHash + "'");
+console.log("RESULT: ---------- " + deployGroup2Message + " ----------");
+var rbtLibName = "BokkyPooBahsRedBlackTreeLibrary.sol:BokkyPooBahsRedBlackTreeLibrary";
+var rbtLibSearchHash = "__\$" + web3.sha3(rbtLibName).substring(2, 36) + "\$__";
+// console.log("RESULT: rbtLibSearchHash='" + rbtLibSearchHash + "'");
 // console.log("RESULT: old='" + dexzBin + "'");
-var newDexzBin = dexzBin.split(rbtLibSearchHash).join(rbtLibAddress.substring(2, 42)).split(ordersLibSearchHash).join(ordersLibAddress.substring(2, 42));
+var newDexzBin = dexzBin.split(rbtLibSearchHash).join(rbtLibAddress.substring(2, 42));
 // console.log("RESULT: new='" + newDexzBin + "'");
 
 var dexzContract = web3.eth.contract(dexzAbi);
@@ -233,9 +197,9 @@ for (i = 0; i < numberOfTokens; i++) {
 while (txpool.status.pending > 0) {
 }
 printBalances();
-failIfTxStatusError(dexzTx, deployGroup3Message + " - DexOneExchange");
+failIfTxStatusError(dexzTx, deployGroup2Message + " - DexOneExchange");
 for (i = 0; i < numberOfTokens; i++) {
-  failIfTxStatusError(tokenTxs[i], deployGroup3Message + " - Token ''" + tokens[i].symbol() + "' '" + tokens[i].name() + "'");
+  failIfTxStatusError(tokenTxs[i], deployGroup2Message + " - Token ''" + tokens[i].symbol() + "' '" + tokens[i].name() + "'");
 }
 printTxData("dexzTx", dexzTx);
 for (i = 0; i < numberOfTokens; i++) {
@@ -252,9 +216,9 @@ console.log("RESULT: ");
 
 
 // -----------------------------------------------------------------------------
-var deployGroup4Message = "Deploy Group #4";
+var deployGroup3Message = "Deploy Group #3";
 // -----------------------------------------------------------------------------
-console.log("RESULT: ---------- " + deployGroup4Message + " ----------");
+console.log("RESULT: ---------- " + deployGroup3Message + " ----------");
 var users = [user1, user2, user3, user4, user5, user6];
 var deployGroup2_Txs = [];
 var userNumber = 1;
@@ -271,7 +235,7 @@ while (txpool.status.pending > 0) {
 }
 printBalances();
 deployGroup2_Txs.forEach(function(t) {
-  failIfTxStatusError(t, deployGroup4Message + " - Distribute tokens and approve spending - " + t);
+  failIfTxStatusError(t, deployGroup3Message + " - Distribute tokens and approve spending - " + t);
 });
 deployGroup2_Txs.forEach(function(t) {
   printTxData("", t);
@@ -498,3 +462,4 @@ grep "DATA: " $TEST1OUTPUT | sed "s/DATA: //" > $DEPLOYMENTDATA
 cat $DEPLOYMENTDATA
 grep "RESULT: " $TEST1OUTPUT | sed "s/RESULT: //" > $TEST1RESULTS
 cat $TEST1RESULTS
+egrep -e "dexzTx.*gasUsed|ordersTx.*gasUsed" $TEST1RESULTS

@@ -10,173 +10,31 @@ pragma solidity ^0.5.0;
 //
 // ----------------------------------------------------------------------------
 
-import "SafeMath.sol";
-import "ERC20Interface.sol";
-import "Owned.sol";
 import "Orders.sol";
 
 
 // ----------------------------------------------------------------------------
 // Dexz contract
 // ----------------------------------------------------------------------------
-contract Dexz is Owned {
-    using SafeMath for uint;
+contract Dexz is Orders {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
-    using Orders for Orders.Data;
 
-    bytes32 private constant SENTINEL = 0x0;
-
-    enum TokenWhitelistStatus {
-        NONE,
-        BLACKLIST,
-        WHITELIST
-    }
-    enum OrderType {
-        BUY,
-        SELL
-    }
-
-    struct Order {
-        OrderType orderType;
-        address maker;
-        address baseToken;
-        address quoteToken;
-        uint price;             // baseToken/quoteToken = #quoteToken per unit baseToken
-        uint expiry;
-        uint baseTokens;
-        uint baseTokensFilled;
-    }
-
-    uint constant private TENPOW18 = uint(10)**18;
-
-    uint public deploymentBlockNumber;
-    uint public takerFee = 10 * uint(10)**14; // 0.10%
-    address public feeAccount;
-
-    mapping(address => TokenWhitelistStatus) public tokenWhitelist;
-
-    Orders.Data public ordersData;
-
-    event TokenWhitelistUpdated(address indexed token, uint oldStatus, uint newStatus);
-    event TakerFeeUpdated(uint oldTakerFee, uint newTakerFee);
-    event FeeAccountUpdated(address oldFeeAccount, address newFeeAccount);
-    event TokenAdded(address indexed token);
-    event AccountAdded(address indexed account);
-    event PairAdded(bytes32 indexed pairKey, address indexed baseToken, address indexed quoteToken);
-
-    event OrderAdded(bytes32 indexed pairKey, bytes32 indexed key, uint orderType, address indexed maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens);
-    event OrderRemoved(bytes32 indexed key);
-    event OrderUpdated(bytes32 indexed key, uint baseTokens, uint newBaseTokens);
-
-    event LogInfo(string topic, uint number, bytes32 data, string note, address addr);
     event Trade(bytes32 indexed key, uint orderType, address indexed taker, address indexed maker, uint amount, address baseToken, address quoteToken, uint baseTokens, uint quoteTokens, uint feeBaseTokens, uint feeQuoteTokens, uint baseTokensFilled);
 
-    constructor(address _feeAccount) public {
-        deploymentBlockNumber = block.number;
-        initOwned(msg.sender);
-        feeAccount = _feeAccount;
-        ordersData.init();
-        ordersData.addAccount(address(this));
-    }
-    function whitelistToken(address token, uint status) public onlyOwner {
-        emit TokenWhitelistUpdated(token, uint(tokenWhitelist[token]), status);
-        tokenWhitelist[token] = TokenWhitelistStatus(status);
-    }
-    function setTakerFee(uint _takerFee) public onlyOwner {
-        emit TakerFeeUpdated(takerFee, _takerFee);
-        takerFee = _takerFee;
-    }
-    function setFeeAccount(address _feeAccount) public onlyOwner {
-        emit FeeAccountUpdated(feeAccount, _feeAccount);
-        feeAccount = _feeAccount;
-    }
-
-    function getTokenBlockNumber(address token) public view returns (uint _blockNumber) {
-        _blockNumber = ordersData.tokens[token];
-    }
-    function getAccountBlockNumber(address account) public view returns (uint _blockNumber) {
-        _blockNumber = ordersData.accounts[account];
-    }
-    function getPairBlockNumber(bytes32 _pairKey) public view returns (uint _blockNumber) {
-        _blockNumber = ordersData.pairs[_pairKey];
-    }
-
-    // Price tree navigating
-    function count(bytes32 _pairKey, uint orderType) public view returns (uint _count) {
-        _count = ordersData.orderKeys[_pairKey][orderType].count();
-    }
-    function first(bytes32 _pairKey, uint orderType) public view returns (uint _key) {
-        _key = ordersData.orderKeys[_pairKey][orderType].first();
-    }
-    function last(bytes32 _pairKey, uint orderType) public view returns (uint _key) {
-        _key = ordersData.orderKeys[_pairKey][orderType].last();
-    }
-    function next(bytes32 _pairKey, uint orderType, uint x) public view returns (uint y) {
-        y = ordersData.orderKeys[_pairKey][orderType].next(x);
-    }
-    function prev(bytes32 _pairKey, uint orderType, uint x) public view returns (uint y) {
-        y = ordersData.orderKeys[_pairKey][orderType].prev(x);
-    }
-    function exists(bytes32 _pairKey, uint orderType, uint key) public view returns (bool) {
-        return ordersData.orderKeys[_pairKey][orderType].exists(key);
-    }
-    function getNode(bytes32 _pairKey, uint orderType, uint key) public view returns (uint _returnKey, uint _parent, uint _left, uint _right, bool _red) {
-        return ordersData.orderKeys[_pairKey][orderType].getNode(key);
-    }
-    // Don't need parent, grandparent, sibling, uncle
-
-    function getBestPrice(bytes32 _pairKey, uint orderType) public view returns (uint _key) {
-        if (orderType == uint(Orders.OrderType.BUY)) {
-            _key = ordersData.orderKeys[_pairKey][orderType].last();
-        } else {
-            _key = ordersData.orderKeys[_pairKey][orderType].first();
-        }
-    }
-    function getNextBestPrice(bytes32 _pairKey, uint orderType, uint x) public view returns (uint y) {
-        if (orderType == uint(Orders.OrderType.BUY)) {
-            if (BokkyPooBahsRedBlackTreeLibrary.isSentinel(x)) {
-                y = ordersData.orderKeys[_pairKey][orderType].last();
-            } else {
-                y = ordersData.orderKeys[_pairKey][orderType].prev(x);
-            }
-        } else {
-            if (BokkyPooBahsRedBlackTreeLibrary.isSentinel(x)) {
-                y = ordersData.orderKeys[_pairKey][orderType].first();
-            } else {
-                y = ordersData.orderKeys[_pairKey][orderType].next(x);
-            }
-        }
-    }
-
-    function getNextOrder(bytes32 _pairKey, uint orderType) public view returns (uint) {
-        uint _key;
-        if (orderType == uint(Orders.OrderType.BUY)) {
-            _key = ordersData.orderKeys[_pairKey][orderType].last();
-        } else {
-            _key = ordersData.orderKeys[_pairKey][orderType].first();
-        }
-    }
-
-    function getOrderQueue(bytes32 _pairKey, uint orderType, uint price) public view returns (bool _exists, bytes32 _head, bytes32 _tail) {
-        Orders.OrderQueue memory orderQueue = ordersData.orderQueue[_pairKey][uint(orderType)][price];
-        return (orderQueue.exists, orderQueue.head, orderQueue.tail);
-    }
-    function getOrder(bytes32 orderKey) public view returns (bytes32 _prev, bytes32 _next, uint orderType, address maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, uint baseTokensFilled) {
-        Orders.Order memory order = ordersData.orders[orderKey];
-        return (order.prev, order.next, uint(order.orderType), order.maker, order.baseToken, order.quoteToken, order.price, order.expiry, order.baseTokens, order.baseTokensFilled);
+    constructor(address _feeAccount) public Orders(_feeAccount) {
     }
 
     function addOrder(Orders.OrderType orderType, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens) public returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, */ uint _baseTokensOnOrder, bytes32 _orderKey) {
         // BK TODO - Add check for expiry
         _baseTokensOnOrder = baseTokens;
 
-        bytes32 matchingOrderKey = ordersData.getBestMatchingOrder(orderType, baseToken, quoteToken, price);
+        bytes32 matchingOrderKey = getBestMatchingOrder(orderType, baseToken, quoteToken, price);
         emit LogInfo("addOrder: matchingOrderKey", 0, matchingOrderKey, "", address(0));
 
-        while (matchingOrderKey != SENTINEL && _baseTokensOnOrder > 0) {
+        while (matchingOrderKey != ORDERKEY_SENTINEL && _baseTokensOnOrder > 0) {
             uint _baseTokens;
             uint _quoteTokens;
-            Orders.Order storage order = ordersData.orders[matchingOrderKey];
+            Orders.Order storage order = orders[matchingOrderKey];
             emit LogInfo("addOrder: order", order.baseTokens, matchingOrderKey, "", order.maker);
             (_baseTokens, _quoteTokens) = calculateOrder(matchingOrderKey, _baseTokensOnOrder, msg.sender);
             emit LogInfo("addOrder: order._baseTokens", _baseTokens, matchingOrderKey, "", order.maker);
@@ -213,18 +71,18 @@ contract Dexz is Owned {
                 _baseTokensOnOrder = _baseTokensOnOrder.sub(_baseTokens);
                 // _baseTokensFilled = _baseTokensFilled.add(_baseTokens);
                 // _quoteTokensFilled = _quoteTokensFilled.add(_quoteTokens);
-                ordersData.updateBestMatchingOrder(orderType, baseToken, quoteToken, price, matchingOrderKey);
-                // matchingOrderKey = SENTINEL;
-                matchingOrderKey = ordersData.getBestMatchingOrder(orderType, baseToken, quoteToken, price);
+                updateBestMatchingOrder(orderType, baseToken, quoteToken, price, matchingOrderKey);
+                // matchingOrderKey = ORDERKEY_SENTINEL;
+                matchingOrderKey = getBestMatchingOrder(orderType, baseToken, quoteToken, price);
             }
         }
         if (_baseTokensOnOrder > 0) {
-            _orderKey = ordersData.add(Orders.OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, price, expiry, _baseTokensOnOrder);
+            _orderKey = add(Orders.OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, price, expiry, _baseTokensOnOrder);
         }
     }
 
     function calculateOrder(bytes32 _matchingOrderKey, uint amountBaseTokens, address taker) public returns (uint baseTokens, uint quoteTokens) {
-        Orders.Order storage matchingOrder = ordersData.orders[_matchingOrderKey];
+        Orders.Order storage matchingOrder = orders[_matchingOrderKey];
         require(now <= matchingOrder.expiry);
 
         // // Maker buying base, needs to have amount in quote = base x price
@@ -362,26 +220,6 @@ contract Dexz is Owned {
         // require(order.maker == msg.sender);
         // order.baseTokens = order.baseTokensFilled;
         // emit OrderRemoved(key);
-        ordersData.remove(key, msg.sender);
-    }
-
-    function transferFrom(address token, address from, address to, uint tokens) internal {
-        TokenWhitelistStatus whitelistStatus = tokenWhitelist[token];
-        // Difference in gas for 2 x maker fills - wl 293405, no wl 326,112
-        if (whitelistStatus == TokenWhitelistStatus.WHITELIST) {
-            require(ERC20Interface(token).transferFrom(from, to, tokens));
-        } else if (whitelistStatus == TokenWhitelistStatus.NONE) {
-            uint balanceToBefore = ERC20Interface(token).balanceOf(to);
-            require(ERC20Interface(token).transferFrom(from, to, tokens));
-            uint balanceToAfter = ERC20Interface(token).balanceOf(to);
-            require(balanceToBefore.add(tokens) == balanceToAfter);
-        } else {
-            revert();
-        }
-    }
-
-    function availableTokens(address token, address wallet) internal view returns (uint _tokens) {
-        _tokens = ERC20Interface(token).allowance(wallet, address(this));
-        _tokens = _tokens.min(ERC20Interface(token).balanceOf(wallet));
+        remove(key, msg.sender);
     }
 }
