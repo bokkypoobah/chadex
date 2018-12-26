@@ -705,30 +705,18 @@ contract Orders is DexzBase {
 
 
     function getBestPrice(bytes32 _pairKey, uint _orderType) public view returns (uint _key) {
-        if (_orderType == ORDERTYPE_BUY) {
-            _key = orderKeys[_pairKey][_orderType].last();
-        } else {
-            _key = orderKeys[_pairKey][_orderType].first();
-        }
+        _key = (_orderType == ORDERTYPE_BUY) ? orderKeys[_pairKey][_orderType].last() : orderKeys[_pairKey][_orderType].first();
     }
     function getNextBestPrice(bytes32 _pairKey, uint _orderType, uint _x) public view returns (uint _y) {
-        if (_orderType == ORDERTYPE_BUY) {
-            if (BokkyPooBahsRedBlackTreeLibrary.isSentinel(_x)) {
-                _y = orderKeys[_pairKey][_orderType].last();
-            } else {
-                _y = orderKeys[_pairKey][_orderType].prev(_x);
-            }
+        if (BokkyPooBahsRedBlackTreeLibrary.isSentinel(_x)) {
+            _y = (_orderType == ORDERTYPE_BUY) ? orderKeys[_pairKey][_orderType].last() : orderKeys[_pairKey][_orderType].first();
         } else {
-            if (BokkyPooBahsRedBlackTreeLibrary.isSentinel(_x)) {
-                _y = orderKeys[_pairKey][_orderType].first();
-            } else {
-                _y = orderKeys[_pairKey][_orderType].next(_x);
-            }
+            _y = (_orderType == ORDERTYPE_BUY) ? orderKeys[_pairKey][_orderType].prev(_x) : orderKeys[_pairKey][_orderType].next(_x);
         }
     }
 
-    function getOrderQueue(bytes32 _pairKey, uint _orderType, uint price) public view returns (bool _exists, bytes32 _head, bytes32 _tail) {
-        Orders.OrderQueue memory _orderQueue = orderQueue[_pairKey][_orderType][price];
+    function getOrderQueue(bytes32 _pairKey, uint _orderType, uint _price) public view returns (bool _exists, bytes32 _head, bytes32 _tail) {
+        Orders.OrderQueue memory _orderQueue = orderQueue[_pairKey][_orderType][_price];
         return (_orderQueue.exists, _orderQueue.head, _orderQueue.tail);
     }
     function getOrder(bytes32 _orderKey) public view returns (bytes32 _prev, bytes32 _next, uint _orderType, address maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, uint baseTokensFilled) {
@@ -744,10 +732,8 @@ contract Orders is DexzBase {
         if (priceKeys.initialised) {
             emit LogInfo("getBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
             uint priceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
-            // bool priceCheck = (priceKey == PRICEKEY_SENTINEL) ? false : (_orderType == OrderType.BUY) ? priceKey <= price : priceKey >= price;
-            // priceCheck = true;
-            // while (priceCheck && priceKey != PRICEKEY_SENTINEL) {
-            while (priceKey != PRICEKEY_SENTINEL) {
+            bool priceOk = (priceKey == PRICEKEY_SENTINEL) ? false : (_orderType == ORDERTYPE_BUY) ? priceKey <= price : priceKey >= price;
+            while (priceOk) {
                 emit LogInfo("getBestMatchingOrder: priceKey", priceKey, 0x0, "", address(0));
                 OrderQueue storage _orderQueue = orderQueue[_pairKey][_inverseOrderType][priceKey];
                 if (_orderQueue.exists) {
@@ -767,6 +753,7 @@ contract Orders is DexzBase {
 
                 }
                 priceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.next(priceKey) : priceKeys.prev(priceKey);
+                priceOk = (priceKey == PRICEKEY_SENTINEL) ? false : (_orderType == ORDERTYPE_BUY) ? priceKey <= price : priceKey >= price;
             }
             // OrderQueue storage orderQueue = self.orderQueue[_pairKey][_orderType][price];
         }
