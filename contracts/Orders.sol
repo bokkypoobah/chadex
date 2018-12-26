@@ -128,7 +128,7 @@ contract Orders is DexzBase {
     }
 
 
-    function getBestMatchingOrder(OrderType orderType, address baseToken, address quoteToken, uint price) internal returns (bytes32 _orderKey) {
+    function _getBestMatchingOrder(OrderType orderType, address baseToken, address quoteToken, uint price) internal returns (bytes32 _orderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         OrderType _inverseOrderType = inverseOrderType(orderType);
         BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = orderKeys[_pairKey][uint(_inverseOrderType)];
@@ -163,7 +163,7 @@ contract Orders is DexzBase {
         }
         return ORDERKEY_SENTINEL;
     }
-    function updateBestMatchingOrder(OrderType orderType, address baseToken, address quoteToken, uint price, bytes32 matchingOrderKey) internal returns (bytes32 _orderKey) {
+    function _updateBestMatchingOrder(OrderType orderType, address baseToken, address quoteToken, uint price, bytes32 matchingOrderKey) internal returns (bytes32 _orderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         OrderType _inverseOrderType = inverseOrderType(orderType);
         BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = orderKeys[_pairKey][uint(_inverseOrderType)];
@@ -211,7 +211,7 @@ contract Orders is DexzBase {
         }
         return ORDERKEY_SENTINEL;
     }
-    function add(OrderType orderType, address maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens) internal returns (bytes32 _orderKey) {
+    function _addOrder(OrderType orderType, address maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens) internal returns (bytes32 _orderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         _orderKey = orderKey(orderType, maker, baseToken, quoteToken, price, expiry);
         require(orders[_orderKey].maker == address(0));
@@ -256,7 +256,7 @@ contract Orders is DexzBase {
 
         emit OrderAdded(_pairKey, _orderKey, uint(orderType), maker, baseToken, quoteToken, price, expiry, baseTokens);
     }
-    function remove(bytes32 _orderKey, address msgSender) internal {
+    function _removeOrder(bytes32 _orderKey, address msgSender) internal {
         require(_orderKey != ORDERKEY_SENTINEL);
         Order memory order = orders[_orderKey];
         require(order.maker == msgSender);

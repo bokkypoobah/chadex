@@ -739,7 +739,7 @@ contract Orders is DexzBase {
     }
 
 
-    function getBestMatchingOrder(OrderType orderType, address baseToken, address quoteToken, uint price) internal returns (bytes32 _orderKey) {
+    function _getBestMatchingOrder(OrderType orderType, address baseToken, address quoteToken, uint price) internal returns (bytes32 _orderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         OrderType _inverseOrderType = inverseOrderType(orderType);
         BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = orderKeys[_pairKey][uint(_inverseOrderType)];
@@ -774,7 +774,7 @@ contract Orders is DexzBase {
         }
         return ORDERKEY_SENTINEL;
     }
-    function updateBestMatchingOrder(OrderType orderType, address baseToken, address quoteToken, uint price, bytes32 matchingOrderKey) internal returns (bytes32 _orderKey) {
+    function _updateBestMatchingOrder(OrderType orderType, address baseToken, address quoteToken, uint price, bytes32 matchingOrderKey) internal returns (bytes32 _orderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         OrderType _inverseOrderType = inverseOrderType(orderType);
         BokkyPooBahsRedBlackTreeLibrary.Tree storage keys = orderKeys[_pairKey][uint(_inverseOrderType)];
@@ -822,7 +822,7 @@ contract Orders is DexzBase {
         }
         return ORDERKEY_SENTINEL;
     }
-    function add(OrderType orderType, address maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens) internal returns (bytes32 _orderKey) {
+    function _addOrder(OrderType orderType, address maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens) internal returns (bytes32 _orderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         _orderKey = orderKey(orderType, maker, baseToken, quoteToken, price, expiry);
         require(orders[_orderKey].maker == address(0));
@@ -867,7 +867,7 @@ contract Orders is DexzBase {
 
         emit OrderAdded(_pairKey, _orderKey, uint(orderType), maker, baseToken, quoteToken, price, expiry, baseTokens);
     }
-    function remove(bytes32 _orderKey, address msgSender) internal {
+    function _removeOrder(bytes32 _orderKey, address msgSender) internal {
         require(_orderKey != ORDERKEY_SENTINEL);
         Order memory order = orders[_orderKey];
         require(order.maker == msgSender);
@@ -928,11 +928,11 @@ contract Dexz is Orders {
     constructor(address _feeAccount) public Orders(_feeAccount) {
     }
 
-    function addOrder(Orders.OrderType orderType, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens) public returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, */ uint _baseTokensOnOrder, bytes32 _orderKey) {
+    function addOrder(Orders.OrderType orderType, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, */ uint _baseTokensOnOrder, bytes32 _orderKey) {
         // BK TODO - Add check for expiry
         _baseTokensOnOrder = baseTokens;
 
-        bytes32 matchingOrderKey = getBestMatchingOrder(orderType, baseToken, quoteToken, price);
+        bytes32 matchingOrderKey = _getBestMatchingOrder(orderType, baseToken, quoteToken, price);
         emit LogInfo("addOrder: matchingOrderKey", 0, matchingOrderKey, "", address(0));
 
         while (matchingOrderKey != ORDERKEY_SENTINEL && _baseTokensOnOrder > 0) {
@@ -957,7 +957,8 @@ contract Dexz is Orders {
                     transferFrom(order.baseToken, msg.sender, order.maker, _baseTokens);
                     transferFrom(order.quoteToken, order.maker, msg.sender, _quoteTokens.sub(takerFeeTokens));
                     if (takerFeeTokens > 0) {
-                        transferFrom(order.quoteToken, order.maker, feeAccount, takerFeeTokens);
+                        transferFrom(order.quoteToken, order.maker, uiFeeAccount, takerFeeTokens/2);
+                        transferFrom(order.quoteToken, order.maker, feeAccount, takerFeeTokens - takerFeeTokens/2);
                     }
 
                 } else {
@@ -969,23 +970,24 @@ contract Dexz is Orders {
                     transferFrom(order.quoteToken, msg.sender, order.maker, _quoteTokens);
                     transferFrom(order.baseToken, order.maker, msg.sender, _baseTokens.sub(takerFeeTokens));
                     if (takerFeeTokens > 0) {
-                        transferFrom(order.baseToken, order.maker, feeAccount, takerFeeTokens);
+                        transferFrom(order.baseToken, order.maker, uiFeeAccount, takerFeeTokens/2);
+                        transferFrom(order.baseToken, order.maker, feeAccount, takerFeeTokens - takerFeeTokens/2);
                     }
                 }
                 _baseTokensOnOrder = _baseTokensOnOrder.sub(_baseTokens);
                 // _baseTokensFilled = _baseTokensFilled.add(_baseTokens);
                 // _quoteTokensFilled = _quoteTokensFilled.add(_quoteTokens);
-                updateBestMatchingOrder(orderType, baseToken, quoteToken, price, matchingOrderKey);
+                _updateBestMatchingOrder(orderType, baseToken, quoteToken, price, matchingOrderKey);
                 // matchingOrderKey = ORDERKEY_SENTINEL;
-                matchingOrderKey = getBestMatchingOrder(orderType, baseToken, quoteToken, price);
+                matchingOrderKey = _getBestMatchingOrder(orderType, baseToken, quoteToken, price);
             }
         }
         if (_baseTokensOnOrder > 0) {
-            _orderKey = add(Orders.OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, price, expiry, _baseTokensOnOrder);
+            _orderKey = _addOrder(Orders.OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, price, expiry, _baseTokensOnOrder);
         }
     }
 
-    function calculateOrder(bytes32 _matchingOrderKey, uint amountBaseTokens, address taker) public returns (uint baseTokens, uint quoteTokens) {
+    function calculateOrder(bytes32 _matchingOrderKey, uint amountBaseTokens, address taker) internal returns (uint baseTokens, uint quoteTokens) {
         Orders.Order storage matchingOrder = orders[_matchingOrderKey];
         require(now <= matchingOrder.expiry);
 
@@ -1120,10 +1122,6 @@ contract Dexz is Orders {
     }
     */
     function removeOrder(bytes32 key) public {
-        // Order storage order = orders[key];
-        // require(order.maker == msg.sender);
-        // order.baseTokens = order.baseTokensFilled;
-        // emit OrderRemoved(key);
-        remove(key, msg.sender);
+        _removeOrder(key, msg.sender);
     }
 }

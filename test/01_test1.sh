@@ -282,7 +282,7 @@ for (var ordersLoop = 0; ordersLoop < 2; ordersLoop++) {
   console.log("RESULT: ---------- " + addOrders1Message + " loop " + ordersLoop + " ----------");
   for (i = 0; i < orders.length; i++) {
     var order = orders[i];
-    ordersTxs.push(dexz.addOrder(order.buySell, order.baseToken, order.quoteToken, order.price, order.expiry, order.amount, {from: order.user, gas: 3000000, gasPrice: defaultGasPrice}));
+    ordersTxs.push(dexz.addOrder(order.buySell, order.baseToken, order.quoteToken, order.price, order.expiry, order.amount, deployer, {from: order.user, gas: 3000000, gasPrice: defaultGasPrice}));
     while (txpool.status.pending > 0) {
     }
   }
