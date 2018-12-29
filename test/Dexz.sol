@@ -24,68 +24,109 @@ contract Dexz is Orders {
     constructor(address _feeAccount) public Orders(_feeAccount) {
     }
 
-    function addOrder(uint orderType, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, */ uint _baseTokensOnOrder, bytes32 _orderKey) {
-        // BK TODO - Add check for expiry
-        _baseTokensOnOrder = baseTokens;
+    // function trade(uint orderType, address taker, address maker, address uiFeeAccount, address baseToken, address quoteToken, uint[2] memory tokens) internal {
+    function trade(uint orderType, address[5] memory addresses, uint[2] memory tokens, bytes32 matchingOrderKey) internal {
+        uint takerFeeTokens;
+        uint _baseTokens = tokens[0];
+        uint _quoteTokens = tokens[1];
 
-        bytes32 matchingOrderKey = _getBestMatchingOrder(orderType, baseToken, quoteToken, price);
-        emit LogInfo("addOrder: matchingOrderKey", 0, matchingOrderKey, "", address(0));
+        // address taker = addresses[0];
+        // address maker = addresses[1];
+        // address uiFeeAccount = addresses[2];
+        // address baseToken = addresses[3];
+        // address quoteToken = addresses[4];
 
-        while (matchingOrderKey != ORDERKEY_SENTINEL && _baseTokensOnOrder > 0) {
-            uint _baseTokens;
-            uint _quoteTokens;
-            Orders.Order storage order = orders[matchingOrderKey];
-            emit LogInfo("addOrder: order", order.baseTokens, matchingOrderKey, "", order.maker);
-            (_baseTokens, _quoteTokens) = calculateOrder(matchingOrderKey, _baseTokensOnOrder, msg.sender);
-            emit LogInfo("addOrder: order._baseTokens", _baseTokens, matchingOrderKey, "", order.maker);
-            emit LogInfo("addOrder: order._quoteTokens", _quoteTokens, matchingOrderKey, "", order.maker);
+        // TODO
+        uint __orderBaseTokensFilled = 0;
 
-            if (_baseTokens > 0 && _quoteTokens > 0) {
-                order.baseTokensFilled = order.baseTokensFilled.add(_baseTokens);
-                uint takerFeeTokens;
+        if (orderType == ORDERTYPE_BUY) {
+            emit LogInfo("trade: BUY", 0, 0x0, "", address(0));
 
-                if (orderType == ORDERTYPE_BUY) {
-                    emit LogInfo("addOrder: order BUY", 0, 0x0, "", address(0));
+            takerFeeTokens = _baseTokens.mul(takerFee).div(TENPOW18);
+            // emit Trade(matchingOrderKey, uint(orderType), msg.sender, order.maker, baseTokens, order.baseToken, order.quoteToken, _baseTokens.sub(takerFeeTokens), _quoteTokens, takerFeeTokens, 0, order.baseTokensFilled);
+            // emit Trade(__matchingOrderKey, orderType, taker, maker, _baseTokens, baseToken, quoteToken, _baseTokens.sub(takerFeeTokens), _quoteTokens, takerFeeTokens, 0, __orderBaseTokensFilled);
+            emit Trade(matchingOrderKey, orderType, addresses[0], addresses[1], _baseTokens, addresses[3], addresses[4], _baseTokens.sub(takerFeeTokens), _quoteTokens, takerFeeTokens, 0, __orderBaseTokensFilled);
 
-                    takerFeeTokens = _baseTokens.mul(takerFee).div(TENPOW18);
-                    // emit Trade(matchingOrderKey, uint(orderType), msg.sender, order.maker, baseTokens, order.baseToken, order.quoteToken, _baseTokens.sub(takerFeeTokens), _quoteTokens, takerFeeTokens, 0, order.baseTokensFilled);
-
-                    transferFrom(order.quoteToken, msg.sender, order.maker, _quoteTokens);
-                    transferFrom(order.baseToken, order.maker, msg.sender, _baseTokens.sub(takerFeeTokens));
-                    if (takerFeeTokens > 0) {
-                        transferFrom(order.baseToken, order.maker, uiFeeAccount, takerFeeTokens/2);
-                        transferFrom(order.baseToken, order.maker, feeAccount, takerFeeTokens - takerFeeTokens/2);
-                    }
+            transferFrom(addresses[4], addresses[0], addresses[1], _quoteTokens);
+            transferFrom(addresses[3], addresses[1], addresses[0], _baseTokens.sub(takerFeeTokens));
+            if (takerFeeTokens > 0) {
+                if (feeAccount == addresses[2] || takerFeeTokens == 1) {
+                    transferFrom(addresses[3], addresses[1], feeAccount, takerFeeTokens);
                 } else {
-                    emit LogInfo("addOrder: order SELL", 0, 0x0, "", address(0));
-
-                    takerFeeTokens = _quoteTokens.mul(takerFee).div(TENPOW18);
-                    // emit Trade(matchingOrderKey, uint(orderType), msg.sender, order.maker, baseTokens, order.baseToken, order.quoteToken, _baseTokens, _quoteTokens.sub(takerFeeTokens), 0, takerFeeTokens, order.baseTokensFilled);
-
-                    transferFrom(order.baseToken, msg.sender, order.maker, _baseTokens);
-                    transferFrom(order.quoteToken, order.maker, msg.sender, _quoteTokens.sub(takerFeeTokens));
-                    if (takerFeeTokens > 0) {
-                        transferFrom(order.quoteToken, order.maker, uiFeeAccount, takerFeeTokens/2);
-                        transferFrom(order.quoteToken, order.maker, feeAccount, takerFeeTokens - takerFeeTokens/2);
-                    }
+                    transferFrom(addresses[3], addresses[1], addresses[2], takerFeeTokens / 2);
+                    transferFrom(addresses[3], addresses[1], feeAccount, takerFeeTokens - takerFeeTokens / 2);
                 }
-                _baseTokensOnOrder = _baseTokensOnOrder.sub(_baseTokens);
-                // _baseTokensFilled = _baseTokensFilled.add(_baseTokens);
-                // _quoteTokensFilled = _quoteTokensFilled.add(_quoteTokens);
-                _updateBestMatchingOrder(orderType, baseToken, quoteToken, price, matchingOrderKey);
-                // matchingOrderKey = ORDERKEY_SENTINEL;
-                matchingOrderKey = _getBestMatchingOrder(orderType, baseToken, quoteToken, price);
             }
-        }
-        if (_baseTokensOnOrder > 0) {
-            require(expiry > now);
-            _orderKey = _addOrder(orderType, msg.sender, baseToken, quoteToken, price, expiry, _baseTokensOnOrder);
+        } else {
+            emit LogInfo("trade: SELL", 0, 0x0, "", address(0));
+
+            takerFeeTokens = _quoteTokens.mul(takerFee).div(TENPOW18);
+            // emit Trade(matchingOrderKey, uint(orderType), msg.sender, order.maker, baseTokens, order.baseToken, order.quoteToken, _baseTokens, _quoteTokens.sub(takerFeeTokens), 0, takerFeeTokens, order.baseTokensFilled);
+            emit Trade(matchingOrderKey, orderType, addresses[0], addresses[1], _baseTokens, addresses[3], addresses[4], _baseTokens, _quoteTokens.sub(takerFeeTokens), takerFeeTokens, 0, __orderBaseTokensFilled);
+
+            transferFrom(addresses[3], addresses[0], addresses[1], _baseTokens);
+            transferFrom(addresses[4], addresses[1], addresses[0], _quoteTokens.sub(takerFeeTokens));
+            if (takerFeeTokens > 0) {
+                if (feeAccount == addresses[2] || takerFeeTokens == 1) {
+                    transferFrom(addresses[4], addresses[1], feeAccount, takerFeeTokens);
+                } else {
+                    transferFrom(addresses[4], addresses[1], addresses[2], takerFeeTokens / 2);
+                    transferFrom(addresses[4], addresses[1], feeAccount, takerFeeTokens - takerFeeTokens / 2);
+                }
+            }
         }
     }
 
-    function calculateOrder(bytes32 _matchingOrderKey, uint amountBaseTokens, address taker) internal returns (uint baseTokens, uint quoteTokens) {
+    function addOrder(uint orderType, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
+        uint matchingPriceKey;
+        bytes32 matchingOrderKey;
+        (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(orderType, baseToken, quoteToken, price);
+        emit LogInfo("addOrder: matchingOrderKey", 0, matchingOrderKey, "", address(0));
+
+        while (matchingOrderKey != ORDERKEY_SENTINEL && baseTokens > 0) {
+            // uint _baseTokens;
+            // uint _quoteTokens;
+            uint[2] memory tokens; // 0 = baseToken, 1 = quoteToken
+            address[5] memory addresses; // 0 = taker, 1 = maker, 2 = uiFeeAccount, 3 = baseToken, 4 = quoteToken
+            bool _orderFilled;
+            Orders.Order storage order = orders[matchingOrderKey];
+            // emit LogInfo("addOrder: order", order.baseTokens, matchingOrderKey, "", order.maker);
+            // (_baseTokens, _quoteTokens, _orderFilled) = calculateOrder(matchingOrderKey, baseTokens, msg.sender);
+            (tokens, _orderFilled) = calculateOrder(matchingOrderKey, baseTokens, msg.sender);
+            // emit LogInfo("addOrder: order._baseTokens", _baseTokens, matchingOrderKey, "", order.maker);
+            // emit LogInfo("addOrder: order._quoteTokens", _quoteTokens, matchingOrderKey, "", order.maker);
+
+            // if (_baseTokens > 0 && _quoteTokens > 0) {
+            if (tokens[0] > 0 && tokens[1] > 0) {
+                // order.baseTokensFilled = order.baseTokensFilled.add(_baseTokens);
+                order.baseTokensFilled = order.baseTokensFilled.add(tokens[0]);
+                // trade(orderType, msg.sender, order.maker, uiFeeAccount, baseToken, quoteToken, _baseTokens, _quoteTokens);
+                addresses[0] = msg.sender;
+                addresses[1] = order.maker;
+                addresses[2] = uiFeeAccount;
+                addresses[3] = baseToken;
+                addresses[4] = quoteToken;
+                // trade(orderType, msg.sender, order.maker, uiFeeAccount, baseToken, quoteToken, tokens);
+                trade(orderType, addresses, tokens, matchingOrderKey);
+                baseTokens = baseTokens.sub(tokens[0]);
+                // _baseTokensFilled = _baseTokensFilled.add(_baseTokens);
+                // _quoteTokensFilled = _quoteTokensFilled.add(_quoteTokens);
+                _updateBestMatchingOrder(orderType, baseToken, quoteToken, matchingPriceKey, matchingOrderKey, _orderFilled);
+                // matchingOrderKey = ORDERKEY_SENTINEL;
+                (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(orderType, baseToken, quoteToken, price);
+            }
+        }
+        if (baseTokens > 0) {
+            require(expiry > now);
+            _orderKey = _addOrder(orderType, msg.sender, baseToken, quoteToken, price, expiry, baseTokens);
+        }
+    }
+
+    function calculateOrder(bytes32 _matchingOrderKey, uint amountBaseTokens, address taker) internal returns (uint[2] memory tokens, bool _orderFilled) {
         Orders.Order storage matchingOrder = orders[_matchingOrderKey];
         require(now <= matchingOrder.expiry);
+        uint baseTokens;
+        uint quoteTokens;
 
         // // Maker buying base, needs to have amount in quote = base x price
         // // Taker selling base, needs to have amount in base
@@ -157,6 +198,10 @@ contract Dexz is Orders {
             quoteTokens = baseTokens.mul(matchingOrder.price).div(TENPOW18);
             emit LogInfo("calculateOrder Sell: quoteTokens = baseTokens x price / 1e18", quoteTokens, 0x0, "", address(0));
         }
+        // TODO BK
+        _orderFilled = true;
+        tokens[0] = baseTokens;
+        tokens[1] = quoteTokens;
     }
 
 
