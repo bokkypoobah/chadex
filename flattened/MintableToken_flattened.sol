@@ -125,7 +125,7 @@ contract Owned {
 //
 // Borrowed from MiniMeToken
 // ----------------------------------------------------------------------------
-contract ApproveAndCallFallBack {
+contract ApproveAndCallFallback {
     function receiveApproval(address from, uint256 tokens, address token, bytes memory data) public;
 }
 
@@ -195,7 +195,7 @@ contract MintableToken is MintableTokenInterface, Owned {
     function approveAndCall(address spender, uint tokens, bytes memory data) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
-        ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, address(this), data);
+        ApproveAndCallFallback(spender).receiveApproval(msg.sender, tokens, address(this), data);
         return true;
     }
     function mint(address tokenOwner, uint tokens) public onlyOwner returns (bool success) {

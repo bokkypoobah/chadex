@@ -11,17 +11,28 @@ pragma solidity ^0.5.0;
 // ----------------------------------------------------------------------------
 
 import "Orders.sol";
+import "ApproveAndCallFallback.sol";
 
 
 // ----------------------------------------------------------------------------
 // Dexz contract
 // ----------------------------------------------------------------------------
-contract Dexz is Orders {
+contract Dexz is Orders, ApproveAndCallFallback {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
     event Trade(bytes32 indexed key, uint orderType, address indexed taker, address indexed maker, uint amount, address baseToken, address quoteToken, uint baseTokens, uint quoteTokens, uint feeBaseTokens, uint feeQuoteTokens, uint baseTokensFilled);
 
     constructor(address _feeAccount) public Orders(_feeAccount) {
+    }
+
+    function receiveApproval(address from, uint256 tokens, address token, bytes memory data) public {
+        emit LogInfo("receiveApproval: from", 0, 0x0, "", from);
+        emit LogInfo("receiveApproval: tokens/token", tokens, 0x0, "", token);
+        bytes32 dataBytes32;
+        for (uint i = 0; i < data.length && i < 32; i++) {
+            dataBytes32 |= bytes32(data[i] & 0xff) >> (i * 8);
+        }
+        emit LogInfo("receiveApproval: data", 0, dataBytes32, "", address(0));
     }
 
     // function trade(uint orderType, address taker, address maker, address uiFeeAccount, address baseToken, address quoteToken, uint[2] memory tokens) internal {
@@ -77,7 +88,7 @@ contract Dexz is Orders {
         }
     }
 
-    function addOrder(uint orderType, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
+    function addOrder(uint orderType, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
         uint matchingPriceKey;
         bytes32 matchingOrderKey;
         (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(orderType, baseToken, quoteToken, price);

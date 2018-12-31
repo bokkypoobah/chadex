@@ -21,6 +21,7 @@ contract DexzBase is Owned {
     uint public deploymentBlockNumber;
     uint public takerFee = 10 * uint(10)**14; // 0.10%
     address public feeAccount;
+    uint public etherFee = 5 * 10 ** 16;
 
     mapping(address => TokenWhitelistStatus) public tokenWhitelist;
 
