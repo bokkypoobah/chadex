@@ -923,14 +923,47 @@ contract Dexz is Orders, ApproveAndCallFallback {
     constructor(address _feeAccount) public Orders(_feeAccount) {
     }
 
-    function receiveApproval(address from, uint256 tokens, address token, bytes memory data) public {
-        emit LogInfo("receiveApproval: from", 0, 0x0, "", from);
-        emit LogInfo("receiveApproval: tokens/token", tokens, 0x0, "", token);
+    function receiveApproval(address _from, uint256 _tokens, address _token, bytes memory _data) public {
+        emit LogInfo("receiveApproval: from", 0, 0x0, "", _from);
+        emit LogInfo("receiveApproval: tokens & token", _tokens, 0x0, "", _token);
         bytes32 dataBytes32;
-        for (uint i = 0; i < data.length && i < 32; i++) {
-            dataBytes32 |= bytes32(data[i] & 0xff) >> (i * 8);
+        for (uint i = 0; i < _data.length && i < 32; i++) {
+            dataBytes32 |= bytes32(_data[i] & 0xff) >> (i * 8);
         }
         emit LogInfo("receiveApproval: data", 0, dataBytes32, "", address(0));
+        uint length;
+        bytes4 functionSignature;
+        bytes32 parameter1;
+        bytes32 parameter2;
+        bytes32 parameter3;
+        bytes32 parameter4;
+        bytes32 parameter5;
+        bytes32 parameter6;
+        bytes32 parameter7;
+        assembly {
+            length := mload(_data)
+            functionSignature := mload(add(_data, 0x20))
+            parameter1 := mload(add(_data, 0x24))
+            parameter2 := mload(add(_data, 0x44))
+            parameter3 := mload(add(_data, 0x64))
+            parameter4 := mload(add(_data, 0x84))
+            parameter5 := mload(add(_data, 0xA4))
+            parameter6 := mload(add(_data, 0xC4))
+            parameter7 := mload(add(_data, 0xE4))
+        }
+        emit LogInfo("receiveApproval: length", length, 0x0, "", address(0));
+        emit LogInfo("receiveApproval: functionSignature", 0, bytes32(functionSignature), "", address(0));
+        emit LogInfo("receiveApproval: parameter1", 0, bytes32(parameter1), "", address(0));
+        emit LogInfo("receiveApproval: parameter2", 0, bytes32(parameter2), "", address(0));
+        emit LogInfo("receiveApproval: parameter3", 0, bytes32(parameter3), "", address(0));
+        emit LogInfo("receiveApproval: parameter4", 0, bytes32(parameter4), "", address(0));
+        emit LogInfo("receiveApproval: parameter4", 0, bytes32(parameter5), "", address(0));
+        emit LogInfo("receiveApproval: parameter4", 0, bytes32(parameter6), "", address(0));
+        emit LogInfo("receiveApproval: parameter4", 0, bytes32(parameter7), "", address(0));
+
+//        function addOrder(uint orderType, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
+
+
     }
 
     // function trade(uint orderType, address taker, address maker, address uiFeeAccount, address baseToken, address quoteToken, uint[2] memory tokens) internal {

@@ -31,9 +31,9 @@ TEST3RESULTS=test3results.txt
 TEST4OUTPUT=test4output.txt
 TEST4RESULTS=test4results.txt
 
-CURRENTTIME = '1546220195' 'Mon Dec 31 12:36:35 2018'
-START_DATE  = '1546220240' 'Mon Dec 31 12:37:20 2018'
-END_DATE    = '1546220315' 'Mon Dec 31 12:38:35 2018'
+CURRENTTIME = '1546310273' 'Tue Jan  1 13:37:53 2019'
+START_DATE  = '1546310318' 'Tue Jan  1 13:38:38 2019'
+END_DATE    = '1546310393' 'Tue Jan  1 13:39:53 2019'
 --- Differences ../contracts//*.sol *.sol ---
 
 solc, the solidity compiler commandline interface
@@ -70,3 +70,808 @@ Processing ../contracts/MintableToken.sol
         Processing ../contracts/ERC20Interface.sol
     Importing ../contracts/Owned.sol
     Processing ../contracts/Owned.sol
+Welcome to the Geth JavaScript console!
+
+instance: Geth/v1.8.20-stable-24d727b6/darwin-amd64/go1.11.2
+coinbase: 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e
+at block: 190534 (Tue, 01 Jan 2019 13:37:54 AEDT)
+ datadir: /Users/bok/Projects/Dexz/test/testchain
+ modules: admin:1.0 clique:1.0 debug:1.0 eth:1.0 miner:1.0 net:1.0 personal:1.0 rpc:1.0 shh:1.0 txpool:1.0 web3:1.0
+
+> 
+true
+> 
+true
+> 
+true
+> 
+DATA: var miner="0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e";
+DATA: var deployer="0xa11aae29840fbb5c86e6fd4cf809eba183aef433";
+DATA: var user1="0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976";
+DATA: var user2="0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0";
+DATA: var user3="0xa44a08d3f6933c69212114bb66e2df1813651844";
+DATA: var user4="0xa55a151eb00fded1634d27d1127b4be4627079ea";
+DATA: var user5="0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9";
+DATA: var user6="0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec";
+DATA: var feeAccount="0xa88a05d2b88283ce84c8325760b72a64591279a2";
+true
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+> 
+> 
+undefined
+> 
+RESULT:  # Account                                             EtherBalanceChange                              0                              1 Name
+RESULT:                                                                                                        2                              3
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:  0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.000000000000000000           0.000000000000000000           0.000000000000000000 Miner
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433        0.000000000000000000           0.000000000000000000           0.000000000000000000 Deployer
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976        0.000000000000000000           0.000000000000000000           0.000000000000000000 User1
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0        0.000000000000000000           0.000000000000000000           0.000000000000000000 User2
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  4 0xa44a08d3f6933c69212114bb66e2df1813651844        0.000000000000000000           0.000000000000000000           0.000000000000000000 User3
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  5 0xa55a151eb00fded1634d27d1127b4be4627079ea        0.000000000000000000           0.000000000000000000           0.000000000000000000 User4
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9        0.000000000000000000           0.000000000000000000           0.000000000000000000 User5
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  7 0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec        0.000000000000000000           0.000000000000000000           0.000000000000000000 User6
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  8 0xa88a05d2b88283ce84c8325760b72a64591279a2        0.000000000000000000           0.000000000000000000           0.000000000000000000 Fee
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000 Total Token Balances
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT: 
+undefined
+> 
+RESULT: 
+undefined
+> 
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+> 
+undefined
+> 
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+RESULT: ---------- Deploy Group #1 ----------
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+... 
+...... 
+......... 
+............ 
+............ 
+............ 
+............ 
+............ 
+............ 
+............ 
+............ 
+......... 
+...... 
+... 
+undefined
+> 
+... 
+undefined
+> 
+DATA: var rbtLibAddress="0x76e208b2bd7482af60f7e390618f58779165ce13";
+DATA: var rbtLibAbi=[{"constant":false,"inputs":[{"name":"self","type":"BokkyPooBahsRedBlackTreeLibrary.Tree storage"},{"name":"z","type":"uint256"}],"name":"remove","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"self","type":"BokkyPooBahsRedBlackTreeLibrary.Tree storage"},{"name":"z","type":"uint256"}],"name":"insert","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"where","type":"string"},{"indexed":false,"name":"action","type":"string"},{"indexed":false,"name":"key","type":"uint256"},{"indexed":false,"name":"parent","type":"uint256"},{"indexed":false,"name":"left","type":"uint256"},{"indexed":false,"name":"right","type":"uint256"},{"indexed":false,"name":"red","type":"bool"}],"name":"Log","type":"event"}];
+DATA: var rbtLib=eth.contract(rbtLibAbi).at(rbtLibAddress);
+RESULT:  # Account                                             EtherBalanceChange                              0                              1 Name
+RESULT:                                                                                                        2                              3
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:  0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.004872055000000000           0.000000000000000000           0.000000000000000000 Miner
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.004872055000000000           0.000000000000000000           0.000000000000000000 Deployer
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976        0.000000000000000000           0.000000000000000000           0.000000000000000000 User1
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0        0.000000000000000000           0.000000000000000000           0.000000000000000000 User2
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  4 0xa44a08d3f6933c69212114bb66e2df1813651844        0.000000000000000000           0.000000000000000000           0.000000000000000000 User3
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  5 0xa55a151eb00fded1634d27d1127b4be4627079ea        0.000000000000000000           0.000000000000000000           0.000000000000000000 User4
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9        0.000000000000000000           0.000000000000000000           0.000000000000000000 User5
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  7 0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec        0.000000000000000000           0.000000000000000000           0.000000000000000000 User6
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  8 0xa88a05d2b88283ce84c8325760b72a64591279a2        0.000000000000000000           0.000000000000000000           0.000000000000000000 Fee
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  9 0x76e208b2bd7482af60f7e390618f58779165ce13        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000 Total Token Balances
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT: 
+undefined
+> 
+RESULT: PASS Deploy Group #1 - RBTLib
+1
+> 
+RESULT: rbtLibTx status=0x1 Success gas=3000000 gasUsed=974411 costETH=0.004872055 costUSD=0.66216099505 @ ETH/USD=135.91 gasPrice=5 gwei block=190544 txIx=0 txId=0xb640045824068fc7fd545ed013d129247784e45a0c60a69586f930006aa0bdd7 @ 1546310284 Tue, 01 Jan 2019 02:38:04 UTC
+undefined
+> 
+RESULT: 
+undefined
+> 
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+RESULT: ---------- Deploy Group #2 ----------
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+... 
+...... 
+......... 
+............ 
+............ 
+............ 
+............ 
+............ 
+............ 
+............ 
+............ 
+............ 
+......... 
+...... 
+... 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+... 
+... 
+...... 
+......... 
+............ 
+............... 
+............... 
+............... 
+............... 
+............... 
+............... 
+............... 
+............... 
+............... 
+............... 
+............... 
+.................. 
+.................. 
+............... 
+............... 
+............ 
+......... 
+...... 
+... 
+... 
+3
+> 
+... 
+undefined
+> 
+DATA: var dexzAddress="0xbb05d4982d3499dee1acd0884c86e30895e2b691";
+DATA: var dexzAbi=[{"constant":true,"inputs":[],"name":"ORDERTYPE_SELL","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"orderType","type":"uint256"},{"name":"baseToken","type":"address"},{"name":"quoteToken","type":"address"},{"name":"price","type":"uint256"},{"name":"expiry","type":"uint256"},{"name":"baseTokens","type":"uint256"},{"name":"uiFeeAccount","type":"address"}],"name":"addOrder","outputs":[{"name":"_orderKey","type":"bytes32"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"_pairKey","type":"bytes32"},{"name":"_orderType","type":"uint256"},{"name":"_key","type":"uint256"}],"name":"getNode","outputs":[{"name":"_returnKey","type":"uint256"},{"name":"_parent","type":"uint256"},{"name":"_left","type":"uint256"},{"name":"_right","type":"uint256"},{"name":"_red","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_pairKey","type":"bytes32"},{"name":"_orderType","type":"uint256"}],"name":"last","outputs":[{"name":"_key","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"ORDERKEY_SENTINEL","outputs":[{"name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"takerFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_feeAccount","type":"address"}],"name":"setFeeAccount","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_pairKey","type":"bytes32"}],"name":"getPairBlockNumber","outputs":[{"name":"_blockNumber","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_orderKey","type":"bytes32"}],"name":"getOrder","outputs":[{"name":"_prev","type":"bytes32"},{"name":"_next","type":"bytes32"},{"name":"_orderType","type":"uint256"},{"name":"maker","type":"address"},{"name":"baseToken","type":"address"},{"name":"quoteToken","type":"address"},{"name":"price","type":"uint256"},{"name":"expiry","type":"uint256"},{"name":"baseTokens","type":"uint256"},{"name":"baseTokensFilled","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_pairKey","type":"bytes32"},{"name":"_orderType","type":"uint256"}],"name":"first","outputs":[{"name":"_key","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"feeAccount","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_pairKey","type":"bytes32"},{"name":"_orderType","type":"uint256"},{"name":"_x","type":"uint256"}],"name":"prev","outputs":[{"name":"_y","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"account","type":"address"}],"name":"getAccountBlockNumber","outputs":[{"name":"_blockNumber","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"tokenWhitelist","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"acceptOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_newOwner","type":"address"}],"name":"transferOwnershipImmediately","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_pairKey","type":"bytes32"},{"name":"_orderType","type":"uint256"},{"name":"_x","type":"uint256"}],"name":"getNextBestPrice","outputs":[{"name":"_y","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_tokens","type":"uint256"},{"name":"_token","type":"address"},{"name":"_data","type":"bytes"}],"name":"receiveApproval","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"TENPOW18","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_pairKey","type":"bytes32"},{"name":"_orderType","type":"uint256"},{"name":"_price","type":"uint256"}],"name":"getOrderQueue","outputs":[{"name":"_exists","type":"bool"},{"name":"_head","type":"bytes32"},{"name":"_tail","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_pairKey","type":"bytes32"},{"name":"_orderType","type":"uint256"},{"name":"_x","type":"uint256"}],"name":"next","outputs":[{"name":"_y","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"token","type":"address"},{"name":"status","type":"uint256"}],"name":"whitelistToken","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"token","type":"address"}],"name":"getTokenBlockNumber","outputs":[{"name":"_blockNumber","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"deploymentBlockNumber","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"newOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"ORDERTYPE_BUY","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_pairKey","type":"bytes32"},{"name":"_orderType","type":"uint256"}],"name":"count","outputs":[{"name":"_count","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"etherFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_pairKey","type":"bytes32"},{"name":"_orderType","type":"uint256"}],"name":"getBestPrice","outputs":[{"name":"_key","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_takerFee","type":"uint256"}],"name":"setTakerFee","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_pairKey","type":"bytes32"},{"name":"_orderType","type":"uint256"},{"name":"_key","type":"uint256"}],"name":"exists","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"key","type":"bytes32"}],"name":"removeOrder","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"_feeAccount","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"key","type":"bytes32"},{"indexed":false,"name":"orderType","type":"uint256"},{"indexed":true,"name":"taker","type":"address"},{"indexed":true,"name":"maker","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"baseToken","type":"address"},{"indexed":false,"name":"quoteToken","type":"address"},{"indexed":false,"name":"baseTokens","type":"uint256"},{"indexed":false,"name":"quoteTokens","type":"uint256"},{"indexed":false,"name":"feeBaseTokens","type":"uint256"},{"indexed":false,"name":"feeQuoteTokens","type":"uint256"},{"indexed":false,"name":"baseTokensFilled","type":"uint256"}],"name":"Trade","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"pairKey","type":"bytes32"},{"indexed":true,"name":"key","type":"bytes32"},{"indexed":false,"name":"orderType","type":"uint256"},{"indexed":true,"name":"maker","type":"address"},{"indexed":false,"name":"baseToken","type":"address"},{"indexed":false,"name":"quoteToken","type":"address"},{"indexed":false,"name":"price","type":"uint256"},{"indexed":false,"name":"expiry","type":"uint256"},{"indexed":false,"name":"baseTokens","type":"uint256"}],"name":"OrderAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"key","type":"bytes32"}],"name":"OrderRemoved","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"key","type":"bytes32"},{"indexed":false,"name":"baseTokens","type":"uint256"},{"indexed":false,"name":"newBaseTokens","type":"uint256"}],"name":"OrderUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"token","type":"address"},{"indexed":false,"name":"oldStatus","type":"uint256"},{"indexed":false,"name":"newStatus","type":"uint256"}],"name":"TokenWhitelistUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"oldTakerFee","type":"uint256"},{"indexed":false,"name":"newTakerFee","type":"uint256"}],"name":"TakerFeeUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"oldFeeAccount","type":"address"},{"indexed":false,"name":"newFeeAccount","type":"address"}],"name":"FeeAccountUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"token","type":"address"}],"name":"TokenAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"account","type":"address"}],"name":"AccountAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"pairKey","type":"bytes32"},{"indexed":true,"name":"baseToken","type":"address"},{"indexed":true,"name":"quoteToken","type":"address"}],"name":"PairAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"topic","type":"string"},{"indexed":false,"name":"number","type":"uint256"},{"indexed":false,"name":"data","type":"bytes32"},{"indexed":false,"name":"note","type":"string"},{"indexed":false,"name":"addr","type":"address"}],"name":"LogInfo","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"}],"name":"OwnershipTransferred","type":"event"}];
+DATA: var dexz=eth.contract(dexzAbi).at(dexzAddress);
+DATA: var token0Address="0xbf1ddeec84a04b7a78c78c3192facaa05b2689f6";
+DATA: var tokenAbi=[{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"spender","type":"address"},{"name":"tokens","type":"uint256"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"tokens","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"tokenOwner","type":"address"},{"name":"tokens","type":"uint256"}],"name":"mint","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"tokenOwner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"acceptOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_newOwner","type":"address"}],"name":"transferOwnershipImmediately","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"tokenOwner","type":"address"},{"name":"tokens","type":"uint256"}],"name":"burn","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"to","type":"address"},{"name":"tokens","type":"uint256"}],"name":"transfer","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"spender","type":"address"},{"name":"tokens","type":"uint256"},{"name":"data","type":"bytes"}],"name":"approveAndCall","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"newOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"tokenAddress","type":"address"},{"name":"tokens","type":"uint256"}],"name":"transferAnyERC20Token","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"tokenOwner","type":"address"},{"name":"spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"symbol","type":"string"},{"name":"name","type":"string"},{"name":"decimals","type":"uint8"},{"name":"tokenOwner","type":"address"},{"name":"initialSupply","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"payable":true,"stateMutability":"payable","type":"fallback"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"tokens","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"tokenOwner","type":"address"},{"indexed":true,"name":"spender","type":"address"},{"indexed":false,"name":"tokens","type":"uint256"}],"name":"Approval","type":"event"}];
+DATA: var token0=eth.contract(tokenAbi).at(token0Address);
+DATA: var token1Address="0xc234bacb4b129a74bbc7119624d70c5a27beaa6f";
+DATA: var token1=eth.contract(tokenAbi).at(token1Address);
+DATA: var token2Address="0x20815fc9830dc0ae6649dbdf5aea2f5727d6a25c";
+DATA: var token2=eth.contract(tokenAbi).at(token2Address);
+DATA: var token3Address="0xa835b8e3b3be6e5bb4028513763b753520759e09";
+DATA: var token3=eth.contract(tokenAbi).at(token3Address);
+RESULT:  # Account                                             EtherBalanceChange                            ABC                            DEF Name
+RESULT:                                                                                                      GHI                           WETH
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:  0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.057001295000000000           0.000000000000000000           0.000000000000000000 Miner
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.057001295000000000           0.000000000000000000           0.000000000000000000 Deployer
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976        0.000000000000000000           0.000000000000000000           0.000000000000000000 User1
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0        0.000000000000000000           0.000000000000000000           0.000000000000000000 User2
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  4 0xa44a08d3f6933c69212114bb66e2df1813651844        0.000000000000000000           0.000000000000000000           0.000000000000000000 User3
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  5 0xa55a151eb00fded1634d27d1127b4be4627079ea        0.000000000000000000           0.000000000000000000           0.000000000000000000 User4
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9        0.000000000000000000           0.000000000000000000           0.000000000000000000 User5
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  7 0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec        0.000000000000000000           0.000000000000000000           0.000000000000000000 User6
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  8 0xa88a05d2b88283ce84c8325760b72a64591279a2        0.000000000000000000           0.000000000000000000           0.000000000000000000 Fee
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  9 0x76e208b2bd7482af60f7e390618f58779165ce13        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: 10 0xbb05d4982d3499dee1acd0884c86e30895e2b691        0.000000000000000000           0.000000000000000000           0.000000000000000000 DexOneExchange
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: 11 0xbf1ddeec84a04b7a78c78c3192facaa05b2689f6        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'ABC' 'Abc'
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: 12 0xc234bacb4b129a74bbc7119624d70c5a27beaa6f        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'DEF' 'Def'
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: 13 0x20815fc9830dc0ae6649dbdf5aea2f5727d6a25c        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'GHI' 'Ghi'
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: 14 0xa835b8e3b3be6e5bb4028513763b753520759e09        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'WETH' 'Wrapped ETH'
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000 Total Token Balances
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT: 
+undefined
+> 
+RESULT: PASS Deploy Group #2 - DexOneExchange
+1
+> 
+... 
+... 
+RESULT: PASS Deploy Group #2 - Token ''ABC' 'Abc'
+RESULT: PASS Deploy Group #2 - Token ''DEF' 'Def'
+RESULT: PASS Deploy Group #2 - Token ''GHI' 'Ghi'
+RESULT: PASS Deploy Group #2 - Token ''WETH' 'Wrapped ETH'
+1
+> 
+RESULT: dexzTx status=0x1 Success gas=6400000 gasUsed=5815808 costETH=0.02907904 costUSD=3.9521323264 @ ETH/USD=135.91 gasPrice=5 gwei block=190546 txIx=0 txId=0x230b0b3f6b5e756d849dc9cde5bdae123ff98d5e01292e06f089053abb4ec5f3 @ 1546310286 Tue, 01 Jan 2019 02:38:06 UTC
+undefined
+> 
+... 
+... 
+RESULT: tokenTx[0] status=0x1 Success gas=2000000 gasUsed=1152366 costETH=0.00576183 costUSD=0.7830903153 @ ETH/USD=135.91 gasPrice=5 gwei block=190546 txIx=1 txId=0xecf53b03bcad6deef9f7280d470220e280fc7d76a23d81818b8bb36f0e589776 @ 1546310286 Tue, 01 Jan 2019 02:38:06 UTC
+RESULT: tokenTx[1] status=0x1 Success gas=2000000 gasUsed=1152366 costETH=0.00576183 costUSD=0.7830903153 @ ETH/USD=135.91 gasPrice=5 gwei block=190546 txIx=2 txId=0x14dda0374689e6716d157bb08c5e7a406d2a08d6915d906a0eaaa8cb219f8555 @ 1546310286 Tue, 01 Jan 2019 02:38:06 UTC
+RESULT: tokenTx[2] status=0x1 Success gas=2000000 gasUsed=1152366 costETH=0.00576183 costUSD=0.7830903153 @ ETH/USD=135.91 gasPrice=5 gwei block=190546 txIx=3 txId=0x223fb92362ebe40a8f1047e88ddfe64c3ed9c201b49547cbe3d3f76284980d14 @ 1546310286 Tue, 01 Jan 2019 02:38:06 UTC
+RESULT: tokenTx[3] status=0x1 Success gas=2000000 gasUsed=1152942 costETH=0.00576471 costUSD=0.7834817361 @ ETH/USD=135.91 gasPrice=5 gwei block=190546 txIx=4 txId=0x365ebc501ead0af7bedcc90718f2db50cf3397a434154e332c017167a8a7c51c @ 1546310286 Tue, 01 Jan 2019 02:38:06 UTC
+undefined
+> 
+RESULT: 
+undefined
+> 
+RESULT: dexOneExchange.address=DexOneExchange:0xbb05
+RESULT: dexOneExchange.owner/new=Deployer:0xa11a/Null:0x0000
+RESULT: dexOneExchange.deploymentBlockNumber=190546
+RESULT: dexOneExchange.takerFee=0.1%
+RESULT: dexOneExchange.feeAccount=Fee:0xa88a
+RESULT: AccountAdded 0 #190546 account=DexOneExchange:0xbb05
+undefined
+> 
+RESULT: 
+undefined
+> 
+... 
+... 
+... 
+RESULT: token0ContractAddress=Token 'ABC' 'Abc':0xbf1d
+RESULT: token0.owner/new=Deployer:0xa11a/Null:0x0000
+RESULT: token0.details='ABC' 'Abc' 18 dp
+RESULT: token0.totalSupply=0
+RESULT: token0.Transfer 0 #190546 from=Null:0x0000 to=Deployer:0xa11a tokens=0
+RESULT: 
+RESULT: token1ContractAddress=Token 'DEF' 'Def':0xc234
+RESULT: token1.owner/new=Deployer:0xa11a/Null:0x0000
+RESULT: token1.details='DEF' 'Def' 18 dp
+RESULT: token1.totalSupply=0
+RESULT: token1.Transfer 0 #190546 from=Null:0x0000 to=Deployer:0xa11a tokens=0
+RESULT: 
+RESULT: token2ContractAddress=Token 'GHI' 'Ghi':0x2081
+RESULT: token2.owner/new=Deployer:0xa11a/Null:0x0000
+RESULT: token2.details='GHI' 'Ghi' 18 dp
+RESULT: token2.totalSupply=0
+RESULT: token2.Transfer 0 #190546 from=Null:0x0000 to=Deployer:0xa11a tokens=0
+RESULT: 
+RESULT: token3ContractAddress=Token 'WETH' 'Wrapped ETH':0xa835
+RESULT: token3.owner/new=Deployer:0xa11a/Null:0x0000
+RESULT: token3.details='WETH' 'Wrapped ETH' 18 dp
+RESULT: token3.totalSupply=0
+RESULT: token3.Transfer 0 #190546 from=Null:0x0000 to=Deployer:0xa11a tokens=0
+RESULT: 
+undefined
+> 
+RESULT: 
+undefined
+> 
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+RESULT: ---------- Deploy Group #3 ----------
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+...... 
+......... 
+......... 
+......... 
+......... 
+......... 
+...... 
+...... 
+undefined
+> 
+... 
+undefined
+> 
+RESULT:  # Account                                             EtherBalanceChange                            ABC                            DEF Name
+RESULT:                                                                                                      GHI                           WETH
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:  0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.068988055000000000           0.000000000000000000           0.000000000000000000 Miner
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.063512295000000000           0.000000000000000000           0.000000000000000000 Deployer
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976       -0.000912680000000000         900.100000000000000000        1001.100000000000000000 User1
+RESULT:                                                                                   100.100000000000000000          10.100000000000000000
+RESULT:  3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0       -0.000912680000000000         900.200000000000000000        1001.200000000000000000 User2
+RESULT:                                                                                   100.200000000000000000          10.200000000000000000
+RESULT:  4 0xa44a08d3f6933c69212114bb66e2df1813651844       -0.000912680000000000         900.300000000000000000        1001.300000000000000000 User3
+RESULT:                                                                                   100.300000000000000000          10.300000000000000000
+RESULT:  5 0xa55a151eb00fded1634d27d1127b4be4627079ea       -0.000912360000000000         900.400000000000000000        1001.400000000000000000 User4
+RESULT:                                                                                   100.400000000000000000          10.400000000000000000
+RESULT:  6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9       -0.000912680000000000         900.500000000000000000        1001.500000000000000000 User5
+RESULT:                                                                                   100.500000000000000000          10.500000000000000000
+RESULT:  7 0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec       -0.000912680000000000         900.600000000000000000        1001.600000000000000000 User6
+RESULT:                                                                                   100.600000000000000000          10.600000000000000000
+RESULT:  8 0xa88a05d2b88283ce84c8325760b72a64591279a2        0.000000000000000000           0.000000000000000000           0.000000000000000000 Fee
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  9 0x76e208b2bd7482af60f7e390618f58779165ce13        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: 10 0xbb05d4982d3499dee1acd0884c86e30895e2b691        0.000000000000000000           0.000000000000000000           0.000000000000000000 DexOneExchange
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: 11 0xbf1ddeec84a04b7a78c78c3192facaa05b2689f6        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'ABC' 'Abc'
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: 12 0xc234bacb4b129a74bbc7119624d70c5a27beaa6f        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'DEF' 'Def'
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: 13 0x20815fc9830dc0ae6649dbdf5aea2f5727d6a25c        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'GHI' 'Ghi'
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: 14 0xa835b8e3b3be6e5bb4028513763b753520759e09        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'WETH' 'Wrapped ETH'
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:                                                                                  5402.100000000000000000        6008.100000000000000000 Total Token Balances
+RESULT:                                                                                   602.100000000000000000          62.100000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT: 
+undefined
+> 
+...... 
+...... 
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x48785d3a9f0f53d5ccf65b14fe0b7addf8c8c6e0e68b5d55c7995a24dda60ccc
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xf274e6a60694f5a09372d1277e357e91939dd96ba0327488baa07d7c30d52ebb
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xdccd92b869f70dc105cc2f09f62d2d82349dc99dac232c5416560fc435eb7320
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xcd6cac46f4536b78b1e6cbca291f074127aa96ee925d741fbe9668f7629afe0f
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xd4050190c55a362e488c06d1664052a922704cf515b90c422c978796331efef8
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x2a866a099438c4d848979d88de7783c4e3dbc939edfb90b1672e9d87ee70979d
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x1f2030beb07e3ee5770c90e418b5d56910437afb42f3b0b13b66f65daefd0137
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x47799b1e83ddfcca6fc3626ec572c73cc1b2fa7b3b53cc7acd75ad0f160958e9
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x9ff4de3238f7df83f9d083022f6438f741f4c395cd59e70906523c4e47ede16b
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x99593fb698892d991c3f08f09dab09e129b6b33c87c9f2bab49f1b436ff11aa4
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x8ac0d818313532144dc9565566f84adb5de5a4f81a4b2db255b9a3b66b32a451
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xb7d38915169a0980e54efb1675da504a23a72e721e2eb6b3218d4fb962e509fa
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x7b63f3b1b93d4ceec3dca62ec6549c66a59bfafcd739ec859c0b75197a032646
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x4d26c4bf25f93ae7317c0c9268c2506f1c401c415b992595f13dc98a5d13c410
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x469c7db01195984d78d8798c913e63a336f6d97718796588af0d0094d131420c
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xb7f9407e808e25220c54a81732e9b84df43e84641eb64f45534d2f9c67d20402
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x50f18d23f279adaa5cacf9e6861e20cbb6ca398a961f84b4f23680784b51bda7
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xd11ebb4b327578d84c11f81edd6230a6e7cd7afc4e7e3b91c0f4e6f217015216
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x5e510417df2a6e689285423757c67a31035fde56840f32a1d18a49dc557115fe
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x880238a15ed60ab3eb160ef2e0ac8bd6dc12d51223fca94d71842d8f1e3e8817
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xdcb6ad677d2eefd15ade3807500da1b9913c5ac621ed98efb9d136fdd387dcf3
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x39483c2a8790158e69d4608662e4ea3470b631364eec4846724b5f39b73425c8
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x898a263290228dfd1dfc114bb16165c06aa79448e602dda0391de155d92eb48e
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xe774ed4db80ebd9402fbafb97ffebf2e58849f06a5de560e4ca13551e89e392e
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xd1f76a16d5f4def9a67154ccfa8a526375b0f0f120b0fb0887f451bd8e64f41f
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xecf816811c1527309e757246064fe626adc25d58793241294a5ec17e605365e7
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xe88afb927a969f38ebf87e0ebea2fe90f64872bef08b2c1ba33c357ca3ea011a
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xbc8756537d34ebe2b96df210e4d0443570103a434b8f211513bfedf3014e0b50
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xe6b2bfde1d6fe42906b633981cf95822d956a9e24bcf31a54b4c641345c6cc1f
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x6ebc3aed840f1be46842bdd4ca79515e3fa7a8c5cd99290878be72639f7bad44
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x709482e5851eaf9abc54ad229b5cf0cff79e25f316931059a4a3126e037d502e
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x2b4931f0b00f1a7aa4f58dc19caff23cb5729a7b76ac41eeff2638e820b32b1f
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x2567a8da5fab76f010c917c8e216e5036f368eb1e5d2ee74335683952f8a0d0b
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xf8bfe36790c0eca628d48e580e82ab60ea670db1fbb2e51e8d40997687cc0948
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x4f7994843b8208a9a1da2824b66b8af574e118635885845d16079798e00f1639
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x4d745b13ccf446a4d5ec8cdcefb265639e0e32741fb763672bbe68d1cb790d0f
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x33ab6b04c0bb2ebb70544cb2ed363c260ecf50f2196d31d68aaea277e4d0932b
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x5f5a92375e86737e961de799be35b38a04153c1202aba9dda5dc8dff559e5880
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x9c5536ce287ef0ffcc5b375e0610a484bb6df1caf4404fdc1144c218e2f8a56e
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x551b83a8c4b7d30f06975b8c0b79b3aa463c9d5b0e1cb7f3ef4f2598f3e96d5e
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x7dbc411ed99e0bf06e1e184497e6373601a6b9b69d2b4ea1d27ba7239fe5c0b2
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x51fd7ad17dc0a214589bd66ff97324630894f5054e7103ae3a67c39469c35b60
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x7c2f939d233140a663d3379fa36ed5e4f2076efede6d1af5cd2bc4fbb11cebb8
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x781cd8db7d662c48219e3ca818d577ddcb735b02c8915618c2c215c894e0cb6a
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xe09acf0911fae5be7427ccf0022adb9d93b7f1a859ecbc2559e4f68bd37d7f66
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xec48fb723dabda7e4382156cab8f5700d417d87013845514fef944b1d6659056
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0x7390083809c853e6dbfa4f22e1aa14d93d93794df2389c313c0b584b15341da8
+RESULT: PASS Deploy Group #3 - Distribute tokens and approve spending - 0xf560c103a103e9faf0565f3a518e64100f7e2cbc22e442e50ffde9b82e7e1eba
+undefined
+> 
+...... 
+...... 
+RESULT:  status=0x1 Success gas=2000000 gasUsed=66777 costETH=0.000333885 costUSD=0.04537831035 @ ETH/USD=135.91 gasPrice=5 gwei block=190554 txIx=0 txId=0x48785d3a9f0f53d5ccf65b14fe0b7addf8c8c6e0e68b5d55c7995a24dda60ccc @ 1546310294 Tue, 01 Jan 2019 02:38:14 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190554 txIx=4 txId=0xf274e6a60694f5a09372d1277e357e91939dd96ba0327488baa07d7c30d52ebb @ 1546310294 Tue, 01 Jan 2019 02:38:14 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=66777 costETH=0.000333885 costUSD=0.04537831035 @ ETH/USD=135.91 gasPrice=5 gwei block=190554 txIx=1 txId=0xdccd92b869f70dc105cc2f09f62d2d82349dc99dac232c5416560fc435eb7320 @ 1546310294 Tue, 01 Jan 2019 02:38:14 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190554 txIx=5 txId=0xcd6cac46f4536b78b1e6cbca291f074127aa96ee925d741fbe9668f7629afe0f @ 1546310294 Tue, 01 Jan 2019 02:38:14 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=66777 costETH=0.000333885 costUSD=0.04537831035 @ ETH/USD=135.91 gasPrice=5 gwei block=190554 txIx=2 txId=0xd4050190c55a362e488c06d1664052a922704cf515b90c422c978796331efef8 @ 1546310294 Tue, 01 Jan 2019 02:38:14 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190554 txIx=6 txId=0x2a866a099438c4d848979d88de7783c4e3dbc939edfb90b1672e9d87ee70979d @ 1546310294 Tue, 01 Jan 2019 02:38:14 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=66713 costETH=0.000333565 costUSD=0.04533481915 @ ETH/USD=135.91 gasPrice=5 gwei block=190554 txIx=3 txId=0x1f2030beb07e3ee5770c90e418b5d56910437afb42f3b0b13b66f65daefd0137 @ 1546310294 Tue, 01 Jan 2019 02:38:14 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45586 costETH=0.00022793 costUSD=0.0309779663 @ ETH/USD=135.91 gasPrice=5 gwei block=190555 txIx=0 txId=0x47799b1e83ddfcca6fc3626ec572c73cc1b2fa7b3b53cc7acd75ad0f160958e9 @ 1546310295 Tue, 01 Jan 2019 02:38:15 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51777 costETH=0.000258885 costUSD=0.03518506035 @ ETH/USD=135.91 gasPrice=5 gwei block=190555 txIx=1 txId=0x9ff4de3238f7df83f9d083022f6438f741f4c395cd59e70906523c4e47ede16b @ 1546310295 Tue, 01 Jan 2019 02:38:15 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190555 txIx=8 txId=0x99593fb698892d991c3f08f09dab09e129b6b33c87c9f2bab49f1b436ff11aa4 @ 1546310295 Tue, 01 Jan 2019 02:38:15 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51777 costETH=0.000258885 costUSD=0.03518506035 @ ETH/USD=135.91 gasPrice=5 gwei block=190555 txIx=2 txId=0x8ac0d818313532144dc9565566f84adb5de5a4f81a4b2db255b9a3b66b32a451 @ 1546310295 Tue, 01 Jan 2019 02:38:15 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190555 txIx=9 txId=0xb7d38915169a0980e54efb1675da504a23a72e721e2eb6b3218d4fb962e509fa @ 1546310295 Tue, 01 Jan 2019 02:38:15 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51777 costETH=0.000258885 costUSD=0.03518506035 @ ETH/USD=135.91 gasPrice=5 gwei block=190555 txIx=3 txId=0x7b63f3b1b93d4ceec3dca62ec6549c66a59bfafcd739ec859c0b75197a032646 @ 1546310295 Tue, 01 Jan 2019 02:38:15 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190555 txIx=10 txId=0x4d26c4bf25f93ae7317c0c9268c2506f1c401c415b992595f13dc98a5d13c410 @ 1546310295 Tue, 01 Jan 2019 02:38:15 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51713 costETH=0.000258565 costUSD=0.03514156915 @ ETH/USD=135.91 gasPrice=5 gwei block=190555 txIx=4 txId=0x469c7db01195984d78d8798c913e63a336f6d97718796588af0d0094d131420c @ 1546310295 Tue, 01 Jan 2019 02:38:15 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45586 costETH=0.00022793 costUSD=0.0309779663 @ ETH/USD=135.91 gasPrice=5 gwei block=190555 txIx=11 txId=0xb7f9407e808e25220c54a81732e9b84df43e84641eb64f45534d2f9c67d20402 @ 1546310295 Tue, 01 Jan 2019 02:38:15 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51777 costETH=0.000258885 costUSD=0.03518506035 @ ETH/USD=135.91 gasPrice=5 gwei block=190555 txIx=5 txId=0x50f18d23f279adaa5cacf9e6861e20cbb6ca398a961f84b4f23680784b51bda7 @ 1546310295 Tue, 01 Jan 2019 02:38:15 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190555 txIx=7 txId=0xd11ebb4b327578d84c11f81edd6230a6e7cd7afc4e7e3b91c0f4e6f217015216 @ 1546310295 Tue, 01 Jan 2019 02:38:15 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51777 costETH=0.000258885 costUSD=0.03518506035 @ ETH/USD=135.91 gasPrice=5 gwei block=190555 txIx=6 txId=0x5e510417df2a6e689285423757c67a31035fde56840f32a1d18a49dc557115fe @ 1546310295 Tue, 01 Jan 2019 02:38:15 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190556 txIx=9 txId=0x880238a15ed60ab3eb160ef2e0ac8bd6dc12d51223fca94d71842d8f1e3e8817 @ 1546310296 Tue, 01 Jan 2019 02:38:16 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51777 costETH=0.000258885 costUSD=0.03518506035 @ ETH/USD=135.91 gasPrice=5 gwei block=190556 txIx=0 txId=0xdcb6ad677d2eefd15ade3807500da1b9913c5ac621ed98efb9d136fdd387dcf3 @ 1546310296 Tue, 01 Jan 2019 02:38:16 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190556 txIx=10 txId=0x39483c2a8790158e69d4608662e4ea3470b631364eec4846724b5f39b73425c8 @ 1546310296 Tue, 01 Jan 2019 02:38:16 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51713 costETH=0.000258565 costUSD=0.03514156915 @ ETH/USD=135.91 gasPrice=5 gwei block=190556 txIx=1 txId=0x898a263290228dfd1dfc114bb16165c06aa79448e602dda0391de155d92eb48e @ 1546310296 Tue, 01 Jan 2019 02:38:16 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45586 costETH=0.00022793 costUSD=0.0309779663 @ ETH/USD=135.91 gasPrice=5 gwei block=190556 txIx=11 txId=0xe774ed4db80ebd9402fbafb97ffebf2e58849f06a5de560e4ca13551e89e392e @ 1546310296 Tue, 01 Jan 2019 02:38:16 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51777 costETH=0.000258885 costUSD=0.03518506035 @ ETH/USD=135.91 gasPrice=5 gwei block=190556 txIx=2 txId=0xd1f76a16d5f4def9a67154ccfa8a526375b0f0f120b0fb0887f451bd8e64f41f @ 1546310296 Tue, 01 Jan 2019 02:38:16 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190556 txIx=6 txId=0xecf816811c1527309e757246064fe626adc25d58793241294a5ec17e605365e7 @ 1546310296 Tue, 01 Jan 2019 02:38:16 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51777 costETH=0.000258885 costUSD=0.03518506035 @ ETH/USD=135.91 gasPrice=5 gwei block=190556 txIx=3 txId=0xe88afb927a969f38ebf87e0ebea2fe90f64872bef08b2c1ba33c357ca3ea011a @ 1546310296 Tue, 01 Jan 2019 02:38:16 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190556 txIx=7 txId=0xbc8756537d34ebe2b96df210e4d0443570103a434b8f211513bfedf3014e0b50 @ 1546310296 Tue, 01 Jan 2019 02:38:16 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51777 costETH=0.000258885 costUSD=0.03518506035 @ ETH/USD=135.91 gasPrice=5 gwei block=190556 txIx=4 txId=0xe6b2bfde1d6fe42906b633981cf95822d956a9e24bcf31a54b4c641345c6cc1f @ 1546310296 Tue, 01 Jan 2019 02:38:16 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190556 txIx=8 txId=0x6ebc3aed840f1be46842bdd4ca79515e3fa7a8c5cd99290878be72639f7bad44 @ 1546310296 Tue, 01 Jan 2019 02:38:16 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51649 costETH=0.000258245 costUSD=0.03509807795 @ ETH/USD=135.91 gasPrice=5 gwei block=190556 txIx=5 txId=0x709482e5851eaf9abc54ad229b5cf0cff79e25f316931059a4a3126e037d502e @ 1546310296 Tue, 01 Jan 2019 02:38:16 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45522 costETH=0.00022761 costUSD=0.0309344751 @ ETH/USD=135.91 gasPrice=5 gwei block=190557 txIx=7 txId=0x2b4931f0b00f1a7aa4f58dc19caff23cb5729a7b76ac41eeff2638e820b32b1f @ 1546310297 Tue, 01 Jan 2019 02:38:17 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51777 costETH=0.000258885 costUSD=0.03518506035 @ ETH/USD=135.91 gasPrice=5 gwei block=190557 txIx=8 txId=0x2567a8da5fab76f010c917c8e216e5036f368eb1e5d2ee74335683952f8a0d0b @ 1546310297 Tue, 01 Jan 2019 02:38:17 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190557 txIx=3 txId=0xf8bfe36790c0eca628d48e580e82ab60ea670db1fbb2e51e8d40997687cc0948 @ 1546310297 Tue, 01 Jan 2019 02:38:17 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51777 costETH=0.000258885 costUSD=0.03518506035 @ ETH/USD=135.91 gasPrice=5 gwei block=190557 txIx=9 txId=0x4f7994843b8208a9a1da2824b66b8af574e118635885845d16079798e00f1639 @ 1546310297 Tue, 01 Jan 2019 02:38:17 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190557 txIx=4 txId=0x4d745b13ccf446a4d5ec8cdcefb265639e0e32741fb763672bbe68d1cb790d0f @ 1546310297 Tue, 01 Jan 2019 02:38:17 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51777 costETH=0.000258885 costUSD=0.03518506035 @ ETH/USD=135.91 gasPrice=5 gwei block=190557 txIx=10 txId=0x33ab6b04c0bb2ebb70544cb2ed363c260ecf50f2196d31d68aaea277e4d0932b @ 1546310297 Tue, 01 Jan 2019 02:38:17 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190557 txIx=5 txId=0x5f5a92375e86737e961de799be35b38a04153c1202aba9dda5dc8dff559e5880 @ 1546310297 Tue, 01 Jan 2019 02:38:17 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51713 costETH=0.000258565 costUSD=0.03514156915 @ ETH/USD=135.91 gasPrice=5 gwei block=190557 txIx=11 txId=0x9c5536ce287ef0ffcc5b375e0610a484bb6df1caf4404fdc1144c218e2f8a56e @ 1546310297 Tue, 01 Jan 2019 02:38:17 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45586 costETH=0.00022793 costUSD=0.0309779663 @ ETH/USD=135.91 gasPrice=5 gwei block=190557 txIx=6 txId=0x551b83a8c4b7d30f06975b8c0b79b3aa463c9d5b0e1cb7f3ef4f2598f3e96d5e @ 1546310297 Tue, 01 Jan 2019 02:38:17 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51777 costETH=0.000258885 costUSD=0.03518506035 @ ETH/USD=135.91 gasPrice=5 gwei block=190557 txIx=12 txId=0x7dbc411ed99e0bf06e1e184497e6373601a6b9b69d2b4ea1d27ba7239fe5c0b2 @ 1546310297 Tue, 01 Jan 2019 02:38:17 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190557 txIx=0 txId=0x51fd7ad17dc0a214589bd66ff97324630894f5054e7103ae3a67c39469c35b60 @ 1546310297 Tue, 01 Jan 2019 02:38:17 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51777 costETH=0.000258885 costUSD=0.03518506035 @ ETH/USD=135.91 gasPrice=5 gwei block=190557 txIx=13 txId=0x7c2f939d233140a663d3379fa36ed5e4f2076efede6d1af5cd2bc4fbb11cebb8 @ 1546310297 Tue, 01 Jan 2019 02:38:17 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190557 txIx=1 txId=0x781cd8db7d662c48219e3ca818d577ddcb735b02c8915618c2c215c894e0cb6a @ 1546310297 Tue, 01 Jan 2019 02:38:17 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51777 costETH=0.000258885 costUSD=0.03518506035 @ ETH/USD=135.91 gasPrice=5 gwei block=190557 txIx=14 txId=0xe09acf0911fae5be7427ccf0022adb9d93b7f1a859ecbc2559e4f68bd37d7f66 @ 1546310297 Tue, 01 Jan 2019 02:38:17 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45650 costETH=0.00022825 costUSD=0.0310214575 @ ETH/USD=135.91 gasPrice=5 gwei block=190557 txIx=2 txId=0xec48fb723dabda7e4382156cab8f5700d417d87013845514fef944b1d6659056 @ 1546310297 Tue, 01 Jan 2019 02:38:17 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=51713 costETH=0.000258565 costUSD=0.03514156915 @ ETH/USD=135.91 gasPrice=5 gwei block=190558 txIx=1 txId=0x7390083809c853e6dbfa4f22e1aa14d93d93794df2389c313c0b584b15341da8 @ 1546310298 Tue, 01 Jan 2019 02:38:18 UTC
+RESULT:  status=0x1 Success gas=2000000 gasUsed=45586 costETH=0.00022793 costUSD=0.0309779663 @ ETH/USD=135.91 gasPrice=5 gwei block=190558 txIx=0 txId=0xf560c103a103e9faf0565f3a518e64100f7e2cbc22e442e50ffde9b82e7e1eba @ 1546310298 Tue, 01 Jan 2019 02:38:18 UTC
+undefined
+> 
+RESULT: 
+undefined
+> 
+RESULT: dexOneExchange.address=DexOneExchange:0xbb05
+RESULT: dexOneExchange.owner/new=Deployer:0xa11a/Null:0x0000
+RESULT: dexOneExchange.deploymentBlockNumber=190546
+RESULT: dexOneExchange.takerFee=0.1%
+RESULT: dexOneExchange.feeAccount=Fee:0xa88a
+undefined
+> 
+RESULT: 
+undefined
+> 
+... 
+... 
+... 
+RESULT: token0ContractAddress=Token 'ABC' 'Abc':0xbf1d
+RESULT: token0.owner/new=Deployer:0xa11a/Null:0x0000
+RESULT: token0.details='ABC' 'Abc' 18 dp
+RESULT: token0.totalSupply=5402.1
+RESULT: token0.Approval 0 #190554 tokenOwner=User1:0xa22a spender=DexOneExchange:0xbb05 tokens=900.1
+RESULT: token0.Approval 1 #190555 tokenOwner=User3:0xa44a spender=DexOneExchange:0xbb05 tokens=900.3
+RESULT: token0.Approval 2 #190555 tokenOwner=User2:0xa33a spender=DexOneExchange:0xbb05 tokens=900.2
+RESULT: token0.Approval 3 #190556 tokenOwner=User4:0xa55a spender=DexOneExchange:0xbb05 tokens=900.4
+RESULT: token0.Approval 4 #190557 tokenOwner=User6:0xa77a spender=DexOneExchange:0xbb05 tokens=900.6
+RESULT: token0.Approval 5 #190557 tokenOwner=User5:0xa66a spender=DexOneExchange:0xbb05 tokens=900.5
+RESULT: token0.Transfer 0 #190554 from=Null:0x0000 to=User1:0xa22a tokens=900.1
+RESULT: token0.Transfer 1 #190555 from=Null:0x0000 to=User2:0xa33a tokens=900.2
+RESULT: token0.Transfer 2 #190555 from=Null:0x0000 to=User3:0xa44a tokens=900.3
+RESULT: token0.Transfer 3 #190556 from=Null:0x0000 to=User4:0xa55a tokens=900.4
+RESULT: token0.Transfer 4 #190557 from=Null:0x0000 to=User5:0xa66a tokens=900.5
+RESULT: token0.Transfer 5 #190557 from=Null:0x0000 to=User6:0xa77a tokens=900.6
+RESULT: 
+RESULT: token1ContractAddress=Token 'DEF' 'Def':0xc234
+RESULT: token1.owner/new=Deployer:0xa11a/Null:0x0000
+RESULT: token1.details='DEF' 'Def' 18 dp
+RESULT: token1.totalSupply=6008.1
+RESULT: token1.Approval 0 #190554 tokenOwner=User1:0xa22a spender=DexOneExchange:0xbb05 tokens=1001.1
+RESULT: token1.Approval 1 #190555 tokenOwner=User2:0xa33a spender=DexOneExchange:0xbb05 tokens=1001.2
+RESULT: token1.Approval 2 #190556 tokenOwner=User4:0xa55a spender=DexOneExchange:0xbb05 tokens=1001.4
+RESULT: token1.Approval 3 #190556 tokenOwner=User3:0xa44a spender=DexOneExchange:0xbb05 tokens=1001.3
+RESULT: token1.Approval 4 #190557 tokenOwner=User6:0xa77a spender=DexOneExchange:0xbb05 tokens=1001.6
+RESULT: token1.Approval 5 #190557 tokenOwner=User5:0xa66a spender=DexOneExchange:0xbb05 tokens=1001.5
+RESULT: token1.Transfer 0 #190554 from=Null:0x0000 to=User1:0xa22a tokens=1001.1
+RESULT: token1.Transfer 1 #190555 from=Null:0x0000 to=User2:0xa33a tokens=1001.2
+RESULT: token1.Transfer 2 #190555 from=Null:0x0000 to=User3:0xa44a tokens=1001.3
+RESULT: token1.Transfer 3 #190556 from=Null:0x0000 to=User4:0xa55a tokens=1001.4
+RESULT: token1.Transfer 4 #190557 from=Null:0x0000 to=User5:0xa66a tokens=1001.5
+RESULT: token1.Transfer 5 #190557 from=Null:0x0000 to=User6:0xa77a tokens=1001.6
+RESULT: 
+RESULT: token2ContractAddress=Token 'GHI' 'Ghi':0x2081
+RESULT: token2.owner/new=Deployer:0xa11a/Null:0x0000
+RESULT: token2.details='GHI' 'Ghi' 18 dp
+RESULT: token2.totalSupply=602.1
+RESULT: token2.Approval 0 #190554 tokenOwner=User1:0xa22a spender=DexOneExchange:0xbb05 tokens=100.1
+RESULT: token2.Approval 1 #190555 tokenOwner=User2:0xa33a spender=DexOneExchange:0xbb05 tokens=100.2
+RESULT: token2.Approval 2 #190556 tokenOwner=User4:0xa55a spender=DexOneExchange:0xbb05 tokens=100.4
+RESULT: token2.Approval 3 #190556 tokenOwner=User3:0xa44a spender=DexOneExchange:0xbb05 tokens=100.3
+RESULT: token2.Approval 4 #190557 tokenOwner=User6:0xa77a spender=DexOneExchange:0xbb05 tokens=100.6
+RESULT: token2.Approval 5 #190557 tokenOwner=User5:0xa66a spender=DexOneExchange:0xbb05 tokens=100.5
+RESULT: token2.Transfer 0 #190554 from=Null:0x0000 to=User1:0xa22a tokens=100.1
+RESULT: token2.Transfer 1 #190555 from=Null:0x0000 to=User2:0xa33a tokens=100.2
+RESULT: token2.Transfer 2 #190556 from=Null:0x0000 to=User3:0xa44a tokens=100.3
+RESULT: token2.Transfer 3 #190556 from=Null:0x0000 to=User4:0xa55a tokens=100.4
+RESULT: token2.Transfer 4 #190557 from=Null:0x0000 to=User5:0xa66a tokens=100.5
+RESULT: token2.Transfer 5 #190557 from=Null:0x0000 to=User6:0xa77a tokens=100.6
+RESULT: 
+RESULT: token3ContractAddress=Token 'WETH' 'Wrapped ETH':0xa835
+RESULT: token3.owner/new=Deployer:0xa11a/Null:0x0000
+RESULT: token3.details='WETH' 'Wrapped ETH' 18 dp
+RESULT: token3.totalSupply=62.1
+RESULT: token3.Approval 0 #190555 tokenOwner=User1:0xa22a spender=DexOneExchange:0xbb05 tokens=10.1
+RESULT: token3.Approval 1 #190555 tokenOwner=User2:0xa33a spender=DexOneExchange:0xbb05 tokens=10.2
+RESULT: token3.Approval 2 #190556 tokenOwner=User3:0xa44a spender=DexOneExchange:0xbb05 tokens=10.3
+RESULT: token3.Approval 3 #190557 tokenOwner=User5:0xa66a spender=DexOneExchange:0xbb05 tokens=10.5
+RESULT: token3.Approval 4 #190557 tokenOwner=User4:0xa55a spender=DexOneExchange:0xbb05 tokens=10.4
+RESULT: token3.Approval 5 #190558 tokenOwner=User6:0xa77a spender=DexOneExchange:0xbb05 tokens=10.6
+RESULT: token3.Transfer 0 #190554 from=Null:0x0000 to=User1:0xa22a tokens=10.1
+RESULT: token3.Transfer 1 #190555 from=Null:0x0000 to=User2:0xa33a tokens=10.2
+RESULT: token3.Transfer 2 #190556 from=Null:0x0000 to=User3:0xa44a tokens=10.3
+RESULT: token3.Transfer 3 #190556 from=Null:0x0000 to=User4:0xa55a tokens=10.4
+RESULT: token3.Transfer 4 #190557 from=Null:0x0000 to=User5:0xa66a tokens=10.5
+RESULT: token3.Transfer 5 #190558 from=Null:0x0000 to=User6:0xa77a tokens=10.6
+RESULT: 
+undefined
+> 
+RESULT: 
+undefined
+> 
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+RESULT: ---------- ApproveAndCall #1 ----------
+undefined
+> 
+undefined
+> 
+... 
+undefined
+> 
+RESULT:  # Account                                             EtherBalanceChange                            ABC                            DEF Name
+RESULT:                                                                                                      GHI                           WETH
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:  0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.069478040000000000           0.000000000000000000           0.000000000000000000 Miner
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.063512295000000000           0.000000000000000000           0.000000000000000000 Deployer
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976       -0.000912680000000000         900.100000000000000000        1001.100000000000000000 User1
+RESULT:                                                                                   100.100000000000000000          10.100000000000000000
+RESULT:  3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0       -0.000912680000000000         900.200000000000000000        1001.200000000000000000 User2
+RESULT:                                                                                   100.200000000000000000          10.200000000000000000
+RESULT:  4 0xa44a08d3f6933c69212114bb66e2df1813651844       -0.000912680000000000         900.300000000000000000        1001.300000000000000000 User3
+RESULT:                                                                                   100.300000000000000000          10.300000000000000000
+RESULT:  5 0xa55a151eb00fded1634d27d1127b4be4627079ea       -0.000912360000000000         900.400000000000000000        1001.400000000000000000 User4
+RESULT:                                                                                   100.400000000000000000          10.400000000000000000
+RESULT:  6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9       -0.001402665000000000         900.500000000000000000        1001.500000000000000000 User5
+RESULT:                                                                                   100.500000000000000000          10.500000000000000000
+RESULT:  7 0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec       -0.000912680000000000         900.600000000000000000        1001.600000000000000000 User6
+RESULT:                                                                                   100.600000000000000000          10.600000000000000000
+RESULT:  8 0xa88a05d2b88283ce84c8325760b72a64591279a2        0.000000000000000000           0.000000000000000000           0.000000000000000000 Fee
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  9 0x76e208b2bd7482af60f7e390618f58779165ce13        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: 10 0xbb05d4982d3499dee1acd0884c86e30895e2b691        0.000000000000000000           0.000000000000000000           0.000000000000000000 DexOneExchange
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: 11 0xbf1ddeec84a04b7a78c78c3192facaa05b2689f6        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'ABC' 'Abc'
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: 12 0xc234bacb4b129a74bbc7119624d70c5a27beaa6f        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'DEF' 'Def'
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: 13 0x20815fc9830dc0ae6649dbdf5aea2f5727d6a25c        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'GHI' 'Ghi'
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: 14 0xa835b8e3b3be6e5bb4028513763b753520759e09        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'WETH' 'Wrapped ETH'
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:                                                                                  5402.100000000000000000        6008.100000000000000000 Total Token Balances
+RESULT:                                                                                   602.100000000000000000          62.100000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT: 
+undefined
+> 
+RESULT: PASS ApproveAndCall #1 - user5 ABC.approveAndCall(dexz, 1500, '0xaabbccdd1122334455667788990011223344556677889900112233445566778899001122122233445566778899001122334455667788990011223344556677889900112213223344556677889900112233445566778899001122334455667788990011221422334455667788990011223344556677889900112233445566778899001122152233445566778899001122334455667788990011223344556677889900112216223344556677889900112233445566778899001122334455667788990011221722334455667788990011223344556677889900112233445566778899001122')
+1
+> 
+RESULT: approveAndCall1_1Tx status=0x1 Success gas=2000000 gasUsed=97997 costETH=0.000489985 costUSD=0.06659386135 @ ETH/USD=135.91 gasPrice=5 gwei block=190566 txIx=0 txId=0xe062043c9cc5145b9ae42153156ade5b7e8e6e5ad18284a9a24766d044769c92 @ 1546310306 Tue, 01 Jan 2019 02:38:26 UTC
+undefined
+> 
+RESULT: 
+undefined
+> 
+RESULT: dexOneExchange.address=DexOneExchange:0xbb05
+RESULT: dexOneExchange.owner/new=Deployer:0xa11a/Null:0x0000
+RESULT: dexOneExchange.deploymentBlockNumber=190546
+RESULT: dexOneExchange.takerFee=0.1%
+RESULT: dexOneExchange.feeAccount=Fee:0xa88a
+RESULT: LogInfo 0 #190566 receiveApproval: from 0 User5:0xa66a
+RESULT: LogInfo 1 #190566 receiveApproval: tokens & token 1500 Token 'ABC' 'Abc':0xbf1d
+RESULT: LogInfo 2 #190566 receiveApproval: data 0 0xaabbccdd11223344556677889900112233445566778899001122334455667788
+RESULT: LogInfo 3 #190566 receiveApproval: length 228
+RESULT: LogInfo 4 #190566 receiveApproval: functionSignature 0 0xaabbccdd00000000000000000000000000000000000000000000000000000000
+RESULT: LogInfo 5 #190566 receiveApproval: parameter1 0 0x1122334455667788990011223344556677889900112233445566778899001122
+RESULT: LogInfo 6 #190566 receiveApproval: parameter2 0 0x1222334455667788990011223344556677889900112233445566778899001122
+RESULT: LogInfo 7 #190566 receiveApproval: parameter3 0 0x1322334455667788990011223344556677889900112233445566778899001122
+RESULT: LogInfo 8 #190566 receiveApproval: parameter4 0 0x1422334455667788990011223344556677889900112233445566778899001122
+RESULT: LogInfo 9 #190566 receiveApproval: parameter4 0 0x1522334455667788990011223344556677889900112233445566778899001122
+RESULT: LogInfo 10 #190566 receiveApproval: parameter4 0 0x1622334455667788990011223344556677889900112233445566778899001122
+RESULT: LogInfo 11 #190566 receiveApproval: parameter4 0 0x1722334455667788990011223344556677889900112233445566778899001122
+undefined
+> 
+RESULT: 
+undefined
+> 
+... 
+... 
+... 
+RESULT: token0ContractAddress=Token 'ABC' 'Abc':0xbf1d
+RESULT: token0.owner/new=Deployer:0xa11a/Null:0x0000
+RESULT: token0.details='ABC' 'Abc' 18 dp
+RESULT: token0.totalSupply=5402.1
+RESULT: token0.Approval 0 #190566 tokenOwner=User5:0xa66a spender=DexOneExchange:0xbb05 tokens=1500
+RESULT: 
+RESULT: token1ContractAddress=Token 'DEF' 'Def':0xc234
+RESULT: token1.owner/new=Deployer:0xa11a/Null:0x0000
+RESULT: token1.details='DEF' 'Def' 18 dp
+RESULT: token1.totalSupply=6008.1
+RESULT: 
+RESULT: token2ContractAddress=Token 'GHI' 'Ghi':0x2081
+RESULT: token2.owner/new=Deployer:0xa11a/Null:0x0000
+RESULT: token2.details='GHI' 'Ghi' 18 dp
+RESULT: token2.totalSupply=602.1
+RESULT: 
+RESULT: token3ContractAddress=Token 'WETH' 'Wrapped ETH':0xa835
+RESULT: token3.owner/new=Deployer:0xa11a/Null:0x0000
+RESULT: token3.details='WETH' 'Wrapped ETH' 18 dp
+RESULT: token3.totalSupply=62.1
+RESULT: 
+undefined
+> 
+RESULT: 
+undefined
+> 
+> 
