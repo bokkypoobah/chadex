@@ -12,10 +12,11 @@ contract Orders is DexzBase {
     // Note that the BUY and SELL flags are used as indices
     uint constant public ORDERTYPE_BUY = 0x00;
     uint constant public ORDERTYPE_SELL = 0x01;
-    uint constant public ORDERFLAG_BUYSELL = 0x01;
-    uint constant public ORDERFLAG_ADDORDER = 0x10;
-
-    // TODO FillMax, FillOrRevert,
+    uint constant public ORDERFLAG_BUYSELL_MASK = 0x01;
+    // BK Default is to fill as much as possible
+    uint constant public ORDERFLAG_FILL = 0x00;
+    uint constant public ORDERFLAG_FILLALL_OR_REVERT = 0x10;
+    uint constant public ORDERFLAG_FILL_AND_ADD_ORDER = 0x20;
 
     // 0.00054087 = new BigNumber(54087).shift(10);
     // GNT/ETH = base/quote = 0.00054087

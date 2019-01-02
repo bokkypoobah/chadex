@@ -22,3 +22,9 @@ Orderbook
          * uint expiry;
          * uint amount;            // GNT - baseToken
     sellOrders
+
+
+TODO:
+* Move past consumed orders
+* Handle canTransferFrom() - https://github.com/ethereum/EIPs/issues/1594
+      function canTransferFrom(address _from, address _to, uint256 _value, bytes _data) external view returns (bool, byte, bytes32);

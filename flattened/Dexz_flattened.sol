@@ -624,10 +624,11 @@ contract Orders is DexzBase {
     // Note that the BUY and SELL flags are used as indices
     uint constant public ORDERTYPE_BUY = 0x00;
     uint constant public ORDERTYPE_SELL = 0x01;
-    uint constant public ORDERFLAG_BUYSELL = 0x01;
-    uint constant public ORDERFLAG_ADDORDER = 0x10;
-
-    // TODO FillMax, FillOrRevert,
+    uint constant public ORDERFLAG_BUYSELL_MASK = 0x01;
+    // BK Default is to fill as much as possible
+    uint constant public ORDERFLAG_FILL = 0x00;
+    uint constant public ORDERFLAG_FILLALL_OR_REVERT = 0x10;
+    uint constant public ORDERFLAG_FILL_AND_ADD_ORDER = 0x20;
 
     // 0.00054087 = new BigNumber(54087).shift(10);
     // GNT/ETH = base/quote = 0.00054087
@@ -933,43 +934,38 @@ contract Dexz is Orders, ApproveAndCallFallback {
         emit LogInfo("receiveApproval: tokens & token", _tokens, 0x0, "", _token);
         uint length;
         bytes4 functionSignature;
-        uint parameter1;
-        uint parameter2;
-        uint parameter3;
-        uint parameter4;
-        uint parameter5;
-        uint parameter6;
-        uint parameter7;
+        uint orderFlag;
+        uint baseToken;
+        uint quoteToken;
+        uint price;
+        uint expiry;
+        uint baseTokens;
+        uint uiFeeAccount;
         assembly {
             length := mload(_data)
             functionSignature := mload(add(_data, 0x20))
-            parameter1 := mload(add(_data, 0x24))
-            parameter2 := mload(add(_data, 0x44))
-            parameter3 := mload(add(_data, 0x64))
-            parameter4 := mload(add(_data, 0x84))
-            parameter5 := mload(add(_data, 0xA4))
-            parameter6 := mload(add(_data, 0xC4))
-            parameter7 := mload(add(_data, 0xE4))
+            orderFlag := mload(add(_data, 0x24))
+            baseToken := mload(add(_data, 0x44))
+            quoteToken := mload(add(_data, 0x64))
+            price := mload(add(_data, 0x84))
+            expiry := mload(add(_data, 0xA4))
+            baseTokens := mload(add(_data, 0xC4))
+            uiFeeAccount := mload(add(_data, 0xE4))
         }
         emit LogInfo("receiveApproval: length", length, 0x0, "", address(0));
         emit LogInfo("receiveApproval: functionSignature", 0, bytes32(functionSignature), "", address(0));
-        emit LogInfo("receiveApproval: p1 orderType", parameter1, 0x0, "", address(0));
-        emit LogInfo("receiveApproval: p2 baseToken", 0, 0x0, "", address(parameter2));
-        emit LogInfo("receiveApproval: p3 quoteToken", 0, 0x0, "", address(parameter3));
-        emit LogInfo("receiveApproval: p4 price", parameter4, 0x0, "", address(0));
-        emit LogInfo("receiveApproval: p5 expiry", parameter5, 0x0, "", address(0));
-        emit LogInfo("receiveApproval: p6 baseTokens", parameter6, 0x0, "", address(0));
-        emit LogInfo("receiveApproval: p7 uiFeeAccount", 0, 0x0, "", address(parameter7));
+        emit LogInfo("receiveApproval: p1 orderFlag", orderFlag, 0x0, "", address(0));
+        emit LogInfo("receiveApproval: p2 baseToken", 0, 0x0, "", address(baseToken));
+        emit LogInfo("receiveApproval: p3 quoteToken", 0, 0x0, "", address(quoteToken));
+        emit LogInfo("receiveApproval: p4 price", price, 0x0, "", address(0));
+        emit LogInfo("receiveApproval: p5 expiry", expiry, 0x0, "", address(0));
+        emit LogInfo("receiveApproval: p6 baseTokens", baseTokens, 0x0, "", address(0));
+        emit LogInfo("receiveApproval: p7 uiFeeAccount", 0, 0x0, "", address(uiFeeAccount));
 
         if (functionSignature == tradeSig) {
             require(length >= tradeDataLength);
-            // TradeInfo memory tradeInfo = TradeInfo(_from, uint(parameter1), address(uint(parameter2)), address(uint(parameter3)), uint(parameter4), uint(parameter5), uint(parameter6), address(uint(parameter7)));
-            _trade(TradeInfo(_from, parameter1, address(parameter2), address(parameter3), parameter4, parameter5, parameter6, address(parameter7)));
-            // _trade(tradeInfo);
-            // _trade(_from, uint(parameter1), address(uint(parameter2)), address(uint(parameter3)), uint(parameter4), uint(parameter5), uint(parameter6), address(uint(parameter7)));
+            _trade(TradeInfo(_from, orderFlag, orderFlag & ORDERFLAG_BUYSELL_MASK, address(baseToken), address(quoteToken), price, expiry, baseTokens, address(uiFeeAccount)));
         }
-//        function addOrder(uint orderType, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
-
     }
 
     // buy(address,address,uint256,uint256,uint256,address)
@@ -984,6 +980,7 @@ contract Dexz is Orders, ApproveAndCallFallback {
     struct TradeInfo {
         address taker;
         uint orderFlag;
+        uint orderType;
         address baseToken;
         address quoteToken;
         uint price;
@@ -997,56 +994,49 @@ contract Dexz is Orders, ApproveAndCallFallback {
     // => "0xcbb924e2"
     bytes4 public constant tradeSig = "\xcb\xb9\x24\xe2";
     function trade(uint orderFlag, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
-        TradeInfo memory tradeInfo = TradeInfo(msg.sender, orderFlag | ORDERFLAG_ADDORDER, baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount);
+        TradeInfo memory tradeInfo = TradeInfo(msg.sender, orderFlag | ORDERFLAG_FILL_AND_ADD_ORDER, orderFlag & ORDERFLAG_BUYSELL_MASK, baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount);
         return _trade(tradeInfo);
-        // return _trade(msg.sender, orderFlag, baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount);
     }
     function _trade(TradeInfo memory tradeInfo) internal returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
     // function _trade(address taker, uint orderFlag, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
-        uint orderType = tradeInfo.orderFlag & ORDERFLAG_BUYSELL;
         uint matchingPriceKey;
         bytes32 matchingOrderKey;
-        (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(orderType, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price);
+        (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.orderType, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price);
         emit LogInfo("_trade: matchingOrderKey", 0, matchingOrderKey, "", address(0));
 
         while (matchingOrderKey != ORDERKEY_SENTINEL && tradeInfo.baseTokens > 0) {
-            // uint _baseTokens;
-            // uint _quoteTokens;
-            uint[2] memory tokens; // 0 = baseToken, 1 = quoteToken
+            uint _baseTokens;
+            uint _quoteTokens;
             bool _orderFilled;
             Orders.Order storage order = orders[matchingOrderKey];
             // emit LogInfo("_trade: order", order.baseTokens, matchingOrderKey, "", order.maker);
-            // (_baseTokens, _quoteTokens, _orderFilled) = calculateOrder(matchingOrderKey, baseTokens, msg.sender);
-            (tokens, _orderFilled) = calculateOrder(matchingOrderKey, tradeInfo.baseTokens, tradeInfo.taker);
+            (_baseTokens, _quoteTokens, _orderFilled) = calculateOrder(matchingOrderKey, tradeInfo.baseTokens, tradeInfo.taker);
             // emit LogInfo("_trade: order._baseTokens", _baseTokens, matchingOrderKey, "", order.maker);
             // emit LogInfo("_trade: order._quoteTokens", _quoteTokens, matchingOrderKey, "", order.maker);
 
-            // if (_baseTokens > 0 && _quoteTokens > 0) {
-            if (tokens[0] > 0 && tokens[1] > 0) {
-                // order.baseTokensFilled = order.baseTokensFilled.add(_baseTokens);
-                order.baseTokensFilled = order.baseTokensFilled.add(tokens[0]);
-                // trade(orderType, msg.sender, order.maker, uiFeeAccount, baseToken, quoteToken, _baseTokens, _quoteTokens);
-                // trade(orderType, msg.sender, order.maker, uiFeeAccount, baseToken, quoteToken, tokens);
-                transferTokens(tradeInfo, orderType, order.maker, tokens, matchingOrderKey);
-                tradeInfo.baseTokens = tradeInfo.baseTokens.sub(tokens[0]);
+            if (_baseTokens > 0 && _quoteTokens > 0) {
+                order.baseTokensFilled = order.baseTokensFilled.add(_baseTokens);
+                transferTokens(tradeInfo, tradeInfo.orderType, order.maker, _baseTokens, _quoteTokens, matchingOrderKey);
+                tradeInfo.baseTokens = tradeInfo.baseTokens.sub(_baseTokens);
                 // _baseTokensFilled = _baseTokensFilled.add(_baseTokens);
                 // _quoteTokensFilled = _quoteTokensFilled.add(_quoteTokens);
-                _updateBestMatchingOrder(orderType, tradeInfo.baseToken, tradeInfo.quoteToken, matchingPriceKey, matchingOrderKey, _orderFilled);
+                _updateBestMatchingOrder(tradeInfo.orderType, tradeInfo.baseToken, tradeInfo.quoteToken, matchingPriceKey, matchingOrderKey, _orderFilled);
                 // matchingOrderKey = ORDERKEY_SENTINEL;
-                (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(orderType, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price);
+                (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.orderType, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price);
             }
         }
-        if (tradeInfo.baseTokens > 0 && ((tradeInfo.orderFlag & ORDERFLAG_ADDORDER) == ORDERFLAG_ADDORDER)) {
+        if ((tradeInfo.orderFlag & ORDERFLAG_FILLALL_OR_REVERT) == ORDERFLAG_FILLALL_OR_REVERT) {
+            require(tradeInfo.baseTokens == 0);
+        }
+        if (tradeInfo.baseTokens > 0 && ((tradeInfo.orderFlag & ORDERFLAG_FILL_AND_ADD_ORDER) == ORDERFLAG_FILL_AND_ADD_ORDER)) {
             require(tradeInfo.expiry > now);
-            _orderKey = _addOrder(orderType, tradeInfo.taker, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
+            _orderKey = _addOrder(tradeInfo.orderType, tradeInfo.taker, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
         }
     }
 
-    function calculateOrder(bytes32 _matchingOrderKey, uint amountBaseTokens, address taker) internal returns (uint[2] memory tokens, bool _orderFilled) {
+    function calculateOrder(bytes32 _matchingOrderKey, uint amountBaseTokens, address taker) internal returns (uint baseTokens, uint quoteTokens, bool _orderFilled) {
         Orders.Order storage matchingOrder = orders[_matchingOrderKey];
         require(now <= matchingOrder.expiry);
-        uint baseTokens;
-        uint quoteTokens;
 
         // // Maker buying base, needs to have amount in quote = base x price
         // // Taker selling base, needs to have amount in base
@@ -1120,28 +1110,20 @@ contract Dexz is Orders, ApproveAndCallFallback {
         }
         // TODO BK
         _orderFilled = true;
-        tokens[0] = baseTokens;
-        tokens[1] = quoteTokens;
     }
 
 
     // function trade(uint orderType, address taker, address maker, address uiFeeAccount, address baseToken, address quoteToken, uint[2] memory tokens) internal {
-    function transferTokens(TradeInfo memory tradeInfo, uint orderType, address maker, uint[2] memory tokens, bytes32 matchingOrderKey) internal {
+    function transferTokens(TradeInfo memory tradeInfo, uint orderType, address maker, uint _baseTokens, uint _quoteTokens, bytes32 matchingOrderKey) internal {
         uint takerFeeTokens;
-        uint _baseTokens = tokens[0];
-        uint _quoteTokens = tokens[1];
 
         // TODO
         uint __orderBaseTokensFilled = 0;
 
         if (orderType == ORDERTYPE_BUY) {
             emit LogInfo("transferTokens: BUY", 0, 0x0, "", address(0));
-
             takerFeeTokens = _baseTokens.mul(takerFee).div(TENPOW18);
-            // emit Trade(matchingOrderKey, uint(orderType), msg.sender, order.maker, baseTokens, order.baseToken, order.quoteToken, _baseTokens.sub(takerFeeTokens), _quoteTokens, takerFeeTokens, 0, order.baseTokensFilled);
-            // emit Trade(__matchingOrderKey, orderType, taker, maker, _baseTokens, baseToken, quoteToken, _baseTokens.sub(takerFeeTokens), _quoteTokens, takerFeeTokens, 0, __orderBaseTokensFilled);
             emit Trade(matchingOrderKey, orderType, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens.sub(takerFeeTokens), _quoteTokens, takerFeeTokens, 0, __orderBaseTokensFilled);
-
             transferFrom(tradeInfo.quoteToken, tradeInfo.taker, maker, _quoteTokens);
             transferFrom(tradeInfo.baseToken, maker, tradeInfo.taker, _baseTokens.sub(takerFeeTokens));
             if (takerFeeTokens > 0) {
@@ -1154,11 +1136,8 @@ contract Dexz is Orders, ApproveAndCallFallback {
             }
         } else {
             emit LogInfo("transferTokens: SELL", 0, 0x0, "", address(0));
-
             takerFeeTokens = _quoteTokens.mul(takerFee).div(TENPOW18);
-            // emit Trade(matchingOrderKey, uint(orderType), msg.sender, order.maker, baseTokens, order.baseToken, order.quoteToken, _baseTokens, _quoteTokens.sub(takerFeeTokens), 0, takerFeeTokens, order.baseTokensFilled);
             emit Trade(matchingOrderKey, orderType, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens, _quoteTokens.sub(takerFeeTokens), takerFeeTokens, 0, __orderBaseTokensFilled);
-
             transferFrom(tradeInfo.baseToken, tradeInfo.taker, maker, _baseTokens);
             transferFrom(tradeInfo.quoteToken, maker, tradeInfo.taker, _quoteTokens.sub(takerFeeTokens));
             if (takerFeeTokens > 0) {
