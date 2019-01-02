@@ -9,8 +9,11 @@ import "DexzBase.sol";
 contract Orders is DexzBase {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
-    uint constant public ORDERTYPE_BUY = 0;
-    uint constant public ORDERTYPE_SELL = 1;
+    // Note that the BUY and SELL flags are used as indices
+    uint constant public ORDERTYPE_BUY = 0x00;
+    uint constant public ORDERTYPE_SELL = 0x01;
+    uint constant public ORDERFLAG_BUYSELL = 0x01;
+    uint constant public ORDERFLAG_ADDORDER = 0x10;
 
     // TODO FillMax, FillOrRevert,
 

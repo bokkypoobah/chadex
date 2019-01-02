@@ -251,35 +251,6 @@ console.log("RESULT: ");
 
 
 // -----------------------------------------------------------------------------
-var approveAndCallMessage = "ApproveAndCall #1";
-var sellAmount = new BigNumber(1500).shift(18);
-var data = "0xaabbccdd" + "1122334455667788990011223344556677889900112233445566778899001122" + \
-  "1222334455667788990011223344556677889900112233445566778899001122" + "1322334455667788990011223344556677889900112233445566778899001122" + \
-  "1422334455667788990011223344556677889900112233445566778899001122" + "1522334455667788990011223344556677889900112233445566778899001122" + \
-  "1622334455667788990011223344556677889900112233445566778899001122" + "1722334455667788990011223344556677889900112233445566778899001122";
-// -----------------------------------------------------------------------------
-console.log("RESULT: ---------- " + approveAndCallMessage + " ----------");
-var approveAndCall1_1Tx = tokens[ABC].approveAndCall(dexzAddress, sellAmount, data, {from: user5, gas: 2000000, gasPrice: defaultGasPrice});
-while (txpool.status.pending > 0) {
-}
-printBalances();
-failIfTxStatusError(approveAndCall1_1Tx, approveAndCallMessage + " - user5 " + tokens[ABC].symbol() + ".approveAndCall(dexz, " + sellAmount.shift(-18) + ", '" + data + "')");
-printTxData("approveAndCall1_1Tx", approveAndCall1_1Tx);
-console.log("RESULT: ");
-printDexOneExchangeContractDetails();
-console.log("RESULT: ");
-for (i = 0; i < numberOfTokens; i++) {
-  printTokenContractDetails(i);
-  console.log("RESULT: ");
-}
-console.log("RESULT: ");
-
-exit;
-
-
-
-
-// -----------------------------------------------------------------------------
 var addOrders1Message = "Add Orders #1";
 var ordersLoop;
 for (var ordersLoop = 0; ordersLoop < 2; ordersLoop++) {
@@ -311,7 +282,7 @@ for (var ordersLoop = 0; ordersLoop < 2; ordersLoop++) {
   console.log("RESULT: ---------- " + addOrders1Message + " loop " + ordersLoop + " ----------");
   for (i = 0; i < orders.length; i++) {
     var order = orders[i];
-    ordersTxs.push(dexz.addOrder(order.buySell, order.baseToken, order.quoteToken, order.price, order.expiry, order.amount, deployer, {from: order.user, gas: 3000000, gasPrice: defaultGasPrice}));
+    ordersTxs.push(dexz.trade(order.buySell, order.baseToken, order.quoteToken, order.price, order.expiry, order.amount, uiFeeAccount, {from: order.user, gas: 3000000, gasPrice: defaultGasPrice}));
     while (txpool.status.pending > 0) {
     }
   }
@@ -336,6 +307,35 @@ for (var ordersLoop = 0; ordersLoop < 2; ordersLoop++) {
   }
   console.log("RESULT: ");
 }
+
+
+if (false) {
+// -----------------------------------------------------------------------------
+var approveAndCallMessage = "ApproveAndCall #1";
+var sellAmount = new BigNumber(1500).shift(18);
+var data = "0xaabbccdd" + "1122334455667788990011223344556677889900112233445566778899001122"; // + \
+  // "1222334455667788990011223344556677889900112233445566778899001122" + "1322334455667788990011223344556677889900112233445566778899001122" + \
+  // "1422334455667788990011223344556677889900112233445566778899001122" + "1522334455667788990011223344556677889900112233445566778899001122" + \
+  // "1622334455667788990011223344556677889900112233445566778899001122" + "1722334455667788990011223344556677889900112233445566778899001122";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ---------- " + approveAndCallMessage + " ----------");
+var approveAndCall1_1Tx = tokens[ABC].approveAndCall(dexzAddress, sellAmount, data, {from: user5, gas: 2000000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+printBalances();
+failIfTxStatusError(approveAndCall1_1Tx, approveAndCallMessage + " - user5 " + tokens[ABC].symbol() + ".approveAndCall(dexz, " + sellAmount.shift(-18) + ", '" + data + "')");
+printTxData("approveAndCall1_1Tx", approveAndCall1_1Tx);
+console.log("RESULT: ");
+printDexOneExchangeContractDetails();
+console.log("RESULT: ");
+for (i = 0; i < numberOfTokens; i++) {
+  printTokenContractDetails(i);
+  console.log("RESULT: ");
+}
+console.log("RESULT: ");
+
+}
+
 
 exit;
 

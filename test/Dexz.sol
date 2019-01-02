@@ -28,20 +28,15 @@ contract Dexz is Orders, ApproveAndCallFallback {
     function receiveApproval(address _from, uint256 _tokens, address _token, bytes memory _data) public {
         emit LogInfo("receiveApproval: from", 0, 0x0, "", _from);
         emit LogInfo("receiveApproval: tokens & token", _tokens, 0x0, "", _token);
-        bytes32 dataBytes32;
-        for (uint i = 0; i < _data.length && i < 32; i++) {
-            dataBytes32 |= bytes32(_data[i] & 0xff) >> (i * 8);
-        }
-        emit LogInfo("receiveApproval: data", 0, dataBytes32, "", address(0));
         uint length;
         bytes4 functionSignature;
-        bytes32 parameter1;
-        bytes32 parameter2;
-        bytes32 parameter3;
-        bytes32 parameter4;
-        bytes32 parameter5;
-        bytes32 parameter6;
-        bytes32 parameter7;
+        uint parameter1;
+        uint parameter2;
+        uint parameter3;
+        uint parameter4;
+        uint parameter5;
+        uint parameter6;
+        uint parameter7;
         assembly {
             length := mload(_data)
             functionSignature := mload(add(_data, 0x20))
@@ -59,110 +54,93 @@ contract Dexz is Orders, ApproveAndCallFallback {
         emit LogInfo("receiveApproval: parameter2", 0, bytes32(parameter2), "", address(0));
         emit LogInfo("receiveApproval: parameter3", 0, bytes32(parameter3), "", address(0));
         emit LogInfo("receiveApproval: parameter4", 0, bytes32(parameter4), "", address(0));
-        emit LogInfo("receiveApproval: parameter4", 0, bytes32(parameter5), "", address(0));
-        emit LogInfo("receiveApproval: parameter4", 0, bytes32(parameter6), "", address(0));
-        emit LogInfo("receiveApproval: parameter4", 0, bytes32(parameter7), "", address(0));
+        emit LogInfo("receiveApproval: parameter5", 0, bytes32(parameter5), "", address(0));
+        emit LogInfo("receiveApproval: parameter6", 0, bytes32(parameter6), "", address(0));
+        emit LogInfo("receiveApproval: parameter7", 0, bytes32(parameter7), "", address(0));
 
+        if (functionSignature == tradeSig) {
+            // TradeInfo memory tradeInfo = TradeInfo(_from, uint(parameter1), address(uint(parameter2)), address(uint(parameter3)), uint(parameter4), uint(parameter5), uint(parameter6), address(uint(parameter7)));
+            _trade(TradeInfo(_from, parameter1, address(parameter2), address(parameter3), parameter4, parameter5, parameter6, address(parameter7)));
+            // _trade(tradeInfo);
+            // _trade(_from, uint(parameter1), address(uint(parameter2)), address(uint(parameter3)), uint(parameter4), uint(parameter5), uint(parameter6), address(uint(parameter7)));
+        }
 //        function addOrder(uint orderType, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
 
-
     }
 
-    // function trade(uint orderType, address taker, address maker, address uiFeeAccount, address baseToken, address quoteToken, uint[2] memory tokens) internal {
-    function trade(uint orderType, address[5] memory addresses, uint[2] memory tokens, bytes32 matchingOrderKey) internal {
-        uint takerFeeTokens;
-        uint _baseTokens = tokens[0];
-        uint _quoteTokens = tokens[1];
+    // buy(address,address,uint256,uint256,uint256,address)
+    // sell(address,address,uint256,uint256,uint256,address)
+    // function buy(address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
+    //     return trade(ORDERTYPE_BUY, baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount);
+    // }
+    // function sell(address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
+    //     return trade(ORDERTYPE_SELL, baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount);
+    // }
 
-        // address taker = addresses[0];
-        // address maker = addresses[1];
-        // address uiFeeAccount = addresses[2];
-        // address baseToken = addresses[3];
-        // address quoteToken = addresses[4];
-
-        // TODO
-        uint __orderBaseTokensFilled = 0;
-
-        if (orderType == ORDERTYPE_BUY) {
-            emit LogInfo("trade: BUY", 0, 0x0, "", address(0));
-
-            takerFeeTokens = _baseTokens.mul(takerFee).div(TENPOW18);
-            // emit Trade(matchingOrderKey, uint(orderType), msg.sender, order.maker, baseTokens, order.baseToken, order.quoteToken, _baseTokens.sub(takerFeeTokens), _quoteTokens, takerFeeTokens, 0, order.baseTokensFilled);
-            // emit Trade(__matchingOrderKey, orderType, taker, maker, _baseTokens, baseToken, quoteToken, _baseTokens.sub(takerFeeTokens), _quoteTokens, takerFeeTokens, 0, __orderBaseTokensFilled);
-            emit Trade(matchingOrderKey, orderType, addresses[0], addresses[1], _baseTokens, addresses[3], addresses[4], _baseTokens.sub(takerFeeTokens), _quoteTokens, takerFeeTokens, 0, __orderBaseTokensFilled);
-
-            transferFrom(addresses[4], addresses[0], addresses[1], _quoteTokens);
-            transferFrom(addresses[3], addresses[1], addresses[0], _baseTokens.sub(takerFeeTokens));
-            if (takerFeeTokens > 0) {
-                if (feeAccount == addresses[2] || takerFeeTokens == 1) {
-                    transferFrom(addresses[3], addresses[1], feeAccount, takerFeeTokens);
-                } else {
-                    transferFrom(addresses[3], addresses[1], addresses[2], takerFeeTokens / 2);
-                    transferFrom(addresses[3], addresses[1], feeAccount, takerFeeTokens - takerFeeTokens / 2);
-                }
-            }
-        } else {
-            emit LogInfo("trade: SELL", 0, 0x0, "", address(0));
-
-            takerFeeTokens = _quoteTokens.mul(takerFee).div(TENPOW18);
-            // emit Trade(matchingOrderKey, uint(orderType), msg.sender, order.maker, baseTokens, order.baseToken, order.quoteToken, _baseTokens, _quoteTokens.sub(takerFeeTokens), 0, takerFeeTokens, order.baseTokensFilled);
-            emit Trade(matchingOrderKey, orderType, addresses[0], addresses[1], _baseTokens, addresses[3], addresses[4], _baseTokens, _quoteTokens.sub(takerFeeTokens), takerFeeTokens, 0, __orderBaseTokensFilled);
-
-            transferFrom(addresses[3], addresses[0], addresses[1], _baseTokens);
-            transferFrom(addresses[4], addresses[1], addresses[0], _quoteTokens.sub(takerFeeTokens));
-            if (takerFeeTokens > 0) {
-                if (feeAccount == addresses[2] || takerFeeTokens == 1) {
-                    transferFrom(addresses[4], addresses[1], feeAccount, takerFeeTokens);
-                } else {
-                    transferFrom(addresses[4], addresses[1], addresses[2], takerFeeTokens / 2);
-                    transferFrom(addresses[4], addresses[1], feeAccount, takerFeeTokens - takerFeeTokens / 2);
-                }
-            }
-        }
+    struct TradeInfo {
+        address taker;
+        uint orderFlag;
+        address baseToken;
+        address quoteToken;
+        uint price;
+        uint expiry;
+        uint baseTokens;
+        address uiFeeAccount;
     }
 
-    function addOrder(uint orderType, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
+    // trade(uint256,address,address,uint256,uint256,uint256,address)
+    // web3.sha3("trade(uint256,address,address,uint256,uint256,uint256,address)").substring(0, 10)
+    // => "0xcbb924e2"
+    bytes4 public constant tradeSig = "\xcb\xb9\x24\xe2";
+    function trade(uint orderFlag, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
+        TradeInfo memory tradeInfo = TradeInfo(msg.sender, orderFlag | ORDERFLAG_ADDORDER, baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount);
+        return _trade(tradeInfo);
+        // return _trade(msg.sender, orderFlag, baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount);
+    }
+    function _trade(TradeInfo memory tradeInfo) internal returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
+    // function _trade(address taker, uint orderFlag, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
+        uint orderType = tradeInfo.orderFlag & ORDERFLAG_BUYSELL;
         uint matchingPriceKey;
         bytes32 matchingOrderKey;
-        (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(orderType, baseToken, quoteToken, price);
-        emit LogInfo("addOrder: matchingOrderKey", 0, matchingOrderKey, "", address(0));
+        (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(orderType, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price);
+        emit LogInfo("_trade: matchingOrderKey", 0, matchingOrderKey, "", address(0));
 
-        while (matchingOrderKey != ORDERKEY_SENTINEL && baseTokens > 0) {
+        while (matchingOrderKey != ORDERKEY_SENTINEL && tradeInfo.baseTokens > 0) {
             // uint _baseTokens;
             // uint _quoteTokens;
             uint[2] memory tokens; // 0 = baseToken, 1 = quoteToken
             address[5] memory addresses; // 0 = taker, 1 = maker, 2 = uiFeeAccount, 3 = baseToken, 4 = quoteToken
             bool _orderFilled;
             Orders.Order storage order = orders[matchingOrderKey];
-            // emit LogInfo("addOrder: order", order.baseTokens, matchingOrderKey, "", order.maker);
+            // emit LogInfo("_trade: order", order.baseTokens, matchingOrderKey, "", order.maker);
             // (_baseTokens, _quoteTokens, _orderFilled) = calculateOrder(matchingOrderKey, baseTokens, msg.sender);
-            (tokens, _orderFilled) = calculateOrder(matchingOrderKey, baseTokens, msg.sender);
-            // emit LogInfo("addOrder: order._baseTokens", _baseTokens, matchingOrderKey, "", order.maker);
-            // emit LogInfo("addOrder: order._quoteTokens", _quoteTokens, matchingOrderKey, "", order.maker);
+            (tokens, _orderFilled) = calculateOrder(matchingOrderKey, tradeInfo.baseTokens, tradeInfo.taker);
+            // emit LogInfo("_trade: order._baseTokens", _baseTokens, matchingOrderKey, "", order.maker);
+            // emit LogInfo("_trade: order._quoteTokens", _quoteTokens, matchingOrderKey, "", order.maker);
 
             // if (_baseTokens > 0 && _quoteTokens > 0) {
             if (tokens[0] > 0 && tokens[1] > 0) {
                 // order.baseTokensFilled = order.baseTokensFilled.add(_baseTokens);
                 order.baseTokensFilled = order.baseTokensFilled.add(tokens[0]);
                 // trade(orderType, msg.sender, order.maker, uiFeeAccount, baseToken, quoteToken, _baseTokens, _quoteTokens);
-                addresses[0] = msg.sender;
+                addresses[0] = tradeInfo.taker;
                 addresses[1] = order.maker;
-                addresses[2] = uiFeeAccount;
-                addresses[3] = baseToken;
-                addresses[4] = quoteToken;
+                addresses[2] = tradeInfo.uiFeeAccount;
+                addresses[3] = tradeInfo.baseToken;
+                addresses[4] = tradeInfo.quoteToken;
                 // trade(orderType, msg.sender, order.maker, uiFeeAccount, baseToken, quoteToken, tokens);
-                trade(orderType, addresses, tokens, matchingOrderKey);
-                baseTokens = baseTokens.sub(tokens[0]);
+                transferTokens(orderType, addresses, tokens, matchingOrderKey);
+                tradeInfo.baseTokens = tradeInfo.baseTokens.sub(tokens[0]);
                 // _baseTokensFilled = _baseTokensFilled.add(_baseTokens);
                 // _quoteTokensFilled = _quoteTokensFilled.add(_quoteTokens);
-                _updateBestMatchingOrder(orderType, baseToken, quoteToken, matchingPriceKey, matchingOrderKey, _orderFilled);
+                _updateBestMatchingOrder(orderType, tradeInfo.baseToken, tradeInfo.quoteToken, matchingPriceKey, matchingOrderKey, _orderFilled);
                 // matchingOrderKey = ORDERKEY_SENTINEL;
-                (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(orderType, baseToken, quoteToken, price);
+                (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(orderType, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price);
             }
         }
-        if (baseTokens > 0) {
-            require(expiry > now);
-            _orderKey = _addOrder(orderType, msg.sender, baseToken, quoteToken, price, expiry, baseTokens);
+        if (tradeInfo.baseTokens > 0 && ((tradeInfo.orderFlag & ORDERFLAG_ADDORDER) == ORDERFLAG_ADDORDER)) {
+            require(tradeInfo.expiry > now);
+            _orderKey = _addOrder(orderType, tradeInfo.taker, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
         }
     }
 
@@ -248,6 +226,59 @@ contract Dexz is Orders, ApproveAndCallFallback {
         tokens[1] = quoteTokens;
     }
 
+
+    // function trade(uint orderType, address taker, address maker, address uiFeeAccount, address baseToken, address quoteToken, uint[2] memory tokens) internal {
+    function transferTokens(uint orderType, address[5] memory addresses, uint[2] memory tokens, bytes32 matchingOrderKey) internal {
+        uint takerFeeTokens;
+        uint _baseTokens = tokens[0];
+        uint _quoteTokens = tokens[1];
+
+        // address taker = addresses[0];
+        // address maker = addresses[1];
+        // address uiFeeAccount = addresses[2];
+        // address baseToken = addresses[3];
+        // address quoteToken = addresses[4];
+
+        // TODO
+        uint __orderBaseTokensFilled = 0;
+
+        if (orderType == ORDERTYPE_BUY) {
+            emit LogInfo("transferTokens: BUY", 0, 0x0, "", address(0));
+
+            takerFeeTokens = _baseTokens.mul(takerFee).div(TENPOW18);
+            // emit Trade(matchingOrderKey, uint(orderType), msg.sender, order.maker, baseTokens, order.baseToken, order.quoteToken, _baseTokens.sub(takerFeeTokens), _quoteTokens, takerFeeTokens, 0, order.baseTokensFilled);
+            // emit Trade(__matchingOrderKey, orderType, taker, maker, _baseTokens, baseToken, quoteToken, _baseTokens.sub(takerFeeTokens), _quoteTokens, takerFeeTokens, 0, __orderBaseTokensFilled);
+            emit Trade(matchingOrderKey, orderType, addresses[0], addresses[1], _baseTokens, addresses[3], addresses[4], _baseTokens.sub(takerFeeTokens), _quoteTokens, takerFeeTokens, 0, __orderBaseTokensFilled);
+
+            transferFrom(addresses[4], addresses[0], addresses[1], _quoteTokens);
+            transferFrom(addresses[3], addresses[1], addresses[0], _baseTokens.sub(takerFeeTokens));
+            if (takerFeeTokens > 0) {
+                if (feeAccount == addresses[2] || takerFeeTokens == 1) {
+                    transferFrom(addresses[3], addresses[1], feeAccount, takerFeeTokens);
+                } else {
+                    transferFrom(addresses[3], addresses[1], addresses[2], takerFeeTokens / 2);
+                    transferFrom(addresses[3], addresses[1], feeAccount, takerFeeTokens - takerFeeTokens / 2);
+                }
+            }
+        } else {
+            emit LogInfo("transferTokens: SELL", 0, 0x0, "", address(0));
+
+            takerFeeTokens = _quoteTokens.mul(takerFee).div(TENPOW18);
+            // emit Trade(matchingOrderKey, uint(orderType), msg.sender, order.maker, baseTokens, order.baseToken, order.quoteToken, _baseTokens, _quoteTokens.sub(takerFeeTokens), 0, takerFeeTokens, order.baseTokensFilled);
+            emit Trade(matchingOrderKey, orderType, addresses[0], addresses[1], _baseTokens, addresses[3], addresses[4], _baseTokens, _quoteTokens.sub(takerFeeTokens), takerFeeTokens, 0, __orderBaseTokensFilled);
+
+            transferFrom(addresses[3], addresses[0], addresses[1], _baseTokens);
+            transferFrom(addresses[4], addresses[1], addresses[0], _quoteTokens.sub(takerFeeTokens));
+            if (takerFeeTokens > 0) {
+                if (feeAccount == addresses[2] || takerFeeTokens == 1) {
+                    transferFrom(addresses[4], addresses[1], feeAccount, takerFeeTokens);
+                } else {
+                    transferFrom(addresses[4], addresses[1], addresses[2], takerFeeTokens / 2);
+                    transferFrom(addresses[4], addresses[1], feeAccount, takerFeeTokens - takerFeeTokens / 2);
+                }
+            }
+        }
+    }
 
 
     /*
