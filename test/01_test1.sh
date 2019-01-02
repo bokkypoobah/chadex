@@ -309,21 +309,23 @@ for (var ordersLoop = 0; ordersLoop < 2; ordersLoop++) {
 }
 
 
-if (false) {
+if (true) {
 // -----------------------------------------------------------------------------
 var approveAndCallMessage = "ApproveAndCall #1";
-var sellAmount = new BigNumber(1500).shift(18);
-var data = "0xaabbccdd" + "1122334455667788990011223344556677889900112233445566778899001122"; // + \
-  // "1222334455667788990011223344556677889900112233445566778899001122" + "1322334455667788990011223344556677889900112233445566778899001122" + \
-  // "1422334455667788990011223344556677889900112233445566778899001122" + "1522334455667788990011223344556677889900112233445566778899001122" + \
-  // "1622334455667788990011223344556677889900112233445566778899001122" + "1722334455667788990011223344556677889900112233445566778899001122";
+var buyAmount = new BigNumber(1500).shift(18);
+// var data = "0xaabbccdd" + "1122334455667788990011223344556677889900112233445566778899001122" + \
+//   "1222334455667788990011223344556677889900112233445566778899001122" + "1322334455667788990011223344556677889900112233445566778899001122" + \
+//   "1422334455667788990011223344556677889900112233445566778899001122" + "1522334455667788990011223344556677889900112233445566778899001122" + \
+//   "1622334455667788990011223344556677889900112233445566778899001122" + "1722334455667788990011223344556677889900112233445566778899001122";
+var tradeData = dexz.trade.getData(BUY, tokenAddresses[ABC], tokenAddresses[WETH], buyPrice2, expiry, buyAmount, uiFeeAccount, {from: user5, gas: 3000000, gasPrice: defaultGasPrice});
+console.log("RESULT: tradeData[Buy 1500 ABC/WETH]='" + tradeData + "'");
 // -----------------------------------------------------------------------------
 console.log("RESULT: ---------- " + approveAndCallMessage + " ----------");
-var approveAndCall1_1Tx = tokens[ABC].approveAndCall(dexzAddress, sellAmount, data, {from: user5, gas: 2000000, gasPrice: defaultGasPrice});
+var approveAndCall1_1Tx = tokens[ABC].approveAndCall(dexzAddress, buyAmount, tradeData, {from: user5, gas: 2000000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 printBalances();
-failIfTxStatusError(approveAndCall1_1Tx, approveAndCallMessage + " - user5 " + tokens[ABC].symbol() + ".approveAndCall(dexz, " + sellAmount.shift(-18) + ", '" + data + "')");
+failIfTxStatusError(approveAndCall1_1Tx, approveAndCallMessage + " - user5 " + tokens[ABC].symbol() + ".approveAndCall(dexz, " + buyAmount.shift(-18) + ", '" + tradeData + "')");
 printTxData("approveAndCall1_1Tx", approveAndCall1_1Tx);
 console.log("RESULT: ");
 printDexOneExchangeContractDetails();
