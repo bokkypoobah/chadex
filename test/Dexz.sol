@@ -20,16 +20,32 @@ import "ApproveAndCallFallback.sol";
 contract Dexz is Orders, ApproveAndCallFallback {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
+    struct TradeInfo {
+        address taker;
+        uint orderFlag;
+        uint orderType;
+        address baseToken;
+        address quoteToken;
+        uint price;
+        uint expiry;
+        uint baseTokens;
+        address uiFeeAccount;
+    }
+
+    // web3.sha3("trade(uint256,address,address,uint256,uint256,uint256,address)").substring(0, 10)
+    // => "0xcbb924e2"
+    bytes4 public constant tradeSig = "\xcb\xb9\x24\xe2";
+
     event Trade(bytes32 indexed key, uint orderType, address indexed taker, address indexed maker, uint amount, address baseToken, address quoteToken, uint baseTokens, uint quoteTokens, uint feeBaseTokens, uint feeQuoteTokens, uint baseTokensFilled);
 
     constructor(address _feeAccount) public Orders(_feeAccount) {
     }
 
     // length = 4 + 7 * 32 = 228
-    uint private constant tradeDataLength = 228;
+    uint private constant TRADE_DATA_LENGTH = 228;
     function receiveApproval(address _from, uint256 _tokens, address _token, bytes memory _data) public {
-        emit LogInfo("receiveApproval: from", 0, 0x0, "", _from);
-        emit LogInfo("receiveApproval: tokens & token", _tokens, 0x0, "", _token);
+        // emit LogInfo("receiveApproval: from", 0, 0x0, "", _from);
+        // emit LogInfo("receiveApproval: tokens & token", _tokens, 0x0, "", _token);
         uint length;
         bytes4 functionSignature;
         uint orderFlag;
@@ -50,53 +66,28 @@ contract Dexz is Orders, ApproveAndCallFallback {
             baseTokens := mload(add(_data, 0xC4))
             uiFeeAccount := mload(add(_data, 0xE4))
         }
-        emit LogInfo("receiveApproval: length", length, 0x0, "", address(0));
-        emit LogInfo("receiveApproval: functionSignature", 0, bytes32(functionSignature), "", address(0));
-        emit LogInfo("receiveApproval: p1 orderFlag", orderFlag, 0x0, "", address(0));
-        emit LogInfo("receiveApproval: p2 baseToken", 0, 0x0, "", address(baseToken));
-        emit LogInfo("receiveApproval: p3 quoteToken", 0, 0x0, "", address(quoteToken));
-        emit LogInfo("receiveApproval: p4 price", price, 0x0, "", address(0));
-        emit LogInfo("receiveApproval: p5 expiry", expiry, 0x0, "", address(0));
-        emit LogInfo("receiveApproval: p6 baseTokens", baseTokens, 0x0, "", address(0));
-        emit LogInfo("receiveApproval: p7 uiFeeAccount", 0, 0x0, "", address(uiFeeAccount));
+        // emit LogInfo("receiveApproval: length", length, 0x0, "", address(0));
+        // emit LogInfo("receiveApproval: functionSignature", 0, bytes32(functionSignature), "", address(0));
+        // emit LogInfo("receiveApproval: p1 orderFlag", orderFlag, 0x0, "", address(0));
+        // emit LogInfo("receiveApproval: p2 baseToken", 0, 0x0, "", address(baseToken));
+        // emit LogInfo("receiveApproval: p3 quoteToken", 0, 0x0, "", address(quoteToken));
+        // emit LogInfo("receiveApproval: p4 price", price, 0x0, "", address(0));
+        // emit LogInfo("receiveApproval: p5 expiry", expiry, 0x0, "", address(0));
+        // emit LogInfo("receiveApproval: p6 baseTokens", baseTokens, 0x0, "", address(0));
+          emit LogInfo("receiveApproval: p7 uiFeeAccount", 0, 0x0, "", address(uiFeeAccount));
 
         if (functionSignature == tradeSig) {
-            require(length >= tradeDataLength);
-            _trade(TradeInfo(_from, orderFlag, orderFlag & ORDERFLAG_BUYSELL_MASK, address(baseToken), address(quoteToken), price, expiry, baseTokens, address(uiFeeAccount)));
+            require(length >= TRADE_DATA_LENGTH);
+            require(_token == address(baseToken) || _token == address(quoteToken));
+            require(_tokens == baseTokens);
+            _trade(TradeInfo(_from, orderFlag | ORDERFLAG_FILL_AND_ADD_ORDER, orderFlag & ORDERFLAG_BUYSELL_MASK, address(baseToken), address(quoteToken), price, expiry, baseTokens, address(uiFeeAccount)));
         }
     }
 
-    // buy(address,address,uint256,uint256,uint256,address)
-    // sell(address,address,uint256,uint256,uint256,address)
-    // function buy(address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
-    //     return trade(ORDERTYPE_BUY, baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount);
-    // }
-    // function sell(address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
-    //     return trade(ORDERTYPE_SELL, baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount);
-    // }
-
-    struct TradeInfo {
-        address taker;
-        uint orderFlag;
-        uint orderType;
-        address baseToken;
-        address quoteToken;
-        uint price;
-        uint expiry;
-        uint baseTokens;
-        address uiFeeAccount;
+    function trade(uint orderFlag, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 _orderKey) {
+        return _trade(TradeInfo(msg.sender, orderFlag | ORDERFLAG_FILL_AND_ADD_ORDER, orderFlag & ORDERFLAG_BUYSELL_MASK, baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
     }
-
-    // trade(uint256,address,address,uint256,uint256,uint256,address)
-    // web3.sha3("trade(uint256,address,address,uint256,uint256,uint256,address)").substring(0, 10)
-    // => "0xcbb924e2"
-    bytes4 public constant tradeSig = "\xcb\xb9\x24\xe2";
-    function trade(uint orderFlag, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
-        TradeInfo memory tradeInfo = TradeInfo(msg.sender, orderFlag | ORDERFLAG_FILL_AND_ADD_ORDER, orderFlag & ORDERFLAG_BUYSELL_MASK, baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount);
-        return _trade(tradeInfo);
-    }
-    function _trade(TradeInfo memory tradeInfo) internal returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
-    // function _trade(address taker, uint orderFlag, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (/*uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, */ bytes32 _orderKey) {
+    function _trade(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 _orderKey) {
         uint matchingPriceKey;
         bytes32 matchingOrderKey;
         (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.orderType, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price);
@@ -116,8 +107,8 @@ contract Dexz is Orders, ApproveAndCallFallback {
                 order.baseTokensFilled = order.baseTokensFilled.add(_baseTokens);
                 transferTokens(tradeInfo, tradeInfo.orderType, order.maker, _baseTokens, _quoteTokens, matchingOrderKey);
                 tradeInfo.baseTokens = tradeInfo.baseTokens.sub(_baseTokens);
-                // _baseTokensFilled = _baseTokensFilled.add(_baseTokens);
-                // _quoteTokensFilled = _quoteTokensFilled.add(_quoteTokens);
+                _baseTokensFilled = _baseTokensFilled.add(_baseTokens);
+                _quoteTokensFilled = _quoteTokensFilled.add(_quoteTokens);
                 _updateBestMatchingOrder(tradeInfo.orderType, tradeInfo.baseToken, tradeInfo.quoteToken, matchingPriceKey, matchingOrderKey, _orderFilled);
                 // matchingOrderKey = ORDERKEY_SENTINEL;
                 (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.orderType, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price);
@@ -129,6 +120,7 @@ contract Dexz is Orders, ApproveAndCallFallback {
         if (tradeInfo.baseTokens > 0 && ((tradeInfo.orderFlag & ORDERFLAG_FILL_AND_ADD_ORDER) == ORDERFLAG_FILL_AND_ADD_ORDER)) {
             require(tradeInfo.expiry > now);
             _orderKey = _addOrder(tradeInfo.orderType, tradeInfo.taker, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
+            _baseTokensOnOrder = tradeInfo.baseTokens;
         }
     }
 
@@ -213,37 +205,38 @@ contract Dexz is Orders, ApproveAndCallFallback {
 
     // function trade(uint orderType, address taker, address maker, address uiFeeAccount, address baseToken, address quoteToken, uint[2] memory tokens) internal {
     function transferTokens(TradeInfo memory tradeInfo, uint orderType, address maker, uint _baseTokens, uint _quoteTokens, bytes32 matchingOrderKey) internal {
-        uint takerFeeTokens;
+        uint _takerFeeInTokens;
+        // bool feeInEthers = (msg.value >= takerFeeInEthers);
 
         // TODO
         uint __orderBaseTokensFilled = 0;
 
         if (orderType == ORDERTYPE_BUY) {
             emit LogInfo("transferTokens: BUY", 0, 0x0, "", address(0));
-            takerFeeTokens = _baseTokens.mul(takerFee).div(TENPOW18);
-            emit Trade(matchingOrderKey, orderType, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens.sub(takerFeeTokens), _quoteTokens, takerFeeTokens, 0, __orderBaseTokensFilled);
+            _takerFeeInTokens = _baseTokens.mul(takerFeeInTokens).div(TENPOW18);
+            emit Trade(matchingOrderKey, orderType, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens.sub(_takerFeeInTokens), _quoteTokens, _takerFeeInTokens, 0, __orderBaseTokensFilled);
             transferFrom(tradeInfo.quoteToken, tradeInfo.taker, maker, _quoteTokens);
-            transferFrom(tradeInfo.baseToken, maker, tradeInfo.taker, _baseTokens.sub(takerFeeTokens));
-            if (takerFeeTokens > 0) {
-                if (feeAccount == tradeInfo.uiFeeAccount || takerFeeTokens == 1) {
-                    transferFrom(tradeInfo.baseToken, maker, feeAccount, takerFeeTokens);
+            transferFrom(tradeInfo.baseToken, maker, tradeInfo.taker, _baseTokens.sub(_takerFeeInTokens));
+            if (_takerFeeInTokens > 0) {
+                if (feeAccount == tradeInfo.uiFeeAccount || _takerFeeInTokens == 1) {
+                    transferFrom(tradeInfo.baseToken, maker, feeAccount, _takerFeeInTokens);
                 } else {
-                    transferFrom(tradeInfo.baseToken, maker, tradeInfo.uiFeeAccount, takerFeeTokens / 2);
-                    transferFrom(tradeInfo.baseToken, maker, feeAccount, takerFeeTokens - takerFeeTokens / 2);
+                    transferFrom(tradeInfo.baseToken, maker, tradeInfo.uiFeeAccount, _takerFeeInTokens / 2);
+                    transferFrom(tradeInfo.baseToken, maker, feeAccount, _takerFeeInTokens - _takerFeeInTokens / 2);
                 }
             }
         } else {
             emit LogInfo("transferTokens: SELL", 0, 0x0, "", address(0));
-            takerFeeTokens = _quoteTokens.mul(takerFee).div(TENPOW18);
-            emit Trade(matchingOrderKey, orderType, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens, _quoteTokens.sub(takerFeeTokens), takerFeeTokens, 0, __orderBaseTokensFilled);
+            _takerFeeInTokens = _quoteTokens.mul(takerFeeInTokens).div(TENPOW18);
+            emit Trade(matchingOrderKey, orderType, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens, _quoteTokens.sub(_takerFeeInTokens), _takerFeeInTokens, 0, __orderBaseTokensFilled);
             transferFrom(tradeInfo.baseToken, tradeInfo.taker, maker, _baseTokens);
-            transferFrom(tradeInfo.quoteToken, maker, tradeInfo.taker, _quoteTokens.sub(takerFeeTokens));
-            if (takerFeeTokens > 0) {
-                if (feeAccount == tradeInfo.uiFeeAccount || takerFeeTokens == 1) {
-                    transferFrom(tradeInfo.quoteToken, maker, feeAccount, takerFeeTokens);
+            transferFrom(tradeInfo.quoteToken, maker, tradeInfo.taker, _quoteTokens.sub(_takerFeeInTokens));
+            if (_takerFeeInTokens > 0) {
+                if (feeAccount == tradeInfo.uiFeeAccount || _takerFeeInTokens == 1) {
+                    transferFrom(tradeInfo.quoteToken, maker, feeAccount, _takerFeeInTokens);
                 } else {
-                    transferFrom(tradeInfo.quoteToken, maker, tradeInfo.uiFeeAccount, takerFeeTokens / 2);
-                    transferFrom(tradeInfo.quoteToken, maker, feeAccount, takerFeeTokens - takerFeeTokens / 2);
+                    transferFrom(tradeInfo.quoteToken, maker, tradeInfo.uiFeeAccount, _takerFeeInTokens / 2);
+                    transferFrom(tradeInfo.quoteToken, maker, feeAccount, _takerFeeInTokens - _takerFeeInTokens / 2);
                 }
             }
         }

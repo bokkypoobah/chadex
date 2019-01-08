@@ -19,19 +19,20 @@ contract DexzBase is Owned {
     uint constant public TENPOW18 = uint(10)**18;
 
     uint public deploymentBlockNumber;
-    uint public takerFee = 10 * uint(10)**14; // 0.10%
+    uint public takerFeeInEthers = 5 * 10 ** 16; // 0.05 ETH
+    uint public takerFeeInTokens = 10 * uint(10)**14; // 0.10%
     address public feeAccount;
-    uint public etherFee = 5 * 10 ** 16;
 
     mapping(address => TokenWhitelistStatus) public tokenWhitelist;
 
     // Data => block.number when first seen
-    mapping(address => uint) tokens;
-    mapping(address => uint) accounts;
-    mapping(bytes32 => uint) pairs;
+    mapping(address => uint) public tokenBlockNumbers;
+    mapping(address => uint) public accountBlockNumbers;
+    mapping(bytes32 => uint) public pairBlockNumbers;
 
     event TokenWhitelistUpdated(address indexed token, uint oldStatus, uint newStatus);
-    event TakerFeeUpdated(uint oldTakerFee, uint newTakerFee);
+    event TakerFeeInEthersUpdated(uint oldTakerFeeInEthers, uint newTakerFeeInEthers);
+    event TakerFeeInTokensUpdated(uint oldTakerFeeInTokens, uint newTakerFeeInTokens);
     event FeeAccountUpdated(address oldFeeAccount, address newFeeAccount);
 
     event TokenAdded(address indexed token);
@@ -48,24 +49,17 @@ contract DexzBase is Owned {
         addAccount(address(this));
     }
 
-    function getTokenBlockNumber(address token) public view returns (uint _blockNumber) {
-        _blockNumber = tokens[token];
-    }
-    function getAccountBlockNumber(address account) public view returns (uint _blockNumber) {
-        _blockNumber = accounts[account];
-    }
-    function getPairBlockNumber(bytes32 _pairKey) public view returns (uint _blockNumber) {
-        _blockNumber = pairs[_pairKey];
-    }
-
-
     function whitelistToken(address token, uint status) public onlyOwner {
         emit TokenWhitelistUpdated(token, uint(tokenWhitelist[token]), status);
         tokenWhitelist[token] = TokenWhitelistStatus(status);
     }
-    function setTakerFee(uint _takerFee) public onlyOwner {
-        emit TakerFeeUpdated(takerFee, _takerFee);
-        takerFee = _takerFee;
+    function setTakerFeeInEthers(uint _takerFeeInEthers) public onlyOwner {
+        emit TakerFeeInEthersUpdated(takerFeeInEthers, _takerFeeInEthers);
+        takerFeeInEthers = _takerFeeInEthers;
+    }
+    function setTakerFeeInTokens(uint _takerFeeInTokens) public onlyOwner {
+        emit TakerFeeInTokensUpdated(takerFeeInTokens, _takerFeeInTokens);
+        takerFeeInTokens = _takerFeeInTokens;
     }
     function setFeeAccount(address _feeAccount) public onlyOwner {
         emit FeeAccountUpdated(feeAccount, _feeAccount);
@@ -73,20 +67,20 @@ contract DexzBase is Owned {
     }
 
     function addToken(address token) internal {
-        if (tokens[token] == 0) {
-            tokens[token] = block.number;
+        if (tokenBlockNumbers[token] == 0) {
+            tokenBlockNumbers[token] = block.number;
             emit TokenAdded(token);
         }
     }
     function addAccount(address account) internal {
-        if (accounts[account] == 0) {
-            accounts[account] = block.number;
+        if (accountBlockNumbers[account] == 0) {
+            accountBlockNumbers[account] = block.number;
             emit AccountAdded(account);
         }
     }
     function addPair(bytes32 _pairKey, address baseToken, address quoteToken) internal {
-        if (pairs[_pairKey] == 0) {
-            pairs[_pairKey] = block.number;
+        if (pairBlockNumbers[_pairKey] == 0) {
+            pairBlockNumbers[_pairKey] = block.number;
             emit PairAdded(_pairKey, baseToken, quoteToken);
         }
     }

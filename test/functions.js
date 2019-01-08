@@ -384,7 +384,8 @@ function printDexOneExchangeContractDetails() {
     var contract = eth.contract(dexOneExchangeContractAbi).at(dexOneExchangeContractAddress);
     console.log("RESULT: dexOneExchange.owner/new=" + getShortAddressName(contract.owner()) + "/" + getShortAddressName(contract.newOwner()));
     console.log("RESULT: dexOneExchange.deploymentBlockNumber=" + contract.deploymentBlockNumber());
-    console.log("RESULT: dexOneExchange.takerFee=" + contract.takerFee().shift(-16) + "%");
+    console.log("RESULT: dexOneExchange.takerFeeInEthers=" + contract.takerFeeInEthers().shift(-18) + " ETH");
+    console.log("RESULT: dexOneExchange.takerFeeInTokens=" + contract.takerFeeInTokens().shift(-16) + "%");
     console.log("RESULT: dexOneExchange.feeAccount=" + getShortAddressName(contract.feeAccount()));
 
     var i;
@@ -405,12 +406,19 @@ function printDexOneExchangeContractDetails() {
     });
     tokenWhitelistUpdatedEvents.stopWatching();
 
-    var takerFeeUpdatedEvents = contract.TakerFeeUpdated({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
+    var takerFeeInEthersUpdatedEvents = contract.TakerFeeInEthersUpdated({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
     i = 0;
-    takerFeeUpdatedEvents.watch(function (error, result) {
-      console.log("RESULT: TakerFeeUpdated " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+    takerFeeInEthersUpdatedEvents.watch(function (error, result) {
+      console.log("RESULT: TakerFeeInEthersUpdated " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
     });
-    takerFeeUpdatedEvents.stopWatching();
+    takerFeeInEthersUpdatedEvents.stopWatching();
+
+    var takerFeeInTokensUpdatedEvents = contract.TakerFeeInTokensUpdated({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
+    i = 0;
+    takerFeeInTokensUpdatedEvents.watch(function (error, result) {
+      console.log("RESULT: TakerFeeInTokensUpdated " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+    });
+    takerFeeInTokensUpdatedEvents.stopWatching();
 
     var feeAccountUpdatedEvents = contract.FeeAccountUpdated({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
     i = 0;
