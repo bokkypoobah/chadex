@@ -568,6 +568,7 @@ contract DexzBase is Owned {
 
     function addToken(address token) internal {
         if (tokenBlockNumbers[token] == 0) {
+            require(ERC20Interface(token).totalSupply() > 0);
             tokenBlockNumbers[token] = block.number;
             emit TokenAdded(token);
         }
@@ -975,7 +976,7 @@ contract Dexz is Orders, ApproveAndCallFallback {
         if (functionSignature == tradeSig) {
             require(length >= TRADE_DATA_LENGTH);
             require(_token == address(baseToken) || _token == address(quoteToken));
-            require(_tokens == baseTokens);
+            require(_tokens >= baseTokens);
             _trade(TradeInfo(_from, orderFlag | ORDERFLAG_FILL_AND_ADD_ORDER, orderFlag & ORDERFLAG_BUYSELL_MASK, address(baseToken), address(quoteToken), price, expiry, baseTokens, address(uiFeeAccount)));
         }
     }

@@ -68,6 +68,7 @@ contract DexzBase is Owned {
 
     function addToken(address token) internal {
         if (tokenBlockNumbers[token] == 0) {
+            require(ERC20Interface(token).totalSupply() > 0);
             tokenBlockNumbers[token] = block.number;
             emit TokenAdded(token);
         }
