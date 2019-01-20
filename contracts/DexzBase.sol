@@ -29,6 +29,9 @@ contract DexzBase is Owned {
     mapping(address => uint) public tokenBlockNumbers;
     mapping(address => uint) public accountBlockNumbers;
     mapping(bytes32 => uint) public pairBlockNumbers;
+    address[] public tokenList;
+    address[] public accountList;
+    bytes32[] public pairList;
 
     event TokenWhitelistUpdated(address indexed token, uint oldStatus, uint newStatus);
     event TakerFeeInEthersUpdated(uint oldTakerFeeInEthers, uint newTakerFeeInEthers);
@@ -70,18 +73,21 @@ contract DexzBase is Owned {
         if (tokenBlockNumbers[token] == 0) {
             require(ERC20Interface(token).totalSupply() > 0);
             tokenBlockNumbers[token] = block.number;
+            tokenList.push(token);
             emit TokenAdded(token);
         }
     }
     function addAccount(address account) internal {
         if (accountBlockNumbers[account] == 0) {
             accountBlockNumbers[account] = block.number;
+            accountList.push(account);
             emit AccountAdded(account);
         }
     }
     function addPair(bytes32 _pairKey, address baseToken, address quoteToken) internal {
         if (pairBlockNumbers[_pairKey] == 0) {
             pairBlockNumbers[_pairKey] = block.number;
+            pairList.push(_pairKey);
             emit PairAdded(_pairKey, baseToken, quoteToken);
         }
     }
@@ -103,6 +109,15 @@ contract DexzBase is Owned {
             require(balanceToBefore.add(_tokens) == balanceToAfter);
         } else {
             revert();
+        }
+    }
+
+
+    function recoverTokens(address token, uint tokens) public onlyOwner returns (bool success) {
+        if (token == address(0)) {
+            address(uint160(owner)).transfer((tokens == 0 ? address(this).balance : tokens));
+        } else {
+            return ERC20Interface(token).transfer(owner, tokens == 0 ? ERC20Interface(token).balanceOf(address(this)) : tokens);
         }
     }
 }
