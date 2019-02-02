@@ -62,9 +62,9 @@ contract Dexz is Orders, ApproveAndCallFallback {
             baseToken := mload(add(_data, 0x44))
             quoteToken := mload(add(_data, 0x64))
             price := mload(add(_data, 0x84))
-            expiry := mload(add(_data, 0xA4))
-            baseTokens := mload(add(_data, 0xC4))
-            uiFeeAccount := mload(add(_data, 0xE4))
+            expiry := mload(add(_data, 0xa4))
+            baseTokens := mload(add(_data, 0xc4))
+            uiFeeAccount := mload(add(_data, 0xe4))
         }
         // emit LogInfo("receiveApproval: length", length, 0x0, "", address(0));
         // emit LogInfo("receiveApproval: functionSignature", 0, bytes32(functionSignature), "", address(0));

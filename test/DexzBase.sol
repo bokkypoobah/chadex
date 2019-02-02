@@ -113,11 +113,11 @@ contract DexzBase is Owned {
     }
 
 
-    function recoverTokens(address token, uint tokens) public onlyOwner returns (bool success) {
+    function recoverTokens(address token, uint tokens) public onlyOwner {
         if (token == address(0)) {
             address(uint160(owner)).transfer((tokens == 0 ? address(this).balance : tokens));
         } else {
-            return ERC20Interface(token).transfer(owner, tokens == 0 ? ERC20Interface(token).balanceOf(address(this)) : tokens);
+            ERC20Interface(token).transfer(owner, tokens == 0 ? ERC20Interface(token).balanceOf(address(this)) : tokens);
         }
     }
 }

@@ -13,7 +13,7 @@ pragma solidity ^0.5.0;
 
 
 // ----------------------------------------------------------------------------
-// BokkyPooBah's Red-Black Tree Library v0.90
+// BokkyPooBah's Red-Black Tree Library v1.00-rc1
 //
 // A Solidity Red-Black Tree library to store and access a sorted list of
 // unsigned integer data in a binary search tree.
@@ -23,7 +23,7 @@ pragma solidity ^0.5.0;
 // https://github.com/bokkypoobah/BokkyPooBahsRedBlackTreeLibrary
 //
 //
-// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2018. The MIT Licence.
+// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2019. The MIT Licence.
 // ----------------------------------------------------------------------------
 library BokkyPooBahsRedBlackTreeLibrary {
     struct Node {
@@ -109,6 +109,9 @@ library BokkyPooBahsRedBlackTreeLibrary {
     }
     function isSentinel(uint key) internal pure returns (bool) {
         return key == SENTINEL;
+    }
+    function getSentinel() internal pure returns (uint) {
+        return SENTINEL;
     }
     function getNode(Tree storage self, uint key) internal view returns (uint _returnKey, uint _parent, uint _left, uint _right, bool _red) {
         require(key != SENTINEL);
@@ -241,9 +244,9 @@ library BokkyPooBahsRedBlackTreeLibrary {
         // TODO - Remove after testing
         // emit Log("remove", "before delete self.nodes[0]", 0, self.nodes[0].parent, self.nodes[0].left, self.nodes[0].right, self.nodes[0].red);
         // emit Log("remove", "before delete self.nodes[SENTINEL]", SENTINEL, self.nodes[SENTINEL].parent, self.nodes[SENTINEL].left, self.nodes[SENTINEL].right, self.nodes[SENTINEL].red);
-        if (self.nodes[SENTINEL].parent != SENTINEL) {
-            delete self.nodes[SENTINEL];
-        }
+        // TODO CONFIRM NOT NEEDED if (self.nodes[SENTINEL].parent != SENTINEL) {
+        // TODO CONFIRM NOT NEEDED     delete self.nodes[SENTINEL];
+        // TODO CONFIRM NOT NEEDED }
         delete self.nodes[y];
         self.removed++;
     }
@@ -613,11 +616,11 @@ contract DexzBase is Owned {
     }
 
 
-    function recoverTokens(address token, uint tokens) public onlyOwner returns (bool success) {
+    function recoverTokens(address token, uint tokens) public onlyOwner {
         if (token == address(0)) {
             address(uint160(owner)).transfer((tokens == 0 ? address(this).balance : tokens));
         } else {
-            return ERC20Interface(token).transfer(owner, tokens == 0 ? ERC20Interface(token).balanceOf(address(this)) : tokens);
+            ERC20Interface(token).transfer(owner, tokens == 0 ? ERC20Interface(token).balanceOf(address(this)) : tokens);
         }
     }
 }
@@ -668,7 +671,6 @@ contract Orders is DexzBase {
     mapping(bytes32 => Order) orders;
 
     bytes32 public constant ORDERKEY_SENTINEL = 0x0;
-    uint private constant PRICEKEY_SENTINEL = 0;
 
     event OrderAdded(bytes32 indexed pairKey, bytes32 indexed key, uint orderType, address indexed maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens);
     event OrderRemoved(bytes32 indexed key);
@@ -747,7 +749,7 @@ contract Orders is DexzBase {
         if (priceKeys.initialised) {
             emit LogInfo("getBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
             _bestMatchingPriceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
-            bool priceOk = (_bestMatchingPriceKey == PRICEKEY_SENTINEL) ? false : (_orderType == ORDERTYPE_BUY) ? _bestMatchingPriceKey <= price : _bestMatchingPriceKey >= price;
+            bool priceOk = BokkyPooBahsRedBlackTreeLibrary.isSentinel(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? _bestMatchingPriceKey <= price : _bestMatchingPriceKey >= price;
             while (priceOk) {
                 emit LogInfo("getBestMatchingOrder: _bestMatchingPriceKey", _bestMatchingPriceKey, 0x0, "", address(0));
                 OrderQueue storage _orderQueue = orderQueue[_pairKey][_matchingOrderType][_bestMatchingPriceKey];
@@ -768,11 +770,11 @@ contract Orders is DexzBase {
 
                 }
                 _bestMatchingPriceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.next(_bestMatchingPriceKey) : priceKeys.prev(_bestMatchingPriceKey);
-                priceOk = (_bestMatchingPriceKey == PRICEKEY_SENTINEL) ? false : (_orderType == ORDERTYPE_BUY) ? _bestMatchingPriceKey <= price : _bestMatchingPriceKey >= price;
+                priceOk = BokkyPooBahsRedBlackTreeLibrary.isSentinel(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? _bestMatchingPriceKey <= price : _bestMatchingPriceKey >= price;
             }
             // OrderQueue storage orderQueue = self.orderQueue[_pairKey][_orderType][price];
         }
-        return (PRICEKEY_SENTINEL, ORDERKEY_SENTINEL);
+        return (BokkyPooBahsRedBlackTreeLibrary.getSentinel(), ORDERKEY_SENTINEL);
     }
     function _updateBestMatchingOrder(uint _orderType, address baseToken, address quoteToken, uint matchingPriceKey, bytes32 matchingOrderKey, bool _orderFilled) internal returns (bytes32 _orderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
@@ -781,7 +783,7 @@ contract Orders is DexzBase {
         if (priceKeys.initialised) {
             emit LogInfo("updateBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
             uint priceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
-            while (priceKey != PRICEKEY_SENTINEL) {
+            while (priceKey != BokkyPooBahsRedBlackTreeLibrary.getSentinel()) {
                 emit LogInfo("updateBestMatchingOrder: priceKey", priceKey, 0x0, "", address(0));
                 OrderQueue storage _orderQueue = orderQueue[_pairKey][_matchingOrderType][priceKey];
                 if (_orderQueue.exists) {
@@ -974,9 +976,9 @@ contract Dexz is Orders, ApproveAndCallFallback {
             baseToken := mload(add(_data, 0x44))
             quoteToken := mload(add(_data, 0x64))
             price := mload(add(_data, 0x84))
-            expiry := mload(add(_data, 0xA4))
-            baseTokens := mload(add(_data, 0xC4))
-            uiFeeAccount := mload(add(_data, 0xE4))
+            expiry := mload(add(_data, 0xa4))
+            baseTokens := mload(add(_data, 0xc4))
+            uiFeeAccount := mload(add(_data, 0xe4))
         }
         // emit LogInfo("receiveApproval: length", length, 0x0, "", address(0));
         // emit LogInfo("receiveApproval: functionSignature", 0, bytes32(functionSignature), "", address(0));
