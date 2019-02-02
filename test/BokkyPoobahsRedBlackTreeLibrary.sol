@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 // ----------------------------------------------------------------------------
-// BokkyPooBah's Red-Black Tree Library v0.90
+// BokkyPooBah's Red-Black Tree Library v1.00-rc1
 //
 // A Solidity Red-Black Tree library to store and access a sorted list of
 // unsigned integer data in a binary search tree.
@@ -11,7 +11,7 @@ pragma solidity ^0.5.0;
 // https://github.com/bokkypoobah/BokkyPooBahsRedBlackTreeLibrary
 //
 //
-// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2018. The MIT Licence.
+// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2019. The MIT Licence.
 // ----------------------------------------------------------------------------
 library BokkyPooBahsRedBlackTreeLibrary {
     struct Node {
@@ -97,6 +97,9 @@ library BokkyPooBahsRedBlackTreeLibrary {
     }
     function isSentinel(uint key) internal pure returns (bool) {
         return key == SENTINEL;
+    }
+    function getSentinel() internal pure returns (uint) {
+        return SENTINEL;
     }
     function getNode(Tree storage self, uint key) internal view returns (uint _returnKey, uint _parent, uint _left, uint _right, bool _red) {
         require(key != SENTINEL);
@@ -229,9 +232,9 @@ library BokkyPooBahsRedBlackTreeLibrary {
         // TODO - Remove after testing
         // emit Log("remove", "before delete self.nodes[0]", 0, self.nodes[0].parent, self.nodes[0].left, self.nodes[0].right, self.nodes[0].red);
         // emit Log("remove", "before delete self.nodes[SENTINEL]", SENTINEL, self.nodes[SENTINEL].parent, self.nodes[SENTINEL].left, self.nodes[SENTINEL].right, self.nodes[SENTINEL].red);
-        if (self.nodes[SENTINEL].parent != SENTINEL) {
-            delete self.nodes[SENTINEL];
-        }
+        // TODO CONFIRM NOT NEEDED if (self.nodes[SENTINEL].parent != SENTINEL) {
+        // TODO CONFIRM NOT NEEDED     delete self.nodes[SENTINEL];
+        // TODO CONFIRM NOT NEEDED }
         delete self.nodes[y];
         self.removed++;
     }
