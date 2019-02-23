@@ -1,12 +1,13 @@
 pragma solidity ^0.5.0;
 
 // ----------------------------------------------------------------------------
-// BokkyPooBah's Decentralised Exchange
+// Dexz 🧙, pronounced dex-zee, the token exchanging wizard
 //
 // https://github.com/bokkypoobah/Dexz
 //
 //
-// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2018.
+// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2018. Please contact us if
+// you want to deploy this contract, or a variation, for yourself
 //
 // ----------------------------------------------------------------------------
 

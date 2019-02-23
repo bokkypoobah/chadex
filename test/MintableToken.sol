@@ -1,33 +1,21 @@
 pragma solidity ^0.5.0;
 
 // ----------------------------------------------------------------------------
-// BokkyPooBah's Covered Call v1.00 - Mintable Token
+// MintableToken = ERC20 + symbol + name + decimals + mint + burn
 //
 // NOTE: This token contract allows the owner to mint and burn tokens for any
 // account, and is used for testing
 //
-// https://github.com/bokkypoobah/BokkyPooBahsDerivatives
+// https://github.com/bokkypoobah/Dexz
 //
 //
-// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2018.
-//
-// GNU Lesser General Public License 3.0
-// https://www.gnu.org/licenses/lgpl-3.0.en.html
+// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2019. The MIT Licence.
 // ----------------------------------------------------------------------------
 
 import "SafeMath.sol";
-import "MintableTokenInterface.sol";
 import "Owned.sol";
-
-
-// ----------------------------------------------------------------------------
-// Contract function to receive approval and execute function in one call
-//
-// Borrowed from MiniMeToken
-// ----------------------------------------------------------------------------
-contract ApproveAndCallFallback {
-    function receiveApproval(address from, uint256 tokens, address token, bytes memory data) public;
-}
+import "MintableTokenInterface.sol";
+import "ApproveAndCallFallback.sol";
 
 
 // ----------------------------------------------------------------------------
@@ -105,9 +93,6 @@ contract MintableToken is MintableTokenInterface, Owned {
         return true;
     }
     function burn(address tokenOwner, uint tokens) public onlyOwner returns (bool success) {
-        if (tokens < balances[tokenOwner]) {
-            tokens = balances[tokenOwner];
-        }
         balances[tokenOwner] = balances[tokenOwner].sub(tokens);
         _totalSupply = _totalSupply.sub(tokens);
         emit Transfer(tokenOwner, address(0), tokens);
@@ -120,3 +105,6 @@ contract MintableToken is MintableTokenInterface, Owned {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 }
+// ----------------------------------------------------------------------------
+// End - MintableToken
+// ----------------------------------------------------------------------------

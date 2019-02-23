@@ -39,10 +39,10 @@ DIFFS1=`diff -r -x '*.js' -x '*.json' -x '*.txt' -x 'testchain' -x '*.md' -x '*.
 echo "--- Differences $SOURCEDIR/*.sol *.sol ---" | tee -a $TEST1OUTPUT
 echo "$DIFFS1" | tee -a $TEST1OUTPUT
 
-solc_0.5.2 --version | tee -a $TEST1OUTPUT
+solc_0.5.4 --version | tee -a $TEST1OUTPUT
 
-echo "var dexzOutput=`solc_0.5.2 --allow-paths . --optimize --pretty-json --combined-json abi,bin,interface $EXCHANGESOL`;" > $EXCHANGEJS
-echo "var mintableTokenOutput=`solc_0.5.2 --allow-paths . --optimize --pretty-json --combined-json abi,bin,interface $MINTABLETOKENSOL`;" > $MINTABLETOKENJS
+echo "var dexzOutput=`solc_0.5.4 --allow-paths . --optimize --pretty-json --combined-json abi,bin,interface $EXCHANGESOL`;" > $EXCHANGEJS
+echo "var mintableTokenOutput=`solc_0.5.4 --allow-paths . --optimize --pretty-json --combined-json abi,bin,interface $MINTABLETOKENSOL`;" > $MINTABLETOKENJS
 ../scripts/solidityFlattener.pl --contractsdir=../contracts --mainsol=$EXCHANGESOL --outputsol=$EXCHANGEFLATTENED --verbose | tee -a $TEST1OUTPUT
 ../scripts/solidityFlattener.pl --contractsdir=../contracts --mainsol=$MINTABLETOKENSOL --outputsol=$MINTABLETOKENFLATTENED --verbose | tee -a $TEST1OUTPUT
 
