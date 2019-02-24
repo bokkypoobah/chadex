@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.4;
 
 // ----------------------------------------------------------------------------
 // BokkyPooBah's Red-Black Tree Library v1.00-rc1
@@ -24,24 +24,24 @@ library BokkyPooBahsRedBlackTreeLibrary {
     struct Tree {
         uint root;
         mapping(uint => Node) nodes;
-        bool initialised;
-        uint inserted;
-        uint removed;
+        // SKINNY2 bool initialised;
+        // SKINNY uint inserted;
+        // SKINNY uint removed;
     }
 
     uint private constant SENTINEL = 0;
 
     event Log(string where, string action, uint key, uint parent, uint left, uint right, bool red);
 
-    function init(Tree storage self) internal {
-        require(!self.initialised);
-        self.root = SENTINEL;
-        self.nodes[SENTINEL] = Node(SENTINEL, SENTINEL, SENTINEL, false);
-        self.initialised = true;
-    }
-    function count(Tree storage self) internal view returns (uint _count) {
-        return self.inserted >= self.removed ? self.inserted - self.removed: 0;
-    }
+    // SKINNY2 function init(Tree storage self) internal {
+    // SKINNY2     require(!self.initialised);
+    // SKINNY2 // SKINNY2     self.root = SENTINEL;
+    // SKINNY2 // SKINNY2     self.nodes[SENTINEL] = Node(SENTINEL, SENTINEL, SENTINEL, false);
+    // SKINNY2     self.initialised = true;
+    // SKINNY2 }
+    // SKINNY function count(Tree storage self) internal view returns (uint _count) {
+    // SKINNY     return self.inserted >= self.removed ? self.inserted - self.removed: 0;
+    // SKINNY }
     function first(Tree storage self) internal view returns (uint _key) {
         _key = self.root;
         while (_key != SENTINEL && self.nodes[_key].left != SENTINEL) {
@@ -117,42 +117,42 @@ library BokkyPooBahsRedBlackTreeLibrary {
         }
         return (SENTINEL, SENTINEL, SENTINEL, SENTINEL, false);
     }
-    function parent(Tree storage self, uint key) internal view returns (uint _parent) {
-        require(key != SENTINEL);
-        _parent = self.nodes[key].parent;
-    }
-    function grandparent(Tree storage self, uint key) internal view returns (uint _grandparent) {
-        require(key != SENTINEL);
-        uint _parent = self.nodes[key].parent;
-        if (_parent != SENTINEL) {
-            _grandparent = self.nodes[_parent].parent;
-        } else {
-            _grandparent = SENTINEL;
-        }
-    }
-    function sibling(Tree storage self, uint key) internal view returns (uint _sibling) {
-        require(key != SENTINEL);
-        uint _parent = self.nodes[key].parent;
-        if (_parent != SENTINEL) {
-            if (key == self.nodes[_parent].left) {
-                _sibling = self.nodes[_parent].right;
-            } else {
-                _sibling = self.nodes[_parent].left;
-            }
-        } else {
-            _sibling = SENTINEL;
-        }
-    }
-    function uncle(Tree storage self, uint key) internal view returns (uint _uncle) {
-        require(key != SENTINEL);
-        uint _grandParent = grandparent(self, key);
-        if (_grandParent != SENTINEL) {
-            uint _parent = self.nodes[key].parent;
-            _uncle = sibling(self, _parent);
-        } else {
-            _uncle = SENTINEL;
-        }
-    }
+    // SKINNY function parent(Tree storage self, uint key) internal view returns (uint _parent) {
+    // SKINNY     require(key != SENTINEL);
+    // SKINNY     _parent = self.nodes[key].parent;
+    // SKINNY }
+    // SKINNY function grandparent(Tree storage self, uint key) internal view returns (uint _grandparent) {
+    // SKINNY     require(key != SENTINEL);
+    // SKINNY     uint _parent = self.nodes[key].parent;
+    // SKINNY     if (_parent != SENTINEL) {
+    // SKINNY         _grandparent = self.nodes[_parent].parent;
+    // SKINNY     } else {
+    // SKINNY         _grandparent = SENTINEL;
+    // SKINNY     }
+    // SKINNY }
+    // SKINNY function sibling(Tree storage self, uint key) internal view returns (uint _sibling) {
+    // SKINNY     require(key != SENTINEL);
+    // SKINNY     uint _parent = self.nodes[key].parent;
+    // SKINNY     if (_parent != SENTINEL) {
+    // SKINNY         if (key == self.nodes[_parent].left) {
+    // SKINNY             _sibling = self.nodes[_parent].right;
+    // SKINNY         } else {
+    // SKINNY             _sibling = self.nodes[_parent].left;
+    // SKINNY         }
+    // SKINNY     } else {
+    // SKINNY         _sibling = SENTINEL;
+    // SKINNY     }
+    // SKINNY }
+    // SKINNY function uncle(Tree storage self, uint key) internal view returns (uint _uncle) {
+    // SKINNY     require(key != SENTINEL);
+    // SKINNY     uint _grandParent = grandparent(self, key);
+    // SKINNY     if (_grandParent != SENTINEL) {
+    // SKINNY         uint _parent = self.nodes[key].parent;
+    // SKINNY         _uncle = sibling(self, _parent);
+    // SKINNY     } else {
+    // SKINNY         _uncle = SENTINEL;
+    // SKINNY     }
+    // SKINNY }
 
     function insert(Tree storage self, uint z) public {
         require(z != SENTINEL);
@@ -181,7 +181,7 @@ library BokkyPooBahsRedBlackTreeLibrary {
             self.nodes[y].right = z;
         }
         insertFixup(self, z);
-        self.inserted++;
+        // SKINNY self.inserted++;
     }
     function remove(Tree storage self, uint z) public {
         require(z != SENTINEL);
@@ -236,7 +236,7 @@ library BokkyPooBahsRedBlackTreeLibrary {
         // TODO CONFIRM NOT NEEDED     delete self.nodes[SENTINEL];
         // TODO CONFIRM NOT NEEDED }
         delete self.nodes[y];
-        self.removed++;
+        // SKINNY self.removed++;
     }
 
     function treeMinimum(Tree storage self, uint key) private view returns (uint) {

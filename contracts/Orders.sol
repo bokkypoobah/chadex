@@ -57,9 +57,9 @@ contract Orders is DexzBase {
 
 
     // Price tree navigating
-    function count(bytes32 _pairKey, uint _orderType) public view returns (uint _count) {
-        _count = orderKeys[_pairKey][_orderType].count();
-    }
+    // BK TODO function count(bytes32 _pairKey, uint _orderType) public view returns (uint _count) {
+    // BK TODO     _count = orderKeys[_pairKey][_orderType].count();
+    // BK TODO }
     function first(bytes32 _pairKey, uint _orderType) public view returns (uint _key) {
         _key = orderKeys[_pairKey][_orderType].first();
     }
@@ -121,7 +121,7 @@ contract Orders is DexzBase {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         uint _matchingOrderType = inverseOrderType(_orderType);
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_matchingOrderType];
-        if (priceKeys.initialised) {
+        // SKINNY2 if (priceKeys.initialised) {
             emit LogInfo("getBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
             _bestMatchingPriceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
             bool priceOk = BokkyPooBahsRedBlackTreeLibrary.isSentinel(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? _bestMatchingPriceKey <= price : _bestMatchingPriceKey >= price;
@@ -146,7 +146,7 @@ contract Orders is DexzBase {
                 }
                 _bestMatchingPriceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.next(_bestMatchingPriceKey) : priceKeys.prev(_bestMatchingPriceKey);
                 priceOk = BokkyPooBahsRedBlackTreeLibrary.isSentinel(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? _bestMatchingPriceKey <= price : _bestMatchingPriceKey >= price;
-            }
+            // SKINNY2 }
             // OrderQueue storage orderQueue = self.orderQueue[_pairKey][_orderType][price];
         }
         return (BokkyPooBahsRedBlackTreeLibrary.getSentinel(), ORDERKEY_SENTINEL);
@@ -155,7 +155,7 @@ contract Orders is DexzBase {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         uint _matchingOrderType = inverseOrderType(_orderType);
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_matchingOrderType];
-        if (priceKeys.initialised) {
+        // SKINNY2 if (priceKeys.initialised) {
             emit LogInfo("updateBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
             uint priceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
             while (priceKey != BokkyPooBahsRedBlackTreeLibrary.getSentinel()) {
@@ -194,7 +194,7 @@ contract Orders is DexzBase {
 
                 }
                 priceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.next(priceKey) : priceKeys.prev(priceKey);
-            }
+            // SKINNY2 }
         }
         return ORDERKEY_SENTINEL;
     }
@@ -209,9 +209,9 @@ contract Orders is DexzBase {
         addPair(_pairKey, baseToken, quoteToken);
 
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_orderType];
-        if (!priceKeys.initialised) {
-            priceKeys.init();
-        }
+        // SKINNY2 if (!priceKeys.initialised) {
+        // SKINNY2     priceKeys.init();
+        // SKINNY2 }
         if (!priceKeys.exists(price)) {
             priceKeys.insert(price);
             emit LogInfo("orders addKey RBT adding ", price, 0x0, "", address(0));

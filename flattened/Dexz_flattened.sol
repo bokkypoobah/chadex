@@ -37,24 +37,24 @@ library BokkyPooBahsRedBlackTreeLibrary {
     struct Tree {
         uint root;
         mapping(uint => Node) nodes;
-        bool initialised;
-        uint inserted;
-        uint removed;
+        // SKINNY2 bool initialised;
+        // SKINNY uint inserted;
+        // SKINNY uint removed;
     }
 
     uint private constant SENTINEL = 0;
 
     event Log(string where, string action, uint key, uint parent, uint left, uint right, bool red);
 
-    function init(Tree storage self) internal {
-        require(!self.initialised);
-        self.root = SENTINEL;
-        self.nodes[SENTINEL] = Node(SENTINEL, SENTINEL, SENTINEL, false);
-        self.initialised = true;
-    }
-    function count(Tree storage self) internal view returns (uint _count) {
-        return self.inserted >= self.removed ? self.inserted - self.removed: 0;
-    }
+    // SKINNY2 function init(Tree storage self) internal {
+    // SKINNY2     require(!self.initialised);
+    // SKINNY2 // SKINNY2     self.root = SENTINEL;
+    // SKINNY2 // SKINNY2     self.nodes[SENTINEL] = Node(SENTINEL, SENTINEL, SENTINEL, false);
+    // SKINNY2     self.initialised = true;
+    // SKINNY2 }
+    // SKINNY function count(Tree storage self) internal view returns (uint _count) {
+    // SKINNY     return self.inserted >= self.removed ? self.inserted - self.removed: 0;
+    // SKINNY }
     function first(Tree storage self) internal view returns (uint _key) {
         _key = self.root;
         while (_key != SENTINEL && self.nodes[_key].left != SENTINEL) {
@@ -130,42 +130,42 @@ library BokkyPooBahsRedBlackTreeLibrary {
         }
         return (SENTINEL, SENTINEL, SENTINEL, SENTINEL, false);
     }
-    function parent(Tree storage self, uint key) internal view returns (uint _parent) {
-        require(key != SENTINEL);
-        _parent = self.nodes[key].parent;
-    }
-    function grandparent(Tree storage self, uint key) internal view returns (uint _grandparent) {
-        require(key != SENTINEL);
-        uint _parent = self.nodes[key].parent;
-        if (_parent != SENTINEL) {
-            _grandparent = self.nodes[_parent].parent;
-        } else {
-            _grandparent = SENTINEL;
-        }
-    }
-    function sibling(Tree storage self, uint key) internal view returns (uint _sibling) {
-        require(key != SENTINEL);
-        uint _parent = self.nodes[key].parent;
-        if (_parent != SENTINEL) {
-            if (key == self.nodes[_parent].left) {
-                _sibling = self.nodes[_parent].right;
-            } else {
-                _sibling = self.nodes[_parent].left;
-            }
-        } else {
-            _sibling = SENTINEL;
-        }
-    }
-    function uncle(Tree storage self, uint key) internal view returns (uint _uncle) {
-        require(key != SENTINEL);
-        uint _grandParent = grandparent(self, key);
-        if (_grandParent != SENTINEL) {
-            uint _parent = self.nodes[key].parent;
-            _uncle = sibling(self, _parent);
-        } else {
-            _uncle = SENTINEL;
-        }
-    }
+    // SKINNY function parent(Tree storage self, uint key) internal view returns (uint _parent) {
+    // SKINNY     require(key != SENTINEL);
+    // SKINNY     _parent = self.nodes[key].parent;
+    // SKINNY }
+    // SKINNY function grandparent(Tree storage self, uint key) internal view returns (uint _grandparent) {
+    // SKINNY     require(key != SENTINEL);
+    // SKINNY     uint _parent = self.nodes[key].parent;
+    // SKINNY     if (_parent != SENTINEL) {
+    // SKINNY         _grandparent = self.nodes[_parent].parent;
+    // SKINNY     } else {
+    // SKINNY         _grandparent = SENTINEL;
+    // SKINNY     }
+    // SKINNY }
+    // SKINNY function sibling(Tree storage self, uint key) internal view returns (uint _sibling) {
+    // SKINNY     require(key != SENTINEL);
+    // SKINNY     uint _parent = self.nodes[key].parent;
+    // SKINNY     if (_parent != SENTINEL) {
+    // SKINNY         if (key == self.nodes[_parent].left) {
+    // SKINNY             _sibling = self.nodes[_parent].right;
+    // SKINNY         } else {
+    // SKINNY             _sibling = self.nodes[_parent].left;
+    // SKINNY         }
+    // SKINNY     } else {
+    // SKINNY         _sibling = SENTINEL;
+    // SKINNY     }
+    // SKINNY }
+    // SKINNY function uncle(Tree storage self, uint key) internal view returns (uint _uncle) {
+    // SKINNY     require(key != SENTINEL);
+    // SKINNY     uint _grandParent = grandparent(self, key);
+    // SKINNY     if (_grandParent != SENTINEL) {
+    // SKINNY         uint _parent = self.nodes[key].parent;
+    // SKINNY         _uncle = sibling(self, _parent);
+    // SKINNY     } else {
+    // SKINNY         _uncle = SENTINEL;
+    // SKINNY     }
+    // SKINNY }
 
     function insert(Tree storage self, uint z) public {
         require(z != SENTINEL);
@@ -194,7 +194,7 @@ library BokkyPooBahsRedBlackTreeLibrary {
             self.nodes[y].right = z;
         }
         insertFixup(self, z);
-        self.inserted++;
+        // SKINNY self.inserted++;
     }
     function remove(Tree storage self, uint z) public {
         require(z != SENTINEL);
@@ -249,7 +249,7 @@ library BokkyPooBahsRedBlackTreeLibrary {
         // TODO CONFIRM NOT NEEDED     delete self.nodes[SENTINEL];
         // TODO CONFIRM NOT NEEDED }
         delete self.nodes[y];
-        self.removed++;
+        // SKINNY self.removed++;
     }
 
     function treeMinimum(Tree storage self, uint key) private view returns (uint) {
@@ -683,9 +683,9 @@ contract Orders is DexzBase {
 
 
     // Price tree navigating
-    function count(bytes32 _pairKey, uint _orderType) public view returns (uint _count) {
-        _count = orderKeys[_pairKey][_orderType].count();
-    }
+    // BK TODO function count(bytes32 _pairKey, uint _orderType) public view returns (uint _count) {
+    // BK TODO     _count = orderKeys[_pairKey][_orderType].count();
+    // BK TODO }
     function first(bytes32 _pairKey, uint _orderType) public view returns (uint _key) {
         _key = orderKeys[_pairKey][_orderType].first();
     }
@@ -747,7 +747,7 @@ contract Orders is DexzBase {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         uint _matchingOrderType = inverseOrderType(_orderType);
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_matchingOrderType];
-        if (priceKeys.initialised) {
+        // SKINNY2 if (priceKeys.initialised) {
             emit LogInfo("getBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
             _bestMatchingPriceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
             bool priceOk = BokkyPooBahsRedBlackTreeLibrary.isSentinel(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? _bestMatchingPriceKey <= price : _bestMatchingPriceKey >= price;
@@ -772,7 +772,7 @@ contract Orders is DexzBase {
                 }
                 _bestMatchingPriceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.next(_bestMatchingPriceKey) : priceKeys.prev(_bestMatchingPriceKey);
                 priceOk = BokkyPooBahsRedBlackTreeLibrary.isSentinel(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? _bestMatchingPriceKey <= price : _bestMatchingPriceKey >= price;
-            }
+            // SKINNY2 }
             // OrderQueue storage orderQueue = self.orderQueue[_pairKey][_orderType][price];
         }
         return (BokkyPooBahsRedBlackTreeLibrary.getSentinel(), ORDERKEY_SENTINEL);
@@ -781,7 +781,7 @@ contract Orders is DexzBase {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         uint _matchingOrderType = inverseOrderType(_orderType);
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_matchingOrderType];
-        if (priceKeys.initialised) {
+        // SKINNY2 if (priceKeys.initialised) {
             emit LogInfo("updateBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
             uint priceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
             while (priceKey != BokkyPooBahsRedBlackTreeLibrary.getSentinel()) {
@@ -820,7 +820,7 @@ contract Orders is DexzBase {
 
                 }
                 priceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.next(priceKey) : priceKeys.prev(priceKey);
-            }
+            // SKINNY2 }
         }
         return ORDERKEY_SENTINEL;
     }
@@ -835,9 +835,9 @@ contract Orders is DexzBase {
         addPair(_pairKey, baseToken, quoteToken);
 
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_orderType];
-        if (!priceKeys.initialised) {
-            priceKeys.init();
-        }
+        // SKINNY2 if (!priceKeys.initialised) {
+        // SKINNY2     priceKeys.init();
+        // SKINNY2 }
         if (!priceKeys.exists(price)) {
             priceKeys.insert(price);
             emit LogInfo("orders addKey RBT adding ", price, 0x0, "", address(0));
