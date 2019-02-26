@@ -26,3 +26,11 @@ dexzTx status=0x1 Success gas=6400000 gasUsed=6074856 costETH=0.03037428 costUSD
 ordersTx[0] status=0x1 Success gas=3000000 gasUsed=534655 costETH=0.002673275 costUSD=0.36332480525 @ ETH/USD=135.91 gasPrice=5 gwei block=10705 txIx=0 txId=0xdc9ae33b97381deb9f1cf913830ee47f175065795b5d088f71dc8c0f9cc267b2 @ 1550970852 Sun, 24 Feb 2019 01:14:12 UTC
 ordersTx[0] status=0x1 Success gas=3000000 gasUsed=592192 costETH=0.00296096 costUSD=0.4024240736 @ ETH/USD=135.91 gasPrice=5 gwei block=10710 txIx=0 txId=0xb49a018f9d6cbfaf83804e854a3af9aaf9be4f9de06565db107f99955596d468 @ 1550970857 Sun, 24 Feb 2019 01:14:17 UTC
 approveAndCall1_1Tx status=0x1 Success gas=2000000 gasUsed=507143 costETH=0.002535715 costUSD=0.34462902565 @ ETH/USD=135.91 gasPrice=5 gwei block=10716 txIx=0 txId=0x14a2381ae133a8306335362a45bedb1985518b18e52e835161626e0bb517373f @ 1550970863 Sun, 24 Feb 2019 01:14:23 UTC
+
+After last(), prev() and exist()
+
+rbtLibTx status=0x1 Success gas=3000000 gasUsed=948867 costETH=0.004744335 costUSD=0.64480256985 @ ETH/USD=135.91 gasPrice=5 gwei block=35895 txIx=0 txId=0x2f0efc2140cb6a6affa5ab0de57435e4fe5a32baea1e879059a731da5309c996 @ 1551000647 Sun, 24 Feb 2019 09:30:47 UTC
+dexzTx status=0x1 Success gas=6400000 gasUsed=6055735 costETH=0.030278675 costUSD=4.11517471925 @ ETH/USD=135.91 gasPrice=5 gwei block=35897 txIx=0 txId=0x58f30e9b246a2297b6914aa992353253f13039a3f58784910cc63930f8a97b17 @ 1551000649 Sun, 24 Feb 2019 09:30:49 UTC
+ordersTx[0] status=0x1 Success gas=3000000 gasUsed=534915 costETH=0.002674575 costUSD=0.36350148825 @ ETH/USD=135.91 gasPrice=5 gwei block=35910 txIx=0 txId=0x27c7fc9dcf27da04494e9d506d0b457b8ba6fca6b4de4d739b963c45f3e4b053 @ 1551000662 Sun, 24 Feb 2019 09:31:02 UTC
+ordersTx[0] status=0x1 Success gas=3000000 gasUsed=592416 costETH=0.00296208 costUSD=0.4025762928 @ ETH/USD=135.91 gasPrice=5 gwei block=35915 txIx=0 txId=0xe26da289db704bc3ae803d68feedd7d89a12accbe0c1d8d380827a0a7aef3c8d @ 1551000667 Sun, 24 Feb 2019 09:31:07 UTC
+approveAndCall1_1Tx status=0x1 Success gas=2000000 gasUsed=507367 costETH=0.002536835 costUSD=0.34478124485 @ ETH/USD=135.91 gasPrice=5 gwei block=35920 txIx=0 txId=0x61ea290c91af5703e0bfd30ad24489982c8b22c364e5ea2d884c7f875005c571 @ 1551000672 Sun, 24 Feb 2019 09:31:12 UTC

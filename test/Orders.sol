@@ -100,7 +100,7 @@ contract Orders is DexzBase {
         _key = (_orderType == ORDERTYPE_BUY) ? orderKeys[_pairKey][_orderType].last() : orderKeys[_pairKey][_orderType].first();
     }
     function getNextBestPrice(bytes32 _pairKey, uint _orderType, uint _x) public view returns (uint _y) {
-        if (BokkyPooBahsRedBlackTreeLibrary.isSentinel(_x)) {
+        if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(_x)) {
             _y = (_orderType == ORDERTYPE_BUY) ? orderKeys[_pairKey][_orderType].last() : orderKeys[_pairKey][_orderType].first();
         } else {
             _y = (_orderType == ORDERTYPE_BUY) ? orderKeys[_pairKey][_orderType].prev(_x) : orderKeys[_pairKey][_orderType].next(_x);
@@ -124,7 +124,7 @@ contract Orders is DexzBase {
         // SKINNY2 if (priceKeys.initialised) {
             emit LogInfo("getBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
             _bestMatchingPriceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
-            bool priceOk = BokkyPooBahsRedBlackTreeLibrary.isSentinel(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? _bestMatchingPriceKey <= price : _bestMatchingPriceKey >= price;
+            bool priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? _bestMatchingPriceKey <= price : _bestMatchingPriceKey >= price;
             while (priceOk) {
                 emit LogInfo("getBestMatchingOrder: _bestMatchingPriceKey", _bestMatchingPriceKey, 0x0, "", address(0));
                 OrderQueue storage _orderQueue = orderQueue[_pairKey][_matchingOrderType][_bestMatchingPriceKey];
@@ -145,11 +145,11 @@ contract Orders is DexzBase {
 
                 }
                 _bestMatchingPriceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.next(_bestMatchingPriceKey) : priceKeys.prev(_bestMatchingPriceKey);
-                priceOk = BokkyPooBahsRedBlackTreeLibrary.isSentinel(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? _bestMatchingPriceKey <= price : _bestMatchingPriceKey >= price;
+                priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? _bestMatchingPriceKey <= price : _bestMatchingPriceKey >= price;
             // SKINNY2 }
             // OrderQueue storage orderQueue = self.orderQueue[_pairKey][_orderType][price];
         }
-        return (BokkyPooBahsRedBlackTreeLibrary.getSentinel(), ORDERKEY_SENTINEL);
+        return (BokkyPooBahsRedBlackTreeLibrary.getEmpty(), ORDERKEY_SENTINEL);
     }
     function _updateBestMatchingOrder(uint _orderType, address baseToken, address quoteToken, uint matchingPriceKey, bytes32 matchingOrderKey, bool _orderFilled) internal returns (bytes32 _orderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
@@ -158,7 +158,7 @@ contract Orders is DexzBase {
         // SKINNY2 if (priceKeys.initialised) {
             emit LogInfo("updateBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
             uint priceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
-            while (priceKey != BokkyPooBahsRedBlackTreeLibrary.getSentinel()) {
+            while (!BokkyPooBahsRedBlackTreeLibrary.isEmpty(priceKey)) {
                 emit LogInfo("updateBestMatchingOrder: priceKey", priceKey, 0x0, "", address(0));
                 OrderQueue storage _orderQueue = orderQueue[_pairKey][_matchingOrderType][priceKey];
                 if (_orderQueue.exists) {
