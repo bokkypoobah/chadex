@@ -85,7 +85,7 @@ library BokkyPooBahsRedBlackTreeLibrary {
         return(key, self.nodes[key].parent, self.nodes[key].left, self.nodes[key].right, self.nodes[key].red);
     }
 
-    function insert(Tree storage self, uint key) internal {
+    function insert(Tree storage self, uint key) public {
         require(key != EMPTY);
         require(!exists(self, key));
         uint cursor = EMPTY;
@@ -108,7 +108,7 @@ library BokkyPooBahsRedBlackTreeLibrary {
         }
         insertFixup(self, key);
     }
-    function remove(Tree storage self, uint key) internal {
+    function remove(Tree storage self, uint key) public {
         require(key != EMPTY);
         require(exists(self, key));
         uint probe;
