@@ -43,14 +43,16 @@ console.log("DATA: var uiFeeAccount=\"" + eth.accounts[9] + "\";");
 
 var baseBlock = eth.blockNumber;
 
-function unlockAccounts(password) {
-  for (var i = 0; i < eth.accounts.length && i < accounts.length; i++) {
-    personal.unlockAccount(eth.accounts[i], password, 100000);
-    if (i > 0 && eth.getBalance(eth.accounts[i]) == 0) {
-      personal.sendTransaction({from: eth.accounts[0], to: eth.accounts[i], value: web3.toWei(1000000, "ether")});
+function unlockAccounts(password, mode) {
+  if (mode == "Dev") {
+    for (var i = 0; i < eth.accounts.length && i < accounts.length; i++) {
+      personal.unlockAccount(eth.accounts[i], password, 100000);
+      if (i > 0 && eth.getBalance(eth.accounts[i]) == 0) {
+        personal.sendTransaction({from: eth.accounts[0], to: eth.accounts[i], value: web3.toWei(1000000, "ether")});
+      }
     }
-  }
-  while (txpool.status.pending > 0) {
+    while (txpool.status.pending > 0) {
+    }
   }
   baseBlock = eth.blockNumber;
 }

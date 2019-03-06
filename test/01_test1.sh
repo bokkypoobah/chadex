@@ -68,8 +68,8 @@ var dexzBin = "0x" + dexzOutput.contracts["$EXCHANGEFLATTENED:Dexz"].bin;
 var mintableTokenAbi = JSON.parse(mintableTokenOutput.contracts["$MINTABLETOKENFLATTENED:MintableToken"].abi);
 var mintableTokenBin = "0x" + mintableTokenOutput.contracts["$MINTABLETOKENFLATTENED:MintableToken"].bin;
 
-// console.log("DATA: rbtLibAbi=" + JSON.stringify(rbtLibAbi));
-// console.log("DATA: rbtLibBin=" + JSON.stringify(rbtLibBin));
+console.log("DATA: rbtLibAbi=" + JSON.stringify(rbtLibAbi));
+console.log("DATA: rbtLibBin=" + JSON.stringify(rbtLibBin));
 // console.log("DATA: dexzAbi=" + JSON.stringify(dexzAbi));
 // console.log("DATA: dexzBin=" + JSON.stringify(dexzBin));
 // console.log("DATA: mintableTokenAbi=" + JSON.stringify(mintableTokenAbi));
@@ -122,6 +122,7 @@ failIfTxStatusError(rbtLibTx, deployGroup1Message + " - RBTLib");
 printTxData("rbtLibTx", rbtLibTx);
 console.log("RESULT: ");
 
+exit;
 
 // -----------------------------------------------------------------------------
 var deployGroup2Message = "Deploy Group #2";

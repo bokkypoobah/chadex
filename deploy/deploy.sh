@@ -69,7 +69,7 @@ var dexzBin = "0x" + dexzOutput.contracts["$EXCHANGEFLATTENED:Dexz"].bin;
 // console.log("DATA: dexzBin=" + JSON.stringify(dexzBin));
 
 
-// unlockAccounts("$PASSWORD");
+unlockAccounts("$PASSWORD", "$DEPLOYMENT");
 printBalances();
 console.log("RESULT: ");
 
@@ -86,8 +86,8 @@ var rbtLibTx = null;
 var rbtLibAddress = null;
 console.log("RESULT: DEPLOYMENTACCOUNT: $DEPLOYMENTACCOUNT");
 console.log("RESULT: " + defaultGasPrice);
-exit;
-var rbtLib = rbtLibContract.new({from: "$DEPLOYMENTACCOUNT", data: rbtLibBin, gas: 3000000, gasPrice: defaultGasPrice},
+console.log("RESULT: " + JSON.stringify(rbtLibContract));
+var rbtLib = rbtLibContract.new({from: "$DEPLOYMENTACCOUNT", data: rbtLibBin, gas: 3000000, gasPrice: web3.toWei("$GASPRICEINGWEI", "gwei")},
   function(e, contract) {
     if (!e) {
       if (!contract.address) {
@@ -104,14 +104,15 @@ var rbtLib = rbtLibContract.new({from: "$DEPLOYMENTACCOUNT", data: rbtLibBin, ga
 );
 // while (txpool.status.pending > 0) {
 // }
+console.log("RESULT: WAIT for rbtLibTx: " + rbtLibTx);
 while (eth.getTransactionReceipt(rbtLibTx) == null) {
 }
+console.log("RESULT: WAITED for rbtLibTx: " + rbtLibTx);
 printBalances();
 failIfTxStatusError(rbtLibTx, deployGroup1Message + " - RBTLib");
 printTxData("rbtLibTx", rbtLibTx);
 console.log("RESULT: ");
 
-exit;
 
 // -----------------------------------------------------------------------------
 var deployGroup2Message = "Deploy Group #2";
@@ -119,15 +120,14 @@ var deployGroup2Message = "Deploy Group #2";
 console.log("RESULT: ---------- " + deployGroup2Message + " ----------");
 var rbtLibName = "$EXCHANGEFLATTENED:BokkyPooBahsRedBlackTreeLibrary";
 var rbtLibSearchHash = "__\$" + web3.sha3(rbtLibName).substring(2, 36) + "\$__";
-// console.log("RESULT: rbtLibSearchHash='" + rbtLibSearchHash + "'");
-// console.log("RESULT: old='" + dexzBin + "'");
+console.log("RESULT: rbtLibSearchHash='" + rbtLibSearchHash + "'");
+console.log("RESULT: old='" + dexzBin + "'");
 var newDexzBin = dexzBin.split(rbtLibSearchHash).join(rbtLibAddress.substring(2, 42));
-// console.log("RESULT: new='" + newDexzBin + "'");
-
+console.log("RESULT: new='" + newDexzBin + "'");
 var dexzContract = web3.eth.contract(dexzAbi);
 var dexzTx = null;
 var dexzAddress = null;
-var dexz = dexzContract.new(feeAccount, {from: deployer, data: newDexzBin, gas: 6400000, gasPrice: defaultGasPrice},
+var dexz = dexzContract.new(feeAccount, {from: "$DEPLOYMENTACCOUNT", data: newDexzBin, gas: 6400000, gasPrice: web3.toWei("$GASPRICEINGWEI", "gwei")},
   function(e, contract) {
     if (!e) {
       if (!contract.address) {
@@ -143,8 +143,10 @@ var dexz = dexzContract.new(feeAccount, {from: deployer, data: newDexzBin, gas: 
     }
   }
 );
+console.log("RESULT: WAIT for dexzTx: " + dexzTx);
 while (eth.getTransactionReceipt(dexzTx) == null) {
 }
+console.log("RESULT: WAITED for dexzTx: " + dexzTx);
 printBalances();
 failIfTxStatusError(dexzTx, deployGroup2Message + " - DexOneExchange");
 printTxData("dexzTx", dexzTx);
