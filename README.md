@@ -27,4 +27,37 @@ Orderbook
 TODO:
 * Move past consumed orders, graceful gas limit exit
 * Handle canTransferFrom() - https://github.com/ethereum/EIPs/issues/1594
-      function canTransferFrom(address _from, address _to, uint256 _value, bytes _data) external view returns (bool, byte, bytes32);
+      `function canTransferFrom(address _from, address _to, uint256 _value, bytes _data) external view returns (bool, byte, bytes32);``
+
+<br />
+
+## Function Calls
+
+### trade
+
+```javascript
+function trade(uint orderFlag, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 _orderKey);
+```
+
+Parameters     | Notes
+:------------- |:-------
+`orderFlag`    | `uint256`
+`baseToken`    | `address` of the baseToken
+`quoteToken`   | `address` of the quoteToken
+`price`        | `uint256`
+`expiry`       | `uint256`
+`baseTokens`   | `uint256`
+`uiFeeAccount` | `address`
+
+And `orderFlag` is constructed using the following bitmasks
+
+```javascript
+// Note that the BUY and SELL flags are used as indices
+uint constant public ORDERTYPE_BUY = 0x00;
+uint constant public ORDERTYPE_SELL = 0x01;
+uint constant public ORDERFLAG_BUYSELL_MASK = 0x01;
+// BK Default is to fill as much as possible
+uint constant public ORDERFLAG_FILL = 0x00;
+uint constant public ORDERFLAG_FILLALL_OR_REVERT = 0x10;
+uint constant public ORDERFLAG_FILL_AND_ADD_ORDER = 0x20;
+```
