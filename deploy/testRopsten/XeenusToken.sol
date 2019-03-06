@@ -9,7 +9,7 @@ pragma solidity ^0.5.4;
 // Name        : Xeenus 💪
 // Total supply: 1,000,000.000000000000000000 + faucet minting
 // Decimals    : 18
-// Deployed to : Ropsten 0x7E0480Ca9fD50EB7A3855Cf53c347A1b4d6A2FF5
+// Deployed to : Mainnet 0xeEf5E2d8255E973d587217f9509B416b41CA5870
 //
 //
 // Enjoy.
