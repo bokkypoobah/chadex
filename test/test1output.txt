@@ -19,7 +19,6 @@ TOKENINITIALDISTRIBUTION="900:1001:100:10"
 
 DEPLOYMENTDATA=deploymentData.js
 
-INCLUDEJS=./include.js
 TEST1OUTPUT=test1output.txt
 TEST1RESULTS=test1results.txt
 TEST2OUTPUT=test2output.txt
@@ -29,9 +28,9 @@ TEST3RESULTS=test3results.txt
 TEST4OUTPUT=test4output.txt
 TEST4RESULTS=test4results.txt
 
-CURRENTTIME = '1551870308' 'Wed Mar  6 22:05:08 2019'
-START_DATE  = '1551870353' 'Wed Mar  6 22:05:53 2019'
-END_DATE    = '1551870428' 'Wed Mar  6 22:07:08 2019'
+CURRENTTIME = '1551879569' 'Thu Mar  7 00:39:29 2019'
+START_DATE  = '1551879614' 'Thu Mar  7 00:40:14 2019'
+END_DATE    = '1551879689' 'Thu Mar  7 00:41:29 2019'
 solc, the solidity compiler commandline interface
 Version: 0.5.4+commit.9549d8ff.Darwin.appleclang
 contractsdir: ../contracts
@@ -72,7 +71,7 @@ Welcome to the Geth JavaScript console!
 
 instance: Geth/v1.8.23-stable-c9427004/darwin-amd64/go1.11.5
 coinbase: 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e
-at block: 125 (Wed, 06 Mar 2019 22:05:09 AEDT)
+at block: 9387 (Thu, 07 Mar 2019 00:39:31 AEDT)
  datadir: /Users/bok/Projects/Dexz/test/testchain
  modules: admin:1.0 clique:1.0 debug:1.0 eth:1.0 miner:1.0 net:1.0 personal:1.0 rpc:1.0 shh:1.0 txpool:1.0 web3:1.0
 
@@ -217,7 +216,7 @@ undefined
 ... 
 undefined
 > 
-DATA: var rbtLibAddress="0x90d8927407c79c4a28ee879b821c76fc9bcc2688";
+DATA: var rbtLibAddress="0x936e75a404fc4ea6aba4d9c3b20ea67abab3188a";
 DATA: var rbtLibAbi=[{"constant":false,"inputs":[{"name":"self","type":"BokkyPooBahsRedBlackTreeLibrary.Tree storage"},{"name":"key","type":"uint256"}],"name":"remove","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"self","type":"BokkyPooBahsRedBlackTreeLibrary.Tree storage"},{"name":"key","type":"uint256"}],"name":"insert","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}];
 DATA: var rbtLib=eth.contract(rbtLibAbi).at(rbtLibAddress);
 RESULT:  # Account                                             EtherBalanceChange                              0                              1 Name
@@ -243,7 +242,7 @@ RESULT:  8 0xa88a05d2b88283ce84c8325760b72a64591279a2        0.00000000000000000
 RESULT:                                                                                     0.000000000000000000           0.000000000000000000
 RESULT:  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.000000000000000000           0.000000000000000000 UIFee
 RESULT:                                                                                     0.000000000000000000           0.000000000000000000
-RESULT: 10 0x90d8927407c79c4a28ee879b821c76fc9bcc2688        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
+RESULT: 10 0x936e75a404fc4ea6aba4d9c3b20ea67abab3188a        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
 RESULT:                                                                                     0.000000000000000000           0.000000000000000000
 RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
 RESULT:                                                                                     0.000000000000000000           0.000000000000000000 Total Token Balances
@@ -255,7 +254,7 @@ undefined
 RESULT: PASS Deploy Group #1 - RBTLib
 1
 > 
-RESULT: rbtLibTx status=0x1 Success gas=3000000 gasUsed=948587 costETH=0.004742935 costUSD=0.64461229585 @ ETH/USD=135.91 gasPrice=5 gwei block=135 txIx=0 txId=0x61cbc2b7f32e084271f1e8f8cb4120e6e645498ddd2e25767b9f50307919891e @ 1551870319 Wed, 06 Mar 2019 11:05:19 UTC
+RESULT: rbtLibTx status=0x1 Success gas=3000000 gasUsed=948587 costETH=0.004742935 costUSD=0.64461229585 @ ETH/USD=135.91 gasPrice=5 gwei block=9397 txIx=0 txId=0x3e77895573ad350d1732ca5bad2c2915ffc505eb1d703af3e2ddc45c663f9f20 @ 1551879581 Wed, 06 Mar 2019 13:39:41 UTC
 undefined
 > 
 RESULT: 

@@ -1,0 +1,74 @@
+---------- Settings ----------
+GETHATTACHPOINT=ipc:~/Library/Ethereum/testnet/geth.ipc
+
+DEXZADDRESS=0xaab9d50a75c5423c9e917447dfb767854d186e76
+
+TOKEN1ADDRESS=0x101848D5C5bBca18E6b4431eEdF6B95E9ADF82FA
+TOKEN1CODE=WEENUS
+TOKEN1NAME="Weenus 💪"
+
+TOKEN2ADDRESS=0x7E0480Ca9fD50EB7A3855Cf53c347A1b4d6A2FF5
+TOKEN2CODE=XEENUS
+TOKEN2NAME="Xeenus 💪"
+
+// eth.accounts[2]
+TEST1ACCOUNT=0x11111CADB6e2019baB3bEe083B1f9B8aA3025c51
+// eth.accounts[3]
+TEST2ACCOUNT=0x22222c7efFDD2e7E1Eb11c55d381Ca059114b237
+
+
+TEST1OUTPUT=test1output.txt
+TEST1RESULTS=test1results.txt
+
+Welcome to the Geth JavaScript console!
+
+instance: Geth/v1.8.23-stable-c9427004/darwin-amd64/go1.11.5
+coinbase: 0xa34b7cba6e3cefe2ebde6f1968c7cc4a7336b702
+at block: 5150198 (Thu, 07 Mar 2019 00:15:38 AEDT)
+ datadir: /Users/bok/Library/Ethereum/testnet
+ modules: admin:1.0 debug:1.0 eth:1.0 ethash:1.0 miner:1.0 net:1.0 personal:1.0 rpc:1.0 txpool:1.0 web3:1.0
+
+> 
+true
+> 
+true
+> 
+true
+> 
+> 
+undefined
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+> 
+RESULT:  # Account                                             EtherBalanceChange                         WEENUS                         XEENUS Name
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:  0 0x101848D5C5bBca18E6b4431eEdF6B95E9ADF82FA        0.000000000000000000           0.000000000000000000           0.000000000000000000 WEENUS
+RESULT:  1 0x7E0480Ca9fD50EB7A3855Cf53c347A1b4d6A2FF5        0.000000000000000000           0.000000000000000000           0.000000000000000000 XEENUS
+RESULT:  2 0x11111CADB6e2019baB3bEe083B1f9B8aA3025c51        0.000000000000000000        2000.000000000000000000           0.000000000000000000 Test11111
+RESULT:  3 0x22222c7efFDD2e7E1Eb11c55d381Ca059114b237        0.000000000000000000           0.000000000000000000           0.000000000000000000 Test2222
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:                                                                                  2000.000000000000000000           0.000000000000000000 Total Token Balances
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT: 
+undefined
+> 
+> 
+> 
+> 

@@ -20,7 +20,6 @@ EXCHANGEJS=Dexz.js
 
 DEPLOYMENTDATA=deploymentData.js
 
-INCLUDEJS=./include.js
 TEST1OUTPUT=test1output.txt
 TEST1RESULTS=test1results.txt
 TEST2OUTPUT=test2output.txt
