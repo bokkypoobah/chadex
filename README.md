@@ -25,6 +25,6 @@ Orderbook
 
 
 TODO:
-* Move past consumed orders
+* Move past consumed orders, graceful gas limit exit
 * Handle canTransferFrom() - https://github.com/ethereum/EIPs/issues/1594
       function canTransferFrom(address _from, address _to, uint256 _value, bytes _data) external view returns (bool, byte, bytes32);

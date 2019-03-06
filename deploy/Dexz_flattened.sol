@@ -1,7 +1,9 @@
 pragma solidity ^0.5.0;
 
 // ----------------------------------------------------------------------------
-// Dexz 🧙, pronounced dex-zee, the token exchanging wizard
+// Dexz🤖, pronounced dex-zee, the token exchanger bot
+//
+// STATUS: In Development
 //
 // https://github.com/bokkypoobah/Dexz
 //
@@ -857,8 +859,7 @@ contract Dexz is Orders, ApproveAndCallFallback {
         address uiFeeAccount;
     }
 
-    // web3.sha3("trade(uint256,address,address,uint256,uint256,uint256,address)").substring(0, 10)
-    // => "0xcbb924e2"
+    // web3.sha3("trade(uint256,address,address,uint256,uint256,uint256,address)").substring(0, 10) => "0xcbb924e2"
     bytes4 public constant tradeSig = "\xcb\xb9\x24\xe2";
 
     event Trade(bytes32 indexed key, uint orderType, address indexed taker, address indexed maker, uint amount, address baseToken, address quoteToken, uint baseTokens, uint quoteTokens, uint feeBaseTokens, uint feeQuoteTokens, uint baseTokensFilled);
@@ -899,7 +900,7 @@ contract Dexz is Orders, ApproveAndCallFallback {
         // emit LogInfo("receiveApproval: p4 price", price, 0x0, "", address(0));
         // emit LogInfo("receiveApproval: p5 expiry", expiry, 0x0, "", address(0));
         // emit LogInfo("receiveApproval: p6 baseTokens", baseTokens, 0x0, "", address(0));
-          emit LogInfo("receiveApproval: p7 uiFeeAccount", 0, 0x0, "", address(uiFeeAccount));
+        // emit LogInfo("receiveApproval: p7 uiFeeAccount", 0, 0x0, "", address(uiFeeAccount));
 
         if (functionSignature == tradeSig) {
             require(length >= TRADE_DATA_LENGTH);

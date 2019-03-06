@@ -12,10 +12,10 @@ pragma solidity ^0.5.0;
 // Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2019. The MIT Licence.
 // ----------------------------------------------------------------------------
 
-import "SafeMath.sol";
-import "Owned.sol";
-import "MintableTokenInterface.sol";
-import "ApproveAndCallFallback.sol";
+import "../SafeMath.sol";
+import "../Owned.sol";
+import "../ApproveAndCallFallback.sol";
+import "./MintableTokenInterface.sol";
 
 
 // ----------------------------------------------------------------------------

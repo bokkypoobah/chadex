@@ -1,8 +1,8 @@
 #!/bin/bash
 # ----------------------------------------------------------------------------------------------
-# Testing the smart contract
+# Deploy the smart contract
 #
-# Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2018. The MIT Licence.
+# Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2019. The MIT Licence.
 # ----------------------------------------------------------------------------------------------
 
 echo "Options: [full|takerSell|takerBuy|exchange]"
@@ -45,10 +45,8 @@ printf "END_DATE    = '$END_DATE' '$END_DATE_S'\n" | tee -a $TEST1OUTPUT
 solc_0.5.4 --version | tee -a $TEST1OUTPUT
 
 ../scripts/solidityFlattener.pl --contractsdir=../contracts --mainsol=$EXCHANGESOL --outputsol=$EXCHANGEFLATTENED --verbose | tee -a $TEST1OUTPUT
-../scripts/solidityFlattener.pl --contractsdir=../contracts --mainsol=$MINTABLETOKENSOL --outputsol=$MINTABLETOKENFLATTENED --verbose | tee -a $TEST1OUTPUT
 
 echo "var dexzOutput=`solc_0.5.4 --allow-paths . --optimize --pretty-json --combined-json abi,bin,interface $EXCHANGEFLATTENED`;" > $EXCHANGEJS
-echo "var mintableTokenOutput=`solc_0.5.4 --allow-paths . --optimize --pretty-json --combined-json abi,bin,interface $MINTABLETOKENFLATTENED`;" > $MINTABLETOKENJS
 
 if [ "$MODE" = "compile" ]; then
   echo "Compiling only"
@@ -57,7 +55,6 @@ fi
 
 geth --verbosity 3 attach $GETHATTACHPOINT << EOF | tee -a $TEST1OUTPUT
 loadScript("$EXCHANGEJS");
-loadScript("$MINTABLETOKENJS");
 loadScript("lookups.js");
 loadScript("functions.js");
 
@@ -65,30 +62,17 @@ var rbtLibAbi = JSON.parse(dexzOutput.contracts["$EXCHANGEFLATTENED:BokkyPooBahs
 var rbtLibBin = "0x" + dexzOutput.contracts["$EXCHANGEFLATTENED:BokkyPooBahsRedBlackTreeLibrary"].bin;
 var dexzAbi = JSON.parse(dexzOutput.contracts["$EXCHANGEFLATTENED:Dexz"].abi);
 var dexzBin = "0x" + dexzOutput.contracts["$EXCHANGEFLATTENED:Dexz"].bin;
-var mintableTokenAbi = JSON.parse(mintableTokenOutput.contracts["$MINTABLETOKENFLATTENED:MintableToken"].abi);
-var mintableTokenBin = "0x" + mintableTokenOutput.contracts["$MINTABLETOKENFLATTENED:MintableToken"].bin;
 
 // console.log("DATA: rbtLibAbi=" + JSON.stringify(rbtLibAbi));
 // console.log("DATA: rbtLibBin=" + JSON.stringify(rbtLibBin));
 // console.log("DATA: dexzAbi=" + JSON.stringify(dexzAbi));
 // console.log("DATA: dexzBin=" + JSON.stringify(dexzBin));
-// console.log("DATA: mintableTokenAbi=" + JSON.stringify(mintableTokenAbi));
-// console.log("DATA: mintableTokenBin=" + JSON.stringify(mintableTokenBin));
 
 
-unlockAccounts("$PASSWORD");
+// unlockAccounts("$PASSWORD");
 printBalances();
 console.log("RESULT: ");
 
-
-var BUY = 0;
-var SELL = 1;
-var TAKERSELL = true;
-var TAKERBUY = true;
-var ABC = 0;
-var DEF = 1;
-var GHI = 2;
-var WETH = 3;
 
 var i;
 
@@ -100,7 +84,10 @@ console.log("RESULT: ---------- " + deployGroup1Message + " ----------");
 var rbtLibContract = web3.eth.contract(rbtLibAbi);
 var rbtLibTx = null;
 var rbtLibAddress = null;
-var rbtLib = rbtLibContract.new({from: deployer, data: rbtLibBin, gas: 3000000, gasPrice: defaultGasPrice},
+console.log("RESULT: DEPLOYMENTACCOUNT: $DEPLOYMENTACCOUNT");
+console.log("RESULT: " + defaultGasPrice);
+exit;
+var rbtLib = rbtLibContract.new({from: "$DEPLOYMENTACCOUNT", data: rbtLibBin, gas: 3000000, gasPrice: defaultGasPrice},
   function(e, contract) {
     if (!e) {
       if (!contract.address) {
@@ -115,27 +102,19 @@ var rbtLib = rbtLibContract.new({from: deployer, data: rbtLibBin, gas: 3000000, 
     }
   }
 );
-while (txpool.status.pending > 0) {
+// while (txpool.status.pending > 0) {
+// }
+while (eth.getTransactionReceipt(rbtLibTx) == null) {
 }
 printBalances();
 failIfTxStatusError(rbtLibTx, deployGroup1Message + " - RBTLib");
 printTxData("rbtLibTx", rbtLibTx);
 console.log("RESULT: ");
 
+exit;
 
 // -----------------------------------------------------------------------------
 var deployGroup2Message = "Deploy Group #2";
-var numberOfTokens = $NUMBEROFTOKENS;
-var _tokenSymbols = "$TOKENSYMBOLS".split(":");
-var _tokenNames = "$TOKENNAMES".split(":");
-var _tokenDecimals = "$TOKENDECIMALS".split(":");
-var _tokenInitialSupplies = "$TOKENINITIALSUPPLIES".split(":");
-var _tokenInitialDistributions = "$TOKENINITIALDISTRIBUTION".split(":");
-// console.log("RESULT: _tokenSymbols = " + JSON.stringify(_tokenSymbols));
-// console.log("RESULT: _tokenNames = " + JSON.stringify(_tokenNames));
-// console.log("RESULT: _tokenDecimals = " + JSON.stringify(_tokenDecimals));
-// console.log("RESULT: _tokenInitialSupplies = " + JSON.stringify(_tokenInitialSupplies));
-// console.log("RESULT: _tokenInitialDistributions = " + JSON.stringify(_tokenInitialDistributions));
 // -----------------------------------------------------------------------------
 console.log("RESULT: ---------- " + deployGroup2Message + " ----------");
 var rbtLibName = "$EXCHANGEFLATTENED:BokkyPooBahsRedBlackTreeLibrary";
@@ -164,56 +143,17 @@ var dexz = dexzContract.new(feeAccount, {from: deployer, data: newDexzBin, gas: 
     }
   }
 );
-var tokenTxs = [];
-var tokenAddresses = [];
-var tokens = [];
-var tokenTxsToIndexMapping = {};
-for (i = 0; i < numberOfTokens; i++) {
-  var tokenContract = web3.eth.contract(mintableTokenAbi);
-  tokens[i] = tokenContract.new(_tokenSymbols[i], _tokenNames[i], _tokenDecimals[i], deployer, _tokenInitialSupplies[i], {from: deployer, data: mintableTokenBin, gas: 2000000, gasPrice: defaultGasPrice},
-    function(e, contract) {
-      if (!e) {
-        if (!contract.address) {
-          // var i = tokenTxsToIndexMapping[contract.transactionHash];
-          // tokenTxs[i] = contract.transactionHash;
-        } else {
-          var i = tokenTxsToIndexMapping[contract.transactionHash];
-          tokenTxs[i] = contract.transactionHash;
-          tokenAddresses[i] = contract.address;
-          addAccount(tokenAddresses[i], "Token '" + tokens[i].symbol() + "' '" + tokens[i].name() + "'");
-          addAddressSymbol(tokenAddresses[i], tokens[i].symbol());
-          addTokenContractAddressAndAbi(i, tokenAddresses[i], mintableTokenAbi);
-          console.log("DATA: var token" + i + "Address=\"" + tokenAddresses[i] + "\";");
-          if (i == 0) {
-            console.log("DATA: var tokenAbi=" + JSON.stringify(mintableTokenAbi) + ";");
-          }
-          console.log("DATA: var token" + i + "=eth.contract(tokenAbi).at(token" + i + "Address);");
-        }
-      }
-    }
-  );
-  tokenTxsToIndexMapping[tokens[i].transactionHash] = i;
-}
-while (txpool.status.pending > 0) {
+while (eth.getTransactionReceipt(dexzTx) == null) {
 }
 printBalances();
 failIfTxStatusError(dexzTx, deployGroup2Message + " - DexOneExchange");
-for (i = 0; i < numberOfTokens; i++) {
-  failIfTxStatusError(tokenTxs[i], deployGroup2Message + " - Token ''" + tokens[i].symbol() + "' '" + tokens[i].name() + "'");
-}
 printTxData("dexzTx", dexzTx);
-for (i = 0; i < numberOfTokens; i++) {
-  printTxData("tokenTx[" + i + "]", tokenTxs[i]);
-}
 console.log("RESULT: ");
 printDexOneExchangeContractDetails();
 console.log("RESULT: ");
-for (i = 0; i < numberOfTokens; i++) {
-  printTokenContractDetails(i);
-  console.log("RESULT: ");
-}
-console.log("RESULT: ");
 
+
+exit;
 
 // -----------------------------------------------------------------------------
 var deployGroup3Message = "Deploy Group #3";
