@@ -343,10 +343,11 @@ function formatOrderEvent(orderType, maker, baseTokenAddress, quoteTokenAddress,
     baseToken + "/" + quoteToken + " +" + minutes.toFixed(2) + "s";
 }
 var dexOneExchangeFromBlock = 0;
-function printDexOneExchangeContractDetails() {
+function printDexOneExchangeContractDetails(_baseBlock) {
   if (dexOneExchangeFromBlock == 0) {
     dexOneExchangeFromBlock = baseBlock;
   }
+  dexOneExchangeFromBlock = _baseBlock;
   console.log("RESULT: dexOneExchange.address=" + getShortAddressName(dexOneExchangeContractAddress));
   if (dexOneExchangeContractAddress != null && dexOneExchangeContractAbi != null) {
     var contract = eth.contract(dexOneExchangeContractAbi).at(dexOneExchangeContractAddress);

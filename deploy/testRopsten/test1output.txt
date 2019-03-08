@@ -2,6 +2,9 @@
 GETHATTACHPOINT=ipc:~/Library/Ethereum/testnet/geth.ipc
 
 DEXZADDRESS=0xaab9d50a75c5423c9e917447dfb767854d186e76
+BASEBLOCK=5149724
+
+UIFEEACCOUNT=0x49D8621f8862c423AbbA0dfAe4916F838Cd264F6
 
 TOKEN1ADDRESS=0x101848D5C5bBca18E6b4431eEdF6B95E9ADF82FA
 TOKEN1CODE=WEENUS
@@ -20,11 +23,12 @@ TEST2ACCOUNT=0x22222c7efFDD2e7E1Eb11c55d381Ca059114b237
 TEST1OUTPUT=test1output.txt
 TEST1RESULTS=test1results.txt
 
+MODE: view
 Welcome to the Geth JavaScript console!
 
 instance: Geth/v1.8.23-stable-c9427004/darwin-amd64/go1.11.5
 coinbase: 0xa34b7cba6e3cefe2ebde6f1968c7cc4a7336b702
-at block: 5150198 (Thu, 07 Mar 2019 00:15:38 AEDT)
+at block: 5164079 (Sat, 09 Mar 2019 03:43:25 AEDT)
  datadir: /Users/bok/Library/Ethereum/testnet
  modules: admin:1.0 debug:1.0 eth:1.0 ethash:1.0 miner:1.0 net:1.0 personal:1.0 rpc:1.0 txpool:1.0 web3:1.0
 
@@ -47,6 +51,10 @@ undefined
 > 
 undefined
 > 
+undefined
+> 
+> 
+undefined
 > 
 undefined
 > 
@@ -61,14 +69,98 @@ RESULT:  # Account                                             EtherBalanceChang
 RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
 RESULT:  0 0x101848D5C5bBca18E6b4431eEdF6B95E9ADF82FA        0.000000000000000000           0.000000000000000000           0.000000000000000000 WEENUS
 RESULT:  1 0x7E0480Ca9fD50EB7A3855Cf53c347A1b4d6A2FF5        0.000000000000000000           0.000000000000000000           0.000000000000000000 XEENUS
-RESULT:  2 0x11111CADB6e2019baB3bEe083B1f9B8aA3025c51        0.000000000000000000        2000.000000000000000000           0.000000000000000000 Test11111
-RESULT:  3 0x22222c7efFDD2e7E1Eb11c55d381Ca059114b237        0.000000000000000000           0.000000000000000000           0.000000000000000000 Test2222
+RESULT:  2 0x11111CADB6e2019baB3bEe083B1f9B8aA3025c51        0.000000000000000000        2000.000000000000000000        1000.000000000000000000 Test11111
+RESULT:  3 0x22222c7efFDD2e7E1Eb11c55d381Ca059114b237        0.000000000000000000        1000.000000000000000000        1000.000000000000000000 Test22222
+RESULT:  4 0xaab9d50a75c5423c9e917447dfb767854d186e76        0.000000000000000000           0.000000000000000000           0.000000000000000000 Dexz
 RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
-RESULT:                                                                                  2000.000000000000000000           0.000000000000000000 Total Token Balances
+RESULT:                                                                                  3000.000000000000000000        2000.000000000000000000 Total Token Balances
 RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
 RESULT: 
 undefined
 > 
+RESULT: 
+undefined
+> 
+RESULT: dexOneExchange.address=Dexz:0xaab9
+RESULT: dexOneExchange.owner/new=0x49d8621f8862c423abba0dfae4916f838cd264f6/Null:0x0000
+RESULT: dexOneExchange.deploymentBlockNumber=5149724
+RESULT: dexOneExchange.takerFeeInEthers=0.05 ETH
+RESULT: dexOneExchange.takerFeeInTokens=0.1%
+RESULT: dexOneExchange.feeAccount=0x064a1f91d69de5d7590645f1e812003057c61e73
+RESULT: TokenAdded 0 #5164023 token=WEENUS:0x1018
+RESULT: TokenAdded 1 #5164023 token=XEENUS:0x7e04
+RESULT: AccountAdded 0 #5149724 account=Dexz:0xaab9
+RESULT: AccountAdded 1 #5164023 account=Test11111:0x1111
+RESULT: PairAdded 0 #5164023 pairKey=0x9d14737c333cc42887f27b7d65dc729efd7871e5247a85414fc53b2c9502bf7f baseToken=WEENUS:0x1018 quoteToken=XEENUS:0x7e04
+RESULT: OrderAdded 0 #5164023 pairKey=0x9d14737c333cc42887f27b7d65dc729efd7871e5247a85414fc53b2c9502bf7f key=0x5caf353de38b40e726e0d51c271f93b0efc2cd7e1f5cf6995493f4774cb3e7f6
+RESULT:   Test11111:0x1111 Buy 1 WEENUS @ 1 WEENUS/XEENUS +-3.98s
+RESULT: OrderAdded 1 #5164024 pairKey=0x9d14737c333cc42887f27b7d65dc729efd7871e5247a85414fc53b2c9502bf7f key=0x24a9dd21dbdd1ee2aed040927f2f88f91d0330fb2dd8f011dbee2dbf87f4817c
+RESULT:   Test11111:0x1111 Buy 1 WEENUS @ 1 WEENUS/XEENUS +-3.06s
+RESULT: OrderAdded 2 #5164030 pairKey=0x9d14737c333cc42887f27b7d65dc729efd7871e5247a85414fc53b2c9502bf7f key=0xf6ce27207a6c699d6f18786f2cb2ade6b1c9386133399ecbd078ba523bbd58af
+RESULT:   Test11111:0x1111 Buy 1 WEENUS @ 1 WEENUS/XEENUS +-1.78s
+RESULT: LogInfo 0 #5164023 getBestMatchingOrder: priceKeys.initialised 0
+RESULT: LogInfo 1 #5164023 _trade: matchingOrderKey 0
+RESULT: LogInfo 2 #5164023 orders addKey RBT adding  1
+RESULT: LogInfo 3 #5164023 orders addData  first 0 0x5caf353de38b40e726e0d51c271f93b0efc2cd7e1f5cf6995493f4774cb3e7f6
+RESULT: LogInfo 4 #5164024 getBestMatchingOrder: priceKeys.initialised 0
+RESULT: LogInfo 5 #5164024 _trade: matchingOrderKey 0
+RESULT: LogInfo 6 #5164024 orders addKey RBT exists  1
+RESULT: LogInfo 7 #5164024 orders addData !first 0 0x24a9dd21dbdd1ee2aed040927f2f88f91d0330fb2dd8f011dbee2dbf87f4817c
+RESULT: LogInfo 8 #5164030 getBestMatchingOrder: priceKeys.initialised 0
+RESULT: LogInfo 9 #5164030 _trade: matchingOrderKey 0
+RESULT: LogInfo 10 #5164030 orders addKey RBT exists  1
+RESULT: LogInfo 11 #5164030 orders addData !first 0 0xf6ce27207a6c699d6f18786f2cb2ade6b1c9386133399ecbd078ba523bbd58af
+RESULT: ----- Pair 0x9d14737c333cc42887f27b7d65dc729efd7871e5247a85414fc53b2c9502bf7f WEENUS/XEENUS -----
+RESULT: --- Buy Orders ---
+RESULT:   Price: 1 head=0x5caf353de38b40e7 tail=0xf6ce27207a6c699d
+RESULT:     Order key=0x5caf353de38b40e7 prev=0x0000000000000000 next=0x24a9dd21dbdd1ee2 Buy maker=Test11111:0x1111 base=WEENUS quote=XEENUS price=1 expiry=-3.99s baseTokens=1 baseTokensFilled=0
+RESULT:     Order key=0x24a9dd21dbdd1ee2 prev=0x5caf353de38b40e7 next=0xf6ce27207a6c699d Buy maker=Test11111:0x1111 base=WEENUS quote=XEENUS price=1 expiry=-3.07s baseTokens=1 baseTokensFilled=0
+RESULT:     Order key=0xf6ce27207a6c699d prev=0x24a9dd21dbdd1ee2 next=0x0000000000000000 Buy maker=Test11111:0x1111 base=WEENUS quote=XEENUS price=1 expiry=-1.79s baseTokens=1 baseTokensFilled=0
+RESULT: --- Sell Orders ---
+undefined
+> 
+RESULT: 
+undefined
+> 
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+> 
+> 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+...... 
+... 
+... 
+... 
+... 
+... 
+... 
+undefined
 > 
 > 
 > 
