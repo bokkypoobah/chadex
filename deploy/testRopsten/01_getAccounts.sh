@@ -36,6 +36,10 @@ addDexOneExchangeContractAddressAndAbi(dexzAddress, dexzAbi);
 
 printBalances();
 console.log("RESULT: ");
+printTokenContractDetails(0, $BASEBLOCK);
+console.log("RESULT: ");
+printTokenContractDetails(1, $BASEBLOCK);
+console.log("RESULT: ");
 printDexOneExchangeContractDetails($BASEBLOCK);
 console.log("RESULT: ");
 
@@ -66,9 +70,14 @@ if ("$MODE" == "addorder") {
 
   printBalances();
   console.log("RESULT: ");
+  printTokenContractDetails(0, $BASEBLOCK);
+  console.log("RESULT: ");
+  printTokenContractDetails(1, $BASEBLOCK);
+  console.log("RESULT: ");
   printDexOneExchangeContractDetails($BASEBLOCK);
   console.log("RESULT: ");
 }
+
 
 
 exit;

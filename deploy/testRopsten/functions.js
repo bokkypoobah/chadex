@@ -266,10 +266,11 @@ function waitUntilBlock(message, block, addBlocks) {
 // Token Contract A
 //-----------------------------------------------------------------------------
 var tokenFromBlock = [0, 0, 0, 0];
-function printTokenContractDetails(j) {
-  if (tokenFromBlock[j] == 0) {
-    tokenFromBlock[j] = baseBlock;
-  }
+function printTokenContractDetails(j, _baseBlock) {
+  // if (tokenFromBlock[j] == 0) {
+  //   tokenFromBlock[j] = baseBlock;
+  // }
+  tokenFromBlock[j] = _baseBlock;
   console.log("RESULT: token" + j + "ContractAddress=" + getShortAddressName(_tokenContractAddresses[j]));
   if (_tokenContractAddresses[j] != null) {
     var contract = _tokens[j];
@@ -344,9 +345,9 @@ function formatOrderEvent(orderType, maker, baseTokenAddress, quoteTokenAddress,
 }
 var dexOneExchangeFromBlock = 0;
 function printDexOneExchangeContractDetails(_baseBlock) {
-  if (dexOneExchangeFromBlock == 0) {
-    dexOneExchangeFromBlock = baseBlock;
-  }
+  // if (dexOneExchangeFromBlock == 0) {
+  //   dexOneExchangeFromBlock = baseBlock;
+  // }
   dexOneExchangeFromBlock = _baseBlock;
   console.log("RESULT: dexOneExchange.address=" + getShortAddressName(dexOneExchangeContractAddress));
   if (dexOneExchangeContractAddress != null && dexOneExchangeContractAbi != null) {
