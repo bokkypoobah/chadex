@@ -4,14 +4,12 @@ PASSWORD=
 
 SOURCEDIR=../contracts/
 
-PROXYSOL=DexOneProxy.sol
-PROXYJS=DexOneProxy.js
 EXCHANGESOL=Dexz.sol
+EXCHANGEFLATTENED=Dexz_flattened.sol
 EXCHANGEJS=Dexz.js
-EXCHANGEFLATTENED=../flattened/Dexz_flattened.sol
-MINTABLETOKENSOL=MintableToken.sol
+MINTABLETOKENSOL=test/MintableToken.sol
 MINTABLETOKENJS=MintableToken.js
-MINTABLETOKENFLATTENED=../flattened/MintableToken_flattened.sol
+MINTABLETOKENFLATTENED=MintableToken_flattened.sol
 NUMBEROFTOKENS=4
 TOKENSYMBOLS="ABC:DEF:GHI:WETH"
 TOKENNAMES="Abc:Def:Ghi:Wrapped ETH"
@@ -21,7 +19,6 @@ TOKENINITIALDISTRIBUTION="900:1001:100:10"
 
 DEPLOYMENTDATA=deploymentData.js
 
-INCLUDEJS=./include.js
 TEST1OUTPUT=test1output.txt
 TEST1RESULTS=test1results.txt
 TEST2OUTPUT=test2output.txt
@@ -31,16 +28,17 @@ TEST3RESULTS=test3results.txt
 TEST4OUTPUT=test4output.txt
 TEST4RESULTS=test4results.txt
 
-CURRENTTIME = '1548773245' 'Wed Jan 30 01:47:25 2019'
-START_DATE  = '1548773290' 'Wed Jan 30 01:48:10 2019'
-END_DATE    = '1548773365' 'Wed Jan 30 01:49:25 2019'
+CURRENTTIME = '1558486274' 'Wed May 22 10:51:14 2019'
+START_DATE  = '1558486319' 'Wed May 22 10:51:59 2019'
+END_DATE    = '1558486394' 'Wed May 22 10:53:14 2019'
 --- Differences ../contracts//*.sol *.sol ---
-
+Only in .: Dexz_flattened.sol
+Only in .: MintableToken_flattened.sol
 Welcome to the Geth JavaScript console!
 
-instance: Geth/v1.8.21-stable-9dc5d1a9/darwin-amd64/go1.11.4
+instance: Geth/v1.8.27-stable-4bcc0a37/darwin-amd64/go1.11.9
 coinbase: 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e
-at block: 7 (Wed, 30 Jan 2019 01:47:26 AEDT)
+at block: 5 (Wed, 22 May 2019 10:51:15 AEST)
  datadir: /Users/bok/Projects/Dexz/test/testchain
  modules: admin:1.0 clique:1.0 debug:1.0 eth:1.0 miner:1.0 net:1.0 personal:1.0 rpc:1.0 shh:1.0 txpool:1.0 web3:1.0
 
@@ -90,6 +88,518 @@ undefined
 undefined
 > 
 undefined
+> 
+> 
+> 
+undefined
+> 
+RESULT:  # Account                                             EtherBalanceChange                              0                              1 Name
+RESULT:                                                                                                        2                              3
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:  0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.000000000000000000           0.000000000000000000           0.000000000000000000 Miner
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433        0.000000000000000000           0.000000000000000000           0.000000000000000000 Deployer
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976        0.000000000000000000           0.000000000000000000           0.000000000000000000 User1
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0        0.000000000000000000           0.000000000000000000           0.000000000000000000 User2
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  4 0xa44a08d3f6933c69212114bb66e2df1813651844        0.000000000000000000           0.000000000000000000           0.000000000000000000 User3
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  5 0xa55a151eb00fded1634d27d1127b4be4627079ea        0.000000000000000000           0.000000000000000000           0.000000000000000000 User4
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9        0.000000000000000000           0.000000000000000000           0.000000000000000000 User5
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  7 0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec        0.000000000000000000           0.000000000000000000           0.000000000000000000 User6
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  8 0xa88a05d2b88283ce84c8325760b72a64591279a2        0.000000000000000000           0.000000000000000000           0.000000000000000000 Fee
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.000000000000000000           0.000000000000000000 UIFee
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000 Total Token Balances
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT: 
+undefined
+> 
+RESULT: 
+undefined
+> 
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+> 
+undefined
+> 
+RESULT: ---------- Deploy Group #1 ----------
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+... 
+...... 
+......... 
+............ 
+............ 
+............ 
+............ 
+............ 
+............ 
+............ 
+............ 
+............ 
+......... 
+...... 
+... 
+TypeError: Cannot access member 'filter' of undefined
+    at web3.js:2830:12
+    at web3.js:3001:21
+    at <anonymous>:1:22
+
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+... 
+... 
+...... 
+......... 
+............ 
+............... 
+............... 
+............... 
+............... 
+............... 
+............... 
+............... 
+............... 
+............... 
+............... 
+............... 
+.................. 
+.................. 
+............... 
+............... 
+............ 
+......... 
+...... 
+... 
+... 
+TypeError: Cannot access member 'filter' of undefined
+    at web3.js:2830:12
+    at web3.js:3001:21
+    at <anonymous>:3:15
+
+> 
+... 
+undefined
+> 
+RESULT:  # Account                                             EtherBalanceChange                              0                              1 Name
+RESULT:                                                                                                        2                              3
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:  0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.000000000000000000           0.000000000000000000           0.000000000000000000 Miner
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433        0.000000000000000000           0.000000000000000000           0.000000000000000000 Deployer
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976        0.000000000000000000           0.000000000000000000           0.000000000000000000 User1
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0        0.000000000000000000           0.000000000000000000           0.000000000000000000 User2
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  4 0xa44a08d3f6933c69212114bb66e2df1813651844        0.000000000000000000           0.000000000000000000           0.000000000000000000 User3
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  5 0xa55a151eb00fded1634d27d1127b4be4627079ea        0.000000000000000000           0.000000000000000000           0.000000000000000000 User4
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9        0.000000000000000000           0.000000000000000000           0.000000000000000000 User5
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  7 0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec        0.000000000000000000           0.000000000000000000           0.000000000000000000 User6
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  8 0xa88a05d2b88283ce84c8325760b72a64591279a2        0.000000000000000000           0.000000000000000000           0.000000000000000000 Fee
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.000000000000000000           0.000000000000000000 UIFee
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000 Total Token Balances
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT: 
+undefined
+> 
+Error: invalid argument 0: json: cannot unmarshal non-string into Go value of type common.Hash
+    at web3.js:3143:20
+    at web3.js:6347:15
+    at web3.js:5081:36
+    at failIfTxStatusError (functions.js:176:16)
+    at <anonymous>:1:1
+
+> 
+... 
+... 
+TypeError: Cannot access member 'symbol' of undefined
+    at <anonymous>:2:74
+
+> 
+Error: invalid argument 0: json: cannot unmarshal non-string into Go value of type common.Hash
+    at web3.js:3143:20
+    at web3.js:6347:15
+    at web3.js:5081:36
+    at printTxData (functions.js:153:12)
+    at <anonymous>:1:1
+
+> 
+... 
+... 
+Error: invalid argument 0: json: cannot unmarshal non-string into Go value of type common.Hash
+    at web3.js:3143:20
+    at web3.js:6347:15
+    at web3.js:5081:36
+    at printTxData (functions.js:153:12)
+    at <anonymous>:2:3
+
+> 
+RESULT: 
+undefined
+> 
+RESULT: dexz.address=null
+undefined
+> 
+RESULT: 
+undefined
+> 
+... 
+... 
+... 
+RESULT: token0ContractAddress=undefined
+RESULT: 
+RESULT: token1ContractAddress=undefined
+RESULT: 
+RESULT: token2ContractAddress=undefined
+RESULT: 
+RESULT: token3ContractAddress=undefined
+RESULT: 
+undefined
+> 
+RESULT: 
+undefined
+> 
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+RESULT: ---------- Deploy Group #2 ----------
+undefined
+> 
+undefined
+> 
+undefined
+> 
+...... 
+......... 
+......... 
+......... 
+......... 
+......... 
+...... 
+TypeError: Cannot access member 'mint' of undefined
+    at <anonymous>:3:14
+    at forEach (<native code>)
+    at <anonymous>:1:1
+
+> 
+... 
+undefined
+> 
+RESULT:  # Account                                             EtherBalanceChange                              0                              1 Name
+RESULT:                                                                                                        2                              3
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:  0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.000000000000000000           0.000000000000000000           0.000000000000000000 Miner
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433        0.000000000000000000           0.000000000000000000           0.000000000000000000 Deployer
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976        0.000000000000000000           0.000000000000000000           0.000000000000000000 User1
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0        0.000000000000000000           0.000000000000000000           0.000000000000000000 User2
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  4 0xa44a08d3f6933c69212114bb66e2df1813651844        0.000000000000000000           0.000000000000000000           0.000000000000000000 User3
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  5 0xa55a151eb00fded1634d27d1127b4be4627079ea        0.000000000000000000           0.000000000000000000           0.000000000000000000 User4
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9        0.000000000000000000           0.000000000000000000           0.000000000000000000 User5
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  7 0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec        0.000000000000000000           0.000000000000000000           0.000000000000000000 User6
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  8 0xa88a05d2b88283ce84c8325760b72a64591279a2        0.000000000000000000           0.000000000000000000           0.000000000000000000 Fee
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.000000000000000000           0.000000000000000000 UIFee
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000 Total Token Balances
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT: 
+undefined
+> 
+...... 
+...... 
+undefined
+> 
+...... 
+...... 
+undefined
+> 
+RESULT: 
+undefined
+> 
+RESULT: dexz.address=null
+undefined
+> 
+RESULT: 
+undefined
+> 
+... 
+... 
+... 
+RESULT: token0ContractAddress=undefined
+RESULT: 
+RESULT: token1ContractAddress=undefined
+RESULT: 
+RESULT: token2ContractAddress=undefined
+RESULT: 
+RESULT: token3ContractAddress=undefined
+RESULT: 
+undefined
+> 
+RESULT: 
+undefined
+> 
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+RESULT: ---------- Add Orders #1 ----------
+undefined
+> 
+TypeError: Cannot access member 'addOrder' of undefined
+    at <anonymous>:1:22
+
+> 
+... 
+undefined
+> 
+TypeError: Cannot access member 'addOrder' of undefined
+    at <anonymous>:1:22
+
+> 
+... 
+undefined
+> 
+TypeError: Cannot access member 'addOrder' of undefined
+    at <anonymous>:1:22
+
+> 
+... 
+undefined
+> 
+RESULT:  # Account                                             EtherBalanceChange                              0                              1 Name
+RESULT:                                                                                                        2                              3
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:  0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.000000000000000000           0.000000000000000000           0.000000000000000000 Miner
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433        0.000000000000000000           0.000000000000000000           0.000000000000000000 Deployer
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976        0.000000000000000000           0.000000000000000000           0.000000000000000000 User1
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0        0.000000000000000000           0.000000000000000000           0.000000000000000000 User2
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  4 0xa44a08d3f6933c69212114bb66e2df1813651844        0.000000000000000000           0.000000000000000000           0.000000000000000000 User3
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  5 0xa55a151eb00fded1634d27d1127b4be4627079ea        0.000000000000000000           0.000000000000000000           0.000000000000000000 User4
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9        0.000000000000000000           0.000000000000000000           0.000000000000000000 User5
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  7 0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec        0.000000000000000000           0.000000000000000000           0.000000000000000000 User6
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  8 0xa88a05d2b88283ce84c8325760b72a64591279a2        0.000000000000000000           0.000000000000000000           0.000000000000000000 Fee
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT:  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.000000000000000000           0.000000000000000000 UIFee
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000 Total Token Balances
+RESULT:                                                                                     0.000000000000000000           0.000000000000000000
+RESULT: -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
+RESULT: 
+undefined
+> 
+TypeError: Cannot access member 'symbol' of undefined
+    at <anonymous>:1:85
+
+> 
+TypeError: Cannot access member 'symbol' of undefined
+    at <anonymous>:1:85
+
+> 
+TypeError: Cannot access member 'symbol' of undefined
+    at <anonymous>:1:86
+
+> 
+Error: invalid argument 0: json: cannot unmarshal non-string into Go value of type common.Hash
+    at web3.js:3143:20
+    at web3.js:6347:15
+    at web3.js:5081:36
+    at printTxData (functions.js:153:12)
+    at <anonymous>:1:1
+
+> 
+Error: invalid argument 0: json: cannot unmarshal non-string into Go value of type common.Hash
+    at web3.js:3143:20
+    at web3.js:6347:15
+    at web3.js:5081:36
+    at printTxData (functions.js:153:12)
+    at <anonymous>:1:1
+
+> 
+Error: invalid argument 0: json: cannot unmarshal non-string into Go value of type common.Hash
+    at web3.js:3143:20
+    at web3.js:6347:15
+    at web3.js:5081:36
+    at printTxData (functions.js:153:12)
+    at <anonymous>:1:1
+
+> 
+RESULT: 
+undefined
+> 
+RESULT: dexz.address=null
+undefined
+> 
+RESULT: 
+undefined
+> 
+RESULT: 
+undefined
+> 
+> 
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+undefined
+> 
+> 
+> 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+...... 
+... 
+... 
+... 
+... 
+... 
+... 
+... 
+...... 
+...... 
+...... 
+... 
+... 
+TypeError: Cannot access member 'ordersIndex' of undefined
+    at <anonymous>:4:15
+
 > 
 > 
 > 

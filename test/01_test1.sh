@@ -42,13 +42,13 @@ printf "END_DATE    = '$END_DATE' '$END_DATE_S'\n" | tee -a $TEST1OUTPUT
 # echo "--- Differences $SOURCEDIR/*.sol *.sol ---" | tee -a $TEST1OUTPUT
 # echo "$DIFFS1" | tee -a $TEST1OUTPUT
 
-solc_0.5.4 --version | tee -a $TEST1OUTPUT
+solc_0.5.7 --version | tee -a $TEST1OUTPUT
 
 ../scripts/solidityFlattener.pl --contractsdir=../contracts --mainsol=$EXCHANGESOL --outputsol=$EXCHANGEFLATTENED --verbose | tee -a $TEST1OUTPUT
 ../scripts/solidityFlattener.pl --contractsdir=../contracts --mainsol=$MINTABLETOKENSOL --outputsol=$MINTABLETOKENFLATTENED --verbose | tee -a $TEST1OUTPUT
 
-echo "var dexzOutput=`solc_0.5.4 --allow-paths . --optimize --pretty-json --combined-json abi,bin,interface $EXCHANGEFLATTENED`;" > $EXCHANGEJS
-echo "var mintableTokenOutput=`solc_0.5.4 --allow-paths . --optimize --pretty-json --combined-json abi,bin,interface $MINTABLETOKENFLATTENED`;" > $MINTABLETOKENJS
+echo "var dexzOutput=`solc_0.5.7 --allow-paths . --optimize --pretty-json --combined-json abi,bin,interface $EXCHANGEFLATTENED`;" > $EXCHANGEJS
+echo "var mintableTokenOutput=`solc_0.5.7 --allow-paths . --optimize --pretty-json --combined-json abi,bin,interface $MINTABLETOKENFLATTENED`;" > $MINTABLETOKENJS
 
 if [ "$MODE" = "compile" ]; then
   echo "Compiling only"
@@ -122,7 +122,6 @@ failIfTxStatusError(rbtLibTx, deployGroup1Message + " - RBTLib");
 printTxData("rbtLibTx", rbtLibTx);
 console.log("RESULT: ");
 
-exit;
 
 // -----------------------------------------------------------------------------
 var deployGroup2Message = "Deploy Group #2";
@@ -156,7 +155,7 @@ var dexz = dexzContract.new(feeAccount, {from: deployer, data: newDexzBin, gas: 
         dexzTx = contract.transactionHash;
       } else {
         dexzAddress = contract.address;
-        addAccount(dexzAddress, "DexOneExchange");
+        addAccount(dexzAddress, "Dexz");
         addDexOneExchangeContractAddressAndAbi(dexzAddress, dexzAbi);
         console.log("DATA: var dexzAddress=\"" + dexzAddress + "\";");
         console.log("DATA: var dexzAbi=" + JSON.stringify(dexzAbi) + ";");
@@ -266,13 +265,13 @@ for (var ordersLoop = 0; ordersLoop < 2; ordersLoop++) {
   var orders = [];
   var ordersTxs = [];
   if (ordersLoop == 0) {
-    // orders.push({buySell: BUY, baseToken: tokenAddresses[ABC], quoteToken: tokenAddresses[WETH], price: new BigNumber(0.00100).shift(18), expiry: expired, amount: buyAmount, user: user2});
-    // orders.push({buySell: BUY, baseToken: tokenAddresses[ABC], quoteToken: tokenAddresses[WETH], price: new BigNumber(0.00100).shift(18), expiry: expired, amount: buyAmount, user: user3});
-    // orders.push({buySell: BUY, baseToken: tokenAddresses[ABC], quoteToken: tokenAddresses[WETH], price: new BigNumber(0.00130).shift(18), expiry: expiry, amount: buyAmount, user: user2});
-    // orders.push({buySell: BUY, baseToken: tokenAddresses[ABC], quoteToken: tokenAddresses[WETH], price: new BigNumber(0.00120).shift(18), expiry: expiry, amount: buyAmount, user: user3});
-    // orders.push({buySell: BUY, baseToken: tokenAddresses[ABC], quoteToken: tokenAddresses[WETH], price: new BigNumber(0.00100).shift(18), expiry: expiry, amount: buyAmount, user: user4});
+    orders.push({buySell: BUY, baseToken: tokenAddresses[ABC], quoteToken: tokenAddresses[WETH], price: new BigNumber(0.00100).shift(18), expiry: expired, amount: buyAmount, user: user2});
+    orders.push({buySell: BUY, baseToken: tokenAddresses[ABC], quoteToken: tokenAddresses[WETH], price: new BigNumber(0.00100).shift(18), expiry: expired, amount: buyAmount, user: user3});
+    orders.push({buySell: BUY, baseToken: tokenAddresses[ABC], quoteToken: tokenAddresses[WETH], price: new BigNumber(0.00130).shift(18), expiry: expiry, amount: buyAmount, user: user2});
+    orders.push({buySell: BUY, baseToken: tokenAddresses[ABC], quoteToken: tokenAddresses[WETH], price: new BigNumber(0.00120).shift(18), expiry: expiry, amount: buyAmount, user: user3});
+    orders.push({buySell: BUY, baseToken: tokenAddresses[ABC], quoteToken: tokenAddresses[WETH], price: new BigNumber(0.00100).shift(18), expiry: expiry, amount: buyAmount, user: user4});
     orders.push({buySell: BUY, baseToken: tokenAddresses[ABC], quoteToken: tokenAddresses[WETH], price: new BigNumber(0.00100).shift(18), expiry: expiry, amount: buyAmount, user: user5});
-    // orders.push({buySell: BUY, baseToken: tokenAddresses[ABC], quoteToken: tokenAddresses[WETH], price: buyPrice2, expiry: expiry, amount: buyAmount, user: user2});
+    orders.push({buySell: BUY, baseToken: tokenAddresses[ABC], quoteToken: tokenAddresses[WETH], price: buyPrice2, expiry: expiry, amount: buyAmount, user: user2});
   } else if (ordersLoop == 1) {
     orders.push({buySell: SELL, baseToken: tokenAddresses[ABC], quoteToken: tokenAddresses[WETH], price: sellPrice1, expiry: expiry, amount: sellAmount, user: user6});
   } else {

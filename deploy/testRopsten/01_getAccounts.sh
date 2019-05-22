@@ -56,6 +56,8 @@ var ORDERFLAG_FILL_AND_ADD_ORDER = 0x20;
 
 if ("$MODE" == "addorder") {
 
+  personal.unlockAccount("$TEST1ACCOUNT", "testtesttest", 0);
+
   var orderFlag = ORDERTYPE_BUY | ORDERFLAG_FILL_AND_ADD_ORDER;
   console.log("RESULT: orderFlag: " + orderFlag);
   var buyAmount = new BigNumber(1).shift(18);
@@ -65,6 +67,7 @@ if ("$MODE" == "addorder") {
   var tradeData = dexz.trade.getData(orderFlag, weenus.address, xeenus.address, buyPrice, expiry, buyAmount, uiFeeAccount, {from: "$TEST1ACCOUNT", gas: 3000000, gasPrice: web3.toWei(5, "gwei")});
   console.log("RESULT: tradeData[Buy 1500 WEENUS @ WEENUS/XEENUS]='" + tradeData + "'");
   var approveAndCall1 = xeenus.approveAndCall(dexzAddress, buyAmount, tradeData, {from: "$TEST1ACCOUNT", gas: 2000000, gas: 1000000, gasPrice: web3.toWei(5, "gwei")});
+  console.log("RESULT: approveAndCall1: " + approveAndCall1);
   while (eth.getTransactionReceipt(approveAndCall1) == null) {
   }
 

@@ -441,13 +441,19 @@ contract DexzBase is Owned {
 
     mapping(address => TokenWhitelistStatus) public tokenWhitelist;
 
+    struct PairInfo {
+        bytes32 pairKey;
+        address baseToken;
+        address quoteToken;
+    }
+
     // Data => block.number when first seen
     mapping(address => uint) public tokenBlockNumbers;
     mapping(address => uint) public accountBlockNumbers;
     mapping(bytes32 => uint) public pairBlockNumbers;
     address[] public tokenList;
     address[] public accountList;
-    bytes32[] public pairList;
+    PairInfo[] public pairInfoList;
 
     event TokenWhitelistUpdated(address indexed token, uint oldStatus, uint newStatus);
     event TakerFeeInEthersUpdated(uint oldTakerFeeInEthers, uint newTakerFeeInEthers);
@@ -485,6 +491,9 @@ contract DexzBase is Owned {
         feeAccount = _feeAccount;
     }
 
+    function tokenListLength() public view returns (uint) {
+        return tokenList.length;
+    }
     function addToken(address token) internal {
         if (tokenBlockNumbers[token] == 0) {
             require(ERC20Interface(token).totalSupply() > 0);
@@ -493,6 +502,9 @@ contract DexzBase is Owned {
             emit TokenAdded(token);
         }
     }
+    function accountListLength() public view returns (uint) {
+        return accountList.length;
+    }
     function addAccount(address account) internal {
         if (accountBlockNumbers[account] == 0) {
             accountBlockNumbers[account] = block.number;
@@ -500,10 +512,13 @@ contract DexzBase is Owned {
             emit AccountAdded(account);
         }
     }
+    function pairInfoListLength() public view returns (uint) {
+        return pairInfoList.length;
+    }
     function addPair(bytes32 _pairKey, address baseToken, address quoteToken) internal {
         if (pairBlockNumbers[_pairKey] == 0) {
             pairBlockNumbers[_pairKey] = block.number;
-            pairList.push(_pairKey);
+            pairInfoList.push(PairInfo(_pairKey, baseToken, quoteToken));
             emit PairAdded(_pairKey, baseToken, quoteToken);
         }
     }

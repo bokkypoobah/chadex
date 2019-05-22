@@ -348,11 +348,11 @@ function printTokenContractDetails(j) {
 // -----------------------------------------------------------------------------
 // DexOneExchange Contract
 // -----------------------------------------------------------------------------
-var dexOneExchangeContractAddress = null;
-var dexOneExchangeContractAbi = null;
+var dexzContractAddress = null;
+var dexzContractAbi = null;
 function addDexOneExchangeContractAddressAndAbi(address, abi) {
-  dexOneExchangeContractAddress = address;
-  dexOneExchangeContractAbi = abi;
+  dexzContractAddress = address;
+  dexzContractAbi = abi;
 }
 function formatOrder(orderType, maker, baseTokenAddress, quoteTokenAddress, price, expiry, baseTokens, baseTokensFilled) {
   var makerString = getShortAddressName(maker);
@@ -374,31 +374,44 @@ function formatOrderEvent(orderType, maker, baseTokenAddress, quoteTokenAddress,
     baseToken + " @ " + price.shift(-18) + " " +
     baseToken + "/" + quoteToken + " +" + minutes.toFixed(2) + "s";
 }
-var dexOneExchangeFromBlock = 0;
+var dexzFromBlock = 0;
 function printDexOneExchangeContractDetails() {
-  if (dexOneExchangeFromBlock == 0) {
-    dexOneExchangeFromBlock = baseBlock;
+  if (dexzFromBlock == 0) {
+    dexzFromBlock = baseBlock;
   }
-  console.log("RESULT: dexOneExchange.address=" + getShortAddressName(dexOneExchangeContractAddress));
-  if (dexOneExchangeContractAddress != null && dexOneExchangeContractAbi != null) {
-    var contract = eth.contract(dexOneExchangeContractAbi).at(dexOneExchangeContractAddress);
-    console.log("RESULT: dexOneExchange.owner/new=" + getShortAddressName(contract.owner()) + "/" + getShortAddressName(contract.newOwner()));
-    console.log("RESULT: dexOneExchange.deploymentBlockNumber=" + contract.deploymentBlockNumber());
-    console.log("RESULT: dexOneExchange.takerFeeInEthers=" + contract.takerFeeInEthers().shift(-18) + " ETH");
-    console.log("RESULT: dexOneExchange.takerFeeInTokens=" + contract.takerFeeInTokens().shift(-16) + "%");
-    console.log("RESULT: dexOneExchange.feeAccount=" + getShortAddressName(contract.feeAccount()));
-
+  console.log("RESULT: dexz.address=" + getShortAddressName(dexzContractAddress));
+  if (dexzContractAddress != null && dexzContractAbi != null) {
     var i;
+    var contract = eth.contract(dexzContractAbi).at(dexzContractAddress);
+    console.log("RESULT: dexz.owner/new=" + getShortAddressName(contract.owner()) + "/" + getShortAddressName(contract.newOwner()));
+    console.log("RESULT: dexz.deploymentBlockNumber=" + contract.deploymentBlockNumber());
+    console.log("RESULT: dexz.takerFeeInEthers=" + contract.takerFeeInEthers().shift(-18) + " ETH");
+    console.log("RESULT: dexz.takerFeeInTokens=" + contract.takerFeeInTokens().shift(-16) + "%");
+    console.log("RESULT: dexz.feeAccount=" + getShortAddressName(contract.feeAccount()));
+
+    console.log("RESULT: dexz.tokenListLength=" + contract.tokenListLength());
+    for (i = 0; i < contract.tokenListLength(); i++) {
+      console.log("RESULT: dexz.tokenList[" + i + "]=" + contract.tokenList(i));
+    }
+    console.log("RESULT: dexz.accountListLength=" + contract.accountListLength());
+    for (i = 0; i < contract.accountListLength(); i++) {
+      console.log("RESULT: dexz.accountList[" + i + "]=" + contract.accountList(i));
+    }
+    console.log("RESULT: dexz.pairInfoListLength=" + contract.pairInfoListLength());
+    for (i = 0; i < contract.pairInfoListLength(); i++) {
+      console.log("RESULT: dexz.pairInfoList[" + i + "]=" + contract.pairInfoList(i));
+    }
+
     var latestBlock = eth.blockNumber;
 
-    var ownershipTransferredEvents = contract.OwnershipTransferred({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
+    var ownershipTransferredEvents = contract.OwnershipTransferred({}, { fromBlock: dexzFromBlock, toBlock: latestBlock });
     i = 0;
     ownershipTransferredEvents.watch(function (error, result) {
       console.log("RESULT: OwnershipTransferred " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
     });
     ownershipTransferredEvents.stopWatching();
 
-    var tokenWhitelistUpdatedEvents = contract.TokenWhitelistUpdated({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
+    var tokenWhitelistUpdatedEvents = contract.TokenWhitelistUpdated({}, { fromBlock: dexzFromBlock, toBlock: latestBlock });
     i = 0;
     tokenWhitelistUpdatedEvents.watch(function (error, result) {
       console.log("RESULT: TokenWhitelistUpdated " + i++ + " #" + result.blockNumber + " token=" + getShortAddressName(result.args.token) +
@@ -406,42 +419,42 @@ function printDexOneExchangeContractDetails() {
     });
     tokenWhitelistUpdatedEvents.stopWatching();
 
-    var takerFeeInEthersUpdatedEvents = contract.TakerFeeInEthersUpdated({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
+    var takerFeeInEthersUpdatedEvents = contract.TakerFeeInEthersUpdated({}, { fromBlock: dexzFromBlock, toBlock: latestBlock });
     i = 0;
     takerFeeInEthersUpdatedEvents.watch(function (error, result) {
       console.log("RESULT: TakerFeeInEthersUpdated " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
     });
     takerFeeInEthersUpdatedEvents.stopWatching();
 
-    var takerFeeInTokensUpdatedEvents = contract.TakerFeeInTokensUpdated({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
+    var takerFeeInTokensUpdatedEvents = contract.TakerFeeInTokensUpdated({}, { fromBlock: dexzFromBlock, toBlock: latestBlock });
     i = 0;
     takerFeeInTokensUpdatedEvents.watch(function (error, result) {
       console.log("RESULT: TakerFeeInTokensUpdated " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
     });
     takerFeeInTokensUpdatedEvents.stopWatching();
 
-    var feeAccountUpdatedEvents = contract.FeeAccountUpdated({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
+    var feeAccountUpdatedEvents = contract.FeeAccountUpdated({}, { fromBlock: dexzFromBlock, toBlock: latestBlock });
     i = 0;
     feeAccountUpdatedEvents.watch(function (error, result) {
       console.log("RESULT: FeeAccountUpdated " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
     });
     feeAccountUpdatedEvents.stopWatching();
 
-    var tokenAddedEvents = contract.TokenAdded({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
+    var tokenAddedEvents = contract.TokenAdded({}, { fromBlock: dexzFromBlock, toBlock: latestBlock });
     i = 0;
     tokenAddedEvents.watch(function (error, result) {
       console.log("RESULT: TokenAdded " + i++ + " #" + result.blockNumber + " token=" + getShortAddressName(result.args.token));
     });
     tokenAddedEvents.stopWatching();
 
-    var accountAddedEvents = contract.AccountAdded({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
+    var accountAddedEvents = contract.AccountAdded({}, { fromBlock: dexzFromBlock, toBlock: latestBlock });
     i = 0;
     accountAddedEvents.watch(function (error, result) {
       console.log("RESULT: AccountAdded " + i++ + " #" + result.blockNumber + " account=" + getShortAddressName(result.args.account));
     });
     accountAddedEvents.stopWatching();
 
-    var pairAddedEvents = contract.PairAdded({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
+    var pairAddedEvents = contract.PairAdded({}, { fromBlock: dexzFromBlock, toBlock: latestBlock });
     i = 0;
     pairAddedEvents.watch(function (error, result) {
       pairs.push({pairKey: result.args.pairKey, baseToken: result.args.baseToken, quoteToken: result.args.quoteToken});
@@ -450,7 +463,7 @@ function printDexOneExchangeContractDetails() {
     });
     pairAddedEvents.stopWatching();
 
-    var orderAddedEvents = contract.OrderAdded({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
+    var orderAddedEvents = contract.OrderAdded({}, { fromBlock: dexzFromBlock, toBlock: latestBlock });
     i = 0;
     orderAddedEvents.watch(function (error, result) {
       console.log("RESULT: OrderAdded " + i++ + " #" + result.blockNumber + " pairKey=" + result.args.pairKey + " key=" + result.args.key);
@@ -459,21 +472,21 @@ function printDexOneExchangeContractDetails() {
     });
     orderAddedEvents.stopWatching();
 
-    var orderRemovedEvents = contract.OrderRemoved({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
+    var orderRemovedEvents = contract.OrderRemoved({}, { fromBlock: dexzFromBlock, toBlock: latestBlock });
     i = 0;
     orderRemovedEvents.watch(function (error, result) {
       console.log("RESULT: OrderRemoved " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
     });
     orderRemovedEvents.stopWatching();
 
-    var orderUpdatedEvents = contract.OrderUpdated({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
+    var orderUpdatedEvents = contract.OrderUpdated({}, { fromBlock: dexzFromBlock, toBlock: latestBlock });
     i = 0;
     orderUpdatedEvents.watch(function (error, result) {
       console.log("RESULT: OrderUpdated " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
     });
     orderUpdatedEvents.stopWatching();
 
-    var tradeEvents = contract.Trade({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
+    var tradeEvents = contract.Trade({}, { fromBlock: dexzFromBlock, toBlock: latestBlock });
     i = 0;
     tradeEvents.watch(function (error, result) {
       console.log("RESULT: Trade " + i++ + " #" + result.blockNumber + " key=" + result.args.key +
@@ -487,7 +500,7 @@ function printDexOneExchangeContractDetails() {
     });
     tradeEvents.stopWatching();
 
-    var logUintEvents = contract.LogInfo({}, { fromBlock: dexOneExchangeFromBlock, toBlock: latestBlock });
+    var logUintEvents = contract.LogInfo({}, { fromBlock: dexzFromBlock, toBlock: latestBlock });
     i = 0;
     logUintEvents.watch(function (error, result) {
       var noteStr = (result.args.note != "") ? " " + result.args.note : "";
@@ -534,6 +547,6 @@ function printDexOneExchangeContractDetails() {
       }
     });
 
-    dexOneExchangeFromBlock = latestBlock + 1;
+    dexzFromBlock = latestBlock + 1;
   }
 }
