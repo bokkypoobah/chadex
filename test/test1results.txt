@@ -51,7 +51,7 @@
                                                                                     0.000000000000000000           0.000000000000000000
  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.000000000000000000           0.000000000000000000 UIFee
                                                                                     0.000000000000000000           0.000000000000000000
-10 0x3dbf612ea46d98c13ec5c8a537f2ad63c466efdf        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
+10 0x90d8927407c79c4a28ee879b821c76fc9bcc2688        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
                                                                                     0.000000000000000000           0.000000000000000000
 -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
                                                                                     0.000000000000000000           0.000000000000000000 Total Token Balances
@@ -59,15 +59,15 @@
 -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
 
 PASS Deploy Group #1 - RBTLib
-rbtLibTx status=0x1 Success gas=3000000 gasUsed=937404 costETH=0.00468702 costUSD=0.6370128882 @ ETH/USD=135.91 gasPrice=5 gwei block=11547 txIx=0 txId=0x6508a52ecd39c5fa8270be3f65202d2928c8627569132c754abd7c4a7a268c35 @ 1558517249 Wed, 22 May 2019 09:27:29 UTC
+rbtLibTx status=0x1 Success gas=3000000 gasUsed=937404 costETH=0.00468702 costUSD=0.6370128882 @ ETH/USD=135.91 gasPrice=5 gwei block=35 txIx=0 txId=0xff71d82b9dc5e7a1e469bf0539d60155f938511ec8f387b5a7cdb36cb9b1c1ec @ 1558645643 Thu, 23 May 2019 21:07:23 UTC
 
 ---------- Deploy Group #2 ----------
  # Account                                             EtherBalanceChange                            ABC                            DEF Name
                                                                                                      GHI                           WETH
 -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
- 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.057803560000000000           0.000000000000000000           0.000000000000000000 Miner
+ 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.057017585000000000           0.000000000000000000           0.000000000000000000 Miner
                                                                                     0.000000000000000000           0.000000000000000000
- 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.057803560000000000           0.000000000000000000           0.000000000000000000 Deployer
+ 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.057017585000000000           0.000000000000000000           0.000000000000000000 Deployer
                                                                                     0.000000000000000000           0.000000000000000000
  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976        0.000000000000000000           0.000000000000000000           0.000000000000000000 User1
                                                                                     0.000000000000000000           0.000000000000000000
@@ -85,17 +85,17 @@ rbtLibTx status=0x1 Success gas=3000000 gasUsed=937404 costETH=0.00468702 costUS
                                                                                     0.000000000000000000           0.000000000000000000
  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.000000000000000000           0.000000000000000000 UIFee
                                                                                     0.000000000000000000           0.000000000000000000
-10 0x3dbf612ea46d98c13ec5c8a537f2ad63c466efdf        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
+10 0x90d8927407c79c4a28ee879b821c76fc9bcc2688        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
                                                                                     0.000000000000000000           0.000000000000000000
-11 0x1d7961dd2bee2c9bd13a9bd8e8b6405ef79e22bf        0.000000000000000000           0.000000000000000000           0.000000000000000000 Dexz
+11 0x0e946b999033257976aa5cbe0e3530618ca1582d        0.000000000000000000           0.000000000000000000           0.000000000000000000 Dexz
                                                                                     0.000000000000000000           0.000000000000000000
-12 0xd8c26d3fda0ce1666fbac2f3d9e30626c50798d2        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'ABC' 'Abc'
+12 0xdf9f36fd5654d92e0844c78d2d2dd562404cd1ff        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'ABC' 'Abc'
                                                                                     0.000000000000000000           0.000000000000000000
-13 0x8970bbfd1a54ae581064ab34e7910dab7e86172f        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'DEF' 'Def'
+13 0xe6ada9beed6e24be4c0259383db61b52bfca85f3        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'DEF' 'Def'
                                                                                     0.000000000000000000           0.000000000000000000
-14 0x6b8bba219f069b3dd5920e6d6958071eb9b8bc50        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'GHI' 'Ghi'
+14 0xf4441f10804b35b13bad1e664e32237773276253        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'GHI' 'Ghi'
                                                                                     0.000000000000000000           0.000000000000000000
-15 0x2484679c29325eaf2f2e91d661e5413d47c04660        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'WETH' 'Wrapped ETH'
+15 0x57930444aa5c1e758c1407ded001a8f36aa80b1d        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'WETH' 'Wrapped ETH'
                                                                                     0.000000000000000000           0.000000000000000000
 -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
                                                                                     0.000000000000000000           0.000000000000000000 Total Token Balances
@@ -107,56 +107,56 @@ PASS Deploy Group #2 - Token ''ABC' 'Abc'
 PASS Deploy Group #2 - Token ''DEF' 'Def'
 PASS Deploy Group #2 - Token ''GHI' 'Ghi'
 PASS Deploy Group #2 - Token ''WETH' 'Wrapped ETH'
-dexzTx status=0x1 Success gas=6400000 gasUsed=5992032 costETH=0.02996016 costUSD=4.0718853456 @ ETH/USD=135.91 gasPrice=5 gwei block=11549 txIx=0 txId=0x6f93690e61d37c13d7f39334c47ce6a9b8dbf42ff6eaace38ad0a8b6409ce4ac @ 1558517251 Wed, 22 May 2019 09:27:31 UTC
-tokenTx[0] status=0x1 Success gas=2000000 gasUsed=1157675 costETH=0.005788375 costUSD=0.78669804625 @ ETH/USD=135.91 gasPrice=5 gwei block=11549 txIx=1 txId=0x3a8da21665fe90bbb19aa360a2a8ba5dcd5edfd39a69fffe938ba670754eedfd @ 1558517251 Wed, 22 May 2019 09:27:31 UTC
-tokenTx[1] status=0x1 Success gas=2000000 gasUsed=1157675 costETH=0.005788375 costUSD=0.78669804625 @ ETH/USD=135.91 gasPrice=5 gwei block=11549 txIx=2 txId=0xb649132832dbbc4426c95e4589852f8d3cfdfa581af32fae8bdd178e00b0eadd @ 1558517251 Wed, 22 May 2019 09:27:31 UTC
-tokenTx[2] status=0x1 Success gas=2000000 gasUsed=1157675 costETH=0.005788375 costUSD=0.78669804625 @ ETH/USD=135.91 gasPrice=5 gwei block=11549 txIx=3 txId=0x805baf0f0f627959a9929647a39a60783d45282775ae99ee78303e1be93441a5 @ 1558517251 Wed, 22 May 2019 09:27:31 UTC
-tokenTx[3] status=0x1 Success gas=2000000 gasUsed=1158251 costETH=0.005791255 costUSD=0.78708946705 @ ETH/USD=135.91 gasPrice=5 gwei block=11549 txIx=4 txId=0xb2670a6e32e6e4bb06dd3715812b652a7ef9fdefcdbbdf9e5f302ce38bd72e55 @ 1558517251 Wed, 22 May 2019 09:27:31 UTC
+dexzTx status=0x1 Success gas=6400000 gasUsed=5834837 costETH=0.029174185 costUSD=3.96506348335 @ ETH/USD=135.91 gasPrice=5 gwei block=37 txIx=0 txId=0x3193cfac066ec4f3d28dfba041b11d906e34fc106518ec66b2ed768d46a91b41 @ 1558645645 Thu, 23 May 2019 21:07:25 UTC
+tokenTx[0] status=0x1 Success gas=2000000 gasUsed=1157675 costETH=0.005788375 costUSD=0.78669804625 @ ETH/USD=135.91 gasPrice=5 gwei block=38 txIx=0 txId=0x0a2bf11a142efdb95b997474808bae3b5d0e22264d1bcaec1175297e4f9e8ec8 @ 1558645646 Thu, 23 May 2019 21:07:26 UTC
+tokenTx[1] status=0x1 Success gas=2000000 gasUsed=1157675 costETH=0.005788375 costUSD=0.78669804625 @ ETH/USD=135.91 gasPrice=5 gwei block=38 txIx=1 txId=0x3731a445803bf32f3a40340dcd7752aaf49a9963c371fc1ccfee1d2d32a7bbd5 @ 1558645646 Thu, 23 May 2019 21:07:26 UTC
+tokenTx[2] status=0x1 Success gas=2000000 gasUsed=1157675 costETH=0.005788375 costUSD=0.78669804625 @ ETH/USD=135.91 gasPrice=5 gwei block=38 txIx=2 txId=0x9e9b5506857085b4769a529709047cf8bf80aac36426bf098391b2c18bb2e819 @ 1558645646 Thu, 23 May 2019 21:07:26 UTC
+tokenTx[3] status=0x1 Success gas=2000000 gasUsed=1158251 costETH=0.005791255 costUSD=0.78708946705 @ ETH/USD=135.91 gasPrice=5 gwei block=38 txIx=3 txId=0x06e789323d50f4ac7f840f7b9ad1c63d7b39b712c710fb758558af7dc402d090 @ 1558645646 Thu, 23 May 2019 21:07:26 UTC
 
-dexz.address=Dexz:0x1d79
+dexz.address=Dexz:0x0e94
 dexz.owner/new=Deployer:0xa11a/Null:0x0000
-dexz.deploymentBlockNumber=11549
+dexz.deploymentBlockNumber=37
 dexz.takerFeeInEthers=0.05 ETH
 dexz.takerFeeInTokens=0.1%
 dexz.feeAccount=Fee:0xa88a
 dexz.tokenListLength=0
 dexz.accountListLength=1
-dexz.accountList[0]=0x1d7961dd2bee2c9bd13a9bd8e8b6405ef79e22bf
+dexz.accountList[0]=0x0e946b999033257976aa5cbe0e3530618ca1582d
 dexz.pairInfoListLength=0
-AccountAdded 0 #11549 account=Dexz:0x1d79
+AccountAdded 0 #37 account=Dexz:0x0e94
 
-token0ContractAddress=Token 'ABC' 'Abc':0xd8c2
+token0ContractAddress=Token 'ABC' 'Abc':0xdf9f
 token0.owner/new=Deployer:0xa11a/Null:0x0000
 token0.details='ABC' 'Abc' 18 dp
 token0.totalSupply=0
-token0.Transfer 0 #11549 from=Null:0x0000 to=Deployer:0xa11a tokens=0
+token0.Transfer 0 #38 from=Null:0x0000 to=Deployer:0xa11a tokens=0
 
-token1ContractAddress=Token 'DEF' 'Def':0x8970
+token1ContractAddress=Token 'DEF' 'Def':0xe6ad
 token1.owner/new=Deployer:0xa11a/Null:0x0000
 token1.details='DEF' 'Def' 18 dp
 token1.totalSupply=0
-token1.Transfer 0 #11549 from=Null:0x0000 to=Deployer:0xa11a tokens=0
+token1.Transfer 0 #38 from=Null:0x0000 to=Deployer:0xa11a tokens=0
 
-token2ContractAddress=Token 'GHI' 'Ghi':0x6b8b
+token2ContractAddress=Token 'GHI' 'Ghi':0xf444
 token2.owner/new=Deployer:0xa11a/Null:0x0000
 token2.details='GHI' 'Ghi' 18 dp
 token2.totalSupply=0
-token2.Transfer 0 #11549 from=Null:0x0000 to=Deployer:0xa11a tokens=0
+token2.Transfer 0 #38 from=Null:0x0000 to=Deployer:0xa11a tokens=0
 
-token3ContractAddress=Token 'WETH' 'Wrapped ETH':0x2484
+token3ContractAddress=Token 'WETH' 'Wrapped ETH':0x5793
 token3.owner/new=Deployer:0xa11a/Null:0x0000
 token3.details='WETH' 'Wrapped ETH' 18 dp
 token3.totalSupply=0
-token3.Transfer 0 #11549 from=Null:0x0000 to=Deployer:0xa11a tokens=0
+token3.Transfer 0 #38 from=Null:0x0000 to=Deployer:0xa11a tokens=0
 
 
 ---------- Deploy Group #3 ----------
  # Account                                             EtherBalanceChange                            ABC                            DEF Name
                                                                                                      GHI                           WETH
 -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
- 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.069742320000000000           0.000000000000000000           0.000000000000000000 Miner
+ 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.068956345000000000           0.000000000000000000           0.000000000000000000 Miner
                                                                                     0.000000000000000000           0.000000000000000000
- 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.064274960000000000           0.000000000000000000           0.000000000000000000 Deployer
+ 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.063488985000000000           0.000000000000000000           0.000000000000000000 Deployer
                                                                                     0.000000000000000000           0.000000000000000000
  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976       -0.000911280000000000         900.100000000000000000        1001.100000000000000000 User1
                                                                                   100.100000000000000000          10.100000000000000000
@@ -174,217 +174,217 @@ token3.Transfer 0 #11549 from=Null:0x0000 to=Deployer:0xa11a tokens=0
                                                                                     0.000000000000000000           0.000000000000000000
  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.000000000000000000           0.000000000000000000 UIFee
                                                                                     0.000000000000000000           0.000000000000000000
-10 0x3dbf612ea46d98c13ec5c8a537f2ad63c466efdf        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
+10 0x90d8927407c79c4a28ee879b821c76fc9bcc2688        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
                                                                                     0.000000000000000000           0.000000000000000000
-11 0x1d7961dd2bee2c9bd13a9bd8e8b6405ef79e22bf        0.000000000000000000           0.000000000000000000           0.000000000000000000 Dexz
+11 0x0e946b999033257976aa5cbe0e3530618ca1582d        0.000000000000000000           0.000000000000000000           0.000000000000000000 Dexz
                                                                                     0.000000000000000000           0.000000000000000000
-12 0xd8c26d3fda0ce1666fbac2f3d9e30626c50798d2        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'ABC' 'Abc'
+12 0xdf9f36fd5654d92e0844c78d2d2dd562404cd1ff        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'ABC' 'Abc'
                                                                                     0.000000000000000000           0.000000000000000000
-13 0x8970bbfd1a54ae581064ab34e7910dab7e86172f        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'DEF' 'Def'
+13 0xe6ada9beed6e24be4c0259383db61b52bfca85f3        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'DEF' 'Def'
                                                                                     0.000000000000000000           0.000000000000000000
-14 0x6b8bba219f069b3dd5920e6d6958071eb9b8bc50        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'GHI' 'Ghi'
+14 0xf4441f10804b35b13bad1e664e32237773276253        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'GHI' 'Ghi'
                                                                                     0.000000000000000000           0.000000000000000000
-15 0x2484679c29325eaf2f2e91d661e5413d47c04660        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'WETH' 'Wrapped ETH'
+15 0x57930444aa5c1e758c1407ded001a8f36aa80b1d        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'WETH' 'Wrapped ETH'
                                                                                     0.000000000000000000           0.000000000000000000
 -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
                                                                                  5402.100000000000000000        6008.100000000000000000 Total Token Balances
                                                                                   602.100000000000000000          62.100000000000000000
 -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
 
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x649f38e8f2e9157d202dbec505524e5102454d6ab126fd646d8b7c4b65f01a57
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x03b74bd71f7191cad28ed679754ffa6ede6ef4861f6292d011b6c92f190d1228
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x3b378c63e6f9d6f7ebe23e718ba31a0fde2983d67175a2f157acc7dcf1529271
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xe8739ce2396c24191d88444c0413e4b8e3d4836339c2af1831dc0bf1ab0a1c1a
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xcc3f53fae4e9624b1b6bcc01302382894ee1b0b2a6570b563caf5035f74c8a85
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x7215ad2db1a56315ca3d133d877c11b2807dab877c59dea8ae84566fc4c894ba
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x34920aa72ce10faacbbf217461fc65df307f01a7424a6e767a8263739849da18
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xe7c491089844150654a815fee0148dd3afaefe372d26b2282337109ac10fa422
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x1dac650a60bf98e0be0cdd676f7e9969b85c11b33274b1744c0c98e51578026c
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xbce662dbf698c47df1f1aa3342ad82f856584443eb13bfc047fb8a7cc0a6ea05
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xa745811fa7ffc11bdd015bacd40daa0365193c81b4a81974b1e42bbedea79499
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xbb59a96e9b312216fe8d47218ac89cb8c48d52d841a8c7fcff165affd0b783de
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x8c61f4f7a633a6247cae2f8ee40d30cef0c537baa97ae6a114115efe917fc9de
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xae9d5103ecb1deb6d5c0a3d01aa4eb8db0bab899eb4089de904914b49c7dfd77
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x6315d30cfdc8818b32a6b3ecd78f28359e756ed3ffa77d6c7327c2b352c2d197
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x6f544a23a83a31ac62ddf36dc9a73f81c4564a0879057d6e89e494f65ecf7ffc
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xb9b0cbded9bb2b2d6770f43466aaf7a5007e2b2d78e764026d8094c6c1814730
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x3092a3c53de37a4c3fe8c6b7b76165c60853eb723e97788a14306866e1f9c9ec
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xa89716dcceadef8e5684f99480e851350ba53f59ac7be8f704b56bae86752d91
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xbd9c482b4542548c57c5776fd5ff0e4c1a7e746925622b49382f642638707938
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x8f70ec4c1adee40cf8a074a2ecd3097cd982da7b39eb64b3a5acfff6534d9885
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x27a1fe705d9b22acf43813fc836242e5ed4267be32e84647a6730cd7823e6e34
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xf4cdc9cfb57d2e609266f8dd289aab04d8f21c2b252e2bc251ddbbf27039b22b
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x468c57e613343777c7ee6d168712932a56abf666ae76a6fd5368855e9d600146
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x8d8938e10f8332491ab97f8adcd6897a413ad04fcd7eedb0deaee93fa4611461
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x4e1b257ca74d01b653b4651ebc8e3da37ca4c600884d42b698cda09a50624b8b
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x624836cf12f712bdbdb4faa2a90d70e11b670b486ea06951d3dc7bdc0c822229
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x20ba85cc613172a578325fa68c59a3e7a310d47a9e4353ec10b9a22bc693515a
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x41036bbb0ad55da174779b859fd56c73e44043e83c2583bed90554263715730c
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x4071964e6384c108347b1257a217904406b3ecdac89ec837f26555a0319c0da8
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xce122d0f6a2b27218a0a77ad450c7b270d2bb8aef26915be9ea8866d3f852618
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x05fdb2d4ea32e4e3416cfac1f18a1e06d31a80efb34d986d8f4adf38532a9090
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xd165fb9c57b29b4e4df5ea6ff962b93e86433ccc2b73c7e676197f517bd4fedb
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x8628908b5a085b98f53f7871094a8413a256c83b692df3a547cf87cf39707b7c
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x62bcfcc72e28a577807269918b0165f647909906aaa037d15aa0d51bbb3be623
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xdc4e4d942c1c27c8b9d64491c843207c1dd355daa1502b3dd40a5435cddc61b5
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x730effbd504962d96acde5f2aa8cb1133cd7d310ab88df4e071dc8966f2777e7
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xd851689611c67b48e62de09cca656ee81a539ee2252c284dec0ddafa80e54651
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xcd2b9929f92afa15ab3421ecee36cb56d8aae4d2986e0705a5157b999a18a96a
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xffa7d2536145504206c86d3a55b2247c40ee758e43bbc4e39cca398b435e6be6
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x52f2e61737466ded02e8fa0bbeae175eaa9554f003c9ccdbb69254ddde48908c
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x64844d6c3a264413e0cfbd50f1547a8a93b6508b67ab9b525e90ce7b0d1258c3
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x6b7bbcb205bc2f4dc6e8b4e05a2f8eaa7da3a0b4700a0920e87518eb35132c65
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x528076f6a053c81f9db1aee1d699bacb0552183b0d38c0b4fbe2242d3dcf000a
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x942d4ad82490baac37339bcbbe0d5c35e5943152f4beb02d7221da0fbc1105d3
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xa9b7e74329b10deb96fcbe3ebff46bd2a878ec246d3d5c87b4551e2784c61a86
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0x7e61f15b620597b3de8e03c599393523c40ab7d316b40074e4d8bffd37eaaab9
-PASS Deploy Group #3 - Distribute tokens and approve spending - 0xd28036e3d51a00028434fefbc50e5a853403f075a83dd9849c027c4bb1cfee74
- status=0x1 Success gas=2000000 gasUsed=66447 costETH=0.000332235 costUSD=0.04515405885 @ ETH/USD=135.91 gasPrice=5 gwei block=11555 txIx=5 txId=0x649f38e8f2e9157d202dbec505524e5102454d6ab126fd646d8b7c4b65f01a57 @ 1558517257 Wed, 22 May 2019 09:27:37 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11555 txIx=1 txId=0x03b74bd71f7191cad28ed679754ffa6ede6ef4861f6292d011b6c92f190d1228 @ 1558517257 Wed, 22 May 2019 09:27:37 UTC
- status=0x1 Success gas=2000000 gasUsed=66447 costETH=0.000332235 costUSD=0.04515405885 @ ETH/USD=135.91 gasPrice=5 gwei block=11555 txIx=6 txId=0x3b378c63e6f9d6f7ebe23e718ba31a0fde2983d67175a2f157acc7dcf1529271 @ 1558517257 Wed, 22 May 2019 09:27:37 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11555 txIx=2 txId=0xe8739ce2396c24191d88444c0413e4b8e3d4836339c2af1831dc0bf1ab0a1c1a @ 1558517257 Wed, 22 May 2019 09:27:37 UTC
- status=0x1 Success gas=2000000 gasUsed=66447 costETH=0.000332235 costUSD=0.04515405885 @ ETH/USD=135.91 gasPrice=5 gwei block=11555 txIx=7 txId=0xcc3f53fae4e9624b1b6bcc01302382894ee1b0b2a6570b563caf5035f74c8a85 @ 1558517257 Wed, 22 May 2019 09:27:37 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11555 txIx=3 txId=0x7215ad2db1a56315ca3d133d877c11b2807dab877c59dea8ae84566fc4c894ba @ 1558517257 Wed, 22 May 2019 09:27:37 UTC
- status=0x1 Success gas=2000000 gasUsed=66383 costETH=0.000331915 costUSD=0.04511056765 @ ETH/USD=135.91 gasPrice=5 gwei block=11555 txIx=8 txId=0x34920aa72ce10faacbbf217461fc65df307f01a7424a6e767a8263739849da18 @ 1558517257 Wed, 22 May 2019 09:27:37 UTC
- status=0x1 Success gas=2000000 gasUsed=45516 costETH=0.00022758 costUSD=0.0309303978 @ ETH/USD=135.91 gasPrice=5 gwei block=11555 txIx=4 txId=0xe7c491089844150654a815fee0148dd3afaefe372d26b2282337109ac10fa422 @ 1558517257 Wed, 22 May 2019 09:27:37 UTC
- status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=11555 txIx=9 txId=0x1dac650a60bf98e0be0cdd676f7e9969b85c11b33274b1744c0c98e51578026c @ 1558517257 Wed, 22 May 2019 09:27:37 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11555 txIx=0 txId=0xbce662dbf698c47df1f1aa3342ad82f856584443eb13bfc047fb8a7cc0a6ea05 @ 1558517257 Wed, 22 May 2019 09:27:37 UTC
- status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=11555 txIx=10 txId=0xa745811fa7ffc11bdd015bacd40daa0365193c81b4a81974b1e42bbedea79499 @ 1558517257 Wed, 22 May 2019 09:27:37 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=8 txId=0xbb59a96e9b312216fe8d47218ac89cb8c48d52d841a8c7fcff165affd0b783de @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=11 txId=0x8c61f4f7a633a6247cae2f8ee40d30cef0c537baa97ae6a114115efe917fc9de @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=9 txId=0xae9d5103ecb1deb6d5c0a3d01aa4eb8db0bab899eb4089de904914b49c7dfd77 @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=51383 costETH=0.000256915 costUSD=0.03491731765 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=12 txId=0x6315d30cfdc8818b32a6b3ecd78f28359e756ed3ffa77d6c7327c2b352c2d197 @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=45516 costETH=0.00022758 costUSD=0.0309303978 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=10 txId=0x6f544a23a83a31ac62ddf36dc9a73f81c4564a0879057d6e89e494f65ecf7ffc @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=13 txId=0xb9b0cbded9bb2b2d6770f43466aaf7a5007e2b2d78e764026d8094c6c1814730 @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=4 txId=0x3092a3c53de37a4c3fe8c6b7b76165c60853eb723e97788a14306866e1f9c9ec @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=14 txId=0xa89716dcceadef8e5684f99480e851350ba53f59ac7be8f704b56bae86752d91 @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=5 txId=0xbd9c482b4542548c57c5776fd5ff0e4c1a7e746925622b49382f642638707938 @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=15 txId=0x8f70ec4c1adee40cf8a074a2ecd3097cd982da7b39eb64b3a5acfff6534d9885 @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=6 txId=0x27a1fe705d9b22acf43813fc836242e5ed4267be32e84647a6730cd7823e6e34 @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=51383 costETH=0.000256915 costUSD=0.03491731765 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=16 txId=0xf4cdc9cfb57d2e609266f8dd289aab04d8f21c2b252e2bc251ddbbf27039b22b @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=45516 costETH=0.00022758 costUSD=0.0309303978 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=7 txId=0x468c57e613343777c7ee6d168712932a56abf666ae76a6fd5368855e9d600146 @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=17 txId=0x8d8938e10f8332491ab97f8adcd6897a413ad04fcd7eedb0deaee93fa4611461 @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=0 txId=0x4e1b257ca74d01b653b4651ebc8e3da37ca4c600884d42b698cda09a50624b8b @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=18 txId=0x624836cf12f712bdbdb4faa2a90d70e11b670b486ea06951d3dc7bdc0c822229 @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=1 txId=0x20ba85cc613172a578325fa68c59a3e7a310d47a9e4353ec10b9a22bc693515a @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=19 txId=0x41036bbb0ad55da174779b859fd56c73e44043e83c2583bed90554263715730c @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=2 txId=0x4071964e6384c108347b1257a217904406b3ecdac89ec837f26555a0319c0da8 @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=51319 costETH=0.000256595 costUSD=0.03487382645 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=20 txId=0xce122d0f6a2b27218a0a77ad450c7b270d2bb8aef26915be9ea8866d3f852618 @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=45452 costETH=0.00022726 costUSD=0.0308869066 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=3 txId=0x05fdb2d4ea32e4e3416cfac1f18a1e06d31a80efb34d986d8f4adf38532a9090 @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=21 txId=0xd165fb9c57b29b4e4df5ea6ff962b93e86433ccc2b73c7e676197f517bd4fedb @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=23 txId=0x8628908b5a085b98f53f7871094a8413a256c83b692df3a547cf87cf39707b7c @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=11556 txIx=22 txId=0x62bcfcc72e28a577807269918b0165f647909906aaa037d15aa0d51bbb3be623 @ 1558517258 Wed, 22 May 2019 09:27:38 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11557 txIx=10 txId=0xdc4e4d942c1c27c8b9d64491c843207c1dd355daa1502b3dd40a5435cddc61b5 @ 1558517259 Wed, 22 May 2019 09:27:39 UTC
- status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=11557 txIx=0 txId=0x730effbd504962d96acde5f2aa8cb1133cd7d310ab88df4e071dc8966f2777e7 @ 1558517259 Wed, 22 May 2019 09:27:39 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11557 txIx=11 txId=0xd851689611c67b48e62de09cca656ee81a539ee2252c284dec0ddafa80e54651 @ 1558517259 Wed, 22 May 2019 09:27:39 UTC
- status=0x1 Success gas=2000000 gasUsed=51383 costETH=0.000256915 costUSD=0.03491731765 @ ETH/USD=135.91 gasPrice=5 gwei block=11557 txIx=1 txId=0xcd2b9929f92afa15ab3421ecee36cb56d8aae4d2986e0705a5157b999a18a96a @ 1558517259 Wed, 22 May 2019 09:27:39 UTC
- status=0x1 Success gas=2000000 gasUsed=45516 costETH=0.00022758 costUSD=0.0309303978 @ ETH/USD=135.91 gasPrice=5 gwei block=11557 txIx=12 txId=0xffa7d2536145504206c86d3a55b2247c40ee758e43bbc4e39cca398b435e6be6 @ 1558517259 Wed, 22 May 2019 09:27:39 UTC
- status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=11557 txIx=2 txId=0x52f2e61737466ded02e8fa0bbeae175eaa9554f003c9ccdbb69254ddde48908c @ 1558517259 Wed, 22 May 2019 09:27:39 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11557 txIx=6 txId=0x64844d6c3a264413e0cfbd50f1547a8a93b6508b67ab9b525e90ce7b0d1258c3 @ 1558517259 Wed, 22 May 2019 09:27:39 UTC
- status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=11557 txIx=3 txId=0x6b7bbcb205bc2f4dc6e8b4e05a2f8eaa7da3a0b4700a0920e87518eb35132c65 @ 1558517259 Wed, 22 May 2019 09:27:39 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11557 txIx=7 txId=0x528076f6a053c81f9db1aee1d699bacb0552183b0d38c0b4fbe2242d3dcf000a @ 1558517259 Wed, 22 May 2019 09:27:39 UTC
- status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=11557 txIx=4 txId=0x942d4ad82490baac37339bcbbe0d5c35e5943152f4beb02d7221da0fbc1105d3 @ 1558517259 Wed, 22 May 2019 09:27:39 UTC
- status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=11557 txIx=8 txId=0xa9b7e74329b10deb96fcbe3ebff46bd2a878ec246d3d5c87b4551e2784c61a86 @ 1558517259 Wed, 22 May 2019 09:27:39 UTC
- status=0x1 Success gas=2000000 gasUsed=51383 costETH=0.000256915 costUSD=0.03491731765 @ ETH/USD=135.91 gasPrice=5 gwei block=11557 txIx=5 txId=0x7e61f15b620597b3de8e03c599393523c40ab7d316b40074e4d8bffd37eaaab9 @ 1558517259 Wed, 22 May 2019 09:27:39 UTC
- status=0x1 Success gas=2000000 gasUsed=45516 costETH=0.00022758 costUSD=0.0309303978 @ ETH/USD=135.91 gasPrice=5 gwei block=11557 txIx=9 txId=0xd28036e3d51a00028434fefbc50e5a853403f075a83dd9849c027c4bb1cfee74 @ 1558517259 Wed, 22 May 2019 09:27:39 UTC
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x6740bfe80857a8d71db09cdda64607233951078ffa1640959df5fc7db5b63313
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x05e2b5fd8a42f4102179def93f6f04aab448b9ab2008b1ad6f2c7b2a86176608
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x9a8a23851a5b2b9af19d42070ff6c871431f357446b737809b8a9f4b587254f7
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x4c26efb84f25ade8301c8309d428056dc011712d6a7cf311529702012d224e78
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x8bb24bb68f1132c271427ffe94dcc62328ef7a951098fc45d67da38d6a3765f4
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x7360bbd6d5bfd1f9ce33de9901f1a021564c102420424facefdbc9b553f9083e
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xf050aa4e34078987c4a6dd8b67cf14cd399c22a500d39ff5712e54759d3fb053
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x5b8561118fe51e80f54cfb2ca91345fb1f8a1f7e164cd69eff284577d90288d7
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x0cf3fcb5c2367ad7996b7b326ae1f71437d8f5d95da46cdb3007b83908c1e2fb
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x9244bc993fd6153f4c21c0ee1a7a09b9216ed6d079ca2ddd5f3bc4366e65e24a
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x5a0b9891e07f7095309df37d1315192382704473309183baa75672fe892e4ae6
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xf1fac16df3dc3847f9fd45626cd53583b0c89357e5bf70ed76f2641743dbcf6c
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x96f0f78081bd093093f6500c69469f5b6632fb64f77ca5d58be84c5b63b00907
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x76799d495ba552cf4b60ab596d02874d60909e8878edd61a623e694c4b00aa4d
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x220430dd5c3dde69e4a99c08c65c1f546a7d3ebf7e7e9cbd5c3cc81236fc967c
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xda8b19593ba82e03be9bd012b01663dc270aaa285c57b5bdd1ab62557a30f34b
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x72d9f1efbb8c35b65ee0f550ba7c1b5c76ee68a1357ccc72f916943727469f69
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xb799ddd45a4af44a05a35bcea0dd98c9f8c46b7edb1934ecb662e99e94eb301f
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x9032c36e8d8d6b90be3d6ef00192d590b48cb7c588dadebfc618a853a82f57fc
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xb0a66fce56e26dec788fb74cd0e315652ca3f993bd8b339abe632b3c25a7ebc4
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x6c42e3290aa43ea4de07ed3238fd26d94a98a323708c4585024e9e722dcf96f3
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x23acf38ec8d502b84f82f06c5777d1e807981cfbd6d64a6f9fae4f181e9c2ea6
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xc135b65ef930095fa17808cddc6157afaabd883fc76316d7cf01bc6739818ea7
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xf9dd7b557730d34d3c48bcd2b75019cf900c0c15374af10968d657e97f880d3e
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x93346f73ce3c20cb354f43430f3abac81e575041613ef7440c5c65fb53ad6101
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x7f61227cfac8a96f6c6b689b7080cb6584f2cb3f74b83edcdfa5ba0ef1a69114
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x9733c049e79274645972c829e542576561767deab5591345fc0b7234abc1412c
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xbce3e46ce35c346c927add627d2ffc46d898bb498bf4443ef193551c7d72a02b
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xdeb1e24aba7aa3b12b43c712b95be08274d4f6e926e3e10cf552e85c54b6e52f
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x000aa4cd2f5e2651db8d481c8bae5103a6edf311d2b3574af7a856e4c08ae49a
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x69a82e8d6b41c8bc616fffe2293b060b6dac6582a3c7886375090f753e0e9d18
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x14b1b074165d082e1555fd53f6dad78b1676479f558e0bbf79a5fc5116316c71
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xcab5f0d4622980635e4445750b27ce0542a83d9e77026063439f6c0b2652e77c
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xee4b54d207c7f3e5ec7dfb1986dfdc828bbe0b46ab49c2eaa19d364f1a717a1b
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xc22b238e248916df395e756db0fad6cbf1bf72edf2cf2a4168d46c9b705a0584
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xfa9032b1b13ba3af6ded7a71519a8809c34df61895fe41d8fab95ba763c2471b
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xb82e7f3525468e3bc0302348a957efab493f5cc64543ccc5981f1bdb439f1626
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x14c70080a7fd14a245b97860f39761453ef9742f20ddd7e566cbc0d178c3f7ec
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xc400c00430d041aded8433add229d9a166471e19796ebdf01990f3c8bf8beb94
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x7c40de85c0a762f4d44c4dbdf7fd9d7cc8f285bc8ceadd0a241e57a0c84579e1
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x07a361b4d203d0c330364e4360bb81904a1401fff0345fc3cb2792fda7e7e9b9
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x9779e3519d0cf2eea5cd4ac195ac21a3f2905be0c65f5172dab47952db76dc39
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x96bc997b1365f6f633942b327eb480e552487c557b69ab605c322fbe6f979557
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x1e91058b46266bbfdad0f7e02db70bdd824434a207e8492ec12ea3e2f04b975a
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xdf9c338445ee3a7dc7885ffa10a8286693b173042be51b97584db8b7fa778ebc
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xb65a49812741b1b17cb7a107f6ee28085209f0668c2a445251bdbdb5f3a3f122
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0xe849673bc19a585e0d39d43d440316a39307c5ebfd9162ce5d4ebe617e74fb66
+PASS Deploy Group #3 - Distribute tokens and approve spending - 0x199b53e93d7602454664a953e7dc79982eb8aaab725aa3719a901d19aeb2e7f4
+ status=0x1 Success gas=2000000 gasUsed=66447 costETH=0.000332235 costUSD=0.04515405885 @ ETH/USD=135.91 gasPrice=5 gwei block=44 txIx=0 txId=0x6740bfe80857a8d71db09cdda64607233951078ffa1640959df5fc7db5b63313 @ 1558645652 Thu, 23 May 2019 21:07:32 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=44 txIx=11 txId=0x05e2b5fd8a42f4102179def93f6f04aab448b9ab2008b1ad6f2c7b2a86176608 @ 1558645652 Thu, 23 May 2019 21:07:32 UTC
+ status=0x1 Success gas=2000000 gasUsed=66447 costETH=0.000332235 costUSD=0.04515405885 @ ETH/USD=135.91 gasPrice=5 gwei block=44 txIx=1 txId=0x9a8a23851a5b2b9af19d42070ff6c871431f357446b737809b8a9f4b587254f7 @ 1558645652 Thu, 23 May 2019 21:07:32 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=44 txIx=12 txId=0x4c26efb84f25ade8301c8309d428056dc011712d6a7cf311529702012d224e78 @ 1558645652 Thu, 23 May 2019 21:07:32 UTC
+ status=0x1 Success gas=2000000 gasUsed=66447 costETH=0.000332235 costUSD=0.04515405885 @ ETH/USD=135.91 gasPrice=5 gwei block=44 txIx=2 txId=0x8bb24bb68f1132c271427ffe94dcc62328ef7a951098fc45d67da38d6a3765f4 @ 1558645652 Thu, 23 May 2019 21:07:32 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=44 txIx=13 txId=0x7360bbd6d5bfd1f9ce33de9901f1a021564c102420424facefdbc9b553f9083e @ 1558645652 Thu, 23 May 2019 21:07:32 UTC
+ status=0x1 Success gas=2000000 gasUsed=66383 costETH=0.000331915 costUSD=0.04511056765 @ ETH/USD=135.91 gasPrice=5 gwei block=44 txIx=3 txId=0xf050aa4e34078987c4a6dd8b67cf14cd399c22a500d39ff5712e54759d3fb053 @ 1558645652 Thu, 23 May 2019 21:07:32 UTC
+ status=0x1 Success gas=2000000 gasUsed=45516 costETH=0.00022758 costUSD=0.0309303978 @ ETH/USD=135.91 gasPrice=5 gwei block=44 txIx=14 txId=0x5b8561118fe51e80f54cfb2ca91345fb1f8a1f7e164cd69eff284577d90288d7 @ 1558645652 Thu, 23 May 2019 21:07:32 UTC
+ status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=44 txIx=4 txId=0x0cf3fcb5c2367ad7996b7b326ae1f71437d8f5d95da46cdb3007b83908c1e2fb @ 1558645652 Thu, 23 May 2019 21:07:32 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=44 txIx=8 txId=0x9244bc993fd6153f4c21c0ee1a7a09b9216ed6d079ca2ddd5f3bc4366e65e24a @ 1558645652 Thu, 23 May 2019 21:07:32 UTC
+ status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=44 txIx=5 txId=0x5a0b9891e07f7095309df37d1315192382704473309183baa75672fe892e4ae6 @ 1558645652 Thu, 23 May 2019 21:07:32 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=44 txIx=9 txId=0xf1fac16df3dc3847f9fd45626cd53583b0c89357e5bf70ed76f2641743dbcf6c @ 1558645652 Thu, 23 May 2019 21:07:32 UTC
+ status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=44 txIx=6 txId=0x96f0f78081bd093093f6500c69469f5b6632fb64f77ca5d58be84c5b63b00907 @ 1558645652 Thu, 23 May 2019 21:07:32 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=44 txIx=10 txId=0x76799d495ba552cf4b60ab596d02874d60909e8878edd61a623e694c4b00aa4d @ 1558645652 Thu, 23 May 2019 21:07:32 UTC
+ status=0x1 Success gas=2000000 gasUsed=51383 costETH=0.000256915 costUSD=0.03491731765 @ ETH/USD=135.91 gasPrice=5 gwei block=44 txIx=7 txId=0x220430dd5c3dde69e4a99c08c65c1f546a7d3ebf7e7e9cbd5c3cc81236fc967c @ 1558645652 Thu, 23 May 2019 21:07:32 UTC
+ status=0x1 Success gas=2000000 gasUsed=45516 costETH=0.00022758 costUSD=0.0309303978 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=4 txId=0xda8b19593ba82e03be9bd012b01663dc270aaa285c57b5bdd1ab62557a30f34b @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=5 txId=0x72d9f1efbb8c35b65ee0f550ba7c1b5c76ee68a1357ccc72f916943727469f69 @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=0 txId=0xb799ddd45a4af44a05a35bcea0dd98c9f8c46b7edb1934ecb662e99e94eb301f @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=6 txId=0x9032c36e8d8d6b90be3d6ef00192d590b48cb7c588dadebfc618a853a82f57fc @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=1 txId=0xb0a66fce56e26dec788fb74cd0e315652ca3f993bd8b339abe632b3c25a7ebc4 @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=7 txId=0x6c42e3290aa43ea4de07ed3238fd26d94a98a323708c4585024e9e722dcf96f3 @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=2 txId=0x23acf38ec8d502b84f82f06c5777d1e807981cfbd6d64a6f9fae4f181e9c2ea6 @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=51383 costETH=0.000256915 costUSD=0.03491731765 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=8 txId=0xc135b65ef930095fa17808cddc6157afaabd883fc76316d7cf01bc6739818ea7 @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=45516 costETH=0.00022758 costUSD=0.0309303978 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=3 txId=0xf9dd7b557730d34d3c48bcd2b75019cf900c0c15374af10968d657e97f880d3e @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=9 txId=0x93346f73ce3c20cb354f43430f3abac81e575041613ef7440c5c65fb53ad6101 @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=20 txId=0x7f61227cfac8a96f6c6b689b7080cb6584f2cb3f74b83edcdfa5ba0ef1a69114 @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=10 txId=0x9733c049e79274645972c829e542576561767deab5591345fc0b7234abc1412c @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=21 txId=0xbce3e46ce35c346c927add627d2ffc46d898bb498bf4443ef193551c7d72a02b @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=11 txId=0xdeb1e24aba7aa3b12b43c712b95be08274d4f6e926e3e10cf552e85c54b6e52f @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=22 txId=0x000aa4cd2f5e2651db8d481c8bae5103a6edf311d2b3574af7a856e4c08ae49a @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=51319 costETH=0.000256595 costUSD=0.03487382645 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=12 txId=0x69a82e8d6b41c8bc616fffe2293b060b6dac6582a3c7886375090f753e0e9d18 @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=45452 costETH=0.00022726 costUSD=0.0308869066 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=23 txId=0x14b1b074165d082e1555fd53f6dad78b1676479f558e0bbf79a5fc5116316c71 @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=13 txId=0xcab5f0d4622980635e4445750b27ce0542a83d9e77026063439f6c0b2652e77c @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=17 txId=0xee4b54d207c7f3e5ec7dfb1986dfdc828bbe0b46ab49c2eaa19d364f1a717a1b @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=14 txId=0xc22b238e248916df395e756db0fad6cbf1bf72edf2cf2a4168d46c9b705a0584 @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=18 txId=0xfa9032b1b13ba3af6ded7a71519a8809c34df61895fe41d8fab95ba763c2471b @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=15 txId=0xb82e7f3525468e3bc0302348a957efab493f5cc64543ccc5981f1bdb439f1626 @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=19 txId=0x14c70080a7fd14a245b97860f39761453ef9742f20ddd7e566cbc0d178c3f7ec @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=51383 costETH=0.000256915 costUSD=0.03491731765 @ ETH/USD=135.91 gasPrice=5 gwei block=45 txIx=16 txId=0xc400c00430d041aded8433add229d9a166471e19796ebdf01990f3c8bf8beb94 @ 1558645653 Thu, 23 May 2019 21:07:33 UTC
+ status=0x1 Success gas=2000000 gasUsed=45516 costETH=0.00022758 costUSD=0.0309303978 @ ETH/USD=135.91 gasPrice=5 gwei block=46 txIx=4 txId=0x7c40de85c0a762f4d44c4dbdf7fd9d7cc8f285bc8ceadd0a241e57a0c84579e1 @ 1558645654 Thu, 23 May 2019 21:07:34 UTC
+ status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=46 txIx=5 txId=0x07a361b4d203d0c330364e4360bb81904a1401fff0345fc3cb2792fda7e7e9b9 @ 1558645654 Thu, 23 May 2019 21:07:34 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=46 txIx=0 txId=0x9779e3519d0cf2eea5cd4ac195ac21a3f2905be0c65f5172dab47952db76dc39 @ 1558645654 Thu, 23 May 2019 21:07:34 UTC
+ status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=46 txIx=6 txId=0x96bc997b1365f6f633942b327eb480e552487c557b69ab605c322fbe6f979557 @ 1558645654 Thu, 23 May 2019 21:07:34 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=46 txIx=1 txId=0x1e91058b46266bbfdad0f7e02db70bdd824434a207e8492ec12ea3e2f04b975a @ 1558645654 Thu, 23 May 2019 21:07:34 UTC
+ status=0x1 Success gas=2000000 gasUsed=51447 costETH=0.000257235 costUSD=0.03496080885 @ ETH/USD=135.91 gasPrice=5 gwei block=46 txIx=7 txId=0xdf9c338445ee3a7dc7885ffa10a8286693b173042be51b97584db8b7fa778ebc @ 1558645654 Thu, 23 May 2019 21:07:34 UTC
+ status=0x1 Success gas=2000000 gasUsed=45580 costETH=0.0002279 costUSD=0.030973889 @ ETH/USD=135.91 gasPrice=5 gwei block=46 txIx=2 txId=0xb65a49812741b1b17cb7a107f6ee28085209f0668c2a445251bdbdb5f3a3f122 @ 1558645654 Thu, 23 May 2019 21:07:34 UTC
+ status=0x1 Success gas=2000000 gasUsed=51383 costETH=0.000256915 costUSD=0.03491731765 @ ETH/USD=135.91 gasPrice=5 gwei block=46 txIx=8 txId=0xe849673bc19a585e0d39d43d440316a39307c5ebfd9162ce5d4ebe617e74fb66 @ 1558645654 Thu, 23 May 2019 21:07:34 UTC
+ status=0x1 Success gas=2000000 gasUsed=45516 costETH=0.00022758 costUSD=0.0309303978 @ ETH/USD=135.91 gasPrice=5 gwei block=46 txIx=3 txId=0x199b53e93d7602454664a953e7dc79982eb8aaab725aa3719a901d19aeb2e7f4 @ 1558645654 Thu, 23 May 2019 21:07:34 UTC
 
-dexz.address=Dexz:0x1d79
+dexz.address=Dexz:0x0e94
 dexz.owner/new=Deployer:0xa11a/Null:0x0000
-dexz.deploymentBlockNumber=11549
+dexz.deploymentBlockNumber=37
 dexz.takerFeeInEthers=0.05 ETH
 dexz.takerFeeInTokens=0.1%
 dexz.feeAccount=Fee:0xa88a
 dexz.tokenListLength=0
 dexz.accountListLength=1
-dexz.accountList[0]=0x1d7961dd2bee2c9bd13a9bd8e8b6405ef79e22bf
+dexz.accountList[0]=0x0e946b999033257976aa5cbe0e3530618ca1582d
 dexz.pairInfoListLength=0
 
-token0ContractAddress=Token 'ABC' 'Abc':0xd8c2
+token0ContractAddress=Token 'ABC' 'Abc':0xdf9f
 token0.owner/new=Deployer:0xa11a/Null:0x0000
 token0.details='ABC' 'Abc' 18 dp
 token0.totalSupply=5402.1
-token0.Approval 0 #11555 tokenOwner=User2:0xa33a spender=Dexz:0x1d79 tokens=900.2
-token0.Approval 1 #11555 tokenOwner=User1:0xa22a spender=Dexz:0x1d79 tokens=900.1
-token0.Approval 2 #11556 tokenOwner=User4:0xa55a spender=Dexz:0x1d79 tokens=900.4
-token0.Approval 3 #11556 tokenOwner=User3:0xa44a spender=Dexz:0x1d79 tokens=900.3
-token0.Approval 4 #11556 tokenOwner=User5:0xa66a spender=Dexz:0x1d79 tokens=900.5
-token0.Approval 5 #11557 tokenOwner=User6:0xa77a spender=Dexz:0x1d79 tokens=900.6
-token0.Transfer 0 #11555 from=Null:0x0000 to=User1:0xa22a tokens=900.1
-token0.Transfer 1 #11555 from=Null:0x0000 to=User2:0xa33a tokens=900.2
-token0.Transfer 2 #11556 from=Null:0x0000 to=User3:0xa44a tokens=900.3
-token0.Transfer 3 #11556 from=Null:0x0000 to=User4:0xa55a tokens=900.4
-token0.Transfer 4 #11556 from=Null:0x0000 to=User5:0xa66a tokens=900.5
-token0.Transfer 5 #11557 from=Null:0x0000 to=User6:0xa77a tokens=900.6
+token0.Approval 0 #44 tokenOwner=User2:0xa33a spender=Dexz:0x0e94 tokens=900.2
+token0.Approval 1 #44 tokenOwner=User1:0xa22a spender=Dexz:0x0e94 tokens=900.1
+token0.Approval 2 #45 tokenOwner=User3:0xa44a spender=Dexz:0x0e94 tokens=900.3
+token0.Approval 3 #45 tokenOwner=User5:0xa66a spender=Dexz:0x0e94 tokens=900.5
+token0.Approval 4 #45 tokenOwner=User4:0xa55a spender=Dexz:0x0e94 tokens=900.4
+token0.Approval 5 #46 tokenOwner=User6:0xa77a spender=Dexz:0x0e94 tokens=900.6
+token0.Transfer 0 #44 from=Null:0x0000 to=User1:0xa22a tokens=900.1
+token0.Transfer 1 #44 from=Null:0x0000 to=User2:0xa33a tokens=900.2
+token0.Transfer 2 #45 from=Null:0x0000 to=User3:0xa44a tokens=900.3
+token0.Transfer 3 #45 from=Null:0x0000 to=User4:0xa55a tokens=900.4
+token0.Transfer 4 #45 from=Null:0x0000 to=User5:0xa66a tokens=900.5
+token0.Transfer 5 #46 from=Null:0x0000 to=User6:0xa77a tokens=900.6
 
-token1ContractAddress=Token 'DEF' 'Def':0x8970
+token1ContractAddress=Token 'DEF' 'Def':0xe6ad
 token1.owner/new=Deployer:0xa11a/Null:0x0000
 token1.details='DEF' 'Def' 18 dp
 token1.totalSupply=6008.1
-token1.Approval 0 #11555 tokenOwner=User1:0xa22a spender=Dexz:0x1d79 tokens=1001.1
-token1.Approval 1 #11556 tokenOwner=User4:0xa55a spender=Dexz:0x1d79 tokens=1001.4
-token1.Approval 2 #11556 tokenOwner=User3:0xa44a spender=Dexz:0x1d79 tokens=1001.3
-token1.Approval 3 #11556 tokenOwner=User2:0xa33a spender=Dexz:0x1d79 tokens=1001.2
-token1.Approval 4 #11557 tokenOwner=User6:0xa77a spender=Dexz:0x1d79 tokens=1001.6
-token1.Approval 5 #11557 tokenOwner=User5:0xa66a spender=Dexz:0x1d79 tokens=1001.5
-token1.Transfer 0 #11555 from=Null:0x0000 to=User1:0xa22a tokens=1001.1
-token1.Transfer 1 #11555 from=Null:0x0000 to=User2:0xa33a tokens=1001.2
-token1.Transfer 2 #11556 from=Null:0x0000 to=User3:0xa44a tokens=1001.3
-token1.Transfer 3 #11556 from=Null:0x0000 to=User4:0xa55a tokens=1001.4
-token1.Transfer 4 #11556 from=Null:0x0000 to=User5:0xa66a tokens=1001.5
-token1.Transfer 5 #11557 from=Null:0x0000 to=User6:0xa77a tokens=1001.6
+token1.Approval 0 #44 tokenOwner=User2:0xa33a spender=Dexz:0x0e94 tokens=1001.2
+token1.Approval 1 #44 tokenOwner=User1:0xa22a spender=Dexz:0x0e94 tokens=1001.1
+token1.Approval 2 #45 tokenOwner=User3:0xa44a spender=Dexz:0x0e94 tokens=1001.3
+token1.Approval 3 #45 tokenOwner=User5:0xa66a spender=Dexz:0x0e94 tokens=1001.5
+token1.Approval 4 #45 tokenOwner=User4:0xa55a spender=Dexz:0x0e94 tokens=1001.4
+token1.Approval 5 #46 tokenOwner=User6:0xa77a spender=Dexz:0x0e94 tokens=1001.6
+token1.Transfer 0 #44 from=Null:0x0000 to=User1:0xa22a tokens=1001.1
+token1.Transfer 1 #44 from=Null:0x0000 to=User2:0xa33a tokens=1001.2
+token1.Transfer 2 #45 from=Null:0x0000 to=User3:0xa44a tokens=1001.3
+token1.Transfer 3 #45 from=Null:0x0000 to=User4:0xa55a tokens=1001.4
+token1.Transfer 4 #45 from=Null:0x0000 to=User5:0xa66a tokens=1001.5
+token1.Transfer 5 #46 from=Null:0x0000 to=User6:0xa77a tokens=1001.6
 
-token2ContractAddress=Token 'GHI' 'Ghi':0x6b8b
+token2ContractAddress=Token 'GHI' 'Ghi':0xf444
 token2.owner/new=Deployer:0xa11a/Null:0x0000
 token2.details='GHI' 'Ghi' 18 dp
 token2.totalSupply=602.1
-token2.Approval 0 #11555 tokenOwner=User1:0xa22a spender=Dexz:0x1d79 tokens=100.1
-token2.Approval 1 #11556 tokenOwner=User4:0xa55a spender=Dexz:0x1d79 tokens=100.4
-token2.Approval 2 #11556 tokenOwner=User3:0xa44a spender=Dexz:0x1d79 tokens=100.3
-token2.Approval 3 #11556 tokenOwner=User2:0xa33a spender=Dexz:0x1d79 tokens=100.2
-token2.Approval 4 #11557 tokenOwner=User6:0xa77a spender=Dexz:0x1d79 tokens=100.6
-token2.Approval 5 #11557 tokenOwner=User5:0xa66a spender=Dexz:0x1d79 tokens=100.5
-token2.Transfer 0 #11555 from=Null:0x0000 to=User1:0xa22a tokens=100.1
-token2.Transfer 1 #11556 from=Null:0x0000 to=User2:0xa33a tokens=100.2
-token2.Transfer 2 #11556 from=Null:0x0000 to=User3:0xa44a tokens=100.3
-token2.Transfer 3 #11556 from=Null:0x0000 to=User4:0xa55a tokens=100.4
-token2.Transfer 4 #11557 from=Null:0x0000 to=User5:0xa66a tokens=100.5
-token2.Transfer 5 #11557 from=Null:0x0000 to=User6:0xa77a tokens=100.6
+token2.Approval 0 #44 tokenOwner=User2:0xa33a spender=Dexz:0x0e94 tokens=100.2
+token2.Approval 1 #44 tokenOwner=User1:0xa22a spender=Dexz:0x0e94 tokens=100.1
+token2.Approval 2 #45 tokenOwner=User3:0xa44a spender=Dexz:0x0e94 tokens=100.3
+token2.Approval 3 #45 tokenOwner=User5:0xa66a spender=Dexz:0x0e94 tokens=100.5
+token2.Approval 4 #45 tokenOwner=User4:0xa55a spender=Dexz:0x0e94 tokens=100.4
+token2.Approval 5 #46 tokenOwner=User6:0xa77a spender=Dexz:0x0e94 tokens=100.6
+token2.Transfer 0 #44 from=Null:0x0000 to=User1:0xa22a tokens=100.1
+token2.Transfer 1 #44 from=Null:0x0000 to=User2:0xa33a tokens=100.2
+token2.Transfer 2 #45 from=Null:0x0000 to=User3:0xa44a tokens=100.3
+token2.Transfer 3 #45 from=Null:0x0000 to=User4:0xa55a tokens=100.4
+token2.Transfer 4 #45 from=Null:0x0000 to=User5:0xa66a tokens=100.5
+token2.Transfer 5 #46 from=Null:0x0000 to=User6:0xa77a tokens=100.6
 
-token3ContractAddress=Token 'WETH' 'Wrapped ETH':0x2484
+token3ContractAddress=Token 'WETH' 'Wrapped ETH':0x5793
 token3.owner/new=Deployer:0xa11a/Null:0x0000
 token3.details='WETH' 'Wrapped ETH' 18 dp
 token3.totalSupply=62.1
-token3.Approval 0 #11555 tokenOwner=User1:0xa22a spender=Dexz:0x1d79 tokens=10.1
-token3.Approval 1 #11556 tokenOwner=User4:0xa55a spender=Dexz:0x1d79 tokens=10.4
-token3.Approval 2 #11556 tokenOwner=User3:0xa44a spender=Dexz:0x1d79 tokens=10.3
-token3.Approval 3 #11556 tokenOwner=User2:0xa33a spender=Dexz:0x1d79 tokens=10.2
-token3.Approval 4 #11557 tokenOwner=User6:0xa77a spender=Dexz:0x1d79 tokens=10.6
-token3.Approval 5 #11557 tokenOwner=User5:0xa66a spender=Dexz:0x1d79 tokens=10.5
-token3.Transfer 0 #11555 from=Null:0x0000 to=User1:0xa22a tokens=10.1
-token3.Transfer 1 #11556 from=Null:0x0000 to=User2:0xa33a tokens=10.2
-token3.Transfer 2 #11556 from=Null:0x0000 to=User3:0xa44a tokens=10.3
-token3.Transfer 3 #11556 from=Null:0x0000 to=User4:0xa55a tokens=10.4
-token3.Transfer 4 #11557 from=Null:0x0000 to=User5:0xa66a tokens=10.5
-token3.Transfer 5 #11557 from=Null:0x0000 to=User6:0xa77a tokens=10.6
+token3.Approval 0 #44 tokenOwner=User1:0xa22a spender=Dexz:0x0e94 tokens=10.1
+token3.Approval 1 #45 tokenOwner=User3:0xa44a spender=Dexz:0x0e94 tokens=10.3
+token3.Approval 2 #45 tokenOwner=User2:0xa33a spender=Dexz:0x0e94 tokens=10.2
+token3.Approval 3 #45 tokenOwner=User4:0xa55a spender=Dexz:0x0e94 tokens=10.4
+token3.Approval 4 #46 tokenOwner=User6:0xa77a spender=Dexz:0x0e94 tokens=10.6
+token3.Approval 5 #46 tokenOwner=User5:0xa66a spender=Dexz:0x0e94 tokens=10.5
+token3.Transfer 0 #44 from=Null:0x0000 to=User1:0xa22a tokens=10.1
+token3.Transfer 1 #44 from=Null:0x0000 to=User2:0xa33a tokens=10.2
+token3.Transfer 2 #45 from=Null:0x0000 to=User3:0xa44a tokens=10.3
+token3.Transfer 3 #45 from=Null:0x0000 to=User4:0xa55a tokens=10.4
+token3.Transfer 4 #45 from=Null:0x0000 to=User5:0xa66a tokens=10.5
+token3.Transfer 5 #46 from=Null:0x0000 to=User6:0xa77a tokens=10.6
 
 
 ---------- Add Orders #1 loop 0 ----------
  # Account                                             EtherBalanceChange                            ABC                            DEF Name
                                                                                                      GHI                           WETH
 -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
- 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.080109195000000000           0.000000000000000000           0.000000000000000000 Miner
+ 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.079322450000000000           0.000000000000000000           0.000000000000000000 Miner
                                                                                     0.000000000000000000           0.000000000000000000
- 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.064274960000000000           0.000000000000000000           0.000000000000000000 Deployer
+ 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.063488985000000000           0.000000000000000000           0.000000000000000000 Deployer
                                                                                     0.000000000000000000           0.000000000000000000
  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976       -0.000911280000000000         900.100000000000000000        1001.100000000000000000 User1
                                                                                   100.100000000000000000          10.100000000000000000
- 3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0       -0.005614425000000000         900.200000000000000000        1001.200000000000000000 User2
+ 3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0       -0.005614095000000000         900.200000000000000000        1001.200000000000000000 User2
                                                                                   100.200000000000000000          10.200000000000000000
- 4 0xa44a08d3f6933c69212114bb66e2df1813651844       -0.003034760000000000         900.300000000000000000        1001.300000000000000000 User3
+ 4 0xa44a08d3f6933c69212114bb66e2df1813651844       -0.003034540000000000         900.300000000000000000        1001.300000000000000000 User3
                                                                                   100.300000000000000000          10.300000000000000000
- 5 0xa55a151eb00fded1634d27d1127b4be4627079ea       -0.003058390000000000         900.400000000000000000        1001.400000000000000000 User4
+ 5 0xa55a151eb00fded1634d27d1127b4be4627079ea       -0.003058280000000000         900.400000000000000000        1001.400000000000000000 User4
                                                                                   100.400000000000000000          10.400000000000000000
- 6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9       -0.002304100000000000         900.500000000000000000        1001.500000000000000000 User5
+ 6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9       -0.002303990000000000         900.500000000000000000        1001.500000000000000000 User5
                                                                                   100.500000000000000000          10.500000000000000000
  7 0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec       -0.000911280000000000         900.600000000000000000        1001.600000000000000000 User6
                                                                                   100.600000000000000000          10.600000000000000000
@@ -392,17 +392,17 @@ token3.Transfer 5 #11557 from=Null:0x0000 to=User6:0xa77a tokens=10.6
                                                                                     0.000000000000000000           0.000000000000000000
  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.000000000000000000           0.000000000000000000 UIFee
                                                                                     0.000000000000000000           0.000000000000000000
-10 0x3dbf612ea46d98c13ec5c8a537f2ad63c466efdf        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
+10 0x90d8927407c79c4a28ee879b821c76fc9bcc2688        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
                                                                                     0.000000000000000000           0.000000000000000000
-11 0x1d7961dd2bee2c9bd13a9bd8e8b6405ef79e22bf        0.000000000000000000           0.000000000000000000           0.000000000000000000 Dexz
+11 0x0e946b999033257976aa5cbe0e3530618ca1582d        0.000000000000000000           0.000000000000000000           0.000000000000000000 Dexz
                                                                                     0.000000000000000000           0.000000000000000000
-12 0xd8c26d3fda0ce1666fbac2f3d9e30626c50798d2        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'ABC' 'Abc'
+12 0xdf9f36fd5654d92e0844c78d2d2dd562404cd1ff        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'ABC' 'Abc'
                                                                                     0.000000000000000000           0.000000000000000000
-13 0x8970bbfd1a54ae581064ab34e7910dab7e86172f        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'DEF' 'Def'
+13 0xe6ada9beed6e24be4c0259383db61b52bfca85f3        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'DEF' 'Def'
                                                                                     0.000000000000000000           0.000000000000000000
-14 0x6b8bba219f069b3dd5920e6d6958071eb9b8bc50        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'GHI' 'Ghi'
+14 0xf4441f10804b35b13bad1e664e32237773276253        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'GHI' 'Ghi'
                                                                                     0.000000000000000000           0.000000000000000000
-15 0x2484679c29325eaf2f2e91d661e5413d47c04660        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'WETH' 'Wrapped ETH'
+15 0x57930444aa5c1e758c1407ded001a8f36aa80b1d        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'WETH' 'Wrapped ETH'
                                                                                     0.000000000000000000           0.000000000000000000
 -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
                                                                                  5402.100000000000000000        6008.100000000000000000 Total Token Balances
@@ -416,97 +416,97 @@ PASS Add Orders #1 - User3:0xa44a addOrder(Buy, ABC/WETH, 0.0012, +1h, 100)
 PASS Add Orders #1 - User4:0xa55a addOrder(Buy, ABC/WETH, 0.001, +1h, 100)
 PASS Add Orders #1 - User5:0xa66a addOrder(Buy, ABC/WETH, 0.001, +1h, 100)
 PASS Add Orders #1 - User2:0xa33a addOrder(Buy, ABC/WETH, 0.0009, +1h, 100)
-ordersTx[0] status=0x0 Failure gas=3000000 gasUsed=35775 costETH=0.000178875 costUSD=0.02431090125 @ ETH/USD=135.91 gasPrice=5 gwei block=11564 txIx=0 txId=0x309ea6d4b47bdcf0b59a5f7b83538a212b0b044435010fc0d8c78909594dd86d @ 1558517266 Wed, 22 May 2019 09:27:46 UTC
-ordersTx[1] status=0x0 Failure gas=3000000 gasUsed=35775 costETH=0.000178875 costUSD=0.02431090125 @ ETH/USD=135.91 gasPrice=5 gwei block=11566 txIx=0 txId=0xfe7d7ba8ee0ca25939b556a6c57308710d03da48759c0d50bea9593c4c98d7bb @ 1558517268 Wed, 22 May 2019 09:27:48 UTC
-ordersTx[2] status=0x1 Success gas=3000000 gasUsed=573988 costETH=0.00286994 costUSD=0.3900535454 @ ETH/USD=135.91 gasPrice=5 gwei block=11568 txIx=0 txId=0x6f5e590e8f8e991dccc0b8ef994d88778c89f6986fde3119615d3593c3db8955 @ 1558517270 Wed, 22 May 2019 09:27:50 UTC
-ordersTx[3] status=0x1 Success gas=3000000 gasUsed=388921 costETH=0.001944605 costUSD=0.26429126555 @ ETH/USD=135.91 gasPrice=5 gwei block=11570 txIx=0 txId=0x31125435e57b9a4d3b61a9784884d88bb0ce228ec5b3e1534e775fa8c5cfd524 @ 1558517272 Wed, 22 May 2019 09:27:52 UTC
-ordersTx[4] status=0x1 Success gas=3000000 gasUsed=429486 costETH=0.00214743 costUSD=0.2918572113 @ ETH/USD=135.91 gasPrice=5 gwei block=11572 txIx=0 txId=0x3dd0f1b24239527f742318e2ec6f3413701a34773dda8175f1ccca7a94f5874f @ 1558517274 Wed, 22 May 2019 09:27:54 UTC
-ordersTx[5] status=0x1 Success gas=3000000 gasUsed=278564 costETH=0.00139282 costUSD=0.1892981662 @ ETH/USD=135.91 gasPrice=5 gwei block=11574 txIx=0 txId=0xdae9b85518b4c18d5ffbfe92d5d2131b22371ca584166e2b897a03b18158924a @ 1558517276 Wed, 22 May 2019 09:27:56 UTC
-ordersTx[6] status=0x1 Success gas=3000000 gasUsed=330866 costETH=0.00165433 costUSD=0.2248399903 @ ETH/USD=135.91 gasPrice=5 gwei block=11576 txIx=0 txId=0x079b18bd05138af8a320507c6aa2355d367ff126d8827bff1771167cc7930caf @ 1558517278 Wed, 22 May 2019 09:27:58 UTC
+ordersTx[0] status=0x0 Failure gas=3000000 gasUsed=35753 costETH=0.000178765 costUSD=0.02429595115 @ ETH/USD=135.91 gasPrice=5 gwei block=52 txIx=0 txId=0x7cc5bc98f28e00502ff40ec273d3c0ea47f18a21807f6331d31b72a91d3cb288 @ 1558645660 Thu, 23 May 2019 21:07:40 UTC
+ordersTx[1] status=0x0 Failure gas=3000000 gasUsed=35753 costETH=0.000178765 costUSD=0.02429595115 @ ETH/USD=135.91 gasPrice=5 gwei block=54 txIx=0 txId=0x9547ceb29b9fcf304b5c5884de698fe9c7e6477afdce4dd5a7091ab6cb0c4756 @ 1558645662 Thu, 23 May 2019 21:07:42 UTC
+ordersTx[2] status=0x1 Success gas=3000000 gasUsed=573966 costETH=0.00286983 costUSD=0.3900385953 @ ETH/USD=135.91 gasPrice=5 gwei block=56 txIx=0 txId=0xf2454c8fa76ed6b882d384334f21b1657d1da984a7635da511f708db8827c4ae @ 1558645664 Thu, 23 May 2019 21:07:44 UTC
+ordersTx[3] status=0x1 Success gas=3000000 gasUsed=388899 costETH=0.001944495 costUSD=0.26427631545 @ ETH/USD=135.91 gasPrice=5 gwei block=58 txIx=0 txId=0xe403bd56b0caaea5ae41921b91bdf1044b718ac77fe7f787dfaf993d017e4cb0 @ 1558645666 Thu, 23 May 2019 21:07:46 UTC
+ordersTx[4] status=0x1 Success gas=3000000 gasUsed=429464 costETH=0.00214732 costUSD=0.2918422612 @ ETH/USD=135.91 gasPrice=5 gwei block=60 txIx=0 txId=0x2aba149cabbc45358bc90fcb533e963e366e11e472f48d4e4590cca8b57a9ad2 @ 1558645668 Thu, 23 May 2019 21:07:48 UTC
+ordersTx[5] status=0x1 Success gas=3000000 gasUsed=278542 costETH=0.00139271 costUSD=0.1892832161 @ ETH/USD=135.91 gasPrice=5 gwei block=62 txIx=0 txId=0x1279d1451ca565ddfab3acd3350bf85e28cc074c442f82713299641d77c06ff5 @ 1558645670 Thu, 23 May 2019 21:07:50 UTC
+ordersTx[6] status=0x1 Success gas=3000000 gasUsed=330844 costETH=0.00165422 costUSD=0.2248250402 @ ETH/USD=135.91 gasPrice=5 gwei block=64 txIx=0 txId=0x91796808f1d2f7999107f2cf0694f4c12fe6fddcadde0dd0b5346ac54a3b5545 @ 1558645672 Thu, 23 May 2019 21:07:52 UTC
 
-dexz.address=Dexz:0x1d79
+dexz.address=Dexz:0x0e94
 dexz.owner/new=Deployer:0xa11a/Null:0x0000
-dexz.deploymentBlockNumber=11549
+dexz.deploymentBlockNumber=37
 dexz.takerFeeInEthers=0.05 ETH
 dexz.takerFeeInTokens=0.1%
 dexz.feeAccount=Fee:0xa88a
 dexz.tokenListLength=2
-dexz.tokenList[0]=0xd8c26d3fda0ce1666fbac2f3d9e30626c50798d2
-dexz.tokenList[1]=0x2484679c29325eaf2f2e91d661e5413d47c04660
+dexz.tokenList[0]=0xdf9f36fd5654d92e0844c78d2d2dd562404cd1ff
+dexz.tokenList[1]=0x57930444aa5c1e758c1407ded001a8f36aa80b1d
 dexz.accountListLength=5
-dexz.accountList[0]=0x1d7961dd2bee2c9bd13a9bd8e8b6405ef79e22bf
+dexz.accountList[0]=0x0e946b999033257976aa5cbe0e3530618ca1582d
 dexz.accountList[1]=0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0
 dexz.accountList[2]=0xa44a08d3f6933c69212114bb66e2df1813651844
 dexz.accountList[3]=0xa55a151eb00fded1634d27d1127b4be4627079ea
 dexz.accountList[4]=0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9
 dexz.pairInfoListLength=1
-dexz.pairInfoList[0]=0xe76d445cfb6752ac3d03963b673d04c37158950f79ef9384b3dbac211c1d813a,0xd8c26d3fda0ce1666fbac2f3d9e30626c50798d2,0x2484679c29325eaf2f2e91d661e5413d47c04660
-TokenAdded 0 #11568 token=Token 'ABC' 'Abc':0xd8c2
-TokenAdded 1 #11568 token=Token 'WETH' 'Wrapped ETH':0x2484
-AccountAdded 0 #11568 account=User2:0xa33a
-AccountAdded 1 #11570 account=User3:0xa44a
-AccountAdded 2 #11572 account=User4:0xa55a
-AccountAdded 3 #11574 account=User5:0xa66a
-PairAdded 0 #11568 pairKey=0xe76d445cfb6752ac3d03963b673d04c37158950f79ef9384b3dbac211c1d813a baseToken=Token 'ABC' 'Abc':0xd8c2 quoteToken=Token 'WETH' 'Wrapped ETH':0x2484
-OrderAdded 0 #11568 pairKey=0xe76d445cfb6752ac3d03963b673d04c37158950f79ef9384b3dbac211c1d813a key=0x3a25eb101b2499c31188701dd0d2cecd0f62265d9e6b3418867717c69e9787b1
-  User2:0xa33a Buy 100 ABC @ 0.0013 ABC/WETH +59.69s
-OrderAdded 1 #11570 pairKey=0xe76d445cfb6752ac3d03963b673d04c37158950f79ef9384b3dbac211c1d813a key=0x88064ae820dce2dd98d39a2ac967ddc0aa580fdb0853fbb88a6bea4179747a64
-  User3:0xa44a Buy 100 ABC @ 0.0012 ABC/WETH +59.69s
-OrderAdded 2 #11572 pairKey=0xe76d445cfb6752ac3d03963b673d04c37158950f79ef9384b3dbac211c1d813a key=0x1828e4bc8372210dcac29a86666164f2ab65804bc1cae21b0905f9b4124416b3
-  User4:0xa55a Buy 100 ABC @ 0.001 ABC/WETH +59.69s
-OrderAdded 3 #11574 pairKey=0xe76d445cfb6752ac3d03963b673d04c37158950f79ef9384b3dbac211c1d813a key=0xf68d12a8e8dcc68bfd59c718ba76683f382b81e3b101e16a8afdd1fa70c9a25a
-  User5:0xa66a Buy 100 ABC @ 0.001 ABC/WETH +59.69s
-OrderAdded 4 #11576 pairKey=0xe76d445cfb6752ac3d03963b673d04c37158950f79ef9384b3dbac211c1d813a key=0x2ff63aee1a30c2340855cb85267d19534358b7f421e6726cb28557c73a59892c
-  User2:0xa33a Buy 100 ABC @ 0.0009 ABC/WETH +59.69s
-LogInfo 0 #11568 getBestMatchingOrder: priceKeys.initialised 0
-LogInfo 1 #11568 _trade: matchingOrderKey 0
-LogInfo 2 #11568 orders addKey RBT adding  0.0013
-LogInfo 3 #11568 orders addData  first 0 0x3a25eb101b2499c31188701dd0d2cecd0f62265d9e6b3418867717c69e9787b1
-LogInfo 4 #11570 getBestMatchingOrder: priceKeys.initialised 0
-LogInfo 5 #11570 _trade: matchingOrderKey 0
-LogInfo 6 #11570 orders addKey RBT adding  0.0012
-LogInfo 7 #11570 orders addData  first 0 0x88064ae820dce2dd98d39a2ac967ddc0aa580fdb0853fbb88a6bea4179747a64
-LogInfo 8 #11572 getBestMatchingOrder: priceKeys.initialised 0
-LogInfo 9 #11572 _trade: matchingOrderKey 0
-LogInfo 10 #11572 orders addKey RBT adding  0.001
-LogInfo 11 #11572 orders addData  first 0 0x1828e4bc8372210dcac29a86666164f2ab65804bc1cae21b0905f9b4124416b3
-LogInfo 12 #11574 getBestMatchingOrder: priceKeys.initialised 0
-LogInfo 13 #11574 _trade: matchingOrderKey 0
-LogInfo 14 #11574 orders addKey RBT exists  0.001
-LogInfo 15 #11574 orders addData !first 0 0xf68d12a8e8dcc68bfd59c718ba76683f382b81e3b101e16a8afdd1fa70c9a25a
-LogInfo 16 #11576 getBestMatchingOrder: priceKeys.initialised 0
-LogInfo 17 #11576 _trade: matchingOrderKey 0
-LogInfo 18 #11576 orders addKey RBT adding  0.0009
-LogInfo 19 #11576 orders addData  first 0 0x2ff63aee1a30c2340855cb85267d19534358b7f421e6726cb28557c73a59892c
------ Pair 0xe76d445cfb6752ac3d03963b673d04c37158950f79ef9384b3dbac211c1d813a ABC/WETH -----
+dexz.pairInfoList[0]=0xb8f5bbc2520fcb0b7b77ca9d72c46ecf9826710f466755c7eead56b38b03f051,0xdf9f36fd5654d92e0844c78d2d2dd562404cd1ff,0x57930444aa5c1e758c1407ded001a8f36aa80b1d
+TokenAdded 0 #56 token=Token 'ABC' 'Abc':0xdf9f
+TokenAdded 1 #56 token=Token 'WETH' 'Wrapped ETH':0x5793
+AccountAdded 0 #56 account=User2:0xa33a
+AccountAdded 1 #58 account=User3:0xa44a
+AccountAdded 2 #60 account=User4:0xa55a
+AccountAdded 3 #62 account=User5:0xa66a
+PairAdded 0 #56 pairKey=0xb8f5bbc2520fcb0b7b77ca9d72c46ecf9826710f466755c7eead56b38b03f051 baseToken=Token 'ABC' 'Abc':0xdf9f quoteToken=Token 'WETH' 'Wrapped ETH':0x5793
+OrderAdded 0 #56 pairKey=0xb8f5bbc2520fcb0b7b77ca9d72c46ecf9826710f466755c7eead56b38b03f051 key=0x486e8d1f932454d6d36887df24c4fe87b8a6a68eab6733a1a95a9e5302b31529
+  User2:0xa33a Buy 100 ABC @ 0.0013 ABC/WETH +59.71s
+OrderAdded 1 #58 pairKey=0xb8f5bbc2520fcb0b7b77ca9d72c46ecf9826710f466755c7eead56b38b03f051 key=0xa0a58be466e40402b200984b63cf89939a3f11618c7a25aad429cb2814250dc2
+  User3:0xa44a Buy 100 ABC @ 0.0012 ABC/WETH +59.71s
+OrderAdded 2 #60 pairKey=0xb8f5bbc2520fcb0b7b77ca9d72c46ecf9826710f466755c7eead56b38b03f051 key=0x6bf0c7fadb884ef567db1b03e40c3eee5df0af9ef17d70d84168fb9e5cef1e5c
+  User4:0xa55a Buy 100 ABC @ 0.001 ABC/WETH +59.71s
+OrderAdded 3 #62 pairKey=0xb8f5bbc2520fcb0b7b77ca9d72c46ecf9826710f466755c7eead56b38b03f051 key=0xb02f8549467ece14e88925dc7fa735fb2da8723519ace53e0301c25310a170d9
+  User5:0xa66a Buy 100 ABC @ 0.001 ABC/WETH +59.71s
+OrderAdded 4 #64 pairKey=0xb8f5bbc2520fcb0b7b77ca9d72c46ecf9826710f466755c7eead56b38b03f051 key=0x16e59a9c0961865da1d04385adcb69097e991be4e0693c2917f345864ef4298e
+  User2:0xa33a Buy 100 ABC @ 0.0009 ABC/WETH +59.71s
+LogInfo 0 #56 getBestMatchingOrder: priceKeys.initialised 0
+LogInfo 1 #56 _trade: matchingOrderKey 0
+LogInfo 2 #56 orders addKey RBT adding  0.0013
+LogInfo 3 #56 orders addData  first 0 0x486e8d1f932454d6d36887df24c4fe87b8a6a68eab6733a1a95a9e5302b31529
+LogInfo 4 #58 getBestMatchingOrder: priceKeys.initialised 0
+LogInfo 5 #58 _trade: matchingOrderKey 0
+LogInfo 6 #58 orders addKey RBT adding  0.0012
+LogInfo 7 #58 orders addData  first 0 0xa0a58be466e40402b200984b63cf89939a3f11618c7a25aad429cb2814250dc2
+LogInfo 8 #60 getBestMatchingOrder: priceKeys.initialised 0
+LogInfo 9 #60 _trade: matchingOrderKey 0
+LogInfo 10 #60 orders addKey RBT adding  0.001
+LogInfo 11 #60 orders addData  first 0 0x6bf0c7fadb884ef567db1b03e40c3eee5df0af9ef17d70d84168fb9e5cef1e5c
+LogInfo 12 #62 getBestMatchingOrder: priceKeys.initialised 0
+LogInfo 13 #62 _trade: matchingOrderKey 0
+LogInfo 14 #62 orders addKey RBT exists  0.001
+LogInfo 15 #62 orders addData !first 0 0xb02f8549467ece14e88925dc7fa735fb2da8723519ace53e0301c25310a170d9
+LogInfo 16 #64 getBestMatchingOrder: priceKeys.initialised 0
+LogInfo 17 #64 _trade: matchingOrderKey 0
+LogInfo 18 #64 orders addKey RBT adding  0.0009
+LogInfo 19 #64 orders addData  first 0 0x16e59a9c0961865da1d04385adcb69097e991be4e0693c2917f345864ef4298e
+----- Pair 0xb8f5bbc2520fcb0b7b77ca9d72c46ecf9826710f466755c7eead56b38b03f051 ABC/WETH -----
 --- Buy Orders ---
-  Price: 0.0013 head=0x3a25eb101b2499c3 tail=0x3a25eb101b2499c3
-    Order key=0x3a25eb101b2499c3 prev=0x0000000000000000 next=0x0000000000000000 Buy maker=User2:0xa33a base=ABC quote=WETH price=0.0013 expiry=59.68s baseTokens=100 baseTokensFilled=0
-  Price: 0.0012 head=0x88064ae820dce2dd tail=0x88064ae820dce2dd
-    Order key=0x88064ae820dce2dd prev=0x0000000000000000 next=0x0000000000000000 Buy maker=User3:0xa44a base=ABC quote=WETH price=0.0012 expiry=59.68s baseTokens=100 baseTokensFilled=0
-  Price: 0.001 head=0x1828e4bc8372210d tail=0xf68d12a8e8dcc68b
-    Order key=0x1828e4bc8372210d prev=0x0000000000000000 next=0xf68d12a8e8dcc68b Buy maker=User4:0xa55a base=ABC quote=WETH price=0.001 expiry=59.68s baseTokens=100 baseTokensFilled=0
-    Order key=0xf68d12a8e8dcc68b prev=0x1828e4bc8372210d next=0x0000000000000000 Buy maker=User5:0xa66a base=ABC quote=WETH price=0.001 expiry=59.68s baseTokens=100 baseTokensFilled=0
-  Price: 0.0009 head=0x2ff63aee1a30c234 tail=0x2ff63aee1a30c234
-    Order key=0x2ff63aee1a30c234 prev=0x0000000000000000 next=0x0000000000000000 Buy maker=User2:0xa33a base=ABC quote=WETH price=0.0009 expiry=59.68s baseTokens=100 baseTokensFilled=0
+  Price: 0.0013 head=0x486e8d1f932454d6 tail=0x486e8d1f932454d6
+    Order key=0x486e8d1f932454d6 prev=0x0000000000000000 next=0x0000000000000000 Buy maker=User2:0xa33a base=ABC quote=WETH price=0.0013 expiry=59.70s baseTokens=100 baseTokensFilled=0
+  Price: 0.0012 head=0xa0a58be466e40402 tail=0xa0a58be466e40402
+    Order key=0xa0a58be466e40402 prev=0x0000000000000000 next=0x0000000000000000 Buy maker=User3:0xa44a base=ABC quote=WETH price=0.0012 expiry=59.70s baseTokens=100 baseTokensFilled=0
+  Price: 0.001 head=0x6bf0c7fadb884ef5 tail=0xb02f8549467ece14
+    Order key=0x6bf0c7fadb884ef5 prev=0x0000000000000000 next=0xb02f8549467ece14 Buy maker=User4:0xa55a base=ABC quote=WETH price=0.001 expiry=59.70s baseTokens=100 baseTokensFilled=0
+    Order key=0xb02f8549467ece14 prev=0x6bf0c7fadb884ef5 next=0x0000000000000000 Buy maker=User5:0xa66a base=ABC quote=WETH price=0.001 expiry=59.70s baseTokens=100 baseTokensFilled=0
+  Price: 0.0009 head=0x16e59a9c0961865d tail=0x16e59a9c0961865d
+    Order key=0x16e59a9c0961865d prev=0x0000000000000000 next=0x0000000000000000 Buy maker=User2:0xa33a base=ABC quote=WETH price=0.0009 expiry=59.70s baseTokens=100 baseTokensFilled=0
 --- Sell Orders ---
 
-token0ContractAddress=Token 'ABC' 'Abc':0xd8c2
+token0ContractAddress=Token 'ABC' 'Abc':0xdf9f
 token0.owner/new=Deployer:0xa11a/Null:0x0000
 token0.details='ABC' 'Abc' 18 dp
 token0.totalSupply=5402.1
 
-token1ContractAddress=Token 'DEF' 'Def':0x8970
+token1ContractAddress=Token 'DEF' 'Def':0xe6ad
 token1.owner/new=Deployer:0xa11a/Null:0x0000
 token1.details='DEF' 'Def' 18 dp
 token1.totalSupply=6008.1
 
-token2ContractAddress=Token 'GHI' 'Ghi':0x6b8b
+token2ContractAddress=Token 'GHI' 'Ghi':0xf444
 token2.owner/new=Deployer:0xa11a/Null:0x0000
 token2.details='GHI' 'Ghi' 18 dp
 token2.totalSupply=602.1
 
-token3ContractAddress=Token 'WETH' 'Wrapped ETH':0x2484
+token3ContractAddress=Token 'WETH' 'Wrapped ETH':0x5793
 token3.owner/new=Deployer:0xa11a/Null:0x0000
 token3.details='WETH' 'Wrapped ETH' 18 dp
 token3.totalSupply=62.1
@@ -516,37 +516,37 @@ token3.totalSupply=62.1
  # Account                                             EtherBalanceChange                            ABC                            DEF Name
                                                                                                      GHI                           WETH
 -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
- 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.085909900000000000           0.000000000000000000           0.000000000000000000 Miner
+ 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.085090965000000000           0.000000000000000000           0.000000000000000000 Miner
                                                                                     0.000000000000000000           0.000000000000000000
- 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.064274960000000000           0.000000000000000000           0.000000000000000000 Deployer
+ 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.063488985000000000           0.000000000000000000           0.000000000000000000 Deployer
                                                                                     0.000000000000000000           0.000000000000000000
  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976       -0.000911280000000000         900.100000000000000000        1001.100000000000000000 User1
                                                                                   100.100000000000000000          10.100000000000000000
- 3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0       -0.005614425000000000        1000.200000000000000000        1001.200000000000000000 User2
+ 3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0       -0.005614095000000000        1000.200000000000000000        1001.200000000000000000 User2
                                                                                   100.200000000000000000          10.070000000000000000
- 4 0xa44a08d3f6933c69212114bb66e2df1813651844       -0.003034760000000000        1000.300000000000000000        1001.300000000000000000 User3
+ 4 0xa44a08d3f6933c69212114bb66e2df1813651844       -0.003034540000000000        1000.300000000000000000        1001.300000000000000000 User3
                                                                                   100.300000000000000000          10.180000000000000000
- 5 0xa55a151eb00fded1634d27d1127b4be4627079ea       -0.003058390000000000        1000.400000000000000000        1001.400000000000000000 User4
+ 5 0xa55a151eb00fded1634d27d1127b4be4627079ea       -0.003058280000000000        1000.400000000000000000        1001.400000000000000000 User4
                                                                                   100.400000000000000000          10.300000000000000000
- 6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9       -0.002304100000000000        1000.500000000000000000        1001.500000000000000000 User5
+ 6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9       -0.002303990000000000        1000.500000000000000000        1001.500000000000000000 User5
                                                                                   100.500000000000000000          10.400000000000000000
- 7 0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec       -0.006711985000000000         500.600000000000000000        1001.600000000000000000 User6
+ 7 0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec       -0.006679795000000000         500.600000000000000000        1001.600000000000000000 User6
                                                                                   100.600000000000000000          11.049550000000000000
  8 0xa88a05d2b88283ce84c8325760b72a64591279a2        0.000000000000000000           0.000000000000000000           0.000000000000000000 Fee
                                                                                     0.000000000000000000           0.000225000000000000
  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.000000000000000000           0.000000000000000000 UIFee
                                                                                     0.000000000000000000           0.000225000000000000
-10 0x3dbf612ea46d98c13ec5c8a537f2ad63c466efdf        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
+10 0x90d8927407c79c4a28ee879b821c76fc9bcc2688        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
                                                                                     0.000000000000000000           0.000000000000000000
-11 0x1d7961dd2bee2c9bd13a9bd8e8b6405ef79e22bf        0.000000000000000000           0.000000000000000000           0.000000000000000000 Dexz
+11 0x0e946b999033257976aa5cbe0e3530618ca1582d        0.000000000000000000           0.000000000000000000           0.000000000000000000 Dexz
                                                                                     0.000000000000000000           0.000000000000000000
-12 0xd8c26d3fda0ce1666fbac2f3d9e30626c50798d2        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'ABC' 'Abc'
+12 0xdf9f36fd5654d92e0844c78d2d2dd562404cd1ff        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'ABC' 'Abc'
                                                                                     0.000000000000000000           0.000000000000000000
-13 0x8970bbfd1a54ae581064ab34e7910dab7e86172f        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'DEF' 'Def'
+13 0xe6ada9beed6e24be4c0259383db61b52bfca85f3        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'DEF' 'Def'
                                                                                     0.000000000000000000           0.000000000000000000
-14 0x6b8bba219f069b3dd5920e6d6958071eb9b8bc50        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'GHI' 'Ghi'
+14 0xf4441f10804b35b13bad1e664e32237773276253        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'GHI' 'Ghi'
                                                                                     0.000000000000000000           0.000000000000000000
-15 0x2484679c29325eaf2f2e91d661e5413d47c04660        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'WETH' 'Wrapped ETH'
+15 0x57930444aa5c1e758c1407ded001a8f36aa80b1d        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'WETH' 'Wrapped ETH'
                                                                                     0.000000000000000000           0.000000000000000000
 -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
                                                                                  5402.100000000000000000        6008.100000000000000000 Total Token Balances
@@ -554,281 +554,281 @@ token3.totalSupply=62.1
 -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
 
 PASS Add Orders #1 - User6:0xa77a addOrder(Sell, ABC/WETH, 0.0009, +1h, 2000)
-ordersTx[0] status=0x1 Success gas=3000000 gasUsed=1160141 costETH=0.005800705 costUSD=0.78837381655 @ ETH/USD=135.91 gasPrice=5 gwei block=11583 txIx=0 txId=0xce896c3ad52eadb63ec6ae3ff58cc3e33f3afeeb7ed9b9d6d5f8ca0f07489792 @ 1558517285 Wed, 22 May 2019 09:28:05 UTC
+ordersTx[0] status=0x1 Success gas=3000000 gasUsed=1153703 costETH=0.005768515 costUSD=0.78399887365 @ ETH/USD=135.91 gasPrice=5 gwei block=70 txIx=0 txId=0x5f805917dc27d1ac20d0adb93fa04c4633823e030860752618af31926422ba2b @ 1558645678 Thu, 23 May 2019 21:07:58 UTC
 
-dexz.address=Dexz:0x1d79
+dexz.address=Dexz:0x0e94
 dexz.owner/new=Deployer:0xa11a/Null:0x0000
-dexz.deploymentBlockNumber=11549
+dexz.deploymentBlockNumber=37
 dexz.takerFeeInEthers=0.05 ETH
 dexz.takerFeeInTokens=0.1%
 dexz.feeAccount=Fee:0xa88a
 dexz.tokenListLength=2
-dexz.tokenList[0]=0xd8c26d3fda0ce1666fbac2f3d9e30626c50798d2
-dexz.tokenList[1]=0x2484679c29325eaf2f2e91d661e5413d47c04660
+dexz.tokenList[0]=0xdf9f36fd5654d92e0844c78d2d2dd562404cd1ff
+dexz.tokenList[1]=0x57930444aa5c1e758c1407ded001a8f36aa80b1d
 dexz.accountListLength=6
-dexz.accountList[0]=0x1d7961dd2bee2c9bd13a9bd8e8b6405ef79e22bf
+dexz.accountList[0]=0x0e946b999033257976aa5cbe0e3530618ca1582d
 dexz.accountList[1]=0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0
 dexz.accountList[2]=0xa44a08d3f6933c69212114bb66e2df1813651844
 dexz.accountList[3]=0xa55a151eb00fded1634d27d1127b4be4627079ea
 dexz.accountList[4]=0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9
 dexz.accountList[5]=0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec
 dexz.pairInfoListLength=1
-dexz.pairInfoList[0]=0xe76d445cfb6752ac3d03963b673d04c37158950f79ef9384b3dbac211c1d813a,0xd8c26d3fda0ce1666fbac2f3d9e30626c50798d2,0x2484679c29325eaf2f2e91d661e5413d47c04660
-AccountAdded 0 #11583 account=User6:0xa77a
-OrderAdded 0 #11583 pairKey=0xe76d445cfb6752ac3d03963b673d04c37158950f79ef9384b3dbac211c1d813a key=0xa62bac2412d2346ac7dd0b3deb2eb06ad502b21f50c2ff0a1ab43a4353938f9e
-  User6:0xa77a Sell 1600 ABC @ 0.0009 ABC/WETH +59.89s
-Trade 0 #11583 key=0x3a25eb101b2499c31188701dd0d2cecd0f62265d9e6b3418867717c69e9787b1 orderType=Sell taker=User6:0xa77a maker=User2:0xa33a amount=100 baseToken=ABC quoteToken=WETH baseTokens=100 quoteTokens=0.12987 feeBaseTokens=0.00013 feeQuoteTokens=0 baseTokensFilled=0
-Trade 1 #11583 key=0x88064ae820dce2dd98d39a2ac967ddc0aa580fdb0853fbb88a6bea4179747a64 orderType=Sell taker=User6:0xa77a maker=User3:0xa44a amount=100 baseToken=ABC quoteToken=WETH baseTokens=100 quoteTokens=0.11988 feeBaseTokens=0.00012 feeQuoteTokens=0 baseTokensFilled=0
-Trade 2 #11583 key=0x1828e4bc8372210dcac29a86666164f2ab65804bc1cae21b0905f9b4124416b3 orderType=Sell taker=User6:0xa77a maker=User4:0xa55a amount=100 baseToken=ABC quoteToken=WETH baseTokens=100 quoteTokens=0.0999 feeBaseTokens=0.0001 feeQuoteTokens=0 baseTokensFilled=0
-Trade 3 #11583 key=0xf68d12a8e8dcc68bfd59c718ba76683f382b81e3b101e16a8afdd1fa70c9a25a orderType=Sell taker=User6:0xa77a maker=User5:0xa66a amount=100 baseToken=ABC quoteToken=WETH baseTokens=100 quoteTokens=0.0999 feeBaseTokens=0.0001 feeQuoteTokens=0 baseTokensFilled=0
-LogInfo 0 #11583 getBestMatchingOrder: priceKeys.initialised 0
-LogInfo 1 #11583 getBestMatchingOrder: _bestMatchingPriceKey 0.0013
-LogInfo 2 #11583 getBestMatchingOrder: orderQueue not empty 0.0013
-LogInfo 3 #11583 getBestMatchingOrder: _bestMatchingOrderKey  1558520863 0x3a25eb101b2499c31188701dd0d2cecd0f62265d9e6b3418867717c69e9787b1
-LogInfo 4 #11583 _trade: matchingOrderKey 0 0x3a25eb101b2499c31188701dd0d2cecd0f62265d9e6b3418867717c69e9787b1
-LogInfo 5 #11583 calculateOrder Maker Buy: matchingOrder.baseTokens 100
-LogInfo 6 #11583 calculateOrder Maker Buy: matchingOrder.baseTokensFilled 0
-LogInfo 7 #11583 calculateOrder Maker Buy: amountBaseTokens 2000
-LogInfo 8 #11583 calculateOrder Maker Buy: availableTokens(matchingOrder.baseToken, taker) 900.6 User6:0xa77a
-LogInfo 9 #11583 calculateOrder Maker Buy: matchingOrder.baseTokens NOT reduced due to available tokens 100
-LogInfo 10 #11583 calculateOrder Maker Buy: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, taker)) 100 User6:0xa77a
-LogInfo 11 #11583 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.13
-LogInfo 12 #11583 calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker) 10.2 User2:0xa33a
-LogInfo 13 #11583 calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker)) 0.13 User2:0xa33a
-LogInfo 14 #11583 calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price) 100
-LogInfo 15 #11583 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.13
-LogInfo 16 #11583 transferTokens: SELL 0
-LogInfo 17 #11583 updateBestMatchingOrder: priceKeys.initialised 0
-LogInfo 18 #11583 updateBestMatchingOrder: priceKey 0.0013
-LogInfo 19 #11583 updateBestMatchingOrder: orderQueue not empty 0.0013
-LogInfo 20 #11583 orders remove RBT 0.0013
-LogInfo 21 #11583 getBestMatchingOrder: priceKeys.initialised 0
-LogInfo 22 #11583 getBestMatchingOrder: _bestMatchingPriceKey 0.0012
-LogInfo 23 #11583 getBestMatchingOrder: orderQueue not empty 0.0012
-LogInfo 24 #11583 getBestMatchingOrder: _bestMatchingOrderKey  1558520863 0x88064ae820dce2dd98d39a2ac967ddc0aa580fdb0853fbb88a6bea4179747a64
-LogInfo 25 #11583 calculateOrder Maker Buy: matchingOrder.baseTokens 100
-LogInfo 26 #11583 calculateOrder Maker Buy: matchingOrder.baseTokensFilled 0
-LogInfo 27 #11583 calculateOrder Maker Buy: amountBaseTokens 1900
-LogInfo 28 #11583 calculateOrder Maker Buy: availableTokens(matchingOrder.baseToken, taker) 800.6 User6:0xa77a
-LogInfo 29 #11583 calculateOrder Maker Buy: matchingOrder.baseTokens NOT reduced due to available tokens 100
-LogInfo 30 #11583 calculateOrder Maker Buy: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, taker)) 100 User6:0xa77a
-LogInfo 31 #11583 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.12
-LogInfo 32 #11583 calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker) 10.3 User3:0xa44a
-LogInfo 33 #11583 calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker)) 0.12 User3:0xa44a
-LogInfo 34 #11583 calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price) 100
-LogInfo 35 #11583 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.12
-LogInfo 36 #11583 transferTokens: SELL 0
-LogInfo 37 #11583 updateBestMatchingOrder: priceKeys.initialised 0
-LogInfo 38 #11583 updateBestMatchingOrder: priceKey 0.0012
-LogInfo 39 #11583 updateBestMatchingOrder: orderQueue not empty 0.0012
-LogInfo 40 #11583 orders remove RBT 0.0012
-LogInfo 41 #11583 getBestMatchingOrder: priceKeys.initialised 0
-LogInfo 42 #11583 getBestMatchingOrder: _bestMatchingPriceKey 0.001
-LogInfo 43 #11583 getBestMatchingOrder: orderQueue not empty 0.001
-LogInfo 44 #11583 getBestMatchingOrder: _bestMatchingOrderKey  1558520863 0x1828e4bc8372210dcac29a86666164f2ab65804bc1cae21b0905f9b4124416b3
-LogInfo 45 #11583 calculateOrder Maker Buy: matchingOrder.baseTokens 100
-LogInfo 46 #11583 calculateOrder Maker Buy: matchingOrder.baseTokensFilled 0
-LogInfo 47 #11583 calculateOrder Maker Buy: amountBaseTokens 1800
-LogInfo 48 #11583 calculateOrder Maker Buy: availableTokens(matchingOrder.baseToken, taker) 700.6 User6:0xa77a
-LogInfo 49 #11583 calculateOrder Maker Buy: matchingOrder.baseTokens NOT reduced due to available tokens 100
-LogInfo 50 #11583 calculateOrder Maker Buy: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, taker)) 100 User6:0xa77a
-LogInfo 51 #11583 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.1
-LogInfo 52 #11583 calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker) 10.4 User4:0xa55a
-LogInfo 53 #11583 calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker)) 0.1 User4:0xa55a
-LogInfo 54 #11583 calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price) 100
-LogInfo 55 #11583 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.1
-LogInfo 56 #11583 transferTokens: SELL 0
-LogInfo 57 #11583 updateBestMatchingOrder: priceKeys.initialised 0
-LogInfo 58 #11583 updateBestMatchingOrder: priceKey 0.001
-LogInfo 59 #11583 updateBestMatchingOrder: orderQueue not empty 0.001
-LogInfo 60 #11583 updateBestMatchingOrder: priceKey 0.0009
-LogInfo 61 #11583 updateBestMatchingOrder: orderQueue not empty 0.0009
-LogInfo 62 #11583 orders remove RBT 0.0009
-LogInfo 63 #11583 getBestMatchingOrder: priceKeys.initialised 0
-LogInfo 64 #11583 getBestMatchingOrder: _bestMatchingPriceKey 0.001
-LogInfo 65 #11583 getBestMatchingOrder: orderQueue not empty 0.001
-LogInfo 66 #11583 getBestMatchingOrder: _bestMatchingOrderKey  1558520863 0xf68d12a8e8dcc68bfd59c718ba76683f382b81e3b101e16a8afdd1fa70c9a25a
-LogInfo 67 #11583 calculateOrder Maker Buy: matchingOrder.baseTokens 100
-LogInfo 68 #11583 calculateOrder Maker Buy: matchingOrder.baseTokensFilled 0
-LogInfo 69 #11583 calculateOrder Maker Buy: amountBaseTokens 1700
-LogInfo 70 #11583 calculateOrder Maker Buy: availableTokens(matchingOrder.baseToken, taker) 600.6 User6:0xa77a
-LogInfo 71 #11583 calculateOrder Maker Buy: matchingOrder.baseTokens NOT reduced due to available tokens 100
-LogInfo 72 #11583 calculateOrder Maker Buy: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, taker)) 100 User6:0xa77a
-LogInfo 73 #11583 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.1
-LogInfo 74 #11583 calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker) 10.5 User5:0xa66a
-LogInfo 75 #11583 calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker)) 0.1 User5:0xa66a
-LogInfo 76 #11583 calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price) 100
-LogInfo 77 #11583 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.1
-LogInfo 78 #11583 transferTokens: SELL 0
-LogInfo 79 #11583 updateBestMatchingOrder: priceKeys.initialised 0
-LogInfo 80 #11583 updateBestMatchingOrder: priceKey 0.001
-LogInfo 81 #11583 updateBestMatchingOrder: orderQueue not empty 0.001
-LogInfo 82 #11583 orders remove RBT 0.001
-LogInfo 83 #11583 getBestMatchingOrder: priceKeys.initialised 0
-LogInfo 84 #11583 orders addKey RBT adding  0.0009
-LogInfo 85 #11583 orders addData  first 0 0xa62bac2412d2346ac7dd0b3deb2eb06ad502b21f50c2ff0a1ab43a4353938f9e
------ Pair 0xe76d445cfb6752ac3d03963b673d04c37158950f79ef9384b3dbac211c1d813a ABC/WETH -----
+dexz.pairInfoList[0]=0xb8f5bbc2520fcb0b7b77ca9d72c46ecf9826710f466755c7eead56b38b03f051,0xdf9f36fd5654d92e0844c78d2d2dd562404cd1ff,0x57930444aa5c1e758c1407ded001a8f36aa80b1d
+AccountAdded 0 #70 account=User6:0xa77a
+OrderAdded 0 #70 pairKey=0xb8f5bbc2520fcb0b7b77ca9d72c46ecf9826710f466755c7eead56b38b03f051 key=0x4029e1be7e8a12c662c735adf2e1930698e38cd979793b36ef6e696fc4a86048
+  User6:0xa77a Sell 1600 ABC @ 0.0009 ABC/WETH +59.91s
+Trade 0 #70 key=0x486e8d1f932454d6d36887df24c4fe87b8a6a68eab6733a1a95a9e5302b31529 orderType=Sell taker=User6:0xa77a maker=User2:0xa33a amount=100 baseToken=ABC quoteToken=WETH baseTokens=100 quoteTokens=0.12987 feeBaseTokens=0.00013 feeQuoteTokens=0 baseTokensFilled=0
+Trade 1 #70 key=0xa0a58be466e40402b200984b63cf89939a3f11618c7a25aad429cb2814250dc2 orderType=Sell taker=User6:0xa77a maker=User3:0xa44a amount=100 baseToken=ABC quoteToken=WETH baseTokens=100 quoteTokens=0.11988 feeBaseTokens=0.00012 feeQuoteTokens=0 baseTokensFilled=0
+Trade 2 #70 key=0x6bf0c7fadb884ef567db1b03e40c3eee5df0af9ef17d70d84168fb9e5cef1e5c orderType=Sell taker=User6:0xa77a maker=User4:0xa55a amount=100 baseToken=ABC quoteToken=WETH baseTokens=100 quoteTokens=0.0999 feeBaseTokens=0.0001 feeQuoteTokens=0 baseTokensFilled=0
+Trade 3 #70 key=0xb02f8549467ece14e88925dc7fa735fb2da8723519ace53e0301c25310a170d9 orderType=Sell taker=User6:0xa77a maker=User5:0xa66a amount=100 baseToken=ABC quoteToken=WETH baseTokens=100 quoteTokens=0.0999 feeBaseTokens=0.0001 feeQuoteTokens=0 baseTokensFilled=0
+LogInfo 0 #70 getBestMatchingOrder: priceKeys.initialised 0
+LogInfo 1 #70 getBestMatchingOrder: _bestMatchingPriceKey 0.0013
+LogInfo 2 #70 getBestMatchingOrder: orderQueue not empty 0.0013
+LogInfo 3 #70 getBestMatchingOrder: _bestMatchingOrderKey  1558649258 0x486e8d1f932454d6d36887df24c4fe87b8a6a68eab6733a1a95a9e5302b31529
+LogInfo 4 #70 _trade: matchingOrderKey 0 0x486e8d1f932454d6d36887df24c4fe87b8a6a68eab6733a1a95a9e5302b31529
+LogInfo 5 #70 calculateOrder Maker Buy: matchingOrder.baseTokens 100
+LogInfo 6 #70 calculateOrder Maker Buy: matchingOrder.baseTokensFilled 0
+LogInfo 7 #70 calculateOrder Maker Buy: amountBaseTokens 2000
+LogInfo 8 #70 calculateOrder Maker Buy: availableTokens(matchingOrder.baseToken, taker) 900.6 User6:0xa77a
+LogInfo 9 #70 calculateOrder Maker Buy: matchingOrder.baseTokens NOT reduced due to available tokens 100
+LogInfo 10 #70 calculateOrder Maker Buy: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, taker)) 100 User6:0xa77a
+LogInfo 11 #70 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.13
+LogInfo 12 #70 calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker) 10.2 User2:0xa33a
+LogInfo 13 #70 calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker)) 0.13 User2:0xa33a
+LogInfo 14 #70 calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price) 100
+LogInfo 15 #70 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.13
+LogInfo 16 #70 transferTokens: SELL 0
+LogInfo 17 #70 updateBestMatchingOrder: priceKeys.initialised 0
+LogInfo 18 #70 updateBestMatchingOrder: priceKey 0.0013
+LogInfo 19 #70 updateBestMatchingOrder: orderQueue not empty 0.0013
+LogInfo 20 #70 orders remove RBT 0.0013
+LogInfo 21 #70 getBestMatchingOrder: priceKeys.initialised 0
+LogInfo 22 #70 getBestMatchingOrder: _bestMatchingPriceKey 0.0012
+LogInfo 23 #70 getBestMatchingOrder: orderQueue not empty 0.0012
+LogInfo 24 #70 getBestMatchingOrder: _bestMatchingOrderKey  1558649258 0xa0a58be466e40402b200984b63cf89939a3f11618c7a25aad429cb2814250dc2
+LogInfo 25 #70 calculateOrder Maker Buy: matchingOrder.baseTokens 100
+LogInfo 26 #70 calculateOrder Maker Buy: matchingOrder.baseTokensFilled 0
+LogInfo 27 #70 calculateOrder Maker Buy: amountBaseTokens 1900
+LogInfo 28 #70 calculateOrder Maker Buy: availableTokens(matchingOrder.baseToken, taker) 800.6 User6:0xa77a
+LogInfo 29 #70 calculateOrder Maker Buy: matchingOrder.baseTokens NOT reduced due to available tokens 100
+LogInfo 30 #70 calculateOrder Maker Buy: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, taker)) 100 User6:0xa77a
+LogInfo 31 #70 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.12
+LogInfo 32 #70 calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker) 10.3 User3:0xa44a
+LogInfo 33 #70 calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker)) 0.12 User3:0xa44a
+LogInfo 34 #70 calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price) 100
+LogInfo 35 #70 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.12
+LogInfo 36 #70 transferTokens: SELL 0
+LogInfo 37 #70 updateBestMatchingOrder: priceKeys.initialised 0
+LogInfo 38 #70 updateBestMatchingOrder: priceKey 0.0012
+LogInfo 39 #70 updateBestMatchingOrder: orderQueue not empty 0.0012
+LogInfo 40 #70 orders remove RBT 0.0012
+LogInfo 41 #70 getBestMatchingOrder: priceKeys.initialised 0
+LogInfo 42 #70 getBestMatchingOrder: _bestMatchingPriceKey 0.001
+LogInfo 43 #70 getBestMatchingOrder: orderQueue not empty 0.001
+LogInfo 44 #70 getBestMatchingOrder: _bestMatchingOrderKey  1558649258 0x6bf0c7fadb884ef567db1b03e40c3eee5df0af9ef17d70d84168fb9e5cef1e5c
+LogInfo 45 #70 calculateOrder Maker Buy: matchingOrder.baseTokens 100
+LogInfo 46 #70 calculateOrder Maker Buy: matchingOrder.baseTokensFilled 0
+LogInfo 47 #70 calculateOrder Maker Buy: amountBaseTokens 1800
+LogInfo 48 #70 calculateOrder Maker Buy: availableTokens(matchingOrder.baseToken, taker) 700.6 User6:0xa77a
+LogInfo 49 #70 calculateOrder Maker Buy: matchingOrder.baseTokens NOT reduced due to available tokens 100
+LogInfo 50 #70 calculateOrder Maker Buy: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, taker)) 100 User6:0xa77a
+LogInfo 51 #70 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.1
+LogInfo 52 #70 calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker) 10.4 User4:0xa55a
+LogInfo 53 #70 calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker)) 0.1 User4:0xa55a
+LogInfo 54 #70 calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price) 100
+LogInfo 55 #70 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.1
+LogInfo 56 #70 transferTokens: SELL 0
+LogInfo 57 #70 updateBestMatchingOrder: priceKeys.initialised 0
+LogInfo 58 #70 updateBestMatchingOrder: priceKey 0.001
+LogInfo 59 #70 updateBestMatchingOrder: orderQueue not empty 0.001
+LogInfo 60 #70 updateBestMatchingOrder: priceKey 0.0009
+LogInfo 61 #70 updateBestMatchingOrder: orderQueue not empty 0.0009
+LogInfo 62 #70 orders remove RBT 0.0009
+LogInfo 63 #70 getBestMatchingOrder: priceKeys.initialised 0
+LogInfo 64 #70 getBestMatchingOrder: _bestMatchingPriceKey 0.001
+LogInfo 65 #70 getBestMatchingOrder: orderQueue not empty 0.001
+LogInfo 66 #70 getBestMatchingOrder: _bestMatchingOrderKey  1558649258 0xb02f8549467ece14e88925dc7fa735fb2da8723519ace53e0301c25310a170d9
+LogInfo 67 #70 calculateOrder Maker Buy: matchingOrder.baseTokens 100
+LogInfo 68 #70 calculateOrder Maker Buy: matchingOrder.baseTokensFilled 0
+LogInfo 69 #70 calculateOrder Maker Buy: amountBaseTokens 1700
+LogInfo 70 #70 calculateOrder Maker Buy: availableTokens(matchingOrder.baseToken, taker) 600.6 User6:0xa77a
+LogInfo 71 #70 calculateOrder Maker Buy: matchingOrder.baseTokens NOT reduced due to available tokens 100
+LogInfo 72 #70 calculateOrder Maker Buy: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, taker)) 100 User6:0xa77a
+LogInfo 73 #70 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.1
+LogInfo 74 #70 calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker) 10.5 User5:0xa66a
+LogInfo 75 #70 calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker)) 0.1 User5:0xa66a
+LogInfo 76 #70 calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price) 100
+LogInfo 77 #70 calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18 0.1
+LogInfo 78 #70 transferTokens: SELL 0
+LogInfo 79 #70 updateBestMatchingOrder: priceKeys.initialised 0
+LogInfo 80 #70 updateBestMatchingOrder: priceKey 0.001
+LogInfo 81 #70 updateBestMatchingOrder: orderQueue not empty 0.001
+LogInfo 82 #70 orders remove RBT 0.001
+LogInfo 83 #70 getBestMatchingOrder: priceKeys.initialised 0
+LogInfo 84 #70 orders addKey RBT adding  0.0009
+LogInfo 85 #70 orders addData  first 0 0x4029e1be7e8a12c662c735adf2e1930698e38cd979793b36ef6e696fc4a86048
+----- Pair 0xb8f5bbc2520fcb0b7b77ca9d72c46ecf9826710f466755c7eead56b38b03f051 ABC/WETH -----
 --- Buy Orders ---
 --- Sell Orders ---
-  Price: 0.0009 head=0xa62bac2412d2346a tail=0xa62bac2412d2346a
-    Order key=0xa62bac2412d2346a prev=0x0000000000000000 next=0x0000000000000000 Sell maker=User6:0xa77a base=ABC quote=WETH price=0.0009 expiry=59.87s baseTokens=1600 baseTokensFilled=0
+  Price: 0.0009 head=0x4029e1be7e8a12c6 tail=0x4029e1be7e8a12c6
+    Order key=0x4029e1be7e8a12c6 prev=0x0000000000000000 next=0x0000000000000000 Sell maker=User6:0xa77a base=ABC quote=WETH price=0.0009 expiry=59.89s baseTokens=1600 baseTokensFilled=0
 
-token0ContractAddress=Token 'ABC' 'Abc':0xd8c2
+token0ContractAddress=Token 'ABC' 'Abc':0xdf9f
 token0.owner/new=Deployer:0xa11a/Null:0x0000
 token0.details='ABC' 'Abc' 18 dp
 token0.totalSupply=5402.1
-token0.Transfer 0 #11583 from=User6:0xa77a to=User2:0xa33a tokens=100
-token0.Transfer 1 #11583 from=User6:0xa77a to=User3:0xa44a tokens=100
-token0.Transfer 2 #11583 from=User6:0xa77a to=User4:0xa55a tokens=100
-token0.Transfer 3 #11583 from=User6:0xa77a to=User5:0xa66a tokens=100
+token0.Transfer 0 #70 from=User6:0xa77a to=User2:0xa33a tokens=100
+token0.Transfer 1 #70 from=User6:0xa77a to=User3:0xa44a tokens=100
+token0.Transfer 2 #70 from=User6:0xa77a to=User4:0xa55a tokens=100
+token0.Transfer 3 #70 from=User6:0xa77a to=User5:0xa66a tokens=100
 
-token1ContractAddress=Token 'DEF' 'Def':0x8970
+token1ContractAddress=Token 'DEF' 'Def':0xe6ad
 token1.owner/new=Deployer:0xa11a/Null:0x0000
 token1.details='DEF' 'Def' 18 dp
 token1.totalSupply=6008.1
 
-token2ContractAddress=Token 'GHI' 'Ghi':0x6b8b
+token2ContractAddress=Token 'GHI' 'Ghi':0xf444
 token2.owner/new=Deployer:0xa11a/Null:0x0000
 token2.details='GHI' 'Ghi' 18 dp
 token2.totalSupply=602.1
 
-token3ContractAddress=Token 'WETH' 'Wrapped ETH':0x2484
+token3ContractAddress=Token 'WETH' 'Wrapped ETH':0x5793
 token3.owner/new=Deployer:0xa11a/Null:0x0000
 token3.details='WETH' 'Wrapped ETH' 18 dp
 token3.totalSupply=62.1
-token3.Transfer 0 #11583 from=User2:0xa33a to=User6:0xa77a tokens=0.12987
-token3.Transfer 1 #11583 from=User2:0xa33a to=UIFee:0xa99a tokens=0.000065
-token3.Transfer 2 #11583 from=User2:0xa33a to=Fee:0xa88a tokens=0.000065
-token3.Transfer 3 #11583 from=User3:0xa44a to=User6:0xa77a tokens=0.11988
-token3.Transfer 4 #11583 from=User3:0xa44a to=UIFee:0xa99a tokens=0.00006
-token3.Transfer 5 #11583 from=User3:0xa44a to=Fee:0xa88a tokens=0.00006
-token3.Transfer 6 #11583 from=User4:0xa55a to=User6:0xa77a tokens=0.0999
-token3.Transfer 7 #11583 from=User4:0xa55a to=UIFee:0xa99a tokens=0.00005
-token3.Transfer 8 #11583 from=User4:0xa55a to=Fee:0xa88a tokens=0.00005
-token3.Transfer 9 #11583 from=User5:0xa66a to=User6:0xa77a tokens=0.0999
-token3.Transfer 10 #11583 from=User5:0xa66a to=UIFee:0xa99a tokens=0.00005
-token3.Transfer 11 #11583 from=User5:0xa66a to=Fee:0xa88a tokens=0.00005
+token3.Transfer 0 #70 from=User2:0xa33a to=User6:0xa77a tokens=0.12987
+token3.Transfer 1 #70 from=User2:0xa33a to=UIFee:0xa99a tokens=0.000065
+token3.Transfer 2 #70 from=User2:0xa33a to=Fee:0xa88a tokens=0.000065
+token3.Transfer 3 #70 from=User3:0xa44a to=User6:0xa77a tokens=0.11988
+token3.Transfer 4 #70 from=User3:0xa44a to=UIFee:0xa99a tokens=0.00006
+token3.Transfer 5 #70 from=User3:0xa44a to=Fee:0xa88a tokens=0.00006
+token3.Transfer 6 #70 from=User4:0xa55a to=User6:0xa77a tokens=0.0999
+token3.Transfer 7 #70 from=User4:0xa55a to=UIFee:0xa99a tokens=0.00005
+token3.Transfer 8 #70 from=User4:0xa55a to=Fee:0xa88a tokens=0.00005
+token3.Transfer 9 #70 from=User5:0xa66a to=User6:0xa77a tokens=0.0999
+token3.Transfer 10 #70 from=User5:0xa66a to=UIFee:0xa99a tokens=0.00005
+token3.Transfer 11 #70 from=User5:0xa66a to=Fee:0xa88a tokens=0.00005
 
 
-tradeData[Buy 1500 ABC/WETH]='0xcbb924e20000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d8c26d3fda0ce1666fbac2f3d9e30626c50798d20000000000000000000000002484679c29325eaf2f2e91d661e5413d47c046600000000000000000000000000000000000000000000000000003328b944c4000000000000000000000000000000000000000000000000000000000005ce5243200000000000000000000000000000000000000000000005150ae84a8cdf00000000000000000000000000000a99a0ae3354c06b1459fd441a32a3f71005d7da0'
+tradeData[Buy 1500 ABC/WETH]='0xcbb924e20000000000000000000000000000000000000000000000000000000000000000000000000000000000000000df9f36fd5654d92e0844c78d2d2dd562404cd1ff00000000000000000000000057930444aa5c1e758c1407ded001a8f36aa80b1d0000000000000000000000000000000000000000000000000003328b944c4000000000000000000000000000000000000000000000000000000000005ce719bc00000000000000000000000000000000000000000000005150ae84a8cdf00000000000000000000000000000a99a0ae3354c06b1459fd441a32a3f71005d7da0'
 ---------- ApproveAndCall #1 ----------
  # Account                                             EtherBalanceChange                            ABC                            DEF Name
                                                                                                      GHI                           WETH
 -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
- 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.088387010000000000           0.000000000000000000           0.000000000000000000 Miner
+ 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.087560055000000000           0.000000000000000000           0.000000000000000000 Miner
                                                                                     0.000000000000000000           0.000000000000000000
- 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.064274960000000000           0.000000000000000000           0.000000000000000000 Deployer
+ 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.063488985000000000           0.000000000000000000           0.000000000000000000 Deployer
                                                                                     0.000000000000000000           0.000000000000000000
  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976       -0.000911280000000000         900.100000000000000000        1001.100000000000000000 User1
                                                                                   100.100000000000000000          10.100000000000000000
- 3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0       -0.005614425000000000        1000.200000000000000000        1001.200000000000000000 User2
+ 3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0       -0.005614095000000000        1000.200000000000000000        1001.200000000000000000 User2
                                                                                   100.200000000000000000          10.070000000000000000
- 4 0xa44a08d3f6933c69212114bb66e2df1813651844       -0.003034760000000000        1000.300000000000000000        1001.300000000000000000 User3
+ 4 0xa44a08d3f6933c69212114bb66e2df1813651844       -0.003034540000000000        1000.300000000000000000        1001.300000000000000000 User3
                                                                                   100.300000000000000000          10.180000000000000000
- 5 0xa55a151eb00fded1634d27d1127b4be4627079ea       -0.003058390000000000        1000.400000000000000000        1001.400000000000000000 User4
+ 5 0xa55a151eb00fded1634d27d1127b4be4627079ea       -0.003058280000000000        1000.400000000000000000        1001.400000000000000000 User4
                                                                                   100.400000000000000000          10.300000000000000000
- 6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9       -0.004781210000000000        1500.599400000000000000        1001.500000000000000000 User5
+ 6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9       -0.004773080000000000        1500.599400000000000000        1001.500000000000000000 User5
                                                                                   100.500000000000000000           9.949460000000000000
- 7 0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec       -0.006711985000000000           0.000000000000000000        1001.600000000000000000 User6
+ 7 0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec       -0.006679795000000000           0.000000000000000000        1001.600000000000000000 User6
                                                                                   100.600000000000000000          11.500090000000000000
  8 0xa88a05d2b88283ce84c8325760b72a64591279a2        0.000000000000000000           0.250300000000000000           0.000000000000000000 Fee
                                                                                     0.000000000000000000           0.000225000000000000
  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.250300000000000000           0.000000000000000000 UIFee
                                                                                     0.000000000000000000           0.000225000000000000
-10 0x3dbf612ea46d98c13ec5c8a537f2ad63c466efdf        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
+10 0x90d8927407c79c4a28ee879b821c76fc9bcc2688        0.000000000000000000           0.000000000000000000           0.000000000000000000 RBTLib
                                                                                     0.000000000000000000           0.000000000000000000
-11 0x1d7961dd2bee2c9bd13a9bd8e8b6405ef79e22bf        0.000000000000000000           0.000000000000000000           0.000000000000000000 Dexz
+11 0x0e946b999033257976aa5cbe0e3530618ca1582d        0.000000000000000000           0.000000000000000000           0.000000000000000000 Dexz
                                                                                     0.000000000000000000           0.000000000000000000
-12 0xd8c26d3fda0ce1666fbac2f3d9e30626c50798d2        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'ABC' 'Abc'
+12 0xdf9f36fd5654d92e0844c78d2d2dd562404cd1ff        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'ABC' 'Abc'
                                                                                     0.000000000000000000           0.000000000000000000
-13 0x8970bbfd1a54ae581064ab34e7910dab7e86172f        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'DEF' 'Def'
+13 0xe6ada9beed6e24be4c0259383db61b52bfca85f3        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'DEF' 'Def'
                                                                                     0.000000000000000000           0.000000000000000000
-14 0x6b8bba219f069b3dd5920e6d6958071eb9b8bc50        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'GHI' 'Ghi'
+14 0xf4441f10804b35b13bad1e664e32237773276253        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'GHI' 'Ghi'
                                                                                     0.000000000000000000           0.000000000000000000
-15 0x2484679c29325eaf2f2e91d661e5413d47c04660        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'WETH' 'Wrapped ETH'
+15 0x57930444aa5c1e758c1407ded001a8f36aa80b1d        0.000000000000000000           0.000000000000000000           0.000000000000000000 Token 'WETH' 'Wrapped ETH'
                                                                                     0.000000000000000000           0.000000000000000000
 -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
                                                                                  5402.100000000000000000        6008.100000000000000000 Total Token Balances
                                                                                   602.100000000000000000          62.100000000000000000
 -- ------------------------------------------ --------------------------- ------------------------------ ------------------------------ ---------------------------
 
-PASS ApproveAndCall #1 - user5 ABC.approveAndCall(dexz, 1500, '0xcbb924e20000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d8c26d3fda0ce1666fbac2f3d9e30626c50798d20000000000000000000000002484679c29325eaf2f2e91d661e5413d47c046600000000000000000000000000000000000000000000000000003328b944c4000000000000000000000000000000000000000000000000000000000005ce5243200000000000000000000000000000000000000000000005150ae84a8cdf00000000000000000000000000000a99a0ae3354c06b1459fd441a32a3f71005d7da0')
-approveAndCall1_1Tx status=0x1 Success gas=2000000 gasUsed=495422 costETH=0.00247711 costUSD=0.3366640201 @ ETH/USD=135.91 gasPrice=5 gwei block=11590 txIx=0 txId=0xfaac73452289c483ac05858be2d0d8e0933aa8d741974dbc7837c8d4073f1059 @ 1558517292 Wed, 22 May 2019 09:28:12 UTC
+PASS ApproveAndCall #1 - user5 ABC.approveAndCall(dexz, 1500, '0xcbb924e20000000000000000000000000000000000000000000000000000000000000000000000000000000000000000df9f36fd5654d92e0844c78d2d2dd562404cd1ff00000000000000000000000057930444aa5c1e758c1407ded001a8f36aa80b1d0000000000000000000000000000000000000000000000000003328b944c4000000000000000000000000000000000000000000000000000000000005ce719bc00000000000000000000000000000000000000000000005150ae84a8cdf00000000000000000000000000000a99a0ae3354c06b1459fd441a32a3f71005d7da0')
+approveAndCall1_1Tx status=0x1 Success gas=2000000 gasUsed=493818 costETH=0.00246909 costUSD=0.3355740219 @ ETH/USD=135.91 gasPrice=5 gwei block=77 txIx=0 txId=0x4007969b3a32f12a5d70c9ed3d085756da2bb97c73184b51b80674dfb60ec668 @ 1558645685 Thu, 23 May 2019 21:08:05 UTC
 
-dexz.address=Dexz:0x1d79
+dexz.address=Dexz:0x0e94
 dexz.owner/new=Deployer:0xa11a/Null:0x0000
-dexz.deploymentBlockNumber=11549
+dexz.deploymentBlockNumber=37
 dexz.takerFeeInEthers=0.05 ETH
 dexz.takerFeeInTokens=0.1%
 dexz.feeAccount=Fee:0xa88a
 dexz.tokenListLength=2
-dexz.tokenList[0]=0xd8c26d3fda0ce1666fbac2f3d9e30626c50798d2
-dexz.tokenList[1]=0x2484679c29325eaf2f2e91d661e5413d47c04660
+dexz.tokenList[0]=0xdf9f36fd5654d92e0844c78d2d2dd562404cd1ff
+dexz.tokenList[1]=0x57930444aa5c1e758c1407ded001a8f36aa80b1d
 dexz.accountListLength=6
-dexz.accountList[0]=0x1d7961dd2bee2c9bd13a9bd8e8b6405ef79e22bf
+dexz.accountList[0]=0x0e946b999033257976aa5cbe0e3530618ca1582d
 dexz.accountList[1]=0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0
 dexz.accountList[2]=0xa44a08d3f6933c69212114bb66e2df1813651844
 dexz.accountList[3]=0xa55a151eb00fded1634d27d1127b4be4627079ea
 dexz.accountList[4]=0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9
 dexz.accountList[5]=0xa77a2b9d4b1c010a22a7c565dc418cef683dbcec
 dexz.pairInfoListLength=1
-dexz.pairInfoList[0]=0xe76d445cfb6752ac3d03963b673d04c37158950f79ef9384b3dbac211c1d813a,0xd8c26d3fda0ce1666fbac2f3d9e30626c50798d2,0x2484679c29325eaf2f2e91d661e5413d47c04660
-OrderAdded 0 #11590 pairKey=0xe76d445cfb6752ac3d03963b673d04c37158950f79ef9384b3dbac211c1d813a key=0xf71b43347dbd6c5f999df506aa0d8dc2d5e2622e806f9c3686307b9ae176e25b
-  User5:0xa66a Buy 999.4 ABC @ 0.0009 ABC/WETH +59.78s
-Trade 0 #11590 key=0xa62bac2412d2346ac7dd0b3deb2eb06ad502b21f50c2ff0a1ab43a4353938f9e orderType=Buy taker=User5:0xa66a maker=User6:0xa77a amount=500.6 baseToken=ABC quoteToken=WETH baseTokens=500.0994 quoteTokens=0.45054 feeBaseTokens=0.5006 feeQuoteTokens=0 baseTokensFilled=0
-LogInfo 0 #11590 getBestMatchingOrder: priceKeys.initialised 0
-LogInfo 1 #11590 getBestMatchingOrder: _bestMatchingPriceKey 0.0009
-LogInfo 2 #11590 getBestMatchingOrder: orderQueue not empty 0.0009
-LogInfo 3 #11590 getBestMatchingOrder: _bestMatchingOrderKey  1558520882 0xa62bac2412d2346ac7dd0b3deb2eb06ad502b21f50c2ff0a1ab43a4353938f9e
-LogInfo 4 #11590 _trade: matchingOrderKey 0 0xa62bac2412d2346ac7dd0b3deb2eb06ad502b21f50c2ff0a1ab43a4353938f9e
-LogInfo 5 #11590 calculateOrder Maker Sell: matchingOrder.baseTokens 1600
-LogInfo 6 #11590 calculateOrder Maker Sell: matchingOrder.baseTokensFilled 0
-LogInfo 7 #11590 calculateOrder Maker Sell: amountBaseTokens 1500
-LogInfo 8 #11590 calculateOrder Maker Sell: availableTokens(matchingOrder.baseToken, matchingOrder.maker) 500.6 User6:0xa77a
-LogInfo 9 #11590 calculateOrder Maker Sell: matchingOrder.baseTokens reduced due to available tokens 500.6
-LogInfo 10 #11590 calculateOrder Maker Sell: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, matchingOrder.maker)) 500.6 User6:0xa77a
-LogInfo 11 #11590 calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18 0.45054
-LogInfo 12 #11590 calculateOrder Maker Sell: availableTokens(matchingOrder.quoteToken, matchingOrder.maker) 10.4 User5:0xa66a
-LogInfo 13 #11590 calculateOrder Maker Sell: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, taker)) 0.45054 User5:0xa66a
-LogInfo 14 #11590 calculateOrder Maker Sell: baseTokens = min(baseTokens, quoteTokens x 1e18 / price) 500.6
-LogInfo 15 #11590 calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18 0.45054
-LogInfo 16 #11590 transferTokens: BUY 0
-LogInfo 17 #11590 updateBestMatchingOrder: priceKeys.initialised 0
-LogInfo 18 #11590 updateBestMatchingOrder: priceKey 0.0009
-LogInfo 19 #11590 updateBestMatchingOrder: orderQueue not empty 0.0009
-LogInfo 20 #11590 orders remove RBT 0.0009
-LogInfo 21 #11590 getBestMatchingOrder: priceKeys.initialised 0
-LogInfo 22 #11590 orders addKey RBT adding  0.0009
-LogInfo 23 #11590 orders addData  first 0 0xf71b43347dbd6c5f999df506aa0d8dc2d5e2622e806f9c3686307b9ae176e25b
------ Pair 0xe76d445cfb6752ac3d03963b673d04c37158950f79ef9384b3dbac211c1d813a ABC/WETH -----
+dexz.pairInfoList[0]=0xb8f5bbc2520fcb0b7b77ca9d72c46ecf9826710f466755c7eead56b38b03f051,0xdf9f36fd5654d92e0844c78d2d2dd562404cd1ff,0x57930444aa5c1e758c1407ded001a8f36aa80b1d
+OrderAdded 0 #77 pairKey=0xb8f5bbc2520fcb0b7b77ca9d72c46ecf9826710f466755c7eead56b38b03f051 key=0xef998462aff5ed8bf40f410033864b9825c16de9604a106ee65eaaab6075da04
+  User5:0xa66a Buy 999.4 ABC @ 0.0009 ABC/WETH +59.79s
+Trade 0 #77 key=0x4029e1be7e8a12c662c735adf2e1930698e38cd979793b36ef6e696fc4a86048 orderType=Buy taker=User5:0xa66a maker=User6:0xa77a amount=500.6 baseToken=ABC quoteToken=WETH baseTokens=500.0994 quoteTokens=0.45054 feeBaseTokens=0.5006 feeQuoteTokens=0 baseTokensFilled=0
+LogInfo 0 #77 getBestMatchingOrder: priceKeys.initialised 0
+LogInfo 1 #77 getBestMatchingOrder: _bestMatchingPriceKey 0.0009
+LogInfo 2 #77 getBestMatchingOrder: orderQueue not empty 0.0009
+LogInfo 3 #77 getBestMatchingOrder: _bestMatchingOrderKey  1558649276 0x4029e1be7e8a12c662c735adf2e1930698e38cd979793b36ef6e696fc4a86048
+LogInfo 4 #77 _trade: matchingOrderKey 0 0x4029e1be7e8a12c662c735adf2e1930698e38cd979793b36ef6e696fc4a86048
+LogInfo 5 #77 calculateOrder Maker Sell: matchingOrder.baseTokens 1600
+LogInfo 6 #77 calculateOrder Maker Sell: matchingOrder.baseTokensFilled 0
+LogInfo 7 #77 calculateOrder Maker Sell: amountBaseTokens 1500
+LogInfo 8 #77 calculateOrder Maker Sell: availableTokens(matchingOrder.baseToken, matchingOrder.maker) 500.6 User6:0xa77a
+LogInfo 9 #77 calculateOrder Maker Sell: matchingOrder.baseTokens reduced due to available tokens 500.6
+LogInfo 10 #77 calculateOrder Maker Sell: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, matchingOrder.maker)) 500.6 User6:0xa77a
+LogInfo 11 #77 calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18 0.45054
+LogInfo 12 #77 calculateOrder Maker Sell: availableTokens(matchingOrder.quoteToken, matchingOrder.maker) 10.4 User5:0xa66a
+LogInfo 13 #77 calculateOrder Maker Sell: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, taker)) 0.45054 User5:0xa66a
+LogInfo 14 #77 calculateOrder Maker Sell: baseTokens = min(baseTokens, quoteTokens x 1e18 / price) 500.6
+LogInfo 15 #77 calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18 0.45054
+LogInfo 16 #77 transferTokens: BUY 0
+LogInfo 17 #77 updateBestMatchingOrder: priceKeys.initialised 0
+LogInfo 18 #77 updateBestMatchingOrder: priceKey 0.0009
+LogInfo 19 #77 updateBestMatchingOrder: orderQueue not empty 0.0009
+LogInfo 20 #77 orders remove RBT 0.0009
+LogInfo 21 #77 getBestMatchingOrder: priceKeys.initialised 0
+LogInfo 22 #77 orders addKey RBT adding  0.0009
+LogInfo 23 #77 orders addData  first 0 0xef998462aff5ed8bf40f410033864b9825c16de9604a106ee65eaaab6075da04
+----- Pair 0xb8f5bbc2520fcb0b7b77ca9d72c46ecf9826710f466755c7eead56b38b03f051 ABC/WETH -----
 --- Buy Orders ---
-  Price: 0.0009 head=0xf71b43347dbd6c5f tail=0xf71b43347dbd6c5f
-    Order key=0xf71b43347dbd6c5f prev=0x0000000000000000 next=0x0000000000000000 Buy maker=User5:0xa66a base=ABC quote=WETH price=0.0009 expiry=59.77s baseTokens=999.4 baseTokensFilled=0
+  Price: 0.0009 head=0xef998462aff5ed8b tail=0xef998462aff5ed8b
+    Order key=0xef998462aff5ed8b prev=0x0000000000000000 next=0x0000000000000000 Buy maker=User5:0xa66a base=ABC quote=WETH price=0.0009 expiry=59.78s baseTokens=999.4 baseTokensFilled=0
 --- Sell Orders ---
 
-token0ContractAddress=Token 'ABC' 'Abc':0xd8c2
+token0ContractAddress=Token 'ABC' 'Abc':0xdf9f
 token0.owner/new=Deployer:0xa11a/Null:0x0000
 token0.details='ABC' 'Abc' 18 dp
 token0.totalSupply=5402.1
-token0.Approval 0 #11590 tokenOwner=User5:0xa66a spender=Dexz:0x1d79 tokens=1500
-token0.Transfer 0 #11590 from=User6:0xa77a to=User5:0xa66a tokens=500.0994
-token0.Transfer 1 #11590 from=User6:0xa77a to=UIFee:0xa99a tokens=0.2503
-token0.Transfer 2 #11590 from=User6:0xa77a to=Fee:0xa88a tokens=0.2503
+token0.Approval 0 #77 tokenOwner=User5:0xa66a spender=Dexz:0x0e94 tokens=1500
+token0.Transfer 0 #77 from=User6:0xa77a to=User5:0xa66a tokens=500.0994
+token0.Transfer 1 #77 from=User6:0xa77a to=UIFee:0xa99a tokens=0.2503
+token0.Transfer 2 #77 from=User6:0xa77a to=Fee:0xa88a tokens=0.2503
 
-token1ContractAddress=Token 'DEF' 'Def':0x8970
+token1ContractAddress=Token 'DEF' 'Def':0xe6ad
 token1.owner/new=Deployer:0xa11a/Null:0x0000
 token1.details='DEF' 'Def' 18 dp
 token1.totalSupply=6008.1
 
-token2ContractAddress=Token 'GHI' 'Ghi':0x6b8b
+token2ContractAddress=Token 'GHI' 'Ghi':0xf444
 token2.owner/new=Deployer:0xa11a/Null:0x0000
 token2.details='GHI' 'Ghi' 18 dp
 token2.totalSupply=602.1
 
-token3ContractAddress=Token 'WETH' 'Wrapped ETH':0x2484
+token3ContractAddress=Token 'WETH' 'Wrapped ETH':0x5793
 token3.owner/new=Deployer:0xa11a/Null:0x0000
 token3.details='WETH' 'Wrapped ETH' 18 dp
 token3.totalSupply=62.1
-token3.Transfer 0 #11590 from=User5:0xa66a to=User6:0xa77a tokens=0.45054
+token3.Transfer 0 #77 from=User5:0xa66a to=User6:0xa77a tokens=0.45054
 
 

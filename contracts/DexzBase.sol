@@ -10,20 +10,12 @@ import "Owned.sol";
 contract DexzBase is Owned {
     using SafeMath for uint;
 
-    enum TokenWhitelistStatus {
-        NONE,
-        BLACKLIST,
-        WHITELIST
-    }
-
     uint constant public TENPOW18 = uint(10)**18;
 
     uint public deploymentBlockNumber;
     uint public takerFeeInEthers = 5 * 10 ** 16; // 0.05 ETH
     uint public takerFeeInTokens = 10 * uint(10)**14; // 0.10%
     address public feeAccount;
-
-    mapping(address => TokenWhitelistStatus) public tokenWhitelist;
 
     struct PairInfo {
         bytes32 pairKey;
@@ -39,7 +31,6 @@ contract DexzBase is Owned {
     address[] public accountList;
     PairInfo[] public pairInfoList;
 
-    event TokenWhitelistUpdated(address indexed token, uint oldStatus, uint newStatus);
     event TakerFeeInEthersUpdated(uint oldTakerFeeInEthers, uint newTakerFeeInEthers);
     event TakerFeeInTokensUpdated(uint oldTakerFeeInTokens, uint newTakerFeeInTokens);
     event FeeAccountUpdated(address oldFeeAccount, address newFeeAccount);
@@ -58,10 +49,6 @@ contract DexzBase is Owned {
         addAccount(address(this));
     }
 
-    function whitelistToken(address token, uint status) public onlyOwner {
-        emit TokenWhitelistUpdated(token, uint(tokenWhitelist[token]), status);
-        tokenWhitelist[token] = TokenWhitelistStatus(status);
-    }
     function setTakerFeeInEthers(uint _takerFeeInEthers) public onlyOwner {
         emit TakerFeeInEthersUpdated(takerFeeInEthers, _takerFeeInEthers);
         takerFeeInEthers = _takerFeeInEthers;
@@ -113,18 +100,11 @@ contract DexzBase is Owned {
         _tokens = _tokens.min(ERC20Interface(token).balanceOf(wallet));
     }
     function transferFrom(address token, address from, address to, uint _tokens) internal {
-        TokenWhitelistStatus whitelistStatus = tokenWhitelist[token];
-        // Difference in gas for 2 x maker fills - wl 293405, no wl 326,112
-        if (whitelistStatus == TokenWhitelistStatus.WHITELIST) {
-            require(ERC20Interface(token).transferFrom(from, to, _tokens));
-        } else if (whitelistStatus == TokenWhitelistStatus.NONE) {
-            uint balanceToBefore = ERC20Interface(token).balanceOf(to);
-            require(ERC20Interface(token).transferFrom(from, to, _tokens));
-            uint balanceToAfter = ERC20Interface(token).balanceOf(to);
-            require(balanceToBefore.add(_tokens) == balanceToAfter);
-        } else {
-            revert();
-        }
+        // TODO: Remove check?
+        uint balanceToBefore = ERC20Interface(token).balanceOf(to);
+        require(ERC20Interface(token).transferFrom(from, to, _tokens));
+        uint balanceToAfter = ERC20Interface(token).balanceOf(to);
+        require(balanceToBefore.add(_tokens) == balanceToAfter);
     }
 
 

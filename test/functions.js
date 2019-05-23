@@ -411,14 +411,6 @@ function printDexOneExchangeContractDetails() {
     });
     ownershipTransferredEvents.stopWatching();
 
-    var tokenWhitelistUpdatedEvents = contract.TokenWhitelistUpdated({}, { fromBlock: dexzFromBlock, toBlock: latestBlock });
-    i = 0;
-    tokenWhitelistUpdatedEvents.watch(function (error, result) {
-      console.log("RESULT: TokenWhitelistUpdated " + i++ + " #" + result.blockNumber + " token=" + getShortAddressName(result.args.token) +
-        " status=" + result.args.status);
-    });
-    tokenWhitelistUpdatedEvents.stopWatching();
-
     var takerFeeInEthersUpdatedEvents = contract.TakerFeeInEthersUpdated({}, { fromBlock: dexzFromBlock, toBlock: latestBlock });
     i = 0;
     takerFeeInEthersUpdatedEvents.watch(function (error, result) {
