@@ -15,11 +15,7 @@ pragma solidity ^0.8.0;
 import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 
 
-// ----------------------------------------------------------------------------
-// ERC Token Standard #20 Interface
-// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
-// ----------------------------------------------------------------------------
-interface ERC20 {
+interface IERC20 {
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 
@@ -30,13 +26,8 @@ interface ERC20 {
     function approve(address spender, uint tokens) external returns (bool success);
     function transferFrom(address from, address to, uint tokens) external returns (bool success);
 }
-// ----------------------------------------------------------------------------
-// End - ERC Token Standard #20 Interface
-// ----------------------------------------------------------------------------
 
-// ----------------------------------------------------------------------------
-// Owned contract
-// ----------------------------------------------------------------------------
+
 contract Owned {
     address public owner;
     address public newOwner;
@@ -68,9 +59,6 @@ contract Owned {
         owner = _newOwner;
     }
 }
-// ----------------------------------------------------------------------------
-// End - Owned contract
-// ----------------------------------------------------------------------------
 
 
 // ----------------------------------------------------------------------------
@@ -134,7 +122,7 @@ contract DexzBase is Owned {
     }
     function addToken(address token) internal {
         if (tokenBlockNumbers[token] == 0) {
-            require(ERC20(token).totalSupply() > 0);
+            require(IERC20(token).totalSupply() > 0);
             tokenBlockNumbers[token] = block.number;
             tokenList.push(token);
             emit TokenAdded(token);
@@ -163,8 +151,8 @@ contract DexzBase is Owned {
 
 
     function availableTokens(address token, address wallet) internal view returns (uint _tokens) {
-        uint _allowance = ERC20(token).allowance(wallet, address(this));
-        uint _balance = ERC20(token).balanceOf(wallet);
+        uint _allowance = IERC20(token).allowance(wallet, address(this));
+        uint _balance = IERC20(token).balanceOf(wallet);
         if (_allowance < _balance) {
             return _allowance;
         } else {
@@ -173,9 +161,9 @@ contract DexzBase is Owned {
     }
     function transferFrom(address token, address from, address to, uint _tokens) internal {
         // TODO: Remove check?
-        uint balanceToBefore = ERC20(token).balanceOf(to);
-        require(ERC20(token).transferFrom(from, to, _tokens));
-        uint balanceToAfter = ERC20(token).balanceOf(to);
+        uint balanceToBefore = IERC20(token).balanceOf(to);
+        require(IERC20(token).transferFrom(from, to, _tokens));
+        uint balanceToAfter = IERC20(token).balanceOf(to);
         require(balanceToBefore + _tokens == balanceToAfter);
     }
 
@@ -185,7 +173,7 @@ contract DexzBase is Owned {
     //     if (token == address(0)) {
     //         payable(uint160(owner)).transfer((tokens == 0 ? address(this).balance : tokens));
     //     } else {
-    //         ERC20(token).transfer(owner, tokens == 0 ? ERC20(token).balanceOf(address(this)) : tokens);
+    //         IERC20(token).transfer(owner, tokens == 0 ? IERC20(token).balanceOf(address(this)) : tokens);
     //     }
     // }
 }
