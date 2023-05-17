@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.8.0;
 
 // ----------------------------------------------------------------------------
 // MintableToken = ERC20 + symbol + name + decimals + mint + burn
@@ -8,11 +8,11 @@ pragma solidity ^0.5.0;
 //
 // https://github.com/bokkypoobah/Dexz
 //
+// SPDX-License-Identifier: MIT
 //
 // Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2019. The MIT Licence.
 // ----------------------------------------------------------------------------
 
-import "../SafeMath.sol";
 import "../Owned.sol";
 import "../ApproveAndCallFallback.sol";
 import "./MintableTokenInterface.sol";
@@ -25,8 +25,6 @@ import "./MintableTokenInterface.sol";
 // account, and is used for testing
 // ----------------------------------------------------------------------------
 contract MintableToken is MintableTokenInterface, Owned {
-    using SafeMath for uint;
-
     string _symbol;
     string  _name;
     uint8 _decimals;
@@ -35,11 +33,11 @@ contract MintableToken is MintableTokenInterface, Owned {
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 
-    constructor(string memory symbol, string memory name, uint8 decimals, address tokenOwner, uint initialSupply) public {
+    constructor(string memory __symbol, string memory __name, uint8 __decimals, address tokenOwner, uint initialSupply) {
         initOwned(msg.sender);
-        _symbol = symbol;
-        _name = name;
-        _decimals = decimals;
+        _symbol = __symbol;
+        _name = __name;
+        _decimals = __decimals;
         balances[tokenOwner] = initialSupply;
         _totalSupply = initialSupply;
         emit Transfer(address(0), tokenOwner, _totalSupply);
@@ -54,14 +52,14 @@ contract MintableToken is MintableTokenInterface, Owned {
         return _decimals;
     }
     function totalSupply() public view returns (uint) {
-        return _totalSupply.sub(balances[address(0)]);
+        return _totalSupply - balances[address(0)];
     }
     function balanceOf(address tokenOwner) public view returns (uint balance) {
         return balances[tokenOwner];
     }
     function transfer(address to, uint tokens) public returns (bool success) {
-        balances[msg.sender] = balances[msg.sender].sub(tokens);
-        balances[to] = balances[to].add(tokens);
+        balances[msg.sender] -= tokens;
+        balances[to] += tokens;
         emit Transfer(msg.sender, to, tokens);
         return true;
     }
@@ -71,9 +69,9 @@ contract MintableToken is MintableTokenInterface, Owned {
         return true;
     }
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
-        balances[from] = balances[from].sub(tokens);
-        allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
-        balances[to] = balances[to].add(tokens);
+        balances[from] -= tokens;
+        allowed[from][msg.sender] -= tokens;
+        balances[to] += tokens;
         emit Transfer(from, to, tokens);
         return true;
     }
@@ -87,22 +85,22 @@ contract MintableToken is MintableTokenInterface, Owned {
         return true;
     }
     function mint(address tokenOwner, uint tokens) public onlyOwner returns (bool success) {
-        balances[tokenOwner] = balances[tokenOwner].add(tokens);
-        _totalSupply = _totalSupply.add(tokens);
+        balances[tokenOwner] += tokens;
+        _totalSupply += tokens;
         emit Transfer(address(0), tokenOwner, tokens);
         return true;
     }
     function burn(address tokenOwner, uint tokens) public onlyOwner returns (bool success) {
-        balances[tokenOwner] = balances[tokenOwner].sub(tokens);
-        _totalSupply = _totalSupply.sub(tokens);
+        balances[tokenOwner] -= tokens;
+        _totalSupply -= tokens;
         emit Transfer(tokenOwner, address(0), tokens);
         return true;
     }
-    function () external payable {
-        revert();
-    }
+    // function () external payable {
+    //     revert();
+    // }
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
-        return ERC20Interface(tokenAddress).transfer(owner, tokens);
+        return ERC20(tokenAddress).transfer(owner, tokens);
     }
 }
 // ----------------------------------------------------------------------------

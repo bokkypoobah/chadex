@@ -1,15 +1,13 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.8.0;
 
-import "SafeMath.sol";
-import "ERC20Interface.sol";
-import "Owned.sol";
+import "./ERC20.sol";
+import "./Owned.sol";
 
 // ----------------------------------------------------------------------------
 // DexzBase
+// SPDX-License-Identifier: MIT
 // ----------------------------------------------------------------------------
 contract DexzBase is Owned {
-    using SafeMath for uint;
-
     uint constant public TENPOW18 = uint(10)**18;
 
     uint public deploymentBlockNumber;
@@ -42,7 +40,7 @@ contract DexzBase is Owned {
     event LogInfo(string topic, uint number, bytes32 data, string note, address addr);
 
 
-    constructor(address _feeAccount) public {
+    constructor(address _feeAccount) {
         initOwned(msg.sender);
         deploymentBlockNumber = block.number;
         feeAccount = _feeAccount;
@@ -67,7 +65,7 @@ contract DexzBase is Owned {
     }
     function addToken(address token) internal {
         if (tokenBlockNumbers[token] == 0) {
-            require(ERC20Interface(token).totalSupply() > 0);
+            require(ERC20(token).totalSupply() > 0);
             tokenBlockNumbers[token] = block.number;
             tokenList.push(token);
             emit TokenAdded(token);
@@ -96,25 +94,31 @@ contract DexzBase is Owned {
 
 
     function availableTokens(address token, address wallet) internal view returns (uint _tokens) {
-        _tokens = ERC20Interface(token).allowance(wallet, address(this));
-        _tokens = _tokens.min(ERC20Interface(token).balanceOf(wallet));
+        uint _allowance = ERC20(token).allowance(wallet, address(this));
+        uint _balance = ERC20(token).balanceOf(wallet);
+        if (_allowance < _balance) {
+            return _allowance;
+        } else {
+            return _balance;
+        }
     }
     function transferFrom(address token, address from, address to, uint _tokens) internal {
         // TODO: Remove check?
-        uint balanceToBefore = ERC20Interface(token).balanceOf(to);
-        require(ERC20Interface(token).transferFrom(from, to, _tokens));
-        uint balanceToAfter = ERC20Interface(token).balanceOf(to);
-        require(balanceToBefore.add(_tokens) == balanceToAfter);
+        uint balanceToBefore = ERC20(token).balanceOf(to);
+        require(ERC20(token).transferFrom(from, to, _tokens));
+        uint balanceToAfter = ERC20(token).balanceOf(to);
+        require(balanceToBefore + _tokens == balanceToAfter);
     }
 
 
-    function recoverTokens(address token, uint tokens) public onlyOwner {
-        if (token == address(0)) {
-            address(uint160(owner)).transfer((tokens == 0 ? address(this).balance : tokens));
-        } else {
-            ERC20Interface(token).transfer(owner, tokens == 0 ? ERC20Interface(token).balanceOf(address(this)) : tokens);
-        }
-    }
+    // TODO
+    // function recoverTokens(address token, uint tokens) public onlyOwner {
+    //     if (token == address(0)) {
+    //         payable(uint160(owner)).transfer((tokens == 0 ? address(this).balance : tokens));
+    //     } else {
+    //         ERC20(token).transfer(owner, tokens == 0 ? ERC20(token).balanceOf(address(this)) : tokens);
+    //     }
+    // }
 }
 // ----------------------------------------------------------------------------
 // End - DexzBase

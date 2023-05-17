@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.8.0;
 
 // ----------------------------------------------------------------------------
 // Dexz🤖, pronounced dex-zee, the token exchanger bot
@@ -7,14 +7,13 @@ pragma solidity ^0.5.0;
 //
 // https://github.com/bokkypoobah/Dexz
 //
+// SPDX-License-Identifier: MIT
 //
-// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2018. Please contact us if
-// you want to deploy this contract, or a variation, for yourself
-//
+// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2023
 // ----------------------------------------------------------------------------
 
-import "Orders.sol";
-import "ApproveAndCallFallback.sol";
+import "./Orders.sol";
+import "./ApproveAndCallFallback.sol";
 
 
 // ----------------------------------------------------------------------------
@@ -40,7 +39,7 @@ contract Dexz is Orders, ApproveAndCallFallback {
 
     event Trade(bytes32 indexed key, uint orderType, address indexed taker, address indexed maker, uint amount, address baseToken, address quoteToken, uint baseTokens, uint quoteTokens, uint feeBaseTokens, uint feeQuoteTokens, uint baseTokensFilled);
 
-    constructor(address _feeAccount) public Orders(_feeAccount) {
+    constructor(address _feeAccount) Orders(_feeAccount) {
     }
 
     // length = 4 + 7 * 32 = 228
@@ -80,9 +79,9 @@ contract Dexz is Orders, ApproveAndCallFallback {
 
         if (functionSignature == tradeSig) {
             require(length >= TRADE_DATA_LENGTH);
-            require(_token == address(baseToken) || _token == address(quoteToken));
+            require(_token == address(uint160(baseToken)) || _token == address(uint160(quoteToken)));
             require(_tokens >= baseTokens);
-            _trade(TradeInfo(_from, orderFlag | ORDERFLAG_FILL_AND_ADD_ORDER, orderFlag & ORDERFLAG_BUYSELL_MASK, address(baseToken), address(quoteToken), price, expiry, baseTokens, address(uiFeeAccount)));
+            _trade(TradeInfo(_from, orderFlag | ORDERFLAG_FILL_AND_ADD_ORDER, orderFlag & ORDERFLAG_BUYSELL_MASK, address(uint160(baseToken)), address(uint160(quoteToken)), price, expiry, baseTokens, address(uint160(uiFeeAccount))));
         }
     }
 
@@ -106,11 +105,11 @@ contract Dexz is Orders, ApproveAndCallFallback {
             // emit LogInfo("_trade: order._quoteTokens", _quoteTokens, matchingOrderKey, "", order.maker);
 
             if (_baseTokens > 0 && _quoteTokens > 0) {
-                order.baseTokensFilled = order.baseTokensFilled.add(_baseTokens);
+                order.baseTokensFilled = order.baseTokensFilled + _baseTokens;
                 transferTokens(tradeInfo, tradeInfo.orderType, order.maker, _baseTokens, _quoteTokens, matchingOrderKey);
-                tradeInfo.baseTokens = tradeInfo.baseTokens.sub(_baseTokens);
-                _baseTokensFilled = _baseTokensFilled.add(_baseTokens);
-                _quoteTokensFilled = _quoteTokensFilled.add(_quoteTokens);
+                tradeInfo.baseTokens = tradeInfo.baseTokens - _baseTokens;
+                _baseTokensFilled = _baseTokensFilled + _baseTokens;
+                _quoteTokensFilled = _quoteTokensFilled + _quoteTokens;
                 _updateBestMatchingOrder(tradeInfo.orderType, tradeInfo.baseToken, tradeInfo.quoteToken, matchingPriceKey, matchingOrderKey, _orderFilled);
                 // matchingOrderKey = ORDERKEY_SENTINEL;
                 (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.orderType, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price);
@@ -120,7 +119,7 @@ contract Dexz is Orders, ApproveAndCallFallback {
             require(tradeInfo.baseTokens == 0);
         }
         if (tradeInfo.baseTokens > 0 && ((tradeInfo.orderFlag & ORDERFLAG_FILL_AND_ADD_ORDER) == ORDERFLAG_FILL_AND_ADD_ORDER)) {
-            require(tradeInfo.expiry > now);
+            require(tradeInfo.expiry > block.timestamp);
             _orderKey = _addOrder(tradeInfo.orderType, tradeInfo.taker, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
             _baseTokensOnOrder = tradeInfo.baseTokens;
         }
@@ -128,7 +127,7 @@ contract Dexz is Orders, ApproveAndCallFallback {
 
     function calculateOrder(bytes32 _matchingOrderKey, uint amountBaseTokens, address taker) internal returns (uint baseTokens, uint quoteTokens, bool _orderFilled) {
         Orders.Order storage matchingOrder = orders[_matchingOrderKey];
-        require(now <= matchingOrder.expiry);
+        require(block.timestamp <= matchingOrder.expiry);
 
         // // Maker buying base, needs to have amount in quote = base x price
         // // Taker selling base, needs to have amount in base
@@ -139,30 +138,42 @@ contract Dexz is Orders, ApproveAndCallFallback {
             uint _availableBaseTokens = availableTokens(matchingOrder.baseToken, taker);
             emit LogInfo("calculateOrder Maker Buy: availableTokens(matchingOrder.baseToken, taker)", _availableBaseTokens, 0x0, "", taker);
             // Update maker matchingOrder with currently available tokens
-            if (matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled) > _availableBaseTokens) {
+            if (matchingOrder.baseTokens - matchingOrder.baseTokensFilled > _availableBaseTokens) {
                 matchingOrder.baseTokens = _availableBaseTokens + matchingOrder.baseTokensFilled;
                 emit LogInfo("calculateOrder Maker Buy: matchingOrder.baseTokens reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
                 // ordersData.orders[_matchingOrderKey].baseTokens = matchingOrder.baseTokens;
             } else {
                 emit LogInfo("calculateOrder Maker Buy: matchingOrder.baseTokens NOT reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
             }
-            baseTokens = matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled).min(amountBaseTokens);
-            baseTokens = baseTokens.min(_availableBaseTokens);
+            // baseTokens = matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled).min(amountBaseTokens);
+            // baseTokens = baseTokens.min(_availableBaseTokens);
+            baseTokens = matchingOrder.baseTokens - matchingOrder.baseTokensFilled;
+            if (amountBaseTokens < baseTokens) {
+                baseTokens = amountBaseTokens;
+            }
+            if (_availableBaseTokens < baseTokens) {
+                baseTokens = _availableBaseTokens;
+            }
             emit LogInfo("calculateOrder Maker Buy: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, taker))", baseTokens, 0x0, "", taker);
 
-            emit LogInfo("calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18", baseTokens.mul(matchingOrder.price).div(TENPOW18), 0x0, "", address(0));
+            emit LogInfo("calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18", baseTokens * matchingOrder.price / TENPOW18, 0x0, "", address(0));
             uint _availableQuoteTokens = availableTokens(matchingOrder.quoteToken, matchingOrder.maker);
             emit LogInfo("calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", matchingOrder.maker);
-            if (matchingOrder.orderType == ORDERTYPE_BUY && matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled) > _availableBaseTokens) {
+            if (matchingOrder.orderType == ORDERTYPE_BUY && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
             }
-            quoteTokens = baseTokens.mul(matchingOrder.price).div(TENPOW18);
-            quoteTokens = quoteTokens.min(_availableQuoteTokens);
+            quoteTokens = baseTokens * matchingOrder.price / TENPOW18;
+            if (_availableQuoteTokens < quoteTokens) {
+                quoteTokens = _availableQuoteTokens;
+            }
             emit LogInfo("calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker))", quoteTokens, 0x0, "", matchingOrder.maker);
             // TODO: Add code to collect dust. E.g. > 14 decimal places, check for (dp - 14) threshold to also transfer remaining dust
 
-            baseTokens = baseTokens.min(quoteTokens.mul(TENPOW18).div(matchingOrder.price));
+            if (quoteTokens * TENPOW18 / matchingOrder.price < baseTokens) {
+                baseTokens = quoteTokens * TENPOW18 / matchingOrder.price;
+            }
+            // baseTokens = baseTokens.min(quoteTokens * TENPOW18 / matchingOrder.price));
             emit LogInfo("calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price)", baseTokens, 0x0, "", address(0));
-            quoteTokens = baseTokens.mul(matchingOrder.price).div(TENPOW18);
+            quoteTokens = baseTokens * matchingOrder.price / TENPOW18;
             emit LogInfo("calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18", quoteTokens, 0x0, "", address(0));
 
         // Maker selling base, needs to have amount in base
@@ -174,30 +185,43 @@ contract Dexz is Orders, ApproveAndCallFallback {
             uint _availableBaseTokens = availableTokens(matchingOrder.baseToken, matchingOrder.maker);
             emit LogInfo("calculateOrder Maker Sell: availableTokens(matchingOrder.baseToken, matchingOrder.maker)", _availableBaseTokens, 0x0, "", matchingOrder.maker);
             // Update maker matchingOrder with currently available tokens
-            if (matchingOrder.orderType == ORDERTYPE_SELL && matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled) > _availableBaseTokens) {
+            if (matchingOrder.orderType == ORDERTYPE_SELL && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
                 matchingOrder.baseTokens = _availableBaseTokens + matchingOrder.baseTokensFilled;
                 emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokens reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
                 // ordersData.orders[_matchingOrderKey].baseTokens = matchingOrder.baseTokens;
             } else {
                 emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokens NOT reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
             }
-            baseTokens = matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled).min(amountBaseTokens);
-            baseTokens = baseTokens.min(_availableBaseTokens);
+            // baseTokens = matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled).min(amountBaseTokens);
+            // baseTokens = baseTokens.min(_availableBaseTokens);
+            baseTokens = matchingOrder.baseTokens - matchingOrder.baseTokensFilled;
+            if (amountBaseTokens < baseTokens) {
+                baseTokens = amountBaseTokens;
+            }
+            if (_availableBaseTokens < baseTokens) {
+                baseTokens = _availableBaseTokens;
+            }
             emit LogInfo("calculateOrder Maker Sell: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, matchingOrder.maker))", baseTokens, 0x0, "", matchingOrder.maker);
 
-            emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", baseTokens.mul(matchingOrder.price).div(TENPOW18), 0x0, "", address(0));
+            emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", baseTokens * matchingOrder.price / TENPOW18, 0x0, "", address(0));
             uint _availableQuoteTokens = availableTokens(matchingOrder.quoteToken, taker);
             emit LogInfo("calculateOrder Maker Sell: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", taker);
-            if (matchingOrder.orderType == ORDERTYPE_BUY && matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled) > _availableBaseTokens) {
+            if (matchingOrder.orderType == ORDERTYPE_BUY && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
             }
-            quoteTokens = baseTokens.mul(matchingOrder.price).div(TENPOW18);
-            quoteTokens = quoteTokens.min(_availableQuoteTokens);
+            quoteTokens = baseTokens * matchingOrder.price / TENPOW18;
+            if (_availableQuoteTokens < quoteTokens) {
+                quoteTokens = _availableQuoteTokens;
+            }
             emit LogInfo("calculateOrder Maker Sell: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, taker))", quoteTokens, 0x0, "", taker);
             // TODO: Add code to collect dust. E.g. > 14 decimal places, check for (dp - 14) threshold to also transfer remaining dust
 
-            baseTokens = baseTokens.min(quoteTokens.mul(TENPOW18).div(matchingOrder.price));
+            // baseTokens = baseTokens.min(quoteTokens.mul(TENPOW18).div(matchingOrder.price));
+            if (quoteTokens * TENPOW18 / matchingOrder.price < baseTokens) {
+                baseTokens = quoteTokens * TENPOW18 / matchingOrder.price;
+            }
+
             emit LogInfo("calculateOrder Maker Sell: baseTokens = min(baseTokens, quoteTokens x 1e18 / price)", baseTokens, 0x0, "", address(0));
-            quoteTokens = baseTokens.mul(matchingOrder.price).div(TENPOW18);
+            quoteTokens = baseTokens * matchingOrder.price / TENPOW18;
             emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", quoteTokens, 0x0, "", address(0));
         }
         // TODO BK
@@ -215,10 +239,10 @@ contract Dexz is Orders, ApproveAndCallFallback {
 
         if (orderType == ORDERTYPE_BUY) {
             emit LogInfo("transferTokens: BUY", 0, 0x0, "", address(0));
-            _takerFeeInTokens = _baseTokens.mul(takerFeeInTokens).div(TENPOW18);
-            emit Trade(matchingOrderKey, orderType, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens.sub(_takerFeeInTokens), _quoteTokens, _takerFeeInTokens, 0, __orderBaseTokensFilled);
+            _takerFeeInTokens = _baseTokens * takerFeeInTokens / TENPOW18;
+            emit Trade(matchingOrderKey, orderType, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens - _takerFeeInTokens, _quoteTokens, _takerFeeInTokens, 0, __orderBaseTokensFilled);
             transferFrom(tradeInfo.quoteToken, tradeInfo.taker, maker, _quoteTokens);
-            transferFrom(tradeInfo.baseToken, maker, tradeInfo.taker, _baseTokens.sub(_takerFeeInTokens));
+            transferFrom(tradeInfo.baseToken, maker, tradeInfo.taker, _baseTokens - _takerFeeInTokens);
             if (_takerFeeInTokens > 0) {
                 if (feeAccount == tradeInfo.uiFeeAccount || _takerFeeInTokens == 1) {
                     transferFrom(tradeInfo.baseToken, maker, feeAccount, _takerFeeInTokens);
@@ -229,10 +253,10 @@ contract Dexz is Orders, ApproveAndCallFallback {
             }
         } else {
             emit LogInfo("transferTokens: SELL", 0, 0x0, "", address(0));
-            _takerFeeInTokens = _quoteTokens.mul(takerFeeInTokens).div(TENPOW18);
-            emit Trade(matchingOrderKey, orderType, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens, _quoteTokens.sub(_takerFeeInTokens), _takerFeeInTokens, 0, __orderBaseTokensFilled);
+            _takerFeeInTokens = _quoteTokens * takerFeeInTokens / TENPOW18;
+            emit Trade(matchingOrderKey, orderType, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens, _quoteTokens - _takerFeeInTokens, _takerFeeInTokens, 0, __orderBaseTokensFilled);
             transferFrom(tradeInfo.baseToken, tradeInfo.taker, maker, _baseTokens);
-            transferFrom(tradeInfo.quoteToken, maker, tradeInfo.taker, _quoteTokens.sub(_takerFeeInTokens));
+            transferFrom(tradeInfo.quoteToken, maker, tradeInfo.taker, _quoteTokens - _takerFeeInTokens);
             if (_takerFeeInTokens > 0) {
                 if (feeAccount == tradeInfo.uiFeeAccount || _takerFeeInTokens == 1) {
                     transferFrom(tradeInfo.quoteToken, maker, feeAccount, _takerFeeInTokens);

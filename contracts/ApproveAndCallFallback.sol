@@ -1,10 +1,11 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.8.0;
 
 // ----------------------------------------------------------------------------
 // ApproveAndCall Fallback
+// SPDX-License-Identifier: MIT
 // ----------------------------------------------------------------------------
-contract ApproveAndCallFallback {
-    function receiveApproval(address from, uint256 tokens, address token, bytes memory data) public;
+interface ApproveAndCallFallback {
+    function receiveApproval(address from, uint256 tokens, address token, bytes memory data) external;
 }
 // ----------------------------------------------------------------------------
 // End - ApproveAndCall Fallback
