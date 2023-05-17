@@ -4,6 +4,7 @@
     "@nomiclabs/hardhat-truffle5": "^2.0.7",
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@openzeppelin/test-helpers": "^0.5.16",
+    "solidity-coverage": "^0.8.2",
     "web3": "^1.10.0"
   }
 }
