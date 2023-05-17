@@ -1,4 +1,4 @@
-pragma solidity ^0.5.4;
+pragma solidity ^0.6.0;
 
 // ----------------------------------------------------------------------------
 // BokkyPooBah's Red-Black Tree Library v1.0-pre-release-a
@@ -10,7 +10,7 @@ pragma solidity ^0.5.4;
 // https://github.com/bokkypoobah/BokkyPooBahsRedBlackTreeLibrary
 //
 //
-// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2019. The MIT Licence.
+// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2020. The MIT Licence.
 // ----------------------------------------------------------------------------
 library BokkyPooBahsRedBlackTreeLibrary {
 
@@ -82,7 +82,7 @@ library BokkyPooBahsRedBlackTreeLibrary {
         return(key, self.nodes[key].parent, self.nodes[key].left, self.nodes[key].right, self.nodes[key].red);
     }
 
-    function insert(Tree storage self, uint key) public {
+    function insert(Tree storage self, uint key) internal {
         require(key != EMPTY);
         require(!exists(self, key));
         uint cursor = EMPTY;
@@ -105,7 +105,7 @@ library BokkyPooBahsRedBlackTreeLibrary {
         }
         insertFixup(self, key);
     }
-    function remove(Tree storage self, uint key) public {
+    function remove(Tree storage self, uint key) internal {
         require(key != EMPTY);
         require(exists(self, key));
         uint probe;
