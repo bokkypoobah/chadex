@@ -19,7 +19,8 @@ describe("Dexz", function () {
 
     console.log("        --- Setup Tokens and Dexz Contracts. Assuming gasPrice: " + ethers.utils.formatUnits(data.gasPrice, "gwei") + " gwei, ethUsd: " + ethers.utils.formatUnits(data.ethUsd, 18) + " ---");
 
-    const token0 = await Token.deploy("TOK0", "Token0", 18, "1234567890123456789012");
+    const token0 = await Token.deploy("TOK0", "Token0", 18, ethers.utils.parseUnits("500", 18));
+    // const token0 = await Token.deploy("TOK0", "Token0", 18, ethers.utils.parseUnits("20000", 18));
     await token0.deployed();
     await data.setToken0(token0);
     const token0Receipt = await data.token0.deployTransaction.wait();
@@ -28,7 +29,7 @@ describe("Dexz", function () {
     }
     console.log("        Token0 deployed");
 
-    const token1 = await Token.deploy("TOK1", "Token1", 18, "2345678901234567890123");
+    const token1 = await Token.deploy("TOK1", "Token1", 18, ethers.utils.parseUnits("5000", 18));
     await token1.deployed();
     await data.setToken1(token1);
     const token1Receipt = await data.token1.deployTransaction.wait();
@@ -57,6 +58,19 @@ describe("Dexz", function () {
         await data.printEvents("Transfer Token0", await a.wait());
       });
     }
+
+    const setup2 = [];
+    setup2.push(token1.transfer(data.user0, ethers.utils.parseEther("1000")));
+    setup2.push(token1.transfer(data.user1, ethers.utils.parseEther("1000")));
+    setup2.push(token1.transfer(data.user2, ethers.utils.parseEther("1000")));
+    setup2.push(token1.transfer(data.user3, ethers.utils.parseEther("1000")));
+    const [transferToken10Tx, transferToken11Tx, transferToken12Tx, transferToken13Tx] = await Promise.all(setup2);
+    if (DETAILS > 0) {
+      [transferToken10Tx, transferToken11Tx, transferToken12Tx, transferToken13Tx].forEach( async function (a) {
+        await data.printEvents("Transfer Token1", await a.wait());
+      });
+    }
+    console.log("        Tokens transferred");
 
     // const umswapFactory = await UmswapFactory.deploy();
     // await umswapFactory.deployed();

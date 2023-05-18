@@ -188,8 +188,8 @@ class Data {
     //   umswapTitle = " ".repeat(23 - umswapTitle.length) + umswapTitle;
     // }
 
-    console.log("          Account                                   ETH " + this.padRight(await this.token0.symbol() + " (" + 'erc721TotalSupply' + ")", 25));
-    console.log("          -------------------- ------------------------ ----------------------- ---------------------------------------------");
+    console.log("          Account                                   ETH " + this.padLeft(await this.token0.symbol(), 24) + " " + this.padLeft(await this.token1.symbol(), 24) + " Blah");
+    console.log("          -------------------- ------------------------ ------------------------ ------------------------ ---------------------------------------------");
     const checkAccounts = [this.deployer, this.user0, this.user1, this.user2, this.user3, this.feeAccount];
     if (this.dexz != null) {
       checkAccounts.push(this.dexz.address);
