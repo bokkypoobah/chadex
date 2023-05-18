@@ -19,19 +19,21 @@ class Data {
     this.token0 = null;
     this.token1 = null;
 
+    this.dexz = null;
+
     this.erc721Mock = null;
     this.umswapFactory = null;
     this.umswap = null;
 
-    this.gasPrice = ethers.utils.parseUnits("20", "gwei");
+    this.gasPrice = ethers.utils.parseUnits("40", "gwei");
     this.ethUsd = ethers.utils.parseUnits("2000.00", 18);
 
     this.verbose = false;
   }
 
   async init() {
-    [this.deployerSigner, this.user0Signer, this.user1Signer, this.user2Signer, this.integratorSigner] = await ethers.getSigners();
-    [this.deployer, this.user0, this.user1, this.user2, this.integrator] = await Promise.all([this.deployerSigner.getAddress(), this.user0Signer.getAddress(), this.user1Signer.getAddress(), this.user2Signer.getAddress(), this.integratorSigner.getAddress()]);
+    [this.deployerSigner, this.user0Signer, this.user1Signer, this.user2Signer, this.integratorSigner, this.feeAccountSigner] = await ethers.getSigners();
+    [this.deployer, this.user0, this.user1, this.user2, this.integrator, this.feeAccount] = await Promise.all([this.deployerSigner.getAddress(), this.user0Signer.getAddress(), this.user1Signer.getAddress(), this.user2Signer.getAddress(), this.integratorSigner.getAddress(), this.feeAccountSigner.getAddress()]);
 
     this.addAccount("0x0000000000000000000000000000000000000000", "null");
     this.addAccount(this.deployer, "deployer");
@@ -39,6 +41,7 @@ class Data {
     this.addAccount(this.user1, "user1");
     this.addAccount(this.user2, "user2");
     this.addAccount(this.integrator, "integrator");
+    this.addAccount(this.feeAccount, "feeAccount");
     this.baseBlock = await ethers.provider.getBlockNumber();
   }
 
@@ -137,6 +140,10 @@ class Data {
   async setToken1(token) {
     this.token1 = token;
     this.addContract(token, "Token1");
+  }
+  async setDexz(dexz) {
+    this.dexz = dexz;
+    this.addContract(dexz, "Dexz");
   }
 
   async setERC721Mock(erc721Mock) {

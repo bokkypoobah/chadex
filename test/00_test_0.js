@@ -17,7 +17,7 @@ describe("Dexz", function () {
     data = new Data();
     await data.init();
 
-    console.log("        --- Setup Accounts, NFT and Umswap Contracts - Assuming gasPrice: " + ethers.utils.formatUnits(data.gasPrice, "gwei") + " gwei, ethUsd: " + ethers.utils.formatUnits(data.ethUsd, 18) + " ---");
+    console.log("        --- Setup Tokens and Dexz Contracts. Assuming gasPrice: " + ethers.utils.formatUnits(data.gasPrice, "gwei") + " gwei, ethUsd: " + ethers.utils.formatUnits(data.ethUsd, 18) + " ---");
 
     const token0 = await Token.deploy("TOK0", "Token0", 18, "1234567890123456789012");
     await token0.deployed();
@@ -26,7 +26,7 @@ describe("Dexz", function () {
     if (DETAILS > 0) {
       await data.printEvents("Deployed Token0", token0Receipt);
     }
-    console.log("        token0 deployed");
+    console.log("        Token0 deployed");
 
     const token1 = await Token.deploy("TOK1", "Token1", 18, "2345678901234567890123");
     await token1.deployed();
@@ -35,8 +35,27 @@ describe("Dexz", function () {
     if (DETAILS > 0) {
       await data.printEvents("Deployed Token1", token1Receipt);
     }
-    console.log("        token1 deployed");
+    console.log("        Token1 deployed");
 
+    const dexz = await Dexz.deploy(data.feeAccount);
+    await dexz.deployed();
+    await data.setDexz(dexz);
+    const dexzReceipt = await data.dexz.deployTransaction.wait();
+    if (DETAILS > 0) {
+      await data.printEvents("Deployed Dexz", dexzReceipt);
+    }
+    console.log("        Dexz deployed");
+
+    const setup1 = [];
+    setup1.push(token0.transfer(data.user0, ethers.utils.parseEther("100")));
+    setup1.push(token0.transfer(data.user1, ethers.utils.parseEther("100")));
+    setup1.push(token0.transfer(data.user2, ethers.utils.parseEther("100")));
+    const [transferToken00Tx, transferToken01Tx, transferToken02Tx] = await Promise.all(setup1);
+    if (DETAILS > 0) {
+      [transferToken00Tx, transferToken01Tx, transferToken02Tx].forEach( async function (a) {
+        await data.printEvents("Transfer Token0", await a.wait());
+      });
+    }
 
     // const umswapFactory = await UmswapFactory.deploy();
     // await umswapFactory.deployed();
