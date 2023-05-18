@@ -16,31 +16,25 @@ class Data {
     this.accountNames = {};
     this.contracts = [];
 
-    this.weth = null;
-    this.royaltyEngine = null;
-    this.nftA = null;
-    this.nftB = null;
-    this.nix = null;
-    this.nixHelper = null;
+    this.erc721Mock = null;
+    this.umswapFactory = null;
+    this.umswap = null;
 
-    this.gasPrice = ethers.utils.parseUnits("84", "gwei");
-    this.ethUsd = ethers.utils.parseUnits("3730.93", 18);
+    this.gasPrice = ethers.utils.parseUnits("20", "gwei");
+    this.ethUsd = ethers.utils.parseUnits("2000.00", 18);
 
     this.verbose = false;
   }
 
   async init() {
-    [this.deployerSigner, this.maker0Signer, this.maker1Signer, this.taker0Signer, this.taker1Signer, this.royalty1Signer, this.royalty2Signer, this.integratorSigner] = await ethers.getSigners();
-    [this.deployer, this.maker0, this.maker1, this.taker0, this.taker1, this.royalty1, this.royalty2, this.integrator] = await Promise.all([this.deployerSigner.getAddress(), this.maker0Signer.getAddress(), this.maker1Signer.getAddress(), this.taker0Signer.getAddress(), this.taker1Signer.getAddress(), this.royalty1Signer.getAddress(), this.royalty2Signer.getAddress(), this.integratorSigner.getAddress()]);
+    [this.deployerSigner, this.user0Signer, this.user1Signer, this.user2Signer, this.integratorSigner] = await ethers.getSigners();
+    [this.deployer, this.user0, this.user1, this.user2, this.integrator] = await Promise.all([this.deployerSigner.getAddress(), this.user0Signer.getAddress(), this.user1Signer.getAddress(), this.user2Signer.getAddress(), this.integratorSigner.getAddress()]);
 
     this.addAccount("0x0000000000000000000000000000000000000000", "null");
     this.addAccount(this.deployer, "deployer");
-    this.addAccount(this.maker0, "maker0");
-    this.addAccount(this.maker1, "maker1");
-    this.addAccount(this.taker0, "taker0");
-    this.addAccount(this.taker1, "taker1");
-    this.addAccount(this.royalty1, "royalty1");
-    this.addAccount(this.royalty2, "royalty2");
+    this.addAccount(this.user0, "user0");
+    this.addAccount(this.user1, "user1");
+    this.addAccount(this.user2, "user2");
     this.addAccount(this.integrator, "integrator");
     this.baseBlock = await ethers.provider.getBlockNumber();
   }
@@ -60,7 +54,7 @@ class Data {
         return n + ":" + address.substring(0, 6);
       }
     }
-    return address;
+    return address.substring(0, 20);
   }
   addContract(contract, contractName) {
     const address = contract.address;
@@ -89,7 +83,7 @@ class Data {
             if (a.type == 'address') {
               result = result + this.getShortAccountName(data.args[a.name].toString());
             } else if (a.type == 'uint256' || a.type == 'uint128') {
-              if (a.name == 'tokens' || a.name == 'amount' || a.name == 'balance' || a.name == 'value' || a.name == 'tip') {
+              if (a.name == 'tokens' || a.name == 'amount' || a.name == 'balance' || a.name == 'value' || a.name == 'integratorTip' || a.name == 'remainingTip') {
                 result = result + ethers.utils.formatUnits(data.args[a.name], 18);
               } else {
                 result = result + data.args[a.name].toString();
@@ -133,75 +127,103 @@ class Data {
     return o;
   }
 
-  async setWeth(weth) {
-    this.weth = weth;
-    this.addContract(weth, "WETH");
+  async setERC721Mock(erc721Mock) {
+    this.erc721Mock = erc721Mock;
+    this.addContract(erc721Mock, "ERC721Mock");
   }
-  async setRoyaltyEngine(royaltyEngine) {
-    this.royaltyEngine = royaltyEngine;
-    this.addContract(royaltyEngine, "RoyaltyEngine");
+  async setUmswapFactory(umswapFactory) {
+    this.umswapFactory = umswapFactory;
+    this.addContract(umswapFactory, "UmswapFactory");
   }
-  async setNFTA(nftA) {
-    this.nftA = nftA;
-    this.addContract(nftA, "NFTA");
-  }
-  async setNFTB(nftB) {
-    this.nftB = nftB;
-    this.addContract(nftB, "NFTB");
-  }
-  async setNix(nix) {
-    this.nix = nix;
-    this.addContract(nix, "Nix");
-  }
-  async setNixHelper(nixHelper) {
-    this.nixHelper = nixHelper;
-    this.addContract(nixHelper, "NixHelper");
+  async setUmswap(umswap) {
+    this.umswap = umswap;
+    this.addContract(umswap, "Umswap");
   }
 
   async printState(prefix) {
-    console.log("        --- " + prefix + " ---");
-    let totalSupplyA = 0;
-    let totalSupplyB = 0;
-    const ownersA = {};
-    const ownersB = {};
-    if (this.nftA != null) {
-      totalSupplyA = await this.nftA.totalSupply();
-      for (let i = 0; i < totalSupplyA; i++) {
-        const ownerOf = await this.nftA.ownerOf(i);
-        if (!ownersA[ownerOf]) {
-          ownersA[ownerOf] = [];
+    console.log("\n        --- " + prefix + " ---");
+
+    let erc721TotalSupply = 0;
+    const owners = {};
+    if (this.erc721Mock != null) {
+      erc721TotalSupply = await this.erc721Mock.totalSupply();
+      for (let i = 0; i < erc721TotalSupply; i++) {
+        const tokenId = await this.erc721Mock.tokenByIndex(i);
+        const ownerOf = await this.erc721Mock.ownerOf(tokenId);
+        if (!owners[ownerOf]) {
+          owners[ownerOf] = [];
         }
-        ownersA[ownerOf].push(i);
+        owners[ownerOf].push(parseInt(tokenId));
       }
     }
-    if (this.nftB != null) {
-      totalSupplyB = await this.nftB.totalSupply();
-      for (let i = 0; i < totalSupplyB; i++) {
-        const ownerOf = await this.nftB.ownerOf(i);
-        if (!ownersB[ownerOf]) {
-          ownersB[ownerOf] = [];
-        }
-        ownersB[ownerOf].push(i);
-      }
+    let umswapSymbol = "??????";
+    let umswapTotalSupply = 0;
+    let umswapDecimals = null;
+    if (this.umswap != null) {
+      umswapSymbol = await this.umswap.symbol();
+      umswapTotalSupply = ethers.utils.formatEther(await this.umswap.totalSupply());
+      umswapDecimals = await this.umswap.decimals();
     }
-    console.log("          Account                               ETH                 WETH " + this.padRight(await this.nftA.symbol() + " (" + totalSupplyA + ")", 26) + this.padRight(await this.nftB.symbol() + " (" + totalSupplyB + ")", 26) );
-    console.log("          -------------------- -------------------- -------------------- ------------------------- -------------------------");
-    const checkAccounts = [this.deployer, this.maker0, this.maker1, this.taker0, this.taker1, this.royalty1, this.royalty2, this.integrator];
-    if (this.nix != null) {
-      checkAccounts.push(this.nix.address);
+    let umswapTitle = umswapSymbol.toString().substring(0, 10) + " (" + umswapDecimals + ") " + umswapTotalSupply;
+    if (umswapTitle.length < 23) {
+      umswapTitle = " ".repeat(23 - umswapTitle.length) + umswapTitle;
     }
-    if (this.nixHelper != null) {
-      checkAccounts.push(this.nixHelper.address);
+
+    console.log("          Account                                   ETH " + umswapTitle + " " + this.padRight(await this.erc721Mock.symbol() + " (" + erc721TotalSupply + ")", 25));
+    console.log("          -------------------- ------------------------ ----------------------- ---------------------------------------------");
+    const checkAccounts = [this.deployer, this.user0, this.user1, this.user2, this.integrator];
+    if (this.umswapFactory != null) {
+      checkAccounts.push(this.umswapFactory.address);
+    }
+    if (this.umswap != null) {
+      checkAccounts.push(this.umswap.address);
     }
     for (let i = 0; i < checkAccounts.length; i++) {
-      const ownerDataA = ownersA[checkAccounts[i]] || [];
-      const ownerDataB = ownersB[checkAccounts[i]] || [];
-      const balance = await ethers.provider.getBalance(checkAccounts[i]);
-      const wethBalance = this.weth == null ? 0 : await this.weth.balanceOf(checkAccounts[i]);
-      console.log("          " + this.padRight(this.getShortAccountName(checkAccounts[i]), 20) + " " + this.padLeft(ethers.utils.formatEther(balance), 20) + " " + this.padLeft(ethers.utils.formatEther(wethBalance), 20) + " " + this.padRight(JSON.stringify(ownerDataA), 25) + " " + JSON.stringify(ownerDataB));
+      const ownerData = owners[checkAccounts[i]] || [];
+      const erc721Balance = await ethers.provider.getBalance(checkAccounts[i]);
+      const umswapBalance = this.umswap != null ? await this.umswap.balanceOf(checkAccounts[i]) : 0;
+      console.log("          " + this.padRight(this.getShortAccountName(checkAccounts[i]), 20) + " " + this.padLeft(ethers.utils.formatEther(erc721Balance), 24) + " " + this.padLeft(ethers.utils.formatEther(umswapBalance), 23) + " " + this.padRight(JSON.stringify(ownerData), 25));
     }
     console.log();
 
+    if (this.umswapFactory != null) {
+      const getUmswapsLength = await this.umswapFactory.getUmswapsLength();
+      let indices = generateRange(0, getUmswapsLength - 1, 1);
+      const getUmswaps = await this.umswapFactory.getUmswaps(this.user0, indices);
+      // console.log("getUmswaps: " + JSON.stringify(getUmswaps, null, 2));
+      console.log("            # Address              Creator              Symbol   Name                           ERC-721 Collection     User0 Balance     TotalSupply   In  Out  Rts  Rt# Aprv TokenIds                      ");
+      console.log("          --- -------------------- -------------------- -------- ------------------------------ -------------------- --------------- --------------- ---- ---- ---- ---- ---- ------------------------------");
+      for (let i = 0; i < getUmswaps[0].length; i++) {
+        const stats = getUmswaps[7][i];
+        // console.log("stats: " + JSON.stringify(stats, null, 2));
+        // console.log("stats[0]: " + stats[0]);
+        const ratingsLength = stats[5];
+        console.log("          " + this.padLeft(i, 3) + " " + this.padRight(this.getShortAccountName(getUmswaps[0][i]), 20) + " " +
+          this.padRight(this.getShortAccountName(getUmswaps[6][i]), 20) + " " + getUmswaps[1][i] + " " +
+          this.padRight(getUmswaps[2][i], 30) + " " +
+          this.padRight(this.getShortAccountName(getUmswaps[3][i]), 20) + " " +
+          this.padLeft(ethers.utils.formatEther(stats[3]), 15) + " " +
+          this.padLeft(ethers.utils.formatEther(stats[4]), 15) + " " +
+          this.padLeft(stats[0], 4) + " " +
+          this.padLeft(stats[1], 4) + " " +
+          this.padLeft(stats[2], 4) + " " +
+          this.padLeft(ratingsLength, 4) + " " +
+          this.padLeft(stats[6], 4) + " " +
+          this.padRight(JSON.stringify(getUmswaps[4][i].map((x) => { return parseInt(x.toString()); })) + "/" + JSON.stringify(getUmswaps[5][i].map((x) => { return parseInt(x.toString()); })), 30)
+        );
+        if (ratingsLength > 0 && i == 0 && this.umswap != null) {
+          console.log();
+          const indices = generateRange(0, ratingsLength - 1, 1);
+          const ratings = await this.umswap.getRatings(indices);
+          for (let j = 0; j < ratings.length; j++) {
+            console.log("          " + this.getShortAccountName(ratings[j][0], 20) + " rated " + ratings[j][1]);
+          }
+        }
+      }
+      console.log();
+    }
+
+    if (false) {
     if (this.nix != null) {
       const tokensLength = (await this.nix.getLengths())[0];
       if (tokensLength > 0) {
@@ -269,7 +291,10 @@ class Data {
       // }
     }
   }
+  }
 }
+
+const generateRange = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step));
 
 /* Exporting the module */
 module.exports = {
@@ -278,5 +303,6 @@ module.exports = {
     ANYORALL,
     BUYORSELLSTRING,
     ANYORALLSTRING,
-    Data
+    Data,
+    generateRange
 }

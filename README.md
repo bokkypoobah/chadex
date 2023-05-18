@@ -14,6 +14,10 @@ https://docs.openzeppelin.com/test-helpers/0.5/
 npm install --save-dev @openzeppelin/test-helpers
 npm install --save-dev solidity-coverage
 
+npm install --save-dev @nomiclabs/hardhat-ethers 'ethers@^5.0.0'
+
+
+
 **Coverage**
 
 Run coverage reports using the command
