@@ -6,51 +6,61 @@ const util = require('util');
 
 let data;
 
-describe("umswap", function () {
+describe("Dexz", function () {
   const DETAILS = 1;
 
   beforeEach(async function () {
     console.log();
     console.log("      beforeEach");
-    const ERC721Mock  = await ethers.getContractFactory("ERC721Mock");
-    const UmswapFactory  = await ethers.getContractFactory("UmswapFactory");
+    const Token  = await ethers.getContractFactory("Token");
+    const Dexz  = await ethers.getContractFactory("Dexz");
     data = new Data();
     await data.init();
 
     console.log("        --- Setup Accounts, NFT and Umswap Contracts - Assuming gasPrice: " + ethers.utils.formatUnits(data.gasPrice, "gwei") + " gwei, ethUsd: " + ethers.utils.formatUnits(data.ethUsd, 18) + " ---");
 
-    const erc721Mock = await ERC721Mock.deploy("ERC721Mock", "ERC721MOCK");
-    await erc721Mock.deployed();
-    await data.setERC721Mock(erc721Mock);
-    const erc721MockReceipt = await data.erc721Mock.deployTransaction.wait();
+    const token0 = await Token.deploy("TOK0", "Token0", 18, "1234567890123456789012");
+    await token0.deployed();
+    await data.setToken0(token0);
+    const token0Receipt = await data.token0.deployTransaction.wait();
     if (DETAILS > 0) {
-      await data.printEvents("Deployed ERC721Mock", erc721MockReceipt);
+      await data.printEvents("Deployed Token0", token0Receipt);
     }
-    console.log("        erc721Mock deployed");
+    console.log("        token0 deployed");
 
-    const umswapFactory = await UmswapFactory.deploy();
-    await umswapFactory.deployed();
-    await data.setUmswapFactory(umswapFactory);
-    const umswapFactoryReceipt = await data.umswapFactory.deployTransaction.wait();
+    const token1 = await Token.deploy("TOK1", "Token1", 18, "2345678901234567890123");
+    await token1.deployed();
+    await data.setToken1(token1);
+    const token1Receipt = await data.token1.deployTransaction.wait();
     if (DETAILS > 0) {
-      await data.printEvents("Deployed UmswapFactory", umswapFactoryReceipt);
+      await data.printEvents("Deployed Token1", token1Receipt);
     }
-    console.log("        UmswapFactory deployed");
+    console.log("        token1 deployed");
 
-    const setup1 = [];
-    setup1.push(data.erc721Mock.mint(data.user0, 111));
-    setup1.push(data.erc721Mock.mint(data.user0, 222));
-    setup1.push(data.erc721Mock.mint(data.user0, 333));
-    setup1.push(data.erc721Mock.mint(data.user1, 444));
-    setup1.push(data.erc721Mock.mint(data.user1, 555));
-    setup1.push(data.erc721Mock.mint(data.user1, 666));
-    const mintATxs = await Promise.all(setup1);
-    if (DETAILS > 0) {
-      mintATxs.forEach( async function (a) {
-        await data.printEvents("Minted ERC721Mock", await a.wait());
-      });
-    }
-    await data.printState("Setup Completed. UmswapFactory bytecode ~" + JSON.stringify(data.umswapFactory.deployTransaction.data.length/2, null, 2));
+
+    // const umswapFactory = await UmswapFactory.deploy();
+    // await umswapFactory.deployed();
+    // await data.setUmswapFactory(umswapFactory);
+    // const umswapFactoryReceipt = await data.umswapFactory.deployTransaction.wait();
+    // if (DETAILS > 0) {
+    //   await data.printEvents("Deployed UmswapFactory", umswapFactoryReceipt);
+    // }
+    // console.log("        UmswapFactory deployed");
+    //
+    // const setup1 = [];
+    // setup1.push(data.erc721Mock.mint(data.user0, 111));
+    // setup1.push(data.erc721Mock.mint(data.user0, 222));
+    // setup1.push(data.erc721Mock.mint(data.user0, 333));
+    // setup1.push(data.erc721Mock.mint(data.user1, 444));
+    // setup1.push(data.erc721Mock.mint(data.user1, 555));
+    // setup1.push(data.erc721Mock.mint(data.user1, 666));
+    // const mintATxs = await Promise.all(setup1);
+    // if (DETAILS > 0) {
+    //   mintATxs.forEach( async function (a) {
+    //     await data.printEvents("Minted ERC721Mock", await a.wait());
+    //   });
+    // }
+    // await data.printState("Setup Completed. UmswapFactory bytecode ~" + JSON.stringify(data.umswapFactory.deployTransaction.data.length/2, null, 2));
   });
 
   it("00. Test 00", async function () {

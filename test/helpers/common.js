@@ -16,6 +16,9 @@ class Data {
     this.accountNames = {};
     this.contracts = [];
 
+    this.token0 = null;
+    this.token1 = null;
+
     this.erc721Mock = null;
     this.umswapFactory = null;
     this.umswap = null;
@@ -125,6 +128,15 @@ class Data {
       o = o + " ";
     }
     return o;
+  }
+
+  async setToken0(token) {
+    this.token0 = token;
+    this.addContract(token, "Token0");
+  }
+  async setToken1(token) {
+    this.token1 = token;
+    this.addContract(token, "Token1");
   }
 
   async setERC721Mock(erc721Mock) {
