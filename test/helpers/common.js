@@ -32,15 +32,15 @@ class Data {
   }
 
   async init() {
-    [this.deployerSigner, this.user0Signer, this.user1Signer, this.user2Signer, this.integratorSigner, this.feeAccountSigner] = await ethers.getSigners();
-    [this.deployer, this.user0, this.user1, this.user2, this.integrator, this.feeAccount] = await Promise.all([this.deployerSigner.getAddress(), this.user0Signer.getAddress(), this.user1Signer.getAddress(), this.user2Signer.getAddress(), this.integratorSigner.getAddress(), this.feeAccountSigner.getAddress()]);
+    [this.deployerSigner, this.user0Signer, this.user1Signer, this.user2Signer, this.user3Signer, this.feeAccountSigner] = await ethers.getSigners();
+    [this.deployer, this.user0, this.user1, this.user2, this.user3, this.feeAccount] = await Promise.all([this.deployerSigner.getAddress(), this.user0Signer.getAddress(), this.user1Signer.getAddress(), this.user2Signer.getAddress(), this.user3Signer.getAddress(), this.feeAccountSigner.getAddress()]);
 
     this.addAccount("0x0000000000000000000000000000000000000000", "null");
     this.addAccount(this.deployer, "deployer");
     this.addAccount(this.user0, "user0");
     this.addAccount(this.user1, "user1");
     this.addAccount(this.user2, "user2");
-    this.addAccount(this.integrator, "integrator");
+    this.addAccount(this.user3, "user3");
     this.addAccount(this.feeAccount, "feeAccount");
     this.baseBlock = await ethers.provider.getBlockNumber();
   }
@@ -162,46 +162,43 @@ class Data {
   async printState(prefix) {
     console.log("\n        --- " + prefix + " ---");
 
-    let erc721TotalSupply = 0;
-    const owners = {};
-    if (this.erc721Mock != null) {
-      erc721TotalSupply = await this.erc721Mock.totalSupply();
-      for (let i = 0; i < erc721TotalSupply; i++) {
-        const tokenId = await this.erc721Mock.tokenByIndex(i);
-        const ownerOf = await this.erc721Mock.ownerOf(tokenId);
-        if (!owners[ownerOf]) {
-          owners[ownerOf] = [];
-        }
-        owners[ownerOf].push(parseInt(tokenId));
-      }
-    }
-    let umswapSymbol = "??????";
-    let umswapTotalSupply = 0;
-    let umswapDecimals = null;
-    if (this.umswap != null) {
-      umswapSymbol = await this.umswap.symbol();
-      umswapTotalSupply = ethers.utils.formatEther(await this.umswap.totalSupply());
-      umswapDecimals = await this.umswap.decimals();
-    }
-    let umswapTitle = umswapSymbol.toString().substring(0, 10) + " (" + umswapDecimals + ") " + umswapTotalSupply;
-    if (umswapTitle.length < 23) {
-      umswapTitle = " ".repeat(23 - umswapTitle.length) + umswapTitle;
-    }
+    // let erc721TotalSupply = 0;
+    // const owners = {};
+    // if (this.erc721Mock != null) {
+    //   erc721TotalSupply = await this.erc721Mock.totalSupply();
+    //   for (let i = 0; i < erc721TotalSupply; i++) {
+    //     const tokenId = await this.erc721Mock.tokenByIndex(i);
+    //     const ownerOf = await this.erc721Mock.ownerOf(tokenId);
+    //     if (!owners[ownerOf]) {
+    //       owners[ownerOf] = [];
+    //     }
+    //     owners[ownerOf].push(parseInt(tokenId));
+    //   }
+    // }
+    // let umswapSymbol = "??????";
+    // let umswapTotalSupply = 0;
+    // let umswapDecimals = null;
+    // if (this.umswap != null) {
+    //   umswapSymbol = await this.umswap.symbol();
+    //   umswapTotalSupply = ethers.utils.formatEther(await this.umswap.totalSupply());
+    //   umswapDecimals = await this.umswap.decimals();
+    // }
+    // let umswapTitle = umswapSymbol.toString().substring(0, 10) + " (" + umswapDecimals + ") " + umswapTotalSupply;
+    // if (umswapTitle.length < 23) {
+    //   umswapTitle = " ".repeat(23 - umswapTitle.length) + umswapTitle;
+    // }
 
-    console.log("          Account                                   ETH " + umswapTitle + " " + this.padRight(await this.erc721Mock.symbol() + " (" + erc721TotalSupply + ")", 25));
+    console.log("          Account                                   ETH " + this.padRight(await this.token0.symbol() + " (" + 'erc721TotalSupply' + ")", 25));
     console.log("          -------------------- ------------------------ ----------------------- ---------------------------------------------");
-    const checkAccounts = [this.deployer, this.user0, this.user1, this.user2, this.integrator];
-    if (this.umswapFactory != null) {
-      checkAccounts.push(this.umswapFactory.address);
-    }
-    if (this.umswap != null) {
-      checkAccounts.push(this.umswap.address);
+    const checkAccounts = [this.deployer, this.user0, this.user1, this.user2, this.user3, this.feeAccount];
+    if (this.dexz != null) {
+      checkAccounts.push(this.dexz.address);
     }
     for (let i = 0; i < checkAccounts.length; i++) {
-      const ownerData = owners[checkAccounts[i]] || [];
-      const erc721Balance = await ethers.provider.getBalance(checkAccounts[i]);
-      const umswapBalance = this.umswap != null ? await this.umswap.balanceOf(checkAccounts[i]) : 0;
-      console.log("          " + this.padRight(this.getShortAccountName(checkAccounts[i]), 20) + " " + this.padLeft(ethers.utils.formatEther(erc721Balance), 24) + " " + this.padLeft(ethers.utils.formatEther(umswapBalance), 23) + " " + this.padRight(JSON.stringify(ownerData), 25));
+      const balance = await ethers.provider.getBalance(checkAccounts[i]);
+      const token0Balance = this.token0 == null ? 0 : await this.token0.balanceOf(checkAccounts[i]);
+      const token1Balance = this.token1 == null ? 0 : await this.token1.balanceOf(checkAccounts[i]);
+      console.log("          " + this.padRight(this.getShortAccountName(checkAccounts[i]), 20) + " " + this.padLeft(ethers.utils.formatEther(balance), 24) + " " + this.padLeft(ethers.utils.formatEther(token0Balance), 24) + " " + this.padLeft(ethers.utils.formatEther(token1Balance), 24));
     }
     console.log();
 

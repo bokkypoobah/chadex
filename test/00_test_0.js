@@ -50,9 +50,10 @@ describe("Dexz", function () {
     setup1.push(token0.transfer(data.user0, ethers.utils.parseEther("100")));
     setup1.push(token0.transfer(data.user1, ethers.utils.parseEther("100")));
     setup1.push(token0.transfer(data.user2, ethers.utils.parseEther("100")));
-    const [transferToken00Tx, transferToken01Tx, transferToken02Tx] = await Promise.all(setup1);
+    setup1.push(token0.transfer(data.user3, ethers.utils.parseEther("100")));
+    const [transferToken00Tx, transferToken01Tx, transferToken02Tx, transferToken03Tx] = await Promise.all(setup1);
     if (DETAILS > 0) {
-      [transferToken00Tx, transferToken01Tx, transferToken02Tx].forEach( async function (a) {
+      [transferToken00Tx, transferToken01Tx, transferToken02Tx, transferToken03Tx].forEach( async function (a) {
         await data.printEvents("Transfer Token0", await a.wait());
       });
     }
@@ -79,7 +80,7 @@ describe("Dexz", function () {
     //     await data.printEvents("Minted ERC721Mock", await a.wait());
     //   });
     // }
-    // await data.printState("Setup Completed. UmswapFactory bytecode ~" + JSON.stringify(data.umswapFactory.deployTransaction.data.length/2, null, 2));
+    await data.printState("Setup Completed. Dexz bytecode ~" + JSON.stringify(data.dexz.deployTransaction.data.length/2, null, 2));
   });
 
   it("00. Test 00", async function () {
