@@ -85,7 +85,6 @@ describe("Dexz", function () {
     await data.printEvents("user1->token1.approve(dexz, " + approveAmount + ")", await approve11Tx.wait());
     //   await data.printState("user0 approved user1 to transfer " + approveAmount + " umswaps");
 
-
     await data.printState("Setup Completed. Dexz bytecode ~" + JSON.stringify(data.dexz.deployTransaction.data.length/2, null, 2));
   });
 
@@ -110,10 +109,12 @@ describe("Dexz", function () {
     // const trade2bTx = await data.dexz.connect(data.user1Signer).trade(BUY, data.token0.address, data.token1.address, price2, expiry, baseTokens, data.feeAccount);
     // await data.printEvents("user1->dexz.trade(BUY, token0, token1, 0.6902, expiry, baseTokens, feeAccount)", await trade2bTx.wait());
 
+    await data.printState("After Adding An Order");
+
     const trade2sTx = await data.dexz.connect(data.user1Signer).trade(SELL, data.token0.address, data.token1.address, price1, expiry, baseTokens, data.feeAccount);
     await data.printEvents("user1->dexz.trade(SELL, token0, token1, 0.6901, expiry, baseTokens, feeAccount)", await trade2sTx.wait());
 
-    await data.printState("After Adding An Order");
+    await data.printState("After Executing Against An Order");
 
 
 
