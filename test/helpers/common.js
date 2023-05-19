@@ -255,7 +255,7 @@ class Data {
               var minutes = (order[7] - new Date() / 1000) / 60;
               console.log("                Order key=" + orderKey.substring(0, 10) + " prev=" + order[0].substring(0, 10) + " next=" + order[1].substring(0, 10) +
                 (parseInt(order[2]) == 1 ? " Sell": " Buy") + " maker=" + this.getShortAccountName(order[3]) +
-                " base=" + this.getShortAccountName(order[4]) + " quote=" + this.getShortAccountName(order[5]) + " price=" + ethers.utils.formatEther(order[6]) +
+                " base=" + this.getShortAccountName(order[4]) + " quote=" + this.getShortAccountName(order[5]) + " price=" + ethers.utils.formatUnits(order[6], 9) +
                 " expiry=" + minutes.toFixed(2) + "s baseTokens=" + ethers.utils.formatEther(order[8]) + " baseTokensFilled=" + ethers.utils.formatEther(order[9]));
               orderKey = order[1];
             }

@@ -69,6 +69,9 @@ contract DexzBase is Owned {
     uint constant public TENPOW9 = uint(10)**9;
     uint constant public TENPOW18 = uint(10)**18;
 
+    uint64 public constant PRICE_MIN = 1;
+    uint64 public constant PRICE_MAX = 999_999_999_999_999_999; // max(uint64)=18,446,744,073,709,551,616
+
     uint public deploymentBlockNumber;
     uint public takerFeeInEthers = 5 * 10 ** 16; // 0.05 ETH
     uint public takerFeeInTokens = 10 * uint(10)**14; // 0.10%
