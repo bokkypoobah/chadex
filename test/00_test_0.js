@@ -92,6 +92,10 @@ describe("Dexz", function () {
     await data.printEvents("user0->dexz.trade(BUY, token0, token1, 0.019, expiry, baseTokens, feeAccount)", await trade1Tx.wait());
     await data.printState("After Adding An Order");
 
+    const trade2Tx = await data.dexz.connect(data.user1Signer).trade(SELL, data.token0.address, data.token1.address, price, expiry, baseTokens, data.feeAccount);
+    await data.printEvents("user1->dexz.trade(BUY, token0, token1, 0.019, expiry, baseTokens, feeAccount)", await trade2Tx.wait());
+    await data.printState("After Adding An Order");
+
 
 
 
