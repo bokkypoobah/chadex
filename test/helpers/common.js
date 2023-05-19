@@ -191,7 +191,7 @@ class Data {
     console.log("          Account                                   ETH " + this.padLeft(await this.token0.symbol(), 24) + " " + this.padLeft(await this.token1.symbol(), 24) + " Blah");
     console.log("          -------------------- ------------------------ ------------------------ ------------------------ ---------------------------------------------");
     const checkAccounts = [this.deployer, this.user0, this.user1, this.user2, this.user3, this.feeAccount];
-    if (this.dexz != null) {
+    if (this.dexz) {
       checkAccounts.push(this.dexz.address);
     }
     for (let i = 0; i < checkAccounts.length; i++) {
@@ -214,10 +214,12 @@ class Data {
       const deploymentBlockNumber = await this.dexz.deploymentBlockNumber();
       const takerFeeInEthers = await this.dexz.takerFeeInEthers();
       const takerFeeInTokens = await this.dexz.takerFeeInTokens();
+      const feeAccount = await this.dexz.feeAccount();
       console.log("          - owner: " + this.getShortAccountName(owner));
       console.log("          - deploymentBlockNumber: " + deploymentBlockNumber);
       console.log("          - takerFeeInEthers: " + ethers.utils.formatEther(takerFeeInEthers));
       console.log("          - takerFeeInTokens: " + ethers.utils.formatUnits(takerFeeInTokens, 16) + "%");
+      console.log("          - feeAccount: " + this.getShortAccountName(feeAccount));
       console.log();
     }
 
