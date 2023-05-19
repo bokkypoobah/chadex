@@ -218,28 +218,22 @@ class Data {
       const tokenListLength = parseInt(await this.dexz.tokenListLength());
       const accountListLength = parseInt(await this.dexz.accountListLength());
       const pairInfoListLength = parseInt(await this.dexz.pairInfoListLength());
-      // const feeAccount = await this.dexz.feeAccount();
-      // const feeAccount = await this.dexz.feeAccount();
-      // const feeAccount = await this.dexz.feeAccount();
 
       console.log("          - owner: " + this.getShortAccountName(owner));
       console.log("          - deploymentBlockNumber: " + deploymentBlockNumber);
       console.log("          - takerFeeInEthers: " + ethers.utils.formatEther(takerFeeInEthers));
       console.log("          - takerFeeInTokens: " + ethers.utils.formatUnits(takerFeeInTokens, 16) + "%");
       console.log("          - feeAccount: " + this.getShortAccountName(feeAccount));
-      console.log("          - tokenListLength: " + tokenListLength);
       for (let j = 0; j < tokenListLength; j++) {
-        console.log("            - tokenListLength[" + j + "]: " + this.getShortAccountName(await this.dexz.tokenList(j)));
+        console.log("          - tokenListLength[" + j + "]: " + this.getShortAccountName(await this.dexz.tokenList(j)));
       }
-      console.log("          - accountListLength: " + accountListLength);
       for (let j = 0; j < accountListLength; j++) {
-        console.log("            - accountListLength[" + j + "]: " + this.getShortAccountName(await this.dexz.accountList(j)));
+        console.log("          - accountListLength[" + j + "]: " + this.getShortAccountName(await this.dexz.accountList(j)));
       }
-      console.log("          - pairInfoListLength: " + pairInfoListLength);
       const pairInfos = [];
       for (let j = 0; j < pairInfoListLength; j++) {
         const info = await this.dexz.pairInfoList(j)
-        console.log("            - pairInfoListLength[" + j + "]: " + info[0] + ", baseToken: " + this.getShortAccountName(info[1]) + ", quoteToken: " + this.getShortAccountName(info[2]));
+        console.log("          - pairInfoListLength[" + j + "]: " + info[0] + ", baseToken: " + this.getShortAccountName(info[1]) + ", quoteToken: " + this.getShortAccountName(info[2]));
         pairInfos.push({ pairKey: info[0], baseToken: info[1], quoteToken: info[2] })
       }
       console.log();
@@ -247,17 +241,13 @@ class Data {
       for (let j = 0; j < pairInfos.length; j++) {
         const pair = pairInfos[j];
         console.log("          ----- Pair " + pair.pairKey + " " + this.getShortAccountName(pair.baseToken) + "/" + this.getShortAccountName(pair.quoteToken) + " -----");
-
         for (let buySell = 0; buySell < 2; buySell++) {
           console.log("            --- " + (buySell == 0 ? "Buy" : "Sell") + " Orders ---");
           let orderPriceKey = 0;
           orderPriceKey = await this.dexz.getBestPrice(pair.pairKey, buySell);
-          // orderPriceKey = await this.dexz.next(pair.pairKey, buySell, orderPriceKey);
-          // console.log("orderPriceKey: " + orderPriceKey);
           while (orderPriceKey != 0) {
             console.log("              orderPriceKey: " + ethers.utils.formatEther(orderPriceKey));
             var orderQueue = await this.dexz.getOrderQueue(pair.pairKey, buySell, orderPriceKey);
-            // console.log("                orderQueue: " + JSON.stringify(orderQueue));
             // console.log("                  Price: " + ethers.utils.formatEther(orderPriceKey) + " head=" + orderQueue[1].substring(0, 18) + " tail=" + orderQueue[2].substring(0, 18));
             let orderKey = orderQueue[1];
             while (orderKey != 0) {
@@ -273,8 +263,6 @@ class Data {
           }
         }
       }
-
-
       console.log();
     }
 

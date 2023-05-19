@@ -48,10 +48,7 @@
           - takerFeeInEthers: 0.05
           - takerFeeInTokens: 0.1%
           - feeAccount: feeAccount:0x9965
-          - tokenListLength: 0
-          - accountListLength: 1
-            - accountListLength[0]: Dexz:0x9fE4
-          - pairInfoListLength: 0
+          - accountListLength[0]: Dexz:0x9fE4
 
 
       00. Test 00 - Happy Path - Specified Set
@@ -63,21 +60,21 @@
           + Dexz:0x9fE4 12.4 AccountAdded(account: user0:0x7099)
           + Dexz:0x9fE4 12.5 PairAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1)
           + Dexz:0x9fE4 12.6 LogInfo(topic: orders addKey RBT adding , number: 690100000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 12.7 LogInfo(topic: orders addData  first, number: 0, data: 0x1b38c93424caaa3a32cc15ffb5636e52edbf065c64c41f67c3bd52edaf83a29e, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 12.8 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x1b38c93424caaa3a32cc15ffb5636e52edbf065c64c41f67c3bd52edaf83a29e, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690100000000000000, expiry: 1684473950, baseTokens: 1000000000000000000)
+          + Dexz:0x9fE4 12.7 LogInfo(topic: orders addData  first, number: 0, data: 0x79a19ea61f382a3e303fef5294727bb2c4a576c75475af06317137ac900f06ba, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 12.8 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x79a19ea61f382a3e303fef5294727bb2c4a576c75475af06317137ac900f06ba, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690100000000000000, expiry: 1684474255, baseTokens: 1000000000000000000)
         > user0->dexz.trade(BUY, token0, token1, 0.6902, expiry, baseTokens, feeAccount) - gasUsed: 339982 ~ ETH 0.01359928 ~ USD 27
           + Dexz:0x9fE4 13.0 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
           + Dexz:0x9fE4 13.1 LogInfo(topic: _trade: matchingOrderKey, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
           + Dexz:0x9fE4 13.2 LogInfo(topic: orders addKey RBT adding , number: 690200000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 13.3 LogInfo(topic: orders addData  first, number: 0, data: 0x326fd6e9ea9f0d8bc2b1e22848a0c7e5982c89ec212ab2cb55855fd316f044fb, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 13.4 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x326fd6e9ea9f0d8bc2b1e22848a0c7e5982c89ec212ab2cb55855fd316f044fb, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690200000000000000, expiry: 1684473950, baseTokens: 1000000000000000000)
+          + Dexz:0x9fE4 13.3 LogInfo(topic: orders addData  first, number: 0, data: 0x521ba1cc8ec82ecee565cf2c843bba66ad6ca8294581f23991b0af5a5215614c, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 13.4 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x521ba1cc8ec82ecee565cf2c843bba66ad6ca8294581f23991b0af5a5215614c, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690200000000000000, expiry: 1684474255, baseTokens: 1000000000000000000)
         > user1->dexz.trade(BUY, token0, token1, 0.6902, expiry, baseTokens, feeAccount) - gasUsed: 297668 ~ ETH 0.01190672 ~ USD 23
           + Dexz:0x9fE4 14.0 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
           + Dexz:0x9fE4 14.1 LogInfo(topic: _trade: matchingOrderKey, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
           + Dexz:0x9fE4 14.2 AccountAdded(account: user1:0x3C44)
           + Dexz:0x9fE4 14.3 LogInfo(topic: orders addKey RBT exists , number: 690200000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 14.4 LogInfo(topic: orders addData !first, number: 0, data: 0x5a6374b04bd78561862c3c5728d0978d3c549d18958deba1a3dc59abb09f4398, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 14.5 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x5a6374b04bd78561862c3c5728d0978d3c549d18958deba1a3dc59abb09f4398, orderType: 0, maker: user1:0x3C44, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690200000000000000, expiry: 1684473950, baseTokens: 1000000000000000000)
+          + Dexz:0x9fE4 14.4 LogInfo(topic: orders addData !first, number: 0, data: 0xc79afd4a8eaa32a6a3ab403e3038ecacefc4c2077347331e14602e9a2fe2d126, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 14.5 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0xc79afd4a8eaa32a6a3ab403e3038ecacefc4c2077347331e14602e9a2fe2d126, orderType: 0, maker: user1:0x3C44, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690200000000000000, expiry: 1684474255, baseTokens: 1000000000000000000)
 
         --- After Adding An Order ---
           Account                                   ETH                     TOK0                     TOK1 Blah
@@ -96,26 +93,23 @@
           - takerFeeInEthers: 0.05
           - takerFeeInTokens: 0.1%
           - feeAccount: feeAccount:0x9965
-          - tokenListLength: 2
-            - tokenListLength[0]: Token0:0x5FbD
-            - tokenListLength[1]: Token1:0xe7f1
-          - accountListLength: 3
-            - accountListLength[0]: Dexz:0x9fE4
-            - accountListLength[1]: user0:0x7099
-            - accountListLength[2]: user1:0x3C44
-          - pairInfoListLength: 1
-            - pairInfoListLength[0]: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1
+          - tokenListLength[0]: Token0:0x5FbD
+          - tokenListLength[1]: Token1:0xe7f1
+          - accountListLength[0]: Dexz:0x9fE4
+          - accountListLength[1]: user0:0x7099
+          - accountListLength[2]: user1:0x3C44
+          - pairInfoListLength[0]: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1
 
           ----- Pair 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156 Token0:0x5FbD/Token1:0xe7f1 -----
             --- Buy Orders ---
               orderPriceKey: 0.6901
-                Order key=0x1b38c934 prev=0x00000000 next=0x00000000 Buy maker=user0:0x7099 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.6901 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
+                Order key=0x79a19ea6 prev=0x00000000 next=0x00000000 Buy maker=user0:0x7099 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.6901 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
               orderPriceKey: 0.6902
-                Order key=0x326fd6e9 prev=0x00000000 next=0x5a6374b0 Buy maker=user0:0x7099 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.6902 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
-                Order key=0x5a6374b0 prev=0x326fd6e9 next=0x00000000 Buy maker=user1:0x3C44 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.6902 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
+                Order key=0x521ba1cc prev=0x00000000 next=0xc79afd4a Buy maker=user0:0x7099 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.6902 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
+                Order key=0xc79afd4a prev=0x521ba1cc next=0x00000000 Buy maker=user1:0x3C44 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.6902 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
             --- Sell Orders ---
 
-    ✔ 00. Test 00 (127ms)
+    ✔ 00. Test 00 (117ms)
     - 00. Test 00
     - 01. Test 01
     - 02. Test 02
@@ -124,6 +118,6 @@
     - 05. Test 05
 
 
-  1 passing (890ms)
+  1 passing (825ms)
   6 pending
 
