@@ -1,3 +1,4 @@
+Compiled 1 Solidity file successfully
 
 
   Dexz
@@ -63,15 +64,15 @@
           + Dexz:0x9fE4 12.4 AccountAdded(account: user0:0x7099)
           + Dexz:0x9fE4 12.5 PairAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1)
           + Dexz:0x9fE4 12.6 LogInfo(topic: orders addKey RBT adding , number: 690100000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 12.7 LogInfo(topic: orders addData  first, number: 0, data: 0x724aaf66c895b744af3029c3ba4891be53819e7f4e2c2e5606ff59294e6a06e3, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 12.8 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x724aaf66c895b744af3029c3ba4891be53819e7f4e2c2e5606ff59294e6a06e3, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690100000000000000, expiry: 1684469311, baseTokens: 1000000000000000000)
+          + Dexz:0x9fE4 12.7 LogInfo(topic: orders addData  first, number: 0, data: 0x6d227f1fcbea6f49301c66cbe260a5d7bbb04918223df7da7930ba9d0eca201f, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 12.8 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x6d227f1fcbea6f49301c66cbe260a5d7bbb04918223df7da7930ba9d0eca201f, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690100000000000000, expiry: 1684471191, baseTokens: 1000000000000000000)
         > user1->dexz.trade(BUY, token0, token1, 0.6902, expiry, baseTokens, feeAccount) - gasUsed: 388382 ~ ETH 0.01553528 ~ USD 31
           + Dexz:0x9fE4 13.0 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
           + Dexz:0x9fE4 13.1 LogInfo(topic: _trade: matchingOrderKey, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
           + Dexz:0x9fE4 13.2 AccountAdded(account: user1:0x3C44)
           + Dexz:0x9fE4 13.3 LogInfo(topic: orders addKey RBT adding , number: 690200000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 13.4 LogInfo(topic: orders addData  first, number: 0, data: 0x2ad71ec2e079ffd8b1c1a653767e22d4dd17396ee2922d4f163a0e4281a06c7b, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 13.5 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x2ad71ec2e079ffd8b1c1a653767e22d4dd17396ee2922d4f163a0e4281a06c7b, orderType: 0, maker: user1:0x3C44, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690200000000000000, expiry: 1684469311, baseTokens: 1000000000000000000)
+          + Dexz:0x9fE4 13.4 LogInfo(topic: orders addData  first, number: 0, data: 0x145afe19da158a337d3961846072939432eecbcc170e6dfb3e33d798a4882bff, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 13.5 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x145afe19da158a337d3961846072939432eecbcc170e6dfb3e33d798a4882bff, orderType: 0, maker: user1:0x3C44, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690200000000000000, expiry: 1684471191, baseTokens: 1000000000000000000)
 
         --- After Adding An Order ---
           Account                                   ETH                     TOK0                     TOK1 Blah
@@ -102,11 +103,11 @@
 
           ----- Pair 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156 Token0:0x5FbD/Token1:0xe7f1 -----
             --- Buy Orders ---
+orderPriceKey: 690100000000000000
 orderPriceKey: 690200000000000000
             --- Sell Orders ---
-orderPriceKey: 0
 
-    ✔ 00. Test 00 (95ms)
+    ✔ 00. Test 00 (94ms)
     - 00. Test 00
     - 01. Test 01
     - 02. Test 02
@@ -115,6 +116,6 @@ orderPriceKey: 0
     - 05. Test 05
 
 
-  1 passing (808ms)
+  1 passing (815ms)
   6 pending
 

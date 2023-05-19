@@ -251,10 +251,13 @@ class Data {
         for (let buySell = 0; buySell < 2; buySell++) {
           console.log("            --- " + (buySell == 0 ? "Buy" : "Sell") + " Orders ---");
           let orderPriceKey = 0;
-          orderPriceKey = await this.dexz.getNextBestPrice(pair.pairKey, buySell, orderPriceKey);
-          console.log("orderPriceKey: " + orderPriceKey);
+          orderPriceKey = await this.dexz.first(pair.pairKey, buySell);
+          // orderPriceKey = await this.dexz.next(pair.pairKey, buySell, orderPriceKey);
+          // console.log("orderPriceKey: " + orderPriceKey);
           while (orderPriceKey != 0) {
-          //   var orderQueue = contract.getOrderQueue(e.pairKey, buySell, orderPriceKey);
+            console.log("orderPriceKey: " + orderPriceKey);
+            // var orderQueue = this.dexz.getOrderQueue(pair.pairKey, buySell, orderPriceKey);
+            // console.log("orderQueue: " + JSON.stringify(orderQueue));
           //   console.log("RESULT:   Price: " + orderPriceKey.shift(-18) + " head=" + orderQueue[1].substring(0, 18) + " tail=" + orderQueue[2].substring(0, 18));
           //   var orderKey = orderQueue[1];
           //   while (orderKey != 0) {
@@ -267,7 +270,7 @@ class Data {
           //       " expiry=" + minutes.toFixed(2) + "s baseTokens=" + order[8].shift(-18) + " baseTokensFilled=" + order[9].shift(-18));
           //     orderKey = order[1];
           //   }
-            orderPriceKey = await this.dexz.getNextBestPrice(pair.pairKey, buySell, orderPriceKey);
+            orderPriceKey = await this.dexz.next(pair.pairKey, buySell, orderPriceKey);
           }
         }
       }

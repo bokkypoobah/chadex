@@ -275,13 +275,13 @@ contract Orders is DexzBase {
 
 
     function getBestPrice(bytes32 _pairKey, uint _orderType) public view returns (uint _key) {
-        _key = (_orderType == ORDERTYPE_BUY) ? orderKeys[_pairKey][_orderType].last() : orderKeys[_pairKey][_orderType].first();
+        _key = (_orderType == ORDERTYPE_BUY) ? orderKeys[_pairKey][_orderType].first() : orderKeys[_pairKey][_orderType].last();
     }
     function getNextBestPrice(bytes32 _pairKey, uint _orderType, uint _x) public view returns (uint _y) {
         if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(_x)) {
-            _y = (_orderType == ORDERTYPE_BUY) ? orderKeys[_pairKey][_orderType].last() : orderKeys[_pairKey][_orderType].first();
+            _y = (_orderType == ORDERTYPE_BUY) ? orderKeys[_pairKey][_orderType].first() : orderKeys[_pairKey][_orderType].last();
         } else {
-            _y = (_orderType == ORDERTYPE_BUY) ? orderKeys[_pairKey][_orderType].prev(_x) : orderKeys[_pairKey][_orderType].next(_x);
+            _y = (_orderType == ORDERTYPE_BUY) ? orderKeys[_pairKey][_orderType].next(_x) : orderKeys[_pairKey][_orderType].prev(_x);
         }
     }
 
