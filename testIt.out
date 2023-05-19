@@ -1,3 +1,4 @@
+Compiled 1 Solidity file successfully
 
 
   Dexz
@@ -10,7 +11,7 @@
         > Deployed Token1 - gasUsed: 524193 ~ ETH 0.02096772 ~ USD 41
           + Token1:0xe7f1 2.0 Transfer(from: null:0x0000, to: deployer:0xf39F, tokens: 5000.0)
         Token1 deployed
-        > Deployed Dexz - gasUsed: 4938529 ~ ETH 0.19754116 ~ USD 395
+        > Deployed Dexz - gasUsed: 4987815 ~ ETH 0.1995126 ~ USD 399
           + Dexz:0x9fE4 3.0 AccountAdded(account: Dexz:0x9fE4)
         Dexz deployed
         > Transfer Token0 - gasUsed: 51421 ~ ETH 0.00205684 ~ USD 4
@@ -38,14 +39,18 @@
           + Token0:0x5FbD 14.0 Approval(tokenOwner: user1:0x3C44, spender: Dexz:0x9fE4, tokens: 1000.0)
         > user1->token1.approve(dexz, 1000000000000000000000) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
           + Token1:0xe7f1 15.0 Approval(tokenOwner: user1:0x3C44, spender: Dexz:0x9fE4, tokens: 1000.0)
+        > user2->token0.approve(dexz, 1000000000000000000000) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
+          + Token0:0x5FbD 14.0 Approval(tokenOwner: user1:0x3C44, spender: Dexz:0x9fE4, tokens: 1000.0)
+        > user2->token1.approve(dexz, 1000000000000000000000) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
+          + Token1:0xe7f1 15.0 Approval(tokenOwner: user1:0x3C44, spender: Dexz:0x9fE4, tokens: 1000.0)
 
-        --- Setup Completed. Dexz bytecode ~22453 ---
+        --- Setup Completed. Dexz bytecode ~22681 ---
           Account                                   ETH                     TOK0                     TOK1 Blah
           -------------------- ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F        9999.98923060828814161                    100.0                   1000.0
-          user0:0x7099          9999.999889151768624371                    100.0                   1000.0
-          user1:0x3C44          9999.999893478573750949                    100.0                   1000.0
-          user2:0x90F7                          10000.0                    100.0                   1000.0
+          deployer:0xf39F       9999.989147898891674218                    100.0                   1000.0
+          user0:0x7099          9999.999889143468674944                    100.0                   1000.0
+          user1:0x3C44          9999.999893472213508027                    100.0                   1000.0
+          user2:0x90F7          9999.999896789323815109                    100.0                   1000.0
           user3:0x15d3                          10000.0                    100.0                   1000.0
           feeAccount:0x9965                     10000.0                      0.0                      0.0
           Dexz:0x9fE4                               0.0                      0.0                      0.0
@@ -60,24 +65,35 @@
 
 
       00. Test 00 - Happy Path - Specified Set
-        > user0->dexz.trade(BUY, token0, token1, 0.6901, expiry, baseTokens, feeAccount) - gasUsed: 578521 ~ ETH 0.02314084 ~ USD 46
-          + Dexz:0x9fE4 16.0 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 16.1 LogInfo(topic: _trade: matchingOrderKey, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 16.2 TokenAdded(token: Token0:0x5FbD)
-          + Dexz:0x9fE4 16.3 TokenAdded(token: Token1:0xe7f1)
-          + Dexz:0x9fE4 16.4 AccountAdded(account: user0:0x7099)
-          + Dexz:0x9fE4 16.5 PairAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1)
-          + Dexz:0x9fE4 16.6 LogInfo(topic: orders addKey RBT adding , number: 690100000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 16.7 LogInfo(topic: orders addData  first, number: 0, data: 0x4a879c2250561b353a42b56f16888c6a7cb22bec1ce583095cd4bc7d6e8bff85, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 16.8 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x4a879c2250561b353a42b56f16888c6a7cb22bec1ce583095cd4bc7d6e8bff85, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690100000000000000, expiry: 1684478404, baseTokens: 1000000000000000000)
+          BigChungo
+          BigChungo
+        > user0->dexz.trade(BUY, token0, token1, 0.69, expiry, baseTokens, feeAccount) - gasUsed: 582262 ~ ETH 0.02329048 ~ USD 46
+          + Dexz:0x9fE4 18.0 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 18.1 LogInfo(topic: _trade: matchingOrderKey, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 18.2 TokenAdded(token: Token0:0x5FbD)
+          + Dexz:0x9fE4 18.3 TokenAdded(token: Token1:0xe7f1)
+          + Dexz:0x9fE4 18.4 AccountAdded(account: user0:0x7099)
+          + Dexz:0x9fE4 18.5 PairAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1)
+          + Dexz:0x9fE4 18.6 LogInfo(topic: orders addKey RBT adding , number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 18.7 LogInfo(topic: orders addData  first, number: 0, data: 0x2c3a975af0e16f0f18e70e66bda70f00c630e7430e579946160d1db1b1d7e9b2, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 18.8 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x2c3a975af0e16f0f18e70e66bda70f00c630e7430e579946160d1db1b1d7e9b2, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000000000000, expiry: 1684494432, baseTokens: 1000000000000000000)
+          BigChungo
+          BigChungo
+        > user1->dexz.trade(BUY, token0, token1, 0.69, expiry, baseTokens, feeAccount) - gasUsed: 299225 ~ ETH 0.011969 ~ USD 23
+          + Dexz:0x9fE4 19.0 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 19.1 LogInfo(topic: _trade: matchingOrderKey, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 19.2 AccountAdded(account: user1:0x3C44)
+          + Dexz:0x9fE4 19.3 LogInfo(topic: orders addKey RBT exists , number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 19.4 LogInfo(topic: orders addData !first, number: 0, data: 0x08ceededde755bcc9f0c746ac79b31e21f817c928b67ab522c0bfdd9ca3e0e36, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 19.5 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x08ceededde755bcc9f0c746ac79b31e21f817c928b67ab522c0bfdd9ca3e0e36, orderType: 0, maker: user1:0x3C44, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000000000000, expiry: 1684494432, baseTokens: 1000000000000000000)
 
-        --- After Adding An Order ---
+        --- After Adding Order(s) ---
           Account                                   ETH                     TOK0                     TOK1 Blah
           -------------------- ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F        9999.98923060828814161                    100.0                   1000.0
-          user0:0x7099          9999.999237986952868574                    100.0                   1000.0
-          user1:0x3C44          9999.999893478573750949                    100.0                   1000.0
-          user2:0x90F7                          10000.0                    100.0                   1000.0
+          deployer:0xf39F       9999.989147898891674218                    100.0                   1000.0
+          user0:0x7099           9999.99925082954153689                    100.0                   1000.0
+          user1:0x3C44          9999.999568902948767777                    100.0                   1000.0
+          user2:0x90F7          9999.999896789323815109                    100.0                   1000.0
           user3:0x15d3                          10000.0                    100.0                   1000.0
           feeAccount:0x9965                     10000.0                      0.0                      0.0
           Dexz:0x9fE4                               0.0                      0.0                      0.0
@@ -92,54 +108,88 @@
           - tokenListLength[1]: Token1:0xe7f1
           - accountListLength[0]: Dexz:0x9fE4
           - accountListLength[1]: user0:0x7099
+          - accountListLength[2]: user1:0x3C44
           - pairInfoListLength[0]: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1
 
           ----- Pair 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156 Token0:0x5FbD/Token1:0xe7f1 -----
             --- Buy Orders ---
-              orderPriceKey: 0.6901
-                Order key=0x4a879c22 prev=0x00000000 next=0x00000000 Buy maker=user0:0x7099 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.6901 expiry=59.98s baseTokens=1.0 baseTokensFilled=0.0
+              orderPriceKey: 0.69
+                Order key=0x2c3a975a prev=0x00000000 next=0x08ceeded Buy maker=user0:0x7099 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
+                Order key=0x08ceeded prev=0x2c3a975a next=0x00000000 Buy maker=user1:0x3C44 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
             --- Sell Orders ---
 
-        > user1->dexz.trade(SELL, token0, token1, 0.6901, expiry, baseTokens, feeAccount) - gasUsed: 240729 ~ ETH 0.00962916 ~ USD 19
-          + Dexz:0x9fE4 17.0 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.1 LogInfo(topic: getBestMatchingOrder: _bestMatchingPriceKey, number: 690100000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.2 LogInfo(topic: getBestMatchingOrder: orderQueue not empty, number: 690100000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.3 LogInfo(topic: getBestMatchingOrder: _bestMatchingOrderKey , number: 1684478404, data: 0x4a879c2250561b353a42b56f16888c6a7cb22bec1ce583095cd4bc7d6e8bff85, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.4 LogInfo(topic: _trade: matchingOrderKey, number: 0, data: 0x4a879c2250561b353a42b56f16888c6a7cb22bec1ce583095cd4bc7d6e8bff85, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.5 LogInfo(topic: _trade: order, number: 1000000000000000000, data: 0x4a879c2250561b353a42b56f16888c6a7cb22bec1ce583095cd4bc7d6e8bff85, note: , addr: user0:0x7099)
-          + Dexz:0x9fE4 17.6 LogInfo(topic: calculateOrder Maker Buy: matchingOrder.baseTokens, number: 1000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.7 LogInfo(topic: calculateOrder Maker Buy: matchingOrder.baseTokensFilled, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.8 LogInfo(topic: calculateOrder Maker Buy: amountBaseTokens, number: 1000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.9 LogInfo(topic: calculateOrder Maker Buy: availableTokens(matchingOrder.baseToken, taker), number: 100000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: user1:0x3C44)
-          + Dexz:0x9fE4 17.10 LogInfo(topic: calculateOrder Maker Buy: matchingOrder.baseTokens NOT reduced due to available tokens, number: 1000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.11 LogInfo(topic: calculateOrder Maker Buy: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, taker)), number: 1000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: user1:0x3C44)
-          + Dexz:0x9fE4 17.12 LogInfo(topic: calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18, number: 690100000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.13 LogInfo(topic: calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker), number: 1000000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: user0:0x7099)
-          + Dexz:0x9fE4 17.14 LogInfo(topic: calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker)), number: 690100000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: user0:0x7099)
-          + Dexz:0x9fE4 17.15 LogInfo(topic: calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price), number: 1000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.16 LogInfo(topic: calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18, number: 690100000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.17 LogInfo(topic: _trade: order._baseTokens, number: 1000000000000000000, data: 0x4a879c2250561b353a42b56f16888c6a7cb22bec1ce583095cd4bc7d6e8bff85, note: , addr: user0:0x7099)
-          + Dexz:0x9fE4 17.18 LogInfo(topic: _trade: order._quoteTokens, number: 690100000000000000, data: 0x4a879c2250561b353a42b56f16888c6a7cb22bec1ce583095cd4bc7d6e8bff85, note: , addr: user0:0x7099)
-          + Dexz:0x9fE4 17.19 LogInfo(topic: transferTokens: SELL, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.20 Trade(key: 0x4a879c2250561b353a42b56f16888c6a7cb22bec1ce583095cd4bc7d6e8bff85, orderType: 1, taker: user1:0x3C44, maker: user0:0x7099, amount: 1.0, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, baseTokens: 1000000000000000000, quoteTokens: 689409900000000000, feeBaseTokens: 690100000000000, feeQuoteTokens: 0, baseTokensFilled: 0)
-          + Token0:0x5FbD 17.21 Transfer(from: user1:0x3C44, to: user0:0x7099, tokens: 1.0)
-          + Token1:0xe7f1 17.22 Transfer(from: user0:0x7099, to: user1:0x3C44, tokens: 0.6894099)
-          + Token1:0xe7f1 17.23 Transfer(from: user0:0x7099, to: feeAccount:0x9965, tokens: 0.0006901)
-          + Dexz:0x9fE4 17.24 LogInfo(topic: updateBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.25 LogInfo(topic: updateBestMatchingOrder: priceKey, number: 690100000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.26 LogInfo(topic: updateBestMatchingOrder: orderQueue not empty, number: 690100000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.27 LogInfo(topic: orders remove RBT, number: 690100000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 17.28 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          BigChungo
+          BigChungo
+        > user2->dexz.trade(SELL, token0, token1, 0.69, expiry, sellBaseTokens, feeAccount) - gasUsed: 701337 ~ ETH 0.02805348 ~ USD 56
+          + Dexz:0x9fE4 20.0 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.1 LogInfo(topic: getBestMatchingOrder: _bestMatchingPriceKey, number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.2 LogInfo(topic: getBestMatchingOrder: orderQueue not empty, number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.3 LogInfo(topic: getBestMatchingOrder: _bestMatchingOrderKey , number: 1684494432, data: 0x2c3a975af0e16f0f18e70e66bda70f00c630e7430e579946160d1db1b1d7e9b2, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.4 LogInfo(topic: _trade: matchingOrderKey, number: 0, data: 0x2c3a975af0e16f0f18e70e66bda70f00c630e7430e579946160d1db1b1d7e9b2, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.5 LogInfo(topic: _trade: order, number: 1000000000000000000, data: 0x2c3a975af0e16f0f18e70e66bda70f00c630e7430e579946160d1db1b1d7e9b2, note: , addr: user0:0x7099)
+          + Dexz:0x9fE4 20.6 LogInfo(topic: calculateOrder Maker Buy: matchingOrder.baseTokens, number: 1000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.7 LogInfo(topic: calculateOrder Maker Buy: matchingOrder.baseTokensFilled, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.8 LogInfo(topic: calculateOrder Maker Buy: amountBaseTokens, number: 2420690000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.9 LogInfo(topic: calculateOrder Maker Buy: availableTokens(matchingOrder.baseToken, taker), number: 100000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: user2:0x90F7)
+          + Dexz:0x9fE4 20.10 LogInfo(topic: calculateOrder Maker Buy: matchingOrder.baseTokens NOT reduced due to available tokens, number: 1000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.11 LogInfo(topic: calculateOrder Maker Buy: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, taker)), number: 1000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: user2:0x90F7)
+          + Dexz:0x9fE4 20.12 LogInfo(topic: calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18, number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.13 LogInfo(topic: calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker), number: 1000000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: user0:0x7099)
+          + Dexz:0x9fE4 20.14 LogInfo(topic: calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker)), number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: user0:0x7099)
+          + Dexz:0x9fE4 20.15 LogInfo(topic: calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price), number: 1000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.16 LogInfo(topic: calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18, number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.17 LogInfo(topic: _trade: order._baseTokens, number: 1000000000000000000, data: 0x2c3a975af0e16f0f18e70e66bda70f00c630e7430e579946160d1db1b1d7e9b2, note: , addr: user0:0x7099)
+          + Dexz:0x9fE4 20.18 LogInfo(topic: _trade: order._quoteTokens, number: 690000000000000000, data: 0x2c3a975af0e16f0f18e70e66bda70f00c630e7430e579946160d1db1b1d7e9b2, note: , addr: user0:0x7099)
+          + Dexz:0x9fE4 20.19 LogInfo(topic: transferTokens: SELL, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.20 Trade(key: 0x2c3a975af0e16f0f18e70e66bda70f00c630e7430e579946160d1db1b1d7e9b2, orderType: 1, taker: user2:0x90F7, maker: user0:0x7099, amount: 1.0, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, baseTokens: 1000000000000000000, quoteTokens: 689310000000000000, feeBaseTokens: 690000000000000, feeQuoteTokens: 0, baseTokensFilled: 0)
+          + Token0:0x5FbD 20.21 Transfer(from: user2:0x90F7, to: user0:0x7099, tokens: 1.0)
+          + Token1:0xe7f1 20.22 Transfer(from: user0:0x7099, to: user2:0x90F7, tokens: 0.68931)
+          + Token1:0xe7f1 20.23 Transfer(from: user0:0x7099, to: feeAccount:0x9965, tokens: 0.00069)
+          + Dexz:0x9fE4 20.24 LogInfo(topic: updateBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.25 LogInfo(topic: updateBestMatchingOrder: priceKey, number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.26 LogInfo(topic: updateBestMatchingOrder: orderQueue not empty, number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.27 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.28 LogInfo(topic: getBestMatchingOrder: _bestMatchingPriceKey, number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.29 LogInfo(topic: getBestMatchingOrder: orderQueue not empty, number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.30 LogInfo(topic: getBestMatchingOrder: _bestMatchingOrderKey , number: 1684494432, data: 0x08ceededde755bcc9f0c746ac79b31e21f817c928b67ab522c0bfdd9ca3e0e36, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.31 LogInfo(topic: _trade: order, number: 1000000000000000000, data: 0x08ceededde755bcc9f0c746ac79b31e21f817c928b67ab522c0bfdd9ca3e0e36, note: , addr: user1:0x3C44)
+          + Dexz:0x9fE4 20.32 LogInfo(topic: calculateOrder Maker Buy: matchingOrder.baseTokens, number: 1000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.33 LogInfo(topic: calculateOrder Maker Buy: matchingOrder.baseTokensFilled, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.34 LogInfo(topic: calculateOrder Maker Buy: amountBaseTokens, number: 1420690000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.35 LogInfo(topic: calculateOrder Maker Buy: availableTokens(matchingOrder.baseToken, taker), number: 99000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: user2:0x90F7)
+          + Dexz:0x9fE4 20.36 LogInfo(topic: calculateOrder Maker Buy: matchingOrder.baseTokens NOT reduced due to available tokens, number: 1000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.37 LogInfo(topic: calculateOrder Maker Buy: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, taker)), number: 1000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: user2:0x90F7)
+          + Dexz:0x9fE4 20.38 LogInfo(topic: calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18, number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.39 LogInfo(topic: calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker), number: 1000000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: user1:0x3C44)
+          + Dexz:0x9fE4 20.40 LogInfo(topic: calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker)), number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: user1:0x3C44)
+          + Dexz:0x9fE4 20.41 LogInfo(topic: calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price), number: 1000000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.42 LogInfo(topic: calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18, number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.43 LogInfo(topic: _trade: order._baseTokens, number: 1000000000000000000, data: 0x08ceededde755bcc9f0c746ac79b31e21f817c928b67ab522c0bfdd9ca3e0e36, note: , addr: user1:0x3C44)
+          + Dexz:0x9fE4 20.44 LogInfo(topic: _trade: order._quoteTokens, number: 690000000000000000, data: 0x08ceededde755bcc9f0c746ac79b31e21f817c928b67ab522c0bfdd9ca3e0e36, note: , addr: user1:0x3C44)
+          + Dexz:0x9fE4 20.45 LogInfo(topic: transferTokens: SELL, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.46 Trade(key: 0x08ceededde755bcc9f0c746ac79b31e21f817c928b67ab522c0bfdd9ca3e0e36, orderType: 1, taker: user2:0x90F7, maker: user1:0x3C44, amount: 1.0, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, baseTokens: 1000000000000000000, quoteTokens: 689310000000000000, feeBaseTokens: 690000000000000, feeQuoteTokens: 0, baseTokensFilled: 0)
+          + Token0:0x5FbD 20.47 Transfer(from: user2:0x90F7, to: user1:0x3C44, tokens: 1.0)
+          + Token1:0xe7f1 20.48 Transfer(from: user1:0x3C44, to: user2:0x90F7, tokens: 0.68931)
+          + Token1:0xe7f1 20.49 Transfer(from: user1:0x3C44, to: feeAccount:0x9965, tokens: 0.00069)
+          + Dexz:0x9fE4 20.50 LogInfo(topic: updateBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.51 LogInfo(topic: updateBestMatchingOrder: priceKey, number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.52 LogInfo(topic: updateBestMatchingOrder: orderQueue not empty, number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.53 LogInfo(topic: orders remove RBT, number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.54 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.55 AccountAdded(account: user2:0x90F7)
+          + Dexz:0x9fE4 20.56 LogInfo(topic: orders addKey RBT adding , number: 690000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.57 LogInfo(topic: orders addData  first, number: 0, data: 0x10615030090f356eadc31fc1df4e59907df5f5a06351a3aa1e757fa7c4c88f47, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 20.58 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x10615030090f356eadc31fc1df4e59907df5f5a06351a3aa1e757fa7c4c88f47, orderType: 1, maker: user2:0x90F7, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000000000000, expiry: 1684494432, baseTokens: 420690000000000000)
 
-        --- After Executing Against An Order ---
+        --- After Executing Against Order(s) ---
           Account                                   ETH                     TOK0                     TOK1 Blah
           -------------------- ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F        9999.98923060828814161                    100.0                   1000.0
-          user0:0x7099          9999.999237986952868574                    101.0                 999.3099
-          user1:0x3C44          9999.999626154434931262                     99.0             1000.6894099
-          user2:0x90F7                          10000.0                    100.0                   1000.0
+          deployer:0xf39F       9999.989147898891674218                    100.0                   1000.0
+          user0:0x7099           9999.99925082954153689                    101.0                   999.31
+          user1:0x3C44          9999.999568902948767777                    101.0                   999.31
+          user2:0x90F7          9999.999143326551687862                     98.0               1001.37862
           user3:0x15d3                          10000.0                    100.0                   1000.0
-          feeAccount:0x9965                     10000.0                      0.0                0.0006901
+          feeAccount:0x9965                     10000.0                      0.0                  0.00138
           Dexz:0x9fE4                               0.0                      0.0                      0.0
 
           Dexz: Dexz:0x9fE4
@@ -152,14 +202,18 @@
           - tokenListLength[1]: Token1:0xe7f1
           - accountListLength[0]: Dexz:0x9fE4
           - accountListLength[1]: user0:0x7099
+          - accountListLength[2]: user1:0x3C44
+          - accountListLength[3]: user2:0x90F7
           - pairInfoListLength[0]: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1
 
           ----- Pair 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156 Token0:0x5FbD/Token1:0xe7f1 -----
             --- Buy Orders ---
             --- Sell Orders ---
+              orderPriceKey: 0.69
+                Order key=0x10615030 prev=0x00000000 next=0x00000000 Sell maker=user2:0x90F7 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.99s baseTokens=0.42069 baseTokensFilled=0.0
 
-    ✔ 00. Test 00 (169ms)
+    ✔ 00. Test 00 (253ms)
 
 
-  1 passing (904ms)
+  1 passing (1s)
 

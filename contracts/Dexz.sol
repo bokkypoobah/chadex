@@ -13,6 +13,7 @@ pragma solidity ^0.8.0;
 // ----------------------------------------------------------------------------
 
 import "./BokkyPooBahsRedBlackTreeLibrary.sol";
+import "hardhat/console.sol";
 
 
 interface IERC20 {
@@ -127,6 +128,7 @@ contract DexzBase is Owned {
             tokenList.push(token);
             emit TokenAdded(token);
         }
+        console.log("          BigChungo");
     }
     function accountListLength() public view returns (uint) {
         return accountList.length;
@@ -574,6 +576,7 @@ contract Dexz is Orders {
             require(tradeInfo.baseTokens == 0);
         }
         if (tradeInfo.baseTokens > 0 && ((tradeInfo.orderFlag & ORDERFLAG_FILL_AND_ADD_ORDER) == ORDERFLAG_FILL_AND_ADD_ORDER)) {
+            // TODO Skip and remove expired items
             require(tradeInfo.expiry > block.timestamp);
             _orderKey = _addOrder(tradeInfo.orderType, tradeInfo.taker, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
             _baseTokensOnOrder = tradeInfo.baseTokens;
