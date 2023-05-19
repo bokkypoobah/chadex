@@ -50,8 +50,9 @@
           - feeAccount: feeAccount:0x9965
           - tokenListLength: 0
           - accountListLength: 1
-            - accountListLength[0]: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+            - accountListLength[0]: Dexz:0x9fE4
           - pairInfoListLength: 0
+[]
 
       00. Test 00 - Happy Path - Specified Set
         > user0->dexz.trade(BUY, token0, token1, 0.019, expiry, baseTokens, feeAccount) - gasUsed: 578509 ~ ETH 0.02314036 ~ USD 46
@@ -62,8 +63,8 @@
           + Dexz:0x9fE4 12.4 AccountAdded(account: user0:0x7099)
           + Dexz:0x9fE4 12.5 PairAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1)
           + Dexz:0x9fE4 12.6 LogInfo(topic: orders addKey RBT adding , number: 100000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 12.7 LogInfo(topic: orders addData  first, number: 0, data: 0xae48828603adb5795f5524b7e2f69a34e86b49dae596e5c88cb0530bbb4d4156, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 12.8 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0xae48828603adb5795f5524b7e2f69a34e86b49dae596e5c88cb0530bbb4d4156, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 100000000000000000, expiry: 1684466856, baseTokens: 1000000000000000000)
+          + Dexz:0x9fE4 12.7 LogInfo(topic: orders addData  first, number: 0, data: 0xfa1d8f908492f767e6c2320443ab9ed7c953fd4be81733584df4a26d7d77dfd8, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 12.8 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0xfa1d8f908492f767e6c2320443ab9ed7c953fd4be81733584df4a26d7d77dfd8, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 100000000000000000, expiry: 1684467123, baseTokens: 1000000000000000000)
 
         --- After Adding An Order ---
           Account                                   ETH                     TOK0                     TOK1 Blah
@@ -83,21 +84,22 @@
           - takerFeeInTokens: 0.1%
           - feeAccount: feeAccount:0x9965
           - tokenListLength: 2
-            - tokenListLength[0]: 0x5FbDB2315678afecb367f032d93F642f64180aa3
-            - tokenListLength[1]: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+            - tokenListLength[0]: Token0:0x5FbD
+            - tokenListLength[1]: Token1:0xe7f1
           - accountListLength: 2
-            - accountListLength[0]: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
-            - accountListLength[1]: 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+            - accountListLength[0]: Dexz:0x9fE4
+            - accountListLength[1]: user0:0x7099
           - pairInfoListLength: 1
-            - pairInfoListLength[0]: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156,0x5FbDB2315678afecb367f032d93F642f64180aa3,0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+            - pairInfoListLength[0]: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1
+[{"pairKey":"0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156","baseToken":"0x5FbDB2315678afecb367f032d93F642f64180aa3","quoteToken":"0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"}]
 
         > user1->dexz.trade(BUY, token0, token1, 0.019, expiry, baseTokens, feeAccount) - gasUsed: 295475 ~ ETH 0.011819 ~ USD 23
           + Dexz:0x9fE4 13.0 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
           + Dexz:0x9fE4 13.1 LogInfo(topic: _trade: matchingOrderKey, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
           + Dexz:0x9fE4 13.2 AccountAdded(account: user1:0x3C44)
           + Dexz:0x9fE4 13.3 LogInfo(topic: orders addKey RBT exists , number: 100000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 13.4 LogInfo(topic: orders addData !first, number: 0, data: 0x29bffa718be84dd0ff2165f17d52795d265a74631b0d91a9d4a33af4921a1352, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 13.5 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x29bffa718be84dd0ff2165f17d52795d265a74631b0d91a9d4a33af4921a1352, orderType: 0, maker: user1:0x3C44, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 100000000000000000, expiry: 1684466856, baseTokens: 1000000000000000000)
+          + Dexz:0x9fE4 13.4 LogInfo(topic: orders addData !first, number: 0, data: 0xa8f70bf5299d87446747d895e40e1ec119c01cc47a6d26ed37c0b0755c61f512, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 13.5 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0xa8f70bf5299d87446747d895e40e1ec119c01cc47a6d26ed37c0b0755c61f512, orderType: 0, maker: user1:0x3C44, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 100000000000000000, expiry: 1684467123, baseTokens: 1000000000000000000)
 
         --- After Adding An Order ---
           Account                                   ETH                     TOK0                     TOK1 Blah
@@ -117,16 +119,17 @@
           - takerFeeInTokens: 0.1%
           - feeAccount: feeAccount:0x9965
           - tokenListLength: 2
-            - tokenListLength[0]: 0x5FbDB2315678afecb367f032d93F642f64180aa3
-            - tokenListLength[1]: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+            - tokenListLength[0]: Token0:0x5FbD
+            - tokenListLength[1]: Token1:0xe7f1
           - accountListLength: 3
-            - accountListLength[0]: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
-            - accountListLength[1]: 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
-            - accountListLength[2]: 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
+            - accountListLength[0]: Dexz:0x9fE4
+            - accountListLength[1]: user0:0x7099
+            - accountListLength[2]: user1:0x3C44
           - pairInfoListLength: 1
-            - pairInfoListLength[0]: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156,0x5FbDB2315678afecb367f032d93F642f64180aa3,0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+            - pairInfoListLength[0]: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1
+[{"pairKey":"0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156","baseToken":"0x5FbDB2315678afecb367f032d93F642f64180aa3","quoteToken":"0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"}]
 
-    ✔ 00. Test 00 (130ms)
+    ✔ 00. Test 00 (129ms)
     - 00. Test 00
     - 01. Test 01
     - 02. Test 02
@@ -135,6 +138,6 @@
     - 05. Test 05
 
 
-  1 passing (743ms)
+  1 passing (823ms)
   6 pending
 

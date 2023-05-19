@@ -229,16 +229,20 @@ class Data {
       console.log("          - feeAccount: " + this.getShortAccountName(feeAccount));
       console.log("          - tokenListLength: " + tokenListLength);
       for (let j = 0; j < tokenListLength; j++) {
-        console.log("            - tokenListLength[" + j + "]: " + await this.dexz.tokenList(j));
+        console.log("            - tokenListLength[" + j + "]: " + this.getShortAccountName(await this.dexz.tokenList(j)));
       }
       console.log("          - accountListLength: " + accountListLength);
       for (let j = 0; j < accountListLength; j++) {
-        console.log("            - accountListLength[" + j + "]: " + await this.dexz.accountList(j));
+        console.log("            - accountListLength[" + j + "]: " + this.getShortAccountName(await this.dexz.accountList(j)));
       }
       console.log("          - pairInfoListLength: " + pairInfoListLength);
+      const pairInfos = [];
       for (let j = 0; j < pairInfoListLength; j++) {
-        console.log("            - pairInfoListLength[" + j + "]: " + await this.dexz.pairInfoList(j));
+        const info = await this.dexz.pairInfoList(j)
+        console.log("            - pairInfoListLength[" + j + "]: " + info[0] + ", baseToken: " + this.getShortAccountName(info[1]) + ", quoteToken: " + this.getShortAccountName(info[2]));
+        pairInfos.push({ pairKey: info[0], baseToken: info[1], quoteToken: info[2] })
       }
+      console.log(JSON.stringify(pairInfos));
 
 
       // console.log("RESULT: dexz.tokenListLength=" + contract.tokenListLength());
