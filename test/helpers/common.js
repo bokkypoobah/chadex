@@ -215,11 +215,45 @@ class Data {
       const takerFeeInEthers = await this.dexz.takerFeeInEthers();
       const takerFeeInTokens = await this.dexz.takerFeeInTokens();
       const feeAccount = await this.dexz.feeAccount();
+      const tokenListLength = parseInt(await this.dexz.tokenListLength());
+      const accountListLength = parseInt(await this.dexz.accountListLength());
+      const pairInfoListLength = parseInt(await this.dexz.pairInfoListLength());
+      // const feeAccount = await this.dexz.feeAccount();
+      // const feeAccount = await this.dexz.feeAccount();
+      // const feeAccount = await this.dexz.feeAccount();
+
       console.log("          - owner: " + this.getShortAccountName(owner));
       console.log("          - deploymentBlockNumber: " + deploymentBlockNumber);
       console.log("          - takerFeeInEthers: " + ethers.utils.formatEther(takerFeeInEthers));
       console.log("          - takerFeeInTokens: " + ethers.utils.formatUnits(takerFeeInTokens, 16) + "%");
       console.log("          - feeAccount: " + this.getShortAccountName(feeAccount));
+      console.log("          - tokenListLength: " + tokenListLength);
+      for (let j = 0; j < tokenListLength; j++) {
+        console.log("            - tokenListLength[" + j + "]: " + await this.dexz.tokenList(j));
+      }
+      console.log("          - accountListLength: " + accountListLength);
+      for (let j = 0; j < accountListLength; j++) {
+        console.log("            - accountListLength[" + j + "]: " + await this.dexz.accountList(j));
+      }
+      console.log("          - pairInfoListLength: " + pairInfoListLength);
+      for (let j = 0; j < pairInfoListLength; j++) {
+        console.log("            - pairInfoListLength[" + j + "]: " + await this.dexz.pairInfoList(j));
+      }
+
+
+      // console.log("RESULT: dexz.tokenListLength=" + contract.tokenListLength());
+      // for (i = 0; i < contract.tokenListLength(); i++) {
+      //   console.log("RESULT: dexz.tokenList[" + i + "]=" + contract.tokenList(i));
+      // }
+      // console.log("RESULT: dexz.accountListLength=" + contract.accountListLength());
+      // for (i = 0; i < contract.accountListLength(); i++) {
+      //   console.log("RESULT: dexz.accountList[" + i + "]=" + contract.accountList(i));
+      // }
+      // console.log("RESULT: dexz.pairInfoListLength=" + contract.pairInfoListLength());
+      // for (i = 0; i < contract.pairInfoListLength(); i++) {
+      //   console.log("RESULT: dexz.pairInfoList[" + i + "]=" + contract.pairInfoList(i));
+      // }
+
       console.log();
     }
 
