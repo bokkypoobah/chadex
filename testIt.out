@@ -1,0 +1,119 @@
+
+
+  Dexz
+
+      beforeEach
+        --- Setup Tokens and Dexz Contracts. Assuming gasPrice: 40.0 gwei, ethUsd: 2000.0 ---
+        > Deployed Token0 - gasUsed: 524181 ~ ETH 0.02096724 ~ USD 41
+          + Token0:0x5FbD 1.0 Transfer(from: null:0x0000, to: deployer:0xf39F, tokens: 500.0)
+        Token0 deployed
+        > Deployed Token1 - gasUsed: 524193 ~ ETH 0.02096772 ~ USD 41
+          + Token1:0xe7f1 2.0 Transfer(from: null:0x0000, to: deployer:0xf39F, tokens: 5000.0)
+        Token1 deployed
+        > Deployed Dexz - gasUsed: 4857473 ~ ETH 0.19429892 ~ USD 388
+          + Dexz:0x9fE4 3.0 AccountAdded(account: Dexz:0x9fE4)
+        Dexz deployed
+        > Transfer Token0 - gasUsed: 51421 ~ ETH 0.00205684 ~ USD 4
+          + Token0:0x5FbD 4.0 Transfer(from: deployer:0xf39F, to: user0:0x7099, tokens: 100.0)
+        > Transfer Token0 - gasUsed: 51409 ~ ETH 0.00205636 ~ USD 4
+          + Token0:0x5FbD 5.0 Transfer(from: deployer:0xf39F, to: user1:0x3C44, tokens: 100.0)
+        > Transfer Token0 - gasUsed: 51421 ~ ETH 0.00205684 ~ USD 4
+          + Token0:0x5FbD 6.0 Transfer(from: deployer:0xf39F, to: user2:0x90F7, tokens: 100.0)
+        > Transfer Token0 - gasUsed: 51421 ~ ETH 0.00205684 ~ USD 4
+          + Token0:0x5FbD 7.0 Transfer(from: deployer:0xf39F, to: user3:0x15d3, tokens: 100.0)
+        Tokens transferred
+
+        --- Setup Completed. Dexz bytecode ~22077 ---
+        > Transfer Token1 - gasUsed: 51421 ~ ETH 0.00205684 ~ USD 4
+          + Token1:0xe7f1 8.0 Transfer(from: deployer:0xf39F, to: user0:0x7099, tokens: 1000.0)
+        > Transfer Token1 - gasUsed: 51409 ~ ETH 0.00205636 ~ USD 4
+          + Token1:0xe7f1 9.0 Transfer(from: deployer:0xf39F, to: user1:0x3C44, tokens: 1000.0)
+        > Transfer Token1 - gasUsed: 51421 ~ ETH 0.00205684 ~ USD 4
+          + Token1:0xe7f1 10.0 Transfer(from: deployer:0xf39F, to: user2:0x90F7, tokens: 1000.0)
+        > Transfer Token1 - gasUsed: 51421 ~ ETH 0.00205684 ~ USD 4
+          + Token1:0xe7f1 11.0 Transfer(from: deployer:0xf39F, to: user3:0x15d3, tokens: 1000.0)
+          Account                                   ETH                     TOK0                     TOK1 Blah
+          -------------------- ------------------------ ------------------------ ------------------------ ---------------------------------------------
+          deployer:0xf39F       9999.989366632571236561                    100.0                   1000.0
+          user0:0x7099                          10000.0                    100.0                   1000.0
+          user1:0x3C44                          10000.0                    100.0                   1000.0
+          user2:0x90F7                          10000.0                    100.0                   1000.0
+          user3:0x15d3                          10000.0                    100.0                   1000.0
+          feeAccount:0x9965                     10000.0                      0.0                      0.0
+          Dexz:0x9fE4                               0.0                      0.0                      0.0
+
+          Dexz: Dexz:0x9fE4
+          - owner: deployer:0xf39F
+          - deploymentBlockNumber: 3
+          - takerFeeInEthers: 0.05
+          - takerFeeInTokens: 0.1%
+          - feeAccount: feeAccount:0x9965
+
+      00. Test 00 - Happy Path - Specified Set
+        > user0->dexz.trade(BUY, token0, token1, 0.019, expiry, baseTokens, feeAccount) - gasUsed: 578509 ~ ETH 0.02314036 ~ USD 46
+          + Dexz:0x9fE4 12.0 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 12.1 LogInfo(topic: _trade: matchingOrderKey, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 12.2 TokenAdded(token: Token0:0x5FbD)
+          + Dexz:0x9fE4 12.3 TokenAdded(token: Token1:0xe7f1)
+          + Dexz:0x9fE4 12.4 AccountAdded(account: user0:0x7099)
+          + Dexz:0x9fE4 12.5 PairAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1)
+          + Dexz:0x9fE4 12.6 LogInfo(topic: orders addKey RBT adding , number: 100000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 12.7 LogInfo(topic: orders addData  first, number: 0, data: 0xd6b9dd9606ab2a5583b46d2648b0783b3530fdb699a2c3f3c4c63de8da7711e4, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 12.8 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0xd6b9dd9606ab2a5583b46d2648b0783b3530fdb699a2c3f3c4c63de8da7711e4, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 100000000000000000, expiry: 1684465777, baseTokens: 1000000000000000000)
+
+        --- After Adding An Order ---
+          Account                                   ETH                     TOK0                     TOK1 Blah
+          -------------------- ------------------------ ------------------------ ------------------------ ---------------------------------------------
+          deployer:0xf39F       9999.989366632571236561                    100.0                   1000.0
+          user0:0x7099          9999.999297875349027867                    100.0                   1000.0
+          user1:0x3C44                          10000.0                    100.0                   1000.0
+          user2:0x90F7                          10000.0                    100.0                   1000.0
+          user3:0x15d3                          10000.0                    100.0                   1000.0
+          feeAccount:0x9965                     10000.0                      0.0                      0.0
+          Dexz:0x9fE4                               0.0                      0.0                      0.0
+
+          Dexz: Dexz:0x9fE4
+          - owner: deployer:0xf39F
+          - deploymentBlockNumber: 3
+          - takerFeeInEthers: 0.05
+          - takerFeeInTokens: 0.1%
+          - feeAccount: feeAccount:0x9965
+
+        > user1->dexz.trade(BUY, token0, token1, 0.019, expiry, baseTokens, feeAccount) - gasUsed: 295475 ~ ETH 0.011819 ~ USD 23
+          + Dexz:0x9fE4 13.0 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 13.1 LogInfo(topic: _trade: matchingOrderKey, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 13.2 AccountAdded(account: user1:0x3C44)
+          + Dexz:0x9fE4 13.3 LogInfo(topic: orders addKey RBT exists , number: 100000000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 13.4 LogInfo(topic: orders addData !first, number: 0, data: 0x17c51909c5de0f7688ea12208ab6c8e6fd0700531cb1d5fceb9151be8b7ba124, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 13.5 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x17c51909c5de0f7688ea12208ab6c8e6fd0700531cb1d5fceb9151be8b7ba124, orderType: 0, maker: user1:0x3C44, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 100000000000000000, expiry: 1684465777, baseTokens: 1000000000000000000)
+
+        --- After Adding An Order ---
+          Account                                   ETH                     TOK0                     TOK1 Blah
+          -------------------- ------------------------ ------------------------ ------------------------ ---------------------------------------------
+          deployer:0xf39F       9999.989366632571236561                    100.0                   1000.0
+          user0:0x7099          9999.999297875349027867                    100.0                   1000.0
+          user1:0x3C44          9999.999648975729252025                    100.0                   1000.0
+          user2:0x90F7                          10000.0                    100.0                   1000.0
+          user3:0x15d3                          10000.0                    100.0                   1000.0
+          feeAccount:0x9965                     10000.0                      0.0                      0.0
+          Dexz:0x9fE4                               0.0                      0.0                      0.0
+
+          Dexz: Dexz:0x9fE4
+          - owner: deployer:0xf39F
+          - deploymentBlockNumber: 3
+          - takerFeeInEthers: 0.05
+          - takerFeeInTokens: 0.1%
+          - feeAccount: feeAccount:0x9965
+
+    ✔ 00. Test 00 (105ms)
+    - 00. Test 00
+    - 01. Test 01
+    - 02. Test 02
+    - 03. Test 03
+    - 04. Test 04
+    - 05. Test 05
+
+
+  1 passing (801ms)
+  6 pending
+
