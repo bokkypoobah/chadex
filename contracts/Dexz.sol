@@ -553,21 +553,22 @@ contract Dexz is Orders {
             uint _quoteTokens;
             bool _orderFilled;
             Orders.Order storage order = orders[matchingOrderKey];
-            // emit LogInfo("_trade: order", order.baseTokens, matchingOrderKey, "", order.maker);
+            emit LogInfo("_trade: order", order.baseTokens, matchingOrderKey, "", order.maker);
             (_baseTokens, _quoteTokens, _orderFilled) = calculateOrder(matchingOrderKey, tradeInfo.baseTokens, tradeInfo.taker);
-            // emit LogInfo("_trade: order._baseTokens", _baseTokens, matchingOrderKey, "", order.maker);
-            // emit LogInfo("_trade: order._quoteTokens", _quoteTokens, matchingOrderKey, "", order.maker);
+            emit LogInfo("_trade: order._baseTokens", _baseTokens, matchingOrderKey, "", order.maker);
+            emit LogInfo("_trade: order._quoteTokens", _quoteTokens, matchingOrderKey, "", order.maker);
 
-            if (_baseTokens > 0 && _quoteTokens > 0) {
-                order.baseTokensFilled = order.baseTokensFilled + _baseTokens;
-                transferTokens(tradeInfo, tradeInfo.orderType, order.maker, _baseTokens, _quoteTokens, matchingOrderKey);
-                tradeInfo.baseTokens = tradeInfo.baseTokens - _baseTokens;
-                _baseTokensFilled = _baseTokensFilled + _baseTokens;
-                _quoteTokensFilled = _quoteTokensFilled + _quoteTokens;
-                _updateBestMatchingOrder(tradeInfo.orderType, tradeInfo.baseToken, tradeInfo.quoteToken, matchingPriceKey, matchingOrderKey, _orderFilled);
-                // matchingOrderKey = ORDERKEY_SENTINEL;
-                (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.orderType, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price);
-            }
+            // if (_baseTokens > 0 && _quoteTokens > 0) {
+            //     order.baseTokensFilled = order.baseTokensFilled + _baseTokens;
+            //     transferTokens(tradeInfo, tradeInfo.orderType, order.maker, _baseTokens, _quoteTokens, matchingOrderKey);
+            //     tradeInfo.baseTokens = tradeInfo.baseTokens - _baseTokens;
+            //     _baseTokensFilled = _baseTokensFilled + _baseTokens;
+            //     _quoteTokensFilled = _quoteTokensFilled + _quoteTokens;
+            //     _updateBestMatchingOrder(tradeInfo.orderType, tradeInfo.baseToken, tradeInfo.quoteToken, matchingPriceKey, matchingOrderKey, _orderFilled);
+            //     // matchingOrderKey = ORDERKEY_SENTINEL;
+            //     (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.orderType, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price);
+            // }
+            break;
         }
         if ((tradeInfo.orderFlag & ORDERFLAG_FILLALL_OR_REVERT) == ORDERFLAG_FILLALL_OR_REVERT) {
             require(tradeInfo.baseTokens == 0);
