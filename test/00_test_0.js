@@ -82,7 +82,7 @@ describe("Dexz", function () {
 
     // function trade(uint orderFlag, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 _orderKey) {
 
-    const price = ethers.utils.parseEther("0.019");
+    const price = ethers.utils.parseEther("0.1");
     // const price = ethers.utils.parseUnits("500", 18);
     const expired = parseInt(new Date()/1000) - 60*60;
     const expiry = parseInt(new Date()/1000) + 60*60;
@@ -92,7 +92,7 @@ describe("Dexz", function () {
     await data.printEvents("user0->dexz.trade(BUY, token0, token1, 0.019, expiry, baseTokens, feeAccount)", await trade1Tx.wait());
     await data.printState("After Adding An Order");
 
-    const trade2Tx = await data.dexz.connect(data.user1Signer).trade(SELL, data.token0.address, data.token1.address, price, expiry, baseTokens, data.feeAccount);
+    const trade2Tx = await data.dexz.connect(data.user1Signer).trade(BUY, data.token0.address, data.token1.address, price, expiry, baseTokens, data.feeAccount);
     await data.printEvents("user1->dexz.trade(BUY, token0, token1, 0.019, expiry, baseTokens, feeAccount)", await trade2Tx.wait());
     await data.printState("After Adding An Order");
 
