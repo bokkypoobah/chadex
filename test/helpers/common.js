@@ -242,21 +242,13 @@ class Data {
         console.log("            - pairInfoListLength[" + j + "]: " + info[0] + ", baseToken: " + this.getShortAccountName(info[1]) + ", quoteToken: " + this.getShortAccountName(info[2]));
         pairInfos.push({ pairKey: info[0], baseToken: info[1], quoteToken: info[2] })
       }
-      console.log(JSON.stringify(pairInfos));
+      console.log();
 
+      const t = this;
+      pairInfos.forEach(function(e) {
+        console.log("          --- Pair " + e.pairKey + " " + t.getShortAccountName(e.baseToken) + "/" + t.getShortAccountName(e.quoteToken) + " ---");
+      });
 
-      // console.log("RESULT: dexz.tokenListLength=" + contract.tokenListLength());
-      // for (i = 0; i < contract.tokenListLength(); i++) {
-      //   console.log("RESULT: dexz.tokenList[" + i + "]=" + contract.tokenList(i));
-      // }
-      // console.log("RESULT: dexz.accountListLength=" + contract.accountListLength());
-      // for (i = 0; i < contract.accountListLength(); i++) {
-      //   console.log("RESULT: dexz.accountList[" + i + "]=" + contract.accountList(i));
-      // }
-      // console.log("RESULT: dexz.pairInfoListLength=" + contract.pairInfoListLength());
-      // for (i = 0; i < contract.pairInfoListLength(); i++) {
-      //   console.log("RESULT: dexz.pairInfoList[" + i + "]=" + contract.pairInfoList(i));
-      // }
 
       console.log();
     }
