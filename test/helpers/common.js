@@ -202,6 +202,25 @@ class Data {
     }
     console.log();
 
+    if (this.dexz) {
+      // console.log("RESULT: dexz.owner/new=" + getShortAddressName(contract.owner()) + "/" + getShortAddressName(contract.newOwner()));
+      // console.log("RESULT: dexz.deploymentBlockNumber=" + contract.deploymentBlockNumber());
+      // console.log("RESULT: dexz.takerFeeInEthers=" + contract.takerFeeInEthers().shift(-18) + " ETH");
+      // console.log("RESULT: dexz.takerFeeInTokens=" + contract.takerFeeInTokens().shift(-16) + "%");
+      // console.log("RESULT: dexz.feeAccount=" + getShortAddressName(contract.feeAccount()));
+
+      console.log("          Dexz: " + this.getShortAccountName(this.dexz.address));
+      const owner = await this.dexz.owner();
+      const deploymentBlockNumber = await this.dexz.deploymentBlockNumber();
+      const takerFeeInEthers = await this.dexz.takerFeeInEthers();
+      const takerFeeInTokens = await this.dexz.takerFeeInTokens();
+      console.log("          - owner: " + this.getShortAccountName(owner));
+      console.log("          - deploymentBlockNumber: " + deploymentBlockNumber);
+      console.log("          - takerFeeInEthers: " + ethers.utils.formatEther(takerFeeInEthers));
+      console.log("          - takerFeeInTokens: " + ethers.utils.formatUnits(takerFeeInTokens, 16) + "%");
+      console.log();
+    }
+
     if (this.umswapFactory != null) {
       const getUmswapsLength = await this.umswapFactory.getUmswapsLength();
       let indices = generateRange(0, getUmswapsLength - 1, 1);
