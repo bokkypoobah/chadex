@@ -1,4 +1,3 @@
-Compiled 1 Solidity file successfully
 
 
   Dexz
@@ -64,22 +63,28 @@ Compiled 1 Solidity file successfully
           + Dexz:0x9fE4 12.4 AccountAdded(account: user0:0x7099)
           + Dexz:0x9fE4 12.5 PairAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1)
           + Dexz:0x9fE4 12.6 LogInfo(topic: orders addKey RBT adding , number: 690100000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 12.7 LogInfo(topic: orders addData  first, number: 0, data: 0x6d227f1fcbea6f49301c66cbe260a5d7bbb04918223df7da7930ba9d0eca201f, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 12.8 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x6d227f1fcbea6f49301c66cbe260a5d7bbb04918223df7da7930ba9d0eca201f, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690100000000000000, expiry: 1684471191, baseTokens: 1000000000000000000)
-        > user1->dexz.trade(BUY, token0, token1, 0.6902, expiry, baseTokens, feeAccount) - gasUsed: 388382 ~ ETH 0.01553528 ~ USD 31
+          + Dexz:0x9fE4 12.7 LogInfo(topic: orders addData  first, number: 0, data: 0x031d9b1ddd994f4c5ea288069a93086981b237ddb18933e994c9233adf6e9d32, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 12.8 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x031d9b1ddd994f4c5ea288069a93086981b237ddb18933e994c9233adf6e9d32, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690100000000000000, expiry: 1684473494, baseTokens: 1000000000000000000)
+        > user0->dexz.trade(BUY, token0, token1, 0.6902, expiry, baseTokens, feeAccount) - gasUsed: 339982 ~ ETH 0.01359928 ~ USD 27
           + Dexz:0x9fE4 13.0 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
           + Dexz:0x9fE4 13.1 LogInfo(topic: _trade: matchingOrderKey, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 13.2 AccountAdded(account: user1:0x3C44)
-          + Dexz:0x9fE4 13.3 LogInfo(topic: orders addKey RBT adding , number: 690200000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 13.4 LogInfo(topic: orders addData  first, number: 0, data: 0x145afe19da158a337d3961846072939432eecbcc170e6dfb3e33d798a4882bff, note: , addr: null:0x0000)
-          + Dexz:0x9fE4 13.5 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x145afe19da158a337d3961846072939432eecbcc170e6dfb3e33d798a4882bff, orderType: 0, maker: user1:0x3C44, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690200000000000000, expiry: 1684471191, baseTokens: 1000000000000000000)
+          + Dexz:0x9fE4 13.2 LogInfo(topic: orders addKey RBT adding , number: 690200000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 13.3 LogInfo(topic: orders addData  first, number: 0, data: 0x93191329a33cc01da638d260a24ff20a32fc0a41f3b79e3221f3d225e1ec3c7d, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 13.4 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x93191329a33cc01da638d260a24ff20a32fc0a41f3b79e3221f3d225e1ec3c7d, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690200000000000000, expiry: 1684473494, baseTokens: 1000000000000000000)
+        > user1->dexz.trade(BUY, token0, token1, 0.6902, expiry, baseTokens, feeAccount) - gasUsed: 297668 ~ ETH 0.01190672 ~ USD 23
+          + Dexz:0x9fE4 14.0 LogInfo(topic: getBestMatchingOrder: priceKeys.initialised, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 14.1 LogInfo(topic: _trade: matchingOrderKey, number: 0, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 14.2 AccountAdded(account: user1:0x3C44)
+          + Dexz:0x9fE4 14.3 LogInfo(topic: orders addKey RBT exists , number: 690200000000000000, data: 0x0000000000000000000000000000000000000000000000000000000000000000, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 14.4 LogInfo(topic: orders addData !first, number: 0, data: 0xe8e976648e8b80be6073a08e97626b61f7f4700c6aba2435f731171dbc93c56c, note: , addr: null:0x0000)
+          + Dexz:0x9fE4 14.5 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0xe8e976648e8b80be6073a08e97626b61f7f4700c6aba2435f731171dbc93c56c, orderType: 0, maker: user1:0x3C44, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690200000000000000, expiry: 1684473494, baseTokens: 1000000000000000000)
 
         --- After Adding An Order ---
           Account                                   ETH                     TOK0                     TOK1 Blah
           -------------------- ------------------------ ------------------------ ------------------------ ---------------------------------------------
           deployer:0xf39F       9999.989366632571236561                    100.0                   1000.0
-          user0:0x7099          9999.999297860784871023                    100.0                   1000.0
-          user1:0x3C44          9999.999538602214293796                    100.0                   1000.0
+          user0:0x7099          9999.998893962195389619                    100.0                   1000.0
+          user1:0x3C44           9999.99965320708495324                    100.0                   1000.0
           user2:0x90F7                          10000.0                    100.0                   1000.0
           user3:0x15d3                          10000.0                    100.0                   1000.0
           feeAccount:0x9965                     10000.0                      0.0                      0.0
@@ -103,11 +108,18 @@ Compiled 1 Solidity file successfully
 
           ----- Pair 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156 Token0:0x5FbD/Token1:0xe7f1 -----
             --- Buy Orders ---
-orderPriceKey: 690100000000000000
-orderPriceKey: 690200000000000000
+              orderPriceKey: 0.6901
+                orderQueue: [true,"0x031d9b1ddd994f4c5ea288069a93086981b237ddb18933e994c9233adf6e9d32","0x031d9b1ddd994f4c5ea288069a93086981b237ddb18933e994c9233adf6e9d32"]
+                  Price: 0.6901 head=0x031d9b1ddd994f4c tail=0x031d9b1ddd994f4c
+                    Order '0x031d9b1ddd994f4c5ea288069a93086981b237ddb18933e994c9233adf6e9d32: ["0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000",{"type":"BigNumber","hex":"0x00"},"0x70997970C51812dc3A010C7d01b50e0d17dc79C8","0x5FbDB2315678afecb367f032d93F642f64180aa3","0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",{"type":"BigNumber","hex":"0x0993ba4b2f7f4000"},{"type":"BigNumber","hex":"0x64670696"},{"type":"BigNumber","hex":"0x0de0b6b3a7640000"},{"type":"BigNumber","hex":"0x00"}]
+              orderPriceKey: 0.6902
+                orderQueue: [true,"0x93191329a33cc01da638d260a24ff20a32fc0a41f3b79e3221f3d225e1ec3c7d","0xe8e976648e8b80be6073a08e97626b61f7f4700c6aba2435f731171dbc93c56c"]
+                  Price: 0.6902 head=0x93191329a33cc01d tail=0xe8e976648e8b80be
+                    Order '0x93191329a33cc01da638d260a24ff20a32fc0a41f3b79e3221f3d225e1ec3c7d: ["0x0000000000000000000000000000000000000000000000000000000000000000","0xe8e976648e8b80be6073a08e97626b61f7f4700c6aba2435f731171dbc93c56c",{"type":"BigNumber","hex":"0x00"},"0x70997970C51812dc3A010C7d01b50e0d17dc79C8","0x5FbDB2315678afecb367f032d93F642f64180aa3","0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",{"type":"BigNumber","hex":"0x0994153e3ff98000"},{"type":"BigNumber","hex":"0x64670696"},{"type":"BigNumber","hex":"0x0de0b6b3a7640000"},{"type":"BigNumber","hex":"0x00"}]
+                    Order '0xe8e976648e8b80be6073a08e97626b61f7f4700c6aba2435f731171dbc93c56c: ["0x93191329a33cc01da638d260a24ff20a32fc0a41f3b79e3221f3d225e1ec3c7d","0x0000000000000000000000000000000000000000000000000000000000000000",{"type":"BigNumber","hex":"0x00"},"0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC","0x5FbDB2315678afecb367f032d93F642f64180aa3","0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",{"type":"BigNumber","hex":"0x0994153e3ff98000"},{"type":"BigNumber","hex":"0x64670696"},{"type":"BigNumber","hex":"0x0de0b6b3a7640000"},{"type":"BigNumber","hex":"0x00"}]
             --- Sell Orders ---
 
-    ✔ 00. Test 00 (94ms)
+    ✔ 00. Test 00 (119ms)
     - 00. Test 00
     - 01. Test 01
     - 02. Test 02
@@ -116,6 +128,6 @@ orderPriceKey: 690200000000000000
     - 05. Test 05
 
 
-  1 passing (815ms)
+  1 passing (813ms)
   6 pending
 

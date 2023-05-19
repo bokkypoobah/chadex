@@ -251,26 +251,26 @@ class Data {
         for (let buySell = 0; buySell < 2; buySell++) {
           console.log("            --- " + (buySell == 0 ? "Buy" : "Sell") + " Orders ---");
           let orderPriceKey = 0;
-          orderPriceKey = await this.dexz.first(pair.pairKey, buySell);
+          orderPriceKey = await this.dexz.getBestPrice(pair.pairKey, buySell);
           // orderPriceKey = await this.dexz.next(pair.pairKey, buySell, orderPriceKey);
           // console.log("orderPriceKey: " + orderPriceKey);
           while (orderPriceKey != 0) {
-            console.log("orderPriceKey: " + orderPriceKey);
-            // var orderQueue = this.dexz.getOrderQueue(pair.pairKey, buySell, orderPriceKey);
-            // console.log("orderQueue: " + JSON.stringify(orderQueue));
-          //   console.log("RESULT:   Price: " + orderPriceKey.shift(-18) + " head=" + orderQueue[1].substring(0, 18) + " tail=" + orderQueue[2].substring(0, 18));
-          //   var orderKey = orderQueue[1];
-          //   while (orderKey != 0) {
-          //     var order = contract.getOrder(orderKey);
-          //     // console.log("RESULT:       Order '" + orderKey + ": " + JSON.stringify(order));
+            console.log("              orderPriceKey: " + ethers.utils.formatEther(orderPriceKey));
+            var orderQueue = await this.dexz.getOrderQueue(pair.pairKey, buySell, orderPriceKey);
+            console.log("                orderQueue: " + JSON.stringify(orderQueue));
+            console.log("                  Price: " + ethers.utils.formatEther(orderPriceKey) + " head=" + orderQueue[1].substring(0, 18) + " tail=" + orderQueue[2].substring(0, 18));
+            let orderKey = orderQueue[1];
+            while (orderKey != 0) {
+              let order = await this.dexz.getOrder(orderKey);
+              console.log("                    Order '" + orderKey + ": " + JSON.stringify(order));
           //     var minutes = (order[7] - new Date() / 1000) / 60;
           //     console.log("RESULT:     Order key=" + orderKey.substring(0, 18) + " prev=" + order[0].substring(0, 18) + " next=" + order[1].substring(0, 18) +
           //       (parseInt(order[2]) == 1 ? " Sell": " Buy") + " maker=" + getShortAddressName(order[3]) +
           //       " base=" + getAddressSymbol(order[4]) + " quote=" + getAddressSymbol(order[5]) + " price=" + order[6].shift(-18) +
           //       " expiry=" + minutes.toFixed(2) + "s baseTokens=" + order[8].shift(-18) + " baseTokensFilled=" + order[9].shift(-18));
-          //     orderKey = order[1];
-          //   }
-            orderPriceKey = await this.dexz.next(pair.pairKey, buySell, orderPriceKey);
+              orderKey = order[1];
+            }
+            orderPriceKey = await this.dexz.getNextBestPrice(pair.pairKey, buySell, orderPriceKey);
           }
         }
       }

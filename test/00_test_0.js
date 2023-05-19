@@ -89,12 +89,18 @@ describe("Dexz", function () {
     const expiry = parseInt(new Date()/1000) + 60*60;
     const baseTokens = ethers.utils.parseEther("1");
 
-    const trade1Tx = await data.dexz.connect(data.user0Signer).trade(BUY, data.token0.address, data.token1.address, price1, expiry, baseTokens, data.feeAccount);
-    await data.printEvents("user0->dexz.trade(BUY, token0, token1, 0.6901, expiry, baseTokens, feeAccount)", await trade1Tx.wait());
-    // await data.printState("After Adding An Order");
+    const trade1bTx = await data.dexz.connect(data.user0Signer).trade(BUY, data.token0.address, data.token1.address, price1, expiry, baseTokens, data.feeAccount);
+    await data.printEvents("user0->dexz.trade(BUY, token0, token1, 0.6901, expiry, baseTokens, feeAccount)", await trade1bTx.wait());
 
-    const trade2Tx = await data.dexz.connect(data.user1Signer).trade(BUY, data.token0.address, data.token1.address, price2, expiry, baseTokens, data.feeAccount);
-    await data.printEvents("user1->dexz.trade(BUY, token0, token1, 0.6902, expiry, baseTokens, feeAccount)", await trade2Tx.wait());
+    const trade1sTx = await data.dexz.connect(data.user0Signer).trade(BUY, data.token0.address, data.token1.address, price2, expiry, baseTokens, data.feeAccount);
+    await data.printEvents("user0->dexz.trade(BUY, token0, token1, 0.6902, expiry, baseTokens, feeAccount)", await trade1sTx.wait());
+
+    const trade2bTx = await data.dexz.connect(data.user1Signer).trade(BUY, data.token0.address, data.token1.address, price2, expiry, baseTokens, data.feeAccount);
+    await data.printEvents("user1->dexz.trade(BUY, token0, token1, 0.6902, expiry, baseTokens, feeAccount)", await trade2bTx.wait());
+
+    // const trade2sTx = await data.dexz.connect(data.user1Signer).trade(SELL, data.token0.address, data.token1.address, price2, expiry, baseTokens, data.feeAccount);
+    // await data.printEvents("user1->dexz.trade(BUY, token0, token1, 0.6902, expiry, baseTokens, feeAccount)", await trade2sTx.wait());
+
     await data.printState("After Adding An Order");
 
 
