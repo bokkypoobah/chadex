@@ -66,6 +66,7 @@ contract Owned {
 // DexzBase
 // ----------------------------------------------------------------------------
 contract DexzBase is Owned {
+    uint constant public TENPOW9 = uint(10)**9;
     uint constant public TENPOW18 = uint(10)**18;
 
     uint public deploymentBlockNumber;
@@ -619,19 +620,19 @@ contract Dexz is Orders {
             emit LogInfo("calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", matchingOrder.maker);
             if (matchingOrder.orderType == ORDERTYPE_BUY && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
             }
-            quoteTokens = baseTokens * matchingOrder.price / TENPOW18;
+            quoteTokens = baseTokens * matchingOrder.price / TENPOW9;
             if (_availableQuoteTokens < quoteTokens) {
                 quoteTokens = _availableQuoteTokens;
             }
             emit LogInfo("calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker))", quoteTokens, 0x0, "", matchingOrder.maker);
             // TODO: Add code to collect dust. E.g. > 14 decimal places, check for (dp - 14) threshold to also transfer remaining dust
 
-            if (quoteTokens * TENPOW18 / matchingOrder.price < baseTokens) {
-                baseTokens = quoteTokens * TENPOW18 / matchingOrder.price;
+            if (quoteTokens * TENPOW9 / matchingOrder.price < baseTokens) {
+                baseTokens = quoteTokens * TENPOW9 / matchingOrder.price;
             }
-            // baseTokens = baseTokens.min(quoteTokens * TENPOW18 / matchingOrder.price));
+            // baseTokens = baseTokens.min(quoteTokens * TENPOW9 / matchingOrder.price));
             emit LogInfo("calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price)", baseTokens, 0x0, "", address(0));
-            quoteTokens = baseTokens * matchingOrder.price / TENPOW18;
+            quoteTokens = baseTokens * matchingOrder.price / TENPOW9;
             emit LogInfo("calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18", quoteTokens, 0x0, "", address(0));
 
         // Maker selling base, needs to have amount in base
@@ -661,25 +662,25 @@ contract Dexz is Orders {
             }
             emit LogInfo("calculateOrder Maker Sell: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, matchingOrder.maker))", baseTokens, 0x0, "", matchingOrder.maker);
 
-            emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", baseTokens * matchingOrder.price / TENPOW18, 0x0, "", address(0));
+            emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", baseTokens * matchingOrder.price / TENPOW9, 0x0, "", address(0));
             uint _availableQuoteTokens = availableTokens(matchingOrder.quoteToken, taker);
             emit LogInfo("calculateOrder Maker Sell: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", taker);
             if (matchingOrder.orderType == ORDERTYPE_BUY && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
             }
-            quoteTokens = baseTokens * matchingOrder.price / TENPOW18;
+            quoteTokens = baseTokens * matchingOrder.price / TENPOW9;
             if (_availableQuoteTokens < quoteTokens) {
                 quoteTokens = _availableQuoteTokens;
             }
             emit LogInfo("calculateOrder Maker Sell: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, taker))", quoteTokens, 0x0, "", taker);
             // TODO: Add code to collect dust. E.g. > 14 decimal places, check for (dp - 14) threshold to also transfer remaining dust
 
-            // baseTokens = baseTokens.min(quoteTokens.mul(TENPOW18).div(matchingOrder.price));
-            if (quoteTokens * TENPOW18 / matchingOrder.price < baseTokens) {
-                baseTokens = quoteTokens * TENPOW18 / matchingOrder.price;
+            // baseTokens = baseTokens.min(quoteTokens.mul(TENPOW9).div(matchingOrder.price));
+            if (quoteTokens * TENPOW9 / matchingOrder.price < baseTokens) {
+                baseTokens = quoteTokens * TENPOW9 / matchingOrder.price;
             }
 
             emit LogInfo("calculateOrder Maker Sell: baseTokens = min(baseTokens, quoteTokens x 1e18 / price)", baseTokens, 0x0, "", address(0));
-            quoteTokens = baseTokens * matchingOrder.price / TENPOW18;
+            quoteTokens = baseTokens * matchingOrder.price / TENPOW9;
             emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", quoteTokens, 0x0, "", address(0));
         }
         // TODO BK
