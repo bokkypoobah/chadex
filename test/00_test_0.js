@@ -4,6 +4,9 @@ const { expect, assert } = require("chai");
 const { BigNumber } = require("ethers");
 const util = require('util');
 
+var BUY = 0;
+var SELL = 1;
+
 let data;
 
 describe("Dexz", function () {
@@ -58,7 +61,6 @@ describe("Dexz", function () {
         await data.printEvents("Transfer Token0", await a.wait());
       });
     }
-
     const setup2 = [];
     setup2.push(token1.transfer(data.user0, ethers.utils.parseEther("1000")));
     setup2.push(token1.transfer(data.user1, ethers.utils.parseEther("1000")));
@@ -72,33 +74,29 @@ describe("Dexz", function () {
     }
     console.log("        Tokens transferred");
 
-    // const umswapFactory = await UmswapFactory.deploy();
-    // await umswapFactory.deployed();
-    // await data.setUmswapFactory(umswapFactory);
-    // const umswapFactoryReceipt = await data.umswapFactory.deployTransaction.wait();
-    // if (DETAILS > 0) {
-    //   await data.printEvents("Deployed UmswapFactory", umswapFactoryReceipt);
-    // }
-    // console.log("        UmswapFactory deployed");
-    //
-    // const setup1 = [];
-    // setup1.push(data.erc721Mock.mint(data.user0, 111));
-    // setup1.push(data.erc721Mock.mint(data.user0, 222));
-    // setup1.push(data.erc721Mock.mint(data.user0, 333));
-    // setup1.push(data.erc721Mock.mint(data.user1, 444));
-    // setup1.push(data.erc721Mock.mint(data.user1, 555));
-    // setup1.push(data.erc721Mock.mint(data.user1, 666));
-    // const mintATxs = await Promise.all(setup1);
-    // if (DETAILS > 0) {
-    //   mintATxs.forEach( async function (a) {
-    //     await data.printEvents("Minted ERC721Mock", await a.wait());
-    //   });
-    // }
     await data.printState("Setup Completed. Dexz bytecode ~" + JSON.stringify(data.dexz.deployTransaction.data.length/2, null, 2));
   });
 
   it("00. Test 00", async function () {
     console.log("      00. Test 00 - Happy Path - Specified Set");
+
+    // function trade(uint orderFlag, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 _orderKey) {
+
+    const price = ethers.utils.parseEther("0.019");
+    // const price = ethers.utils.parseUnits("500", 18);
+    const expired = parseInt(new Date()/1000) - 60*60;
+    const expiry = parseInt(new Date()/1000) + 60*60;
+    const baseTokens = ethers.utils.parseEther("1");
+
+    const trade1Tx = await data.dexz.connect(data.user0Signer).trade(BUY, data.token0.address, data.token1.address, price, expiry, baseTokens, data.feeAccount);
+    await data.printEvents("user0->dexz.trade(BUY, token0, token1, 0.019, expiry, baseTokens, feeAccount)", await trade1Tx.wait());
+    await data.printState("After Adding An Order");
+
+
+
+
+    // const newUmswapTx = await data.dexz.newUmswap(data.erc721Mock.address, "Odd TokenIds: - test", tokenIds);
+    // await data.printEvents("deployer->factory.newUmswap(erc721Mock, " + JSON.stringify(tokenIds) + ")", await newUmswapTx.wait());
   });
 
   it.skip("00. Test 00", async function () {

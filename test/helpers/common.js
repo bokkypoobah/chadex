@@ -146,18 +146,18 @@ class Data {
     this.addContract(dexz, "Dexz");
   }
 
-  async setERC721Mock(erc721Mock) {
-    this.erc721Mock = erc721Mock;
-    this.addContract(erc721Mock, "ERC721Mock");
-  }
-  async setUmswapFactory(umswapFactory) {
-    this.umswapFactory = umswapFactory;
-    this.addContract(umswapFactory, "UmswapFactory");
-  }
-  async setUmswap(umswap) {
-    this.umswap = umswap;
-    this.addContract(umswap, "Umswap");
-  }
+  // async setERC721Mock(erc721Mock) {
+  //   this.erc721Mock = erc721Mock;
+  //   this.addContract(erc721Mock, "ERC721Mock");
+  // }
+  // async setUmswapFactory(umswapFactory) {
+  //   this.umswapFactory = umswapFactory;
+  //   this.addContract(umswapFactory, "UmswapFactory");
+  // }
+  // async setUmswap(umswap) {
+  //   this.umswap = umswap;
+  //   this.addContract(umswap, "Umswap");
+  // }
 
   async printState(prefix) {
     console.log("\n        --- " + prefix + " ---");
@@ -239,74 +239,74 @@ class Data {
       console.log();
     }
 
-    if (false) {
-    if (this.nix != null) {
-      const tokensLength = (await this.nix.getLengths())[0];
-      if (tokensLength > 0) {
-        var tokensIndices = [...Array(parseInt(tokensLength)).keys()];
-        const tokens = await this.nixHelper.getTokens(tokensIndices);
-        for (let i = 0; i < tokens[0].length; i++) {
-          const token = tokens[0][i];
-          const ordersLength = tokens[1][i];
-          const executed = tokens[2][i];
-          const volumeToken = tokens[3][i];
-          const volumeWeth = tokens[4][i];
-          console.log("          Orders for " + this.getShortAccountName(token) + ", ordersLength: " + ordersLength + ", executed: " + executed + ", volumeToken: " + volumeToken + ", volumeWeth: " + ethers.utils.formatEther(volumeWeth));
-          console.log("              # Maker          Taker                         Price B/S  Any/All Expiry                   Tx Count   Tx Max  RoyFac% Status               TokenIds");
-          console.log("            --- -------------- -------------- -------------------- ---- ------- ------------------------ -------- -------- -------- -------------------- -----------------------");
-          var orderIndices = [...Array(parseInt(ordersLength)).keys()];
-          const orders = await this.nixHelper.getOrders(token, orderIndices);
-          for (let i = 0; i < ordersLength; i++) {
-            const maker = orders[0][i];
-            const taker = orders[1][i];
-            const tokenIds = orders[2][i];
-            const price = orders[3][i];
-            const data = orders[4][i];
-            const buyOrSell = data[0];
-            const anyOrAll = data[1];
-            const expiry = data[2];
-            const expiryString = expiry == 0 ? "(none)" : new Date(expiry * 1000).toISOString();
-            const tradeCount = data[3];
-            const tradeMax = data[4];
-            const royaltyFactor = data[5];
-            const orderStatus = data[6];
-            const orderStatusString = ORDERSTATUSSTRING[orderStatus];
-            console.log("            " + this.padLeft(i, 3) + " " +
-              this.padRight(this.getShortAccountName(maker), 14) + " " +
-              this.padRight(this.getShortAccountName(taker), 14) + " " +
-              this.padLeft(ethers.utils.formatEther(price), 20) + " " +
-              this.padRight(BUYORSELLSTRING[buyOrSell], 4) + " " +
-              this.padRight(ANYORALLSTRING[anyOrAll], 7) + " " +
-              this.padRight(expiryString, 24) + " " +
-              this.padLeft(tradeCount.toString(), 8) + " " +
-              this.padLeft(tradeMax.toString(), 8) + " " +
-              this.padLeft(royaltyFactor.toString(), 8) + " " +
-              this.padRight(orderStatusString.toString(), 20) + " " +
-              JSON.stringify(tokenIds.map((x) => { return parseInt(x.toString()); })));
-          }
-          console.log();
-        }
-      }
-    }
-
-    const tradesLength = (await this.nix.getLengths())[1];
-    if (tradesLength > 0) {
-      console.log("          tradesLength: " + tradesLength);
-      // if (ordersLength > 0) {
-      //   console.log("            # Maker         Taker        Token                       Price Type     Expiry                   Tx Count   Tx Max Status               Key        TokenIds");
-      //   console.log("          --- ------------- ------------ ------------ -------------------- -------- ------------------------ -------- -------- -------------------- ---------- -----------------------");
-      const tradeIndices = [...Array(parseInt(tradesLength)).keys()];
-      const trades = await this.nixHelper.getTrades(tradeIndices);
-      console.log("          trades: " + JSON.stringify(trades.map((x) => { return x.toString(); })));
-      // //   const orders = await this.nix.getOrders(tradeIndices);
-      //
-      //
-      //   for (let i = 0; i < tradesLength; i++) {
-      //     console.log("trade: " + JSON.stringify(trade));
-      //   }
-      // }
-    }
-  }
+    // if (false) {
+    //   if (this.nix != null) {
+    //     const tokensLength = (await this.nix.getLengths())[0];
+    //     if (tokensLength > 0) {
+    //       var tokensIndices = [...Array(parseInt(tokensLength)).keys()];
+    //       const tokens = await this.nixHelper.getTokens(tokensIndices);
+    //       for (let i = 0; i < tokens[0].length; i++) {
+    //         const token = tokens[0][i];
+    //         const ordersLength = tokens[1][i];
+    //         const executed = tokens[2][i];
+    //         const volumeToken = tokens[3][i];
+    //         const volumeWeth = tokens[4][i];
+    //         console.log("          Orders for " + this.getShortAccountName(token) + ", ordersLength: " + ordersLength + ", executed: " + executed + ", volumeToken: " + volumeToken + ", volumeWeth: " + ethers.utils.formatEther(volumeWeth));
+    //         console.log("              # Maker          Taker                         Price B/S  Any/All Expiry                   Tx Count   Tx Max  RoyFac% Status               TokenIds");
+    //         console.log("            --- -------------- -------------- -------------------- ---- ------- ------------------------ -------- -------- -------- -------------------- -----------------------");
+    //         var orderIndices = [...Array(parseInt(ordersLength)).keys()];
+    //         const orders = await this.nixHelper.getOrders(token, orderIndices);
+    //         for (let i = 0; i < ordersLength; i++) {
+    //           const maker = orders[0][i];
+    //           const taker = orders[1][i];
+    //           const tokenIds = orders[2][i];
+    //           const price = orders[3][i];
+    //           const data = orders[4][i];
+    //           const buyOrSell = data[0];
+    //           const anyOrAll = data[1];
+    //           const expiry = data[2];
+    //           const expiryString = expiry == 0 ? "(none)" : new Date(expiry * 1000).toISOString();
+    //           const tradeCount = data[3];
+    //           const tradeMax = data[4];
+    //           const royaltyFactor = data[5];
+    //           const orderStatus = data[6];
+    //           const orderStatusString = ORDERSTATUSSTRING[orderStatus];
+    //           console.log("            " + this.padLeft(i, 3) + " " +
+    //             this.padRight(this.getShortAccountName(maker), 14) + " " +
+    //             this.padRight(this.getShortAccountName(taker), 14) + " " +
+    //             this.padLeft(ethers.utils.formatEther(price), 20) + " " +
+    //             this.padRight(BUYORSELLSTRING[buyOrSell], 4) + " " +
+    //             this.padRight(ANYORALLSTRING[anyOrAll], 7) + " " +
+    //             this.padRight(expiryString, 24) + " " +
+    //             this.padLeft(tradeCount.toString(), 8) + " " +
+    //             this.padLeft(tradeMax.toString(), 8) + " " +
+    //             this.padLeft(royaltyFactor.toString(), 8) + " " +
+    //             this.padRight(orderStatusString.toString(), 20) + " " +
+    //             JSON.stringify(tokenIds.map((x) => { return parseInt(x.toString()); })));
+    //         }
+    //         console.log();
+    //       }
+    //     }
+    //   }
+    //
+    //   const tradesLength = (await this.nix.getLengths())[1];
+    //   if (tradesLength > 0) {
+    //     console.log("          tradesLength: " + tradesLength);
+    //     // if (ordersLength > 0) {
+    //     //   console.log("            # Maker         Taker        Token                       Price Type     Expiry                   Tx Count   Tx Max Status               Key        TokenIds");
+    //     //   console.log("          --- ------------- ------------ ------------ -------------------- -------- ------------------------ -------- -------- -------------------- ---------- -----------------------");
+    //     const tradeIndices = [...Array(parseInt(tradesLength)).keys()];
+    //     const trades = await this.nixHelper.getTrades(tradeIndices);
+    //     console.log("          trades: " + JSON.stringify(trades.map((x) => { return x.toString(); })));
+    //     // //   const orders = await this.nix.getOrders(tradeIndices);
+    //     //
+    //     //
+    //     //   for (let i = 0; i < tradesLength; i++) {
+    //     //     console.log("trade: " + JSON.stringify(trade));
+    //     //   }
+    //     // }
+    //   }
+    // }
   }
 }
 
