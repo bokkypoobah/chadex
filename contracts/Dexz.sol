@@ -84,19 +84,19 @@ contract DexzBase is Owned {
     }
 
     // Data => block.number when first seen
-    mapping(address => uint) public tokenBlockNumbers;
-    mapping(address => uint) public accountBlockNumbers;
+    // mapping(address => uint) public tokenBlockNumbers;
+    // mapping(address => uint) public accountBlockNumbers;
     mapping(bytes32 => uint) public pairBlockNumbers;
-    address[] public tokenList;
-    address[] public accountList;
+    // address[] public tokenList;
+    // address[] public accountList;
     PairInfo[] public pairInfoList;
 
     event TakerFeeInEthersUpdated(uint oldTakerFeeInEthers, uint newTakerFeeInEthers);
     event TakerFeeInTokensUpdated(uint oldTakerFeeInTokens, uint newTakerFeeInTokens);
     event FeeAccountUpdated(address oldFeeAccount, address newFeeAccount);
 
-    event TokenAdded(address indexed token);
-    event AccountAdded(address indexed account);
+    // event TokenAdded(address indexed token);
+    // event AccountAdded(address indexed account);
     event PairAdded(bytes32 indexed pairKey, address indexed baseToken, address indexed quoteToken);
 
     event LogInfo(string topic, uint number, bytes32 data, string note, address addr);
@@ -106,7 +106,7 @@ contract DexzBase is Owned {
         initOwned(msg.sender);
         deploymentBlockNumber = block.number;
         feeAccount = _feeAccount;
-        addAccount(address(this));
+        // addAccount(address(this));
     }
 
     function setTakerFeeInEthers(uint _takerFeeInEthers) public onlyOwner {
@@ -122,28 +122,28 @@ contract DexzBase is Owned {
         feeAccount = _feeAccount;
     }
 
-    function tokenListLength() public view returns (uint) {
-        return tokenList.length;
-    }
-    function addToken(address token) internal {
-        if (tokenBlockNumbers[token] == 0) {
-            require(IERC20(token).totalSupply() > 0);
-            tokenBlockNumbers[token] = block.number;
-            tokenList.push(token);
-            emit TokenAdded(token);
-        }
-        console.log("          BigChungo");
-    }
-    function accountListLength() public view returns (uint) {
-        return accountList.length;
-    }
-    function addAccount(address account) internal {
-        if (accountBlockNumbers[account] == 0) {
-            accountBlockNumbers[account] = block.number;
-            accountList.push(account);
-            emit AccountAdded(account);
-        }
-    }
+    // function tokenListLength() public view returns (uint) {
+    //     return tokenList.length;
+    // }
+    // function addToken(address token) internal {
+    //     if (tokenBlockNumbers[token] == 0) {
+    //         require(IERC20(token).totalSupply() > 0);
+    //         tokenBlockNumbers[token] = block.number;
+    //         tokenList.push(token);
+    //         emit TokenAdded(token);
+    //     }
+    //     console.log("          BigChungo");
+    // }
+    // function accountListLength() public view returns (uint) {
+    //     return accountList.length;
+    // }
+    // function addAccount(address account) internal {
+    //     if (accountBlockNumbers[account] == 0) {
+    //         accountBlockNumbers[account] = block.number;
+    //         accountList.push(account);
+    //         emit AccountAdded(account);
+    //     }
+    // }
     function pairInfoListLength() public view returns (uint) {
         return pairInfoList.length;
     }

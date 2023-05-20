@@ -224,8 +224,8 @@ class Data {
       const takerFeeInEthers = await this.dexz.takerFeeInEthers();
       const takerFeeInTokens = await this.dexz.takerFeeInTokens();
       const feeAccount = await this.dexz.feeAccount();
-      const tokenListLength = parseInt(await this.dexz.tokenListLength());
-      const accountListLength = parseInt(await this.dexz.accountListLength());
+      // const tokenListLength = parseInt(await this.dexz.tokenListLength());
+      // const accountListLength = parseInt(await this.dexz.accountListLength());
       const pairInfoListLength = parseInt(await this.dexz.pairInfoListLength());
 
       console.log("          - owner: " + this.getShortAccountName(owner));
@@ -233,12 +233,12 @@ class Data {
       console.log("          - takerFeeInEthers: " + ethers.utils.formatEther(takerFeeInEthers));
       console.log("          - takerFeeInTokens: " + ethers.utils.formatUnits(takerFeeInTokens, 16) + "%");
       console.log("          - feeAccount: " + this.getShortAccountName(feeAccount));
-      for (let j = 0; j < tokenListLength; j++) {
-        console.log("          - tokenListLength[" + j + "]: " + this.getShortAccountName(await this.dexz.tokenList(j)));
-      }
-      for (let j = 0; j < accountListLength; j++) {
-        console.log("          - accountListLength[" + j + "]: " + this.getShortAccountName(await this.dexz.accountList(j)));
-      }
+      // for (let j = 0; j < tokenListLength; j++) {
+      //   console.log("          - tokenListLength[" + j + "]: " + this.getShortAccountName(await this.dexz.tokenList(j)));
+      // }
+      // for (let j = 0; j < accountListLength; j++) {
+      //   console.log("          - accountListLength[" + j + "]: " + this.getShortAccountName(await this.dexz.accountList(j)));
+      // }
       const pairInfos = [];
       for (let j = 0; j < pairInfoListLength; j++) {
         const info = await this.dexz.pairInfoList(j)
