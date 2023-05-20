@@ -96,15 +96,15 @@ describe("Dexz", function () {
     await data.printEvents("Send WETH9" , await weth93Tx.wait());
 
     const approveAmount = ethers.utils.parseEther("1000");
-    const approve00Tx = await token0.connect(data.user0Signer).approve(data.dexz.address, approveAmount);
-    const approve10Tx = await token1.connect(data.user0Signer).approve(data.dexz.address, approveAmount);
-    const approve20Tx = await weth9.connect(data.user0Signer).approve(data.dexz.address, approveAmount);
-    const approve01Tx = await token0.connect(data.user1Signer).approve(data.dexz.address, approveAmount);
-    const approve11Tx = await token1.connect(data.user1Signer).approve(data.dexz.address, approveAmount);
-    const approve21Tx = await weth9.connect(data.user1Signer).approve(data.dexz.address, approveAmount);
-    const approve02Tx = await token0.connect(data.user2Signer).approve(data.dexz.address, approveAmount);
-    const approve12Tx = await token1.connect(data.user2Signer).approve(data.dexz.address, approveAmount);
-    const approve22Tx = await weth9.connect(data.user2Signer).approve(data.dexz.address, approveAmount);
+    const approve00Tx = await data.token0.connect(data.user0Signer).approve(data.dexz.address, approveAmount);
+    const approve10Tx = await data.token1.connect(data.user0Signer).approve(data.dexz.address, approveAmount);
+    const approve20Tx = await data.weth9.connect(data.user0Signer).approve(data.dexz.address, approveAmount);
+    const approve01Tx = await data.token0.connect(data.user1Signer).approve(data.dexz.address, approveAmount);
+    const approve11Tx = await data.token1.connect(data.user1Signer).approve(data.dexz.address, approveAmount);
+    const approve21Tx = await data.weth9.connect(data.user1Signer).approve(data.dexz.address, approveAmount);
+    const approve02Tx = await data.token0.connect(data.user2Signer).approve(data.dexz.address, approveAmount);
+    const approve12Tx = await data.token1.connect(data.user2Signer).approve(data.dexz.address, approveAmount);
+    const approve22Tx = await data.weth9.connect(data.user2Signer).approve(data.dexz.address, approveAmount);
     await data.printEvents("user0->token0.approve(dexz, " + approveAmount + ")", await approve00Tx.wait());
     await data.printEvents("user0->token1.approve(dexz, " + approveAmount + ")", await approve10Tx.wait());
     await data.printEvents("user0->weth9.approve(dexz, " + approveAmount + ")", await approve20Tx.wait());
