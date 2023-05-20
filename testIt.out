@@ -1,4 +1,3 @@
-Compiled 1 Solidity file successfully
 
 
   Dexz
@@ -88,13 +87,13 @@ Compiled 1 Solidity file successfully
           + Dexz:0xCf7E 26.0 TokenAdded(token: Token0:0x5FbD)
           + Dexz:0xCf7E 26.1 TokenAdded(token: Token1:0xe7f1)
           + Dexz:0xCf7E 26.2 AccountAdded(account: user0:0x7099)
-          + Dexz:0xCf7E 26.3 PairAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1)
-          + Dexz:0xCf7E 26.4 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x3b8487fa5398f3a55618031d0336d0a347bac5029cd451acbdd595a0ec65eab9, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000, expiry: 1684559727, baseTokens: 1000000000000000000)
+          + Dexz:0xCf7E 26.3 PairAdded(pairKey: 0x40c0...0156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1)
+          + Dexz:0xCf7E 26.4 OrderAdded(pairKey: 0x40c0...0156, key: 0xf882...fe76, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000, expiry: 1684560260, baseTokens: 1.0)
           BigChungo
           BigChungo
         > user1->dexz.trade(BUY, token0, token1, 0.69, expiry, baseTokens, uiFeeAccount) - gasUsed: 263916 ~ ETH 0.01055664 ~ USD 21
           + Dexz:0xCf7E 27.0 AccountAdded(account: user1:0x3C44)
-          + Dexz:0xCf7E 27.1 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0x1c0fedb01306bde21afe23b6f8316a78e908c27166f67c777762d50e5a7a9c98, orderType: 0, maker: user1:0x3C44, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000, expiry: 1684559727, baseTokens: 1000000000000000000)
+          + Dexz:0xCf7E 27.1 OrderAdded(pairKey: 0x40c0...0156, key: 0xa7c3...7fab, orderType: 0, maker: user1:0x3C44, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000, expiry: 1684560260, baseTokens: 1.0)
 
         --- After Adding Order(s) ---
           Account                                   ETH                     TOK0                     TOK1                     WETH Blah
@@ -124,25 +123,25 @@ Compiled 1 Solidity file successfully
           ----- Pair 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156 Token0:0x5FbD/Token1:0xe7f1 -----
             --- Buy Orders ---
               orderPriceKey: 0.69
-                Order key=0x3b8487fa prev=0x00000000 next=0x1c0fedb0 Buy maker=user0:0x7099 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
-                Order key=0x1c0fedb0 prev=0x3b8487fa next=0x00000000 Buy maker=user1:0x3C44 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
+                Order key=0xf8825359 prev=0x00000000 next=0xa7c3570a Buy maker=user0:0x7099 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
+                Order key=0xa7c3570a prev=0xf8825359 next=0x00000000 Buy maker=user1:0x3C44 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
             --- Sell Orders ---
 
           BigChungo
           BigChungo
         > user2->dexz.trade(SELL, token0, token1, 0.69, expiry, sellBaseTokens, uiFeeAccount) - gasUsed: 547422 ~ ETH 0.02189688 ~ USD 43
-          + Dexz:0xCf7E 28.0 Trade(key: 0x3b8487fa5398f3a55618031d0336d0a347bac5029cd451acbdd595a0ec65eab9, orderType: 1, taker: user2:0x90F7, maker: user0:0x7099, amount: 1.0, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, baseTokens: 1000000000000000000, quoteTokens: 689310000000000000, feeBaseTokens: 690000000000000, feeQuoteTokens: 0, baseTokensFilled: 0)
+          + Dexz:0xCf7E 28.0 Trade(key: 0xf882...fe76, orderType: 1, taker: user2:0x90F7, maker: user0:0x7099, amount: 1.0, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, baseTokens: 1.0, quoteTokens: 0.68931, feeBaseTokens: 0.00069, feeQuoteTokens: 0.0, baseTokensFilled: 0)
           + Token0:0x5FbD 28.1 Transfer(from: user2:0x90F7, to: user0:0x7099, tokens: 1.0)
           + Token1:0xe7f1 28.2 Transfer(from: user0:0x7099, to: user2:0x90F7, tokens: 0.68931)
           + Token1:0xe7f1 28.3 Transfer(from: user0:0x7099, to: uiFeeAccount:0x976E, tokens: 0.000345)
           + Token1:0xe7f1 28.4 Transfer(from: user0:0x7099, to: feeAccount:0x9965, tokens: 0.000345)
-          + Dexz:0xCf7E 28.5 Trade(key: 0x1c0fedb01306bde21afe23b6f8316a78e908c27166f67c777762d50e5a7a9c98, orderType: 1, taker: user2:0x90F7, maker: user1:0x3C44, amount: 1.0, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, baseTokens: 1000000000000000000, quoteTokens: 689310000000000000, feeBaseTokens: 690000000000000, feeQuoteTokens: 0, baseTokensFilled: 0)
+          + Dexz:0xCf7E 28.5 Trade(key: 0xa7c3...7fab, orderType: 1, taker: user2:0x90F7, maker: user1:0x3C44, amount: 1.0, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, baseTokens: 1.0, quoteTokens: 0.68931, feeBaseTokens: 0.00069, feeQuoteTokens: 0.0, baseTokensFilled: 0)
           + Token0:0x5FbD 28.6 Transfer(from: user2:0x90F7, to: user1:0x3C44, tokens: 1.0)
           + Token1:0xe7f1 28.7 Transfer(from: user1:0x3C44, to: user2:0x90F7, tokens: 0.68931)
           + Token1:0xe7f1 28.8 Transfer(from: user1:0x3C44, to: uiFeeAccount:0x976E, tokens: 0.000345)
           + Token1:0xe7f1 28.9 Transfer(from: user1:0x3C44, to: feeAccount:0x9965, tokens: 0.000345)
           + Dexz:0xCf7E 28.10 AccountAdded(account: user2:0x90F7)
-          + Dexz:0xCf7E 28.11 OrderAdded(pairKey: 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156, key: 0xea8bb5c3031b986006abbedea0c38b2573ebb265f88bde5786d131c0ab28a886, orderType: 1, maker: user2:0x90F7, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000, expiry: 1684559727, baseTokens: 420690000000000000)
+          + Dexz:0xCf7E 28.11 OrderAdded(pairKey: 0x40c0...0156, key: 0x8d8b...7f6e, orderType: 1, maker: user2:0x90F7, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000, expiry: 1684560260, baseTokens: 0.42069)
 
         --- After Executing Against Order(s) ---
           Account                                   ETH                     TOK0                     TOK1                     WETH Blah
@@ -174,9 +173,9 @@ Compiled 1 Solidity file successfully
             --- Buy Orders ---
             --- Sell Orders ---
               orderPriceKey: 0.69
-                Order key=0xea8bb5c3 prev=0x00000000 next=0x00000000 Sell maker=user2:0x90F7 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.98s baseTokens=0.42069 baseTokensFilled=0.0
+                Order key=0x8d8b2059 prev=0x00000000 next=0x00000000 Sell maker=user2:0x90F7 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.98s baseTokens=0.42069 baseTokensFilled=0.0
 
-    ✔ 00. Test 00 (238ms)
+    ✔ 00. Test 00 (253ms)
 
 
   1 passing (1s)

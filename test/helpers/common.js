@@ -91,11 +91,13 @@ class Data {
             if (a.type == 'address') {
               result = result + this.getShortAccountName(data.args[a.name].toString());
             } else if (a.type == 'uint256' || a.type == 'uint128') {
-              if (a.name == 'tokens' || a.name == 'amount' || a.name == 'balance' || a.name == 'value' || a.name == 'integratorTip' || a.name == 'remainingTip') {
+              if (a.name == 'tokens' || a.name == 'baseTokens' || a.name == 'quoteTokens' || a.name == 'feeBaseTokens' || a.name == 'feeQuoteTokens' || a.name == 'amount' || a.name == 'balance' || a.name == 'value' || a.name == 'integratorTip' || a.name == 'remainingTip') {
                 result = result + ethers.utils.formatUnits(data.args[a.name], 18);
               } else {
                 result = result + data.args[a.name].toString();
               }
+            } else if (a.type == 'bytes32') {
+              result = result + data.args[a.name].substring(0, 6) + "..." + data.args[a.name].substring(62);
             } else {
               result = result + data.args[a.name].toString();
             }
