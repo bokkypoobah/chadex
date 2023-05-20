@@ -220,7 +220,7 @@ class Data {
 
       console.log("          Dexz: " + this.getShortAccountName(this.dexz.address));
       const owner = await this.dexz.owner();
-      const deploymentBlockNumber = await this.dexz.deploymentBlockNumber();
+      // const deploymentBlockNumber = await this.dexz.deploymentBlockNumber();
       const takerFeeInEthers = await this.dexz.takerFeeInEthers();
       const takerFeeInTokens = await this.dexz.takerFeeInTokens();
       const feeAccount = await this.dexz.feeAccount();
@@ -229,7 +229,7 @@ class Data {
       const pairInfoListLength = parseInt(await this.dexz.pairInfoListLength());
 
       console.log("          - owner: " + this.getShortAccountName(owner));
-      console.log("          - deploymentBlockNumber: " + deploymentBlockNumber);
+      // console.log("          - deploymentBlockNumber: " + deploymentBlockNumber);
       console.log("          - takerFeeInEthers: " + ethers.utils.formatEther(takerFeeInEthers));
       console.log("          - takerFeeInTokens: " + ethers.utils.formatUnits(takerFeeInTokens, 16) + "%");
       console.log("          - feeAccount: " + this.getShortAccountName(feeAccount));

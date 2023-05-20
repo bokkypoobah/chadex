@@ -72,7 +72,7 @@ contract DexzBase is Owned {
     PriceType public constant PRICE_MIN = PriceType.wrap(1);
     PriceType public constant PRICE_MAX = PriceType.wrap(999_999_999_999_999_999); // max(uint64)=18,446,744,073,709,551,616
 
-    uint public deploymentBlockNumber;
+    // uint public deploymentBlockNumber;
     uint public takerFeeInEthers = 5 * 10 ** 16; // 0.05 ETH
     uint public takerFeeInTokens = 10 * uint(10)**14; // 0.10%
     address public feeAccount;
@@ -104,7 +104,7 @@ contract DexzBase is Owned {
 
     constructor(address _feeAccount) {
         initOwned(msg.sender);
-        deploymentBlockNumber = block.number;
+        // deploymentBlockNumber = block.number;
         feeAccount = _feeAccount;
         // addAccount(address(this));
     }
@@ -328,17 +328,16 @@ contract Orders is DexzBase {
     }
 
 
-    function _getBestMatchingOrder(BuySell buySell, address baseToken, address quoteToken, PriceType price) internal returns (PriceType _bestMatchingPriceKey, bytes32 _bestMatchingOrderKey) {
-        bytes32 _pairKey = pairKey(baseToken, quoteToken);
+    function _getBestMatchingOrder(bytes32 __pairKey, BuySell buySell, PriceType price) internal returns (PriceType _bestMatchingPriceKey, bytes32 _bestMatchingOrderKey) {
         BuySell _matchingBuySell = inverseBuySell(buySell);
-        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_matchingBuySell];
+        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[__pairKey][_matchingBuySell];
         // SKINNY2 if (priceKeys.initialised) {
             // emit LogInfo("getBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
             _bestMatchingPriceKey = (buySell == BuySell.Buy) ? priceKeys.first() : priceKeys.last();
             bool priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (buySell == BuySell.Buy) ? PriceType.unwrap(_bestMatchingPriceKey) <= PriceType.unwrap(price) : PriceType.unwrap(_bestMatchingPriceKey) >= PriceType.unwrap(price);
             while (priceOk) {
                 // emit LogInfo("getBestMatchingOrder: _bestMatchingPriceKey", uint(PriceType.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
-                OrderQueue storage _orderQueue = orderQueue[_pairKey][_matchingBuySell][_bestMatchingPriceKey];
+                OrderQueue storage _orderQueue = orderQueue[__pairKey][_matchingBuySell][_bestMatchingPriceKey];
                 if (_orderQueue.exists) {
                     // emit LogInfo("getBestMatchingOrder: orderQueue not empty", uint(PriceType.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
                     _bestMatchingOrderKey = _orderQueue.head;
@@ -361,16 +360,15 @@ contract Orders is DexzBase {
         }
         return (BokkyPooBahsRedBlackTreeLibrary.getEmpty(), ORDERKEY_SENTINEL);
     }
-    function _updateBestMatchingOrder(BuySell buySell, address baseToken, address quoteToken, PriceType matchingPriceKey, bytes32 matchingOrderKey, bool _orderFilled) internal returns (bytes32 _orderKey) {
-        bytes32 _pairKey = pairKey(baseToken, quoteToken);
+    function _updateBestMatchingOrder(bytes32 __pairKey, BuySell buySell, PriceType matchingPriceKey, bytes32 matchingOrderKey, bool _orderFilled) internal returns (bytes32 _orderKey) {
         BuySell _matchingBuySell = inverseBuySell(buySell);
-        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_matchingBuySell];
+        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[__pairKey][_matchingBuySell];
         // SKINNY2 if (priceKeys.initialised) {
             // emit LogInfo("updateBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
             PriceType priceKey = (buySell == BuySell.Buy) ? priceKeys.first() : priceKeys.last();
             while (!BokkyPooBahsRedBlackTreeLibrary.isEmpty(priceKey)) {
                 // emit LogInfo("updateBestMatchingOrder: priceKey", uint(PriceType.unwrap(priceKey)), 0x0, "", address(0));
-                OrderQueue storage _orderQueue = orderQueue[_pairKey][_matchingBuySell][priceKey];
+                OrderQueue storage _orderQueue = orderQueue[__pairKey][_matchingBuySell][priceKey];
                 if (_orderQueue.exists) {
                     // emit LogInfo("updateBestMatchingOrder: orderQueue not empty", uint(PriceType.unwrap(priceKey)), 0x0, "", address(0));
 
@@ -394,7 +392,7 @@ contract Orders is DexzBase {
                     }
                     // Clear out queue info, and prie tree if necessary
                     if (_orderQueue.head == ORDERKEY_SENTINEL) {
-                        delete orderQueue[_pairKey][_matchingBuySell][priceKey];
+                        delete orderQueue[__pairKey][_matchingBuySell][priceKey];
                         priceKeys.remove(priceKey);
                         // emit LogInfo("orders remove RBT", uint(PriceType.unwrap(priceKey)), 0x0, "", address(0));
                     }
@@ -586,7 +584,8 @@ contract Dexz is Orders {
     function _trade(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 _orderKey) {
         PriceType matchingPriceKey;
         bytes32 matchingOrderKey;
-        (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.buySell, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price);
+        bytes32 _pairKey = pairKey(tradeInfo.baseToken, tradeInfo.quoteToken);
+        (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(_pairKey, tradeInfo.buySell, tradeInfo.price);
         // emit LogInfo("_trade: matchingOrderKey", 0, matchingOrderKey, "", address(0));
 
         uint loop = 0;
@@ -606,9 +605,9 @@ contract Dexz is Orders {
                 tradeInfo.baseTokens = tradeInfo.baseTokens - _baseTokens;
                 _baseTokensFilled = _baseTokensFilled + _baseTokens;
                 _quoteTokensFilled = _quoteTokensFilled + _quoteTokens;
-                _updateBestMatchingOrder(tradeInfo.buySell, tradeInfo.baseToken, tradeInfo.quoteToken, matchingPriceKey, matchingOrderKey, _orderFilled);
+                _updateBestMatchingOrder(_pairKey, tradeInfo.buySell, matchingPriceKey, matchingOrderKey, _orderFilled);
                 // matchingOrderKey = ORDERKEY_SENTINEL;
-                (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.buySell, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price);
+                (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(_pairKey, tradeInfo.buySell, tradeInfo.price);
             }
             loop++;
             // break;
