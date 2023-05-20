@@ -212,40 +212,22 @@ class Data {
     console.log();
 
     if (this.dexz) {
-      // console.log("RESULT: dexz.owner/new=" + getShortAddressName(contract.owner()) + "/" + getShortAddressName(contract.newOwner()));
-      // console.log("RESULT: dexz.deploymentBlockNumber=" + contract.deploymentBlockNumber());
-      // console.log("RESULT: dexz.takerFeeInEthers=" + contract.takerFeeInEthers().shift(-18) + " ETH");
-      // console.log("RESULT: dexz.takerFeeInTokens=" + contract.takerFeeInTokens().shift(-16) + "%");
-      // console.log("RESULT: dexz.feeAccount=" + getShortAddressName(contract.feeAccount()));
-
-      console.log("          Dexz: " + this.getShortAccountName(this.dexz.address));
       const owner = await this.dexz.owner();
-      // const deploymentBlockNumber = await this.dexz.deploymentBlockNumber();
+      const newOwner = await this.dexz.newOwner();
       const takerFeeInEthers = await this.dexz.takerFeeInEthers();
       const takerFeeInTokens = await this.dexz.takerFeeInTokens();
       const feeAccount = await this.dexz.feeAccount();
-      // const tokenListLength = parseInt(await this.dexz.tokenListLength());
-      // const accountListLength = parseInt(await this.dexz.accountListLength());
       const pairInfoListLength = parseInt(await this.dexz.pairInfoListLength());
-
-      console.log("          - owner: " + this.getShortAccountName(owner));
-      // console.log("          - deploymentBlockNumber: " + deploymentBlockNumber);
-      console.log("          - takerFeeInEthers: " + ethers.utils.formatEther(takerFeeInEthers));
-      console.log("          - takerFeeInTokens: " + ethers.utils.formatUnits(takerFeeInTokens, 16) + "%");
-      console.log("          - feeAccount: " + this.getShortAccountName(feeAccount));
-      // for (let j = 0; j < tokenListLength; j++) {
-      //   console.log("          - tokenListLength[" + j + "]: " + this.getShortAccountName(await this.dexz.tokenList(j)));
-      // }
-      // for (let j = 0; j < accountListLength; j++) {
-      //   console.log("          - accountListLength[" + j + "]: " + this.getShortAccountName(await this.dexz.accountList(j)));
-      // }
+      console.log("          Dexz: " + this.getShortAccountName(this.dexz.address) +
+        ", owner: " + this.getShortAccountName(owner) +
+        ", newOwner: " + this.getShortAccountName(newOwner) +
+        ", takerFeeInEthers: " + ethers.utils.formatEther(takerFeeInEthers) +
+        ", takerFeeInTokens: " + ethers.utils.formatUnits(takerFeeInTokens, 16) + "%" + ", feeAccount: " + this.getShortAccountName(feeAccount));
       const pairInfos = [];
       for (let j = 0; j < pairInfoListLength; j++) {
         const info = await this.dexz.pairInfoList(j)
-        console.log("          - pairInfoListLength[" + j + "]: " + info[0] + ", baseToken: " + this.getShortAccountName(info[1]) + ", quoteToken: " + this.getShortAccountName(info[2]));
         pairInfos.push({ pairKey: info[0], baseToken: info[1], quoteToken: info[2] })
       }
-      console.log();
 
       for (let j = 0; j < pairInfos.length; j++) {
         const pair = pairInfos[j];
