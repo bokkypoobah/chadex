@@ -105,15 +105,15 @@ describe("Dexz", function () {
     const approve02Tx = await data.token0.connect(data.user2Signer).approve(data.dexz.address, approveAmount);
     const approve12Tx = await data.token1.connect(data.user2Signer).approve(data.dexz.address, approveAmount);
     const approve22Tx = await data.weth9.connect(data.user2Signer).approve(data.dexz.address, approveAmount);
-    await data.printEvents("user0->token0.approve(dexz, " + approveAmount + ")", await approve00Tx.wait());
-    await data.printEvents("user0->token1.approve(dexz, " + approveAmount + ")", await approve10Tx.wait());
-    await data.printEvents("user0->weth9.approve(dexz, " + approveAmount + ")", await approve20Tx.wait());
-    await data.printEvents("user1->token0.approve(dexz, " + approveAmount + ")", await approve01Tx.wait());
-    await data.printEvents("user1->token1.approve(dexz, " + approveAmount + ")", await approve11Tx.wait());
-    await data.printEvents("user1->weth9.approve(dexz, " + approveAmount + ")", await approve21Tx.wait());
-    await data.printEvents("user2->token0.approve(dexz, " + approveAmount + ")", await approve02Tx.wait());
-    await data.printEvents("user2->token1.approve(dexz, " + approveAmount + ")", await approve12Tx.wait());
-    await data.printEvents("user2->weth9.approve(dexz, " + approveAmount + ")", await approve22Tx.wait());
+    await data.printEvents("user0->token0.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve00Tx.wait());
+    await data.printEvents("user0->token1.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve10Tx.wait());
+    await data.printEvents("user0->weth9.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve20Tx.wait());
+    await data.printEvents("user1->token0.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve01Tx.wait());
+    await data.printEvents("user1->token1.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve11Tx.wait());
+    await data.printEvents("user1->weth9.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve21Tx.wait());
+    await data.printEvents("user2->token0.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve02Tx.wait());
+    await data.printEvents("user2->token1.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve12Tx.wait());
+    await data.printEvents("user2->weth9.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve22Tx.wait());
     //   await data.printState("user0 approved user1 to transfer " + approveAmount + " umswaps");
 
     await data.printState("Setup Completed. Dexz bytecode ~" + JSON.stringify(data.dexz.deployTransaction.data.length/2, null, 2));

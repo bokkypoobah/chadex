@@ -33,30 +33,30 @@
         > Transfer Token1 - gasUsed: 51421 ~ ETH 0.00205684 ~ USD 4
           + Token1:0xe7f1 12.0 Transfer(from: deployer:0xf39F, to: user3:0x15d3, tokens: 1000.0)
         > Send WETH9 - gasUsed: 44785 ~ ETH 0.0017914 ~ USD 3
-          + WETH9:0x9fE4 13.0 Deposit(dst: user0:0x7099, wad: 100000000000000000000)
+          + WETH9:0x9fE4 13.0 Deposit(dst: user0:0x7099, wad: 100.0)
         > Send WETH9 - gasUsed: 44785 ~ ETH 0.0017914 ~ USD 3
-          + WETH9:0x9fE4 14.0 Deposit(dst: user1:0x3C44, wad: 100000000000000000000)
+          + WETH9:0x9fE4 14.0 Deposit(dst: user1:0x3C44, wad: 100.0)
         > Send WETH9 - gasUsed: 44785 ~ ETH 0.0017914 ~ USD 3
-          + WETH9:0x9fE4 15.0 Deposit(dst: user2:0x90F7, wad: 100000000000000000000)
+          + WETH9:0x9fE4 15.0 Deposit(dst: user2:0x90F7, wad: 100.0)
         > Send WETH9 - gasUsed: 44785 ~ ETH 0.0017914 ~ USD 3
-          + WETH9:0x9fE4 16.0 Deposit(dst: user3:0x15d3, wad: 100000000000000000000)
-        > user0->token0.approve(dexz, 1000000000000000000000) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
+          + WETH9:0x9fE4 16.0 Deposit(dst: user3:0x15d3, wad: 100.0)
+        > user0->token0.approve(dexz, 1000.0) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
           + Token0:0x5FbD 17.0 Approval(tokenOwner: user0:0x7099, spender: Dexz:0xCf7E, tokens: 1000.0)
-        > user0->token1.approve(dexz, 1000000000000000000000) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
+        > user0->token1.approve(dexz, 1000.0) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
           + Token1:0xe7f1 18.0 Approval(tokenOwner: user0:0x7099, spender: Dexz:0xCf7E, tokens: 1000.0)
-        > user0->weth9.approve(dexz, 1000000000000000000000) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
+        > user0->weth9.approve(dexz, 1000.0) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
           + WETH9:0x9fE4 19.0 Approval(tokenOwner: user0:0x7099, spender: Dexz:0xCf7E, tokens: 1000.0)
-        > user1->token0.approve(dexz, 1000000000000000000000) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
+        > user1->token0.approve(dexz, 1000.0) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
           + Token0:0x5FbD 20.0 Approval(tokenOwner: user1:0x3C44, spender: Dexz:0xCf7E, tokens: 1000.0)
-        > user1->token1.approve(dexz, 1000000000000000000000) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
+        > user1->token1.approve(dexz, 1000.0) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
           + Token1:0xe7f1 21.0 Approval(tokenOwner: user1:0x3C44, spender: Dexz:0xCf7E, tokens: 1000.0)
-        > user1->weth9.approve(dexz, 1000000000000000000000) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
+        > user1->weth9.approve(dexz, 1000.0) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
           + WETH9:0x9fE4 22.0 Approval(tokenOwner: user1:0x3C44, spender: Dexz:0xCf7E, tokens: 1000.0)
-        > user2->token0.approve(dexz, 1000000000000000000000) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
+        > user2->token0.approve(dexz, 1000.0) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
           + Token0:0x5FbD 23.0 Approval(tokenOwner: user2:0x90F7, spender: Dexz:0xCf7E, tokens: 1000.0)
-        > user2->token1.approve(dexz, 1000000000000000000000) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
+        > user2->token1.approve(dexz, 1000.0) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
           + Token1:0xe7f1 24.0 Approval(tokenOwner: user2:0x90F7, spender: Dexz:0xCf7E, tokens: 1000.0)
-        > user2->weth9.approve(dexz, 1000000000000000000000) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
+        > user2->weth9.approve(dexz, 1000.0) - gasUsed: 46167 ~ ETH 0.00184668 ~ USD 3
           + WETH9:0x9fE4 25.0 Approval(tokenOwner: user2:0x90F7, spender: Dexz:0xCf7E, tokens: 1000.0)
 
         --- Setup Completed. Dexz bytecode ~20223 ---
@@ -88,12 +88,12 @@
           + Dexz:0xCf7E 26.1 TokenAdded(token: Token1:0xe7f1)
           + Dexz:0xCf7E 26.2 AccountAdded(account: user0:0x7099)
           + Dexz:0xCf7E 26.3 PairAdded(pairKey: 0x40c0...0156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1)
-          + Dexz:0xCf7E 26.4 OrderAdded(pairKey: 0x40c0...0156, key: 0xf882...fe76, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000, expiry: 1684560260, baseTokens: 1.0)
+          + Dexz:0xCf7E 26.4 OrderAdded(pairKey: 0x40c0...0156, key: 0x4ea1...0eee, orderType: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000, expiry: 1684560514, baseTokens: 1.0)
           BigChungo
           BigChungo
         > user1->dexz.trade(BUY, token0, token1, 0.69, expiry, baseTokens, uiFeeAccount) - gasUsed: 263916 ~ ETH 0.01055664 ~ USD 21
           + Dexz:0xCf7E 27.0 AccountAdded(account: user1:0x3C44)
-          + Dexz:0xCf7E 27.1 OrderAdded(pairKey: 0x40c0...0156, key: 0xa7c3...7fab, orderType: 0, maker: user1:0x3C44, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000, expiry: 1684560260, baseTokens: 1.0)
+          + Dexz:0xCf7E 27.1 OrderAdded(pairKey: 0x40c0...0156, key: 0xc919...2690, orderType: 0, maker: user1:0x3C44, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000, expiry: 1684560514, baseTokens: 1.0)
 
         --- After Adding Order(s) ---
           Account                                   ETH                     TOK0                     TOK1                     WETH Blah
@@ -123,25 +123,25 @@
           ----- Pair 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156 Token0:0x5FbD/Token1:0xe7f1 -----
             --- Buy Orders ---
               orderPriceKey: 0.69
-                Order key=0xf8825359 prev=0x00000000 next=0xa7c3570a Buy maker=user0:0x7099 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
-                Order key=0xa7c3570a prev=0xf8825359 next=0x00000000 Buy maker=user1:0x3C44 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
+                Order key=0x4ea187c2 prev=0x00000000 next=0xc9198a23 Buy maker=user0:0x7099 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
+                Order key=0xc9198a23 prev=0x4ea187c2 next=0x00000000 Buy maker=user1:0x3C44 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.99s baseTokens=1.0 baseTokensFilled=0.0
             --- Sell Orders ---
 
           BigChungo
           BigChungo
         > user2->dexz.trade(SELL, token0, token1, 0.69, expiry, sellBaseTokens, uiFeeAccount) - gasUsed: 547422 ~ ETH 0.02189688 ~ USD 43
-          + Dexz:0xCf7E 28.0 Trade(key: 0xf882...fe76, orderType: 1, taker: user2:0x90F7, maker: user0:0x7099, amount: 1.0, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, baseTokens: 1.0, quoteTokens: 0.68931, feeBaseTokens: 0.00069, feeQuoteTokens: 0.0, baseTokensFilled: 0)
+          + Dexz:0xCf7E 28.0 Trade(key: 0x4ea1...0eee, orderType: 1, taker: user2:0x90F7, maker: user0:0x7099, amount: 1.0, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, baseTokens: 1.0, quoteTokens: 0.68931, feeBaseTokens: 0.00069, feeQuoteTokens: 0.0, baseTokensFilled: 0)
           + Token0:0x5FbD 28.1 Transfer(from: user2:0x90F7, to: user0:0x7099, tokens: 1.0)
           + Token1:0xe7f1 28.2 Transfer(from: user0:0x7099, to: user2:0x90F7, tokens: 0.68931)
           + Token1:0xe7f1 28.3 Transfer(from: user0:0x7099, to: uiFeeAccount:0x976E, tokens: 0.000345)
           + Token1:0xe7f1 28.4 Transfer(from: user0:0x7099, to: feeAccount:0x9965, tokens: 0.000345)
-          + Dexz:0xCf7E 28.5 Trade(key: 0xa7c3...7fab, orderType: 1, taker: user2:0x90F7, maker: user1:0x3C44, amount: 1.0, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, baseTokens: 1.0, quoteTokens: 0.68931, feeBaseTokens: 0.00069, feeQuoteTokens: 0.0, baseTokensFilled: 0)
+          + Dexz:0xCf7E 28.5 Trade(key: 0xc919...2690, orderType: 1, taker: user2:0x90F7, maker: user1:0x3C44, amount: 1.0, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, baseTokens: 1.0, quoteTokens: 0.68931, feeBaseTokens: 0.00069, feeQuoteTokens: 0.0, baseTokensFilled: 0)
           + Token0:0x5FbD 28.6 Transfer(from: user2:0x90F7, to: user1:0x3C44, tokens: 1.0)
           + Token1:0xe7f1 28.7 Transfer(from: user1:0x3C44, to: user2:0x90F7, tokens: 0.68931)
           + Token1:0xe7f1 28.8 Transfer(from: user1:0x3C44, to: uiFeeAccount:0x976E, tokens: 0.000345)
           + Token1:0xe7f1 28.9 Transfer(from: user1:0x3C44, to: feeAccount:0x9965, tokens: 0.000345)
           + Dexz:0xCf7E 28.10 AccountAdded(account: user2:0x90F7)
-          + Dexz:0xCf7E 28.11 OrderAdded(pairKey: 0x40c0...0156, key: 0x8d8b...7f6e, orderType: 1, maker: user2:0x90F7, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000, expiry: 1684560260, baseTokens: 0.42069)
+          + Dexz:0xCf7E 28.11 OrderAdded(pairKey: 0x40c0...0156, key: 0x8003...f7ff, orderType: 1, maker: user2:0x90F7, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000, expiry: 1684560514, baseTokens: 0.42069)
 
         --- After Executing Against Order(s) ---
           Account                                   ETH                     TOK0                     TOK1                     WETH Blah
@@ -173,9 +173,9 @@
             --- Buy Orders ---
             --- Sell Orders ---
               orderPriceKey: 0.69
-                Order key=0x8d8b2059 prev=0x00000000 next=0x00000000 Sell maker=user2:0x90F7 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.98s baseTokens=0.42069 baseTokensFilled=0.0
+                Order key=0x80035604 prev=0x00000000 next=0x00000000 Sell maker=user2:0x90F7 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.99s baseTokens=0.42069 baseTokensFilled=0.0
 
-    ✔ 00. Test 00 (253ms)
+    ✔ 00. Test 00 (235ms)
 
 
   1 passing (1s)
