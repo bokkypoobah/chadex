@@ -69,8 +69,8 @@ contract DexzBase is Owned {
     uint constant public TENPOW9 = uint(10)**9;
     uint constant public TENPOW18 = uint(10)**18;
 
-    uint64 public constant PRICE_MIN = 1;
-    uint64 public constant PRICE_MAX = 999_999_999_999_999_999; // max(uint64)=18,446,744,073,709,551,616
+    PriceType public constant PRICE_MIN = PriceType.wrap(1);
+    PriceType public constant PRICE_MAX = PriceType.wrap(999_999_999_999_999_999); // max(uint64)=18,446,744,073,709,551,616
 
     uint public deploymentBlockNumber;
     uint public takerFeeInEthers = 5 * 10 ** 16; // 0.05 ETH
@@ -211,7 +211,7 @@ contract Orders is DexzBase {
         address maker;
         address baseToken;      // GNT
         address quoteToken;     // ETH
-        uint64 price;             // GNT/ETH = 0.00054087 = #quoteToken per unit baseToken
+        PriceType price;             // GNT/ETH = 0.00054087 = #quoteToken per unit baseToken
         uint64 expiry;
         uint baseTokens;        // GNT - baseToken
         uint baseTokensFilled;
@@ -223,15 +223,15 @@ contract Orders is DexzBase {
     }
 
     // PairKey (bytes32) => BuySell (uint64) => Price (BPBRBTL)
-    mapping(bytes32 => mapping(uint64 => BokkyPooBahsRedBlackTreeLibrary.Tree)) orderKeys;
+    mapping(bytes32 => mapping(uint => BokkyPooBahsRedBlackTreeLibrary.Tree)) orderKeys;
     // PairKey (bytes32) => BuySell (uint64) => Price (uint) => OrderQueue
-    mapping(bytes32 => mapping(uint64 => mapping(uint => OrderQueue))) orderQueue;
+    mapping(bytes32 => mapping(uint => mapping(PriceType => OrderQueue))) orderQueue;
     // OrderKey (bytes32) => Order
     mapping(bytes32 => Order) orders;
 
     bytes32 public constant ORDERKEY_SENTINEL = 0x0;
 
-    event OrderAdded(bytes32 indexed pairKey, bytes32 indexed key, uint8 orderType, address indexed maker, address baseToken, address quoteToken, uint64 price, uint64 expiry, uint baseTokens);
+    event OrderAdded(bytes32 indexed pairKey, bytes32 indexed key, uint8 orderType, address indexed maker, address baseToken, address quoteToken, PriceType price, uint64 expiry, uint baseTokens);
     event OrderRemoved(bytes32 indexed key);
     event OrderUpdated(bytes32 indexed key, uint baseTokens, uint newBaseTokens);
 
@@ -244,22 +244,22 @@ contract Orders is DexzBase {
     // BK TODO function count(bytes32 _pairKey, uint _orderType) public view returns (uint _count) {
     // BK TODO     _count = orderKeys[_pairKey][_orderType].count();
     // BK TODO }
-    function first(bytes32 _pairKey, uint8 _orderType) public view returns (uint64 _key) {
+    function first(bytes32 _pairKey, uint8 _orderType) public view returns (PriceType _key) {
         _key = orderKeys[_pairKey][_orderType].first();
     }
-    function last(bytes32 _pairKey, uint8 _orderType) public view returns (uint64 _key) {
+    function last(bytes32 _pairKey, uint8 _orderType) public view returns (PriceType _key) {
         _key = orderKeys[_pairKey][_orderType].last();
     }
-    function next(bytes32 _pairKey, uint8 _orderType, uint64 _x) public view returns (uint64 _y) {
+    function next(bytes32 _pairKey, uint8 _orderType, PriceType _x) public view returns (PriceType _y) {
         _y = orderKeys[_pairKey][_orderType].next(_x);
     }
-    function prev(bytes32 _pairKey, uint8 _orderType, uint64 _x) public view returns (uint64 _y) {
+    function prev(bytes32 _pairKey, uint8 _orderType, PriceType _x) public view returns (PriceType _y) {
         _y = orderKeys[_pairKey][_orderType].prev(_x);
     }
-    function exists(bytes32 _pairKey, uint8 _orderType, uint64 _key) public view returns (bool) {
+    function exists(bytes32 _pairKey, uint8 _orderType, PriceType _key) public view returns (bool) {
         return orderKeys[_pairKey][_orderType].exists(_key);
     }
-    function getNode(bytes32 _pairKey, uint8 _orderType, uint64 _key) public view returns (uint64 _returnKey, uint64 _parent, uint64 _left, uint64 _right, uint8 _red) {
+    function getNode(bytes32 _pairKey, uint8 _orderType, PriceType _key) public view returns (PriceType _returnKey, PriceType _parent, PriceType _left, PriceType _right, uint8 _red) {
         return orderKeys[_pairKey][_orderType].getNode(_key);
     }
     // Don't need parent, grandparent, sibling, uncle
@@ -269,7 +269,7 @@ contract Orders is DexzBase {
     function pairKey(address _baseToken, address _quoteToken) internal pure returns (bytes32) {
         return keccak256(abi.encodePacked(_baseToken, _quoteToken));
     }
-    function orderKey(uint8 _orderType, address _maker, address _baseToken, address _quoteToken, uint64 _price, uint64 _expiry) internal pure returns (bytes32) {
+    function orderKey(uint8 _orderType, address _maker, address _baseToken, address _quoteToken, PriceType _price, uint64 _expiry) internal pure returns (bytes32) {
         return keccak256(abi.encodePacked(_orderType, _maker, _baseToken, _quoteToken, _price, _expiry));
     }
     function exists(bytes32 _key) internal view returns (bool) {
@@ -280,10 +280,10 @@ contract Orders is DexzBase {
     }
 
 
-    function getBestPrice(bytes32 _pairKey, uint8 _orderType) public view returns (uint64 _key) {
+    function getBestPrice(bytes32 _pairKey, uint8 _orderType) public view returns (PriceType _key) {
         _key = (_orderType == ORDERTYPE_BUY) ? orderKeys[_pairKey][_orderType].first() : orderKeys[_pairKey][_orderType].last();
     }
-    function getNextBestPrice(bytes32 _pairKey, uint8 _orderType, uint64 _x) public view returns (uint64 _y) {
+    function getNextBestPrice(bytes32 _pairKey, uint8 _orderType, PriceType _x) public view returns (PriceType _y) {
         if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(_x)) {
             _y = (_orderType == ORDERTYPE_BUY) ? orderKeys[_pairKey][_orderType].first() : orderKeys[_pairKey][_orderType].last();
         } else {
@@ -291,29 +291,30 @@ contract Orders is DexzBase {
         }
     }
 
-    function getOrderQueue(bytes32 _pairKey, uint8 _orderType, uint64 _price) public view returns (bool _exists, bytes32 _head, bytes32 _tail) {
+    function getOrderQueue(bytes32 _pairKey, uint8 _orderType, PriceType _price) public view returns (bool _exists, bytes32 _head, bytes32 _tail) {
         Orders.OrderQueue memory _orderQueue = orderQueue[_pairKey][_orderType][_price];
         return (_orderQueue.exists, _orderQueue.head, _orderQueue.tail);
     }
-    function getOrder(bytes32 _orderKey) public view returns (bytes32 _prev, bytes32 _next, uint _orderType, address maker, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, uint baseTokensFilled) {
+    // TODO check type _orderType
+    function getOrder(bytes32 _orderKey) public view returns (bytes32 _prev, bytes32 _next, uint _orderType, address maker, address baseToken, address quoteToken, PriceType price, uint64 expiry, uint baseTokens, uint baseTokensFilled) {
         Orders.Order memory order = orders[_orderKey];
         return (order.prev, order.next, order.orderType, order.maker, order.baseToken, order.quoteToken, order.price, order.expiry, order.baseTokens, order.baseTokensFilled);
     }
 
 
-    function _getBestMatchingOrder(uint8 _orderType, address baseToken, address quoteToken, uint64 price) internal returns (uint64 _bestMatchingPriceKey, bytes32 _bestMatchingOrderKey) {
+    function _getBestMatchingOrder(uint8 _orderType, address baseToken, address quoteToken, PriceType price) internal returns (PriceType _bestMatchingPriceKey, bytes32 _bestMatchingOrderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         uint8 _matchingOrderType = inverseOrderType(_orderType);
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_matchingOrderType];
         // SKINNY2 if (priceKeys.initialised) {
             emit LogInfo("getBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
             _bestMatchingPriceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
-            bool priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? _bestMatchingPriceKey <= price : _bestMatchingPriceKey >= price;
+            bool priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? PriceType.unwrap(_bestMatchingPriceKey) <= PriceType.unwrap(price) : PriceType.unwrap(_bestMatchingPriceKey) >= PriceType.unwrap(price);
             while (priceOk) {
-                emit LogInfo("getBestMatchingOrder: _bestMatchingPriceKey", _bestMatchingPriceKey, 0x0, "", address(0));
+                emit LogInfo("getBestMatchingOrder: _bestMatchingPriceKey", uint(PriceType.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
                 OrderQueue storage _orderQueue = orderQueue[_pairKey][_matchingOrderType][_bestMatchingPriceKey];
                 if (_orderQueue.exists) {
-                    emit LogInfo("getBestMatchingOrder: orderQueue not empty", _bestMatchingPriceKey, 0x0, "", address(0));
+                    emit LogInfo("getBestMatchingOrder: orderQueue not empty", uint(PriceType.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
                     _bestMatchingOrderKey = _orderQueue.head;
                     while (_bestMatchingOrderKey != ORDERKEY_SENTINEL) {
                         Order storage order = orders[_bestMatchingOrderKey];
@@ -329,24 +330,24 @@ contract Orders is DexzBase {
 
                 }
                 _bestMatchingPriceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.next(_bestMatchingPriceKey) : priceKeys.prev(_bestMatchingPriceKey);
-                priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? _bestMatchingPriceKey <= price : _bestMatchingPriceKey >= price;
+                priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? PriceType.unwrap(_bestMatchingPriceKey) <= PriceType.unwrap(price) : PriceType.unwrap(_bestMatchingPriceKey) >= PriceType.unwrap(price);
             // SKINNY2 }
             // OrderQueue storage orderQueue = self.orderQueue[_pairKey][_orderType][price];
         }
         return (BokkyPooBahsRedBlackTreeLibrary.getEmpty(), ORDERKEY_SENTINEL);
     }
-    function _updateBestMatchingOrder(uint8 _orderType, address baseToken, address quoteToken, uint64 matchingPriceKey, bytes32 matchingOrderKey, bool _orderFilled) internal returns (bytes32 _orderKey) {
+    function _updateBestMatchingOrder(uint8 _orderType, address baseToken, address quoteToken, PriceType matchingPriceKey, bytes32 matchingOrderKey, bool _orderFilled) internal returns (bytes32 _orderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         uint8 _matchingOrderType = inverseOrderType(_orderType);
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_matchingOrderType];
         // SKINNY2 if (priceKeys.initialised) {
             emit LogInfo("updateBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
-            uint64 priceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
+            PriceType priceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
             while (!BokkyPooBahsRedBlackTreeLibrary.isEmpty(priceKey)) {
-                emit LogInfo("updateBestMatchingOrder: priceKey", priceKey, 0x0, "", address(0));
+                emit LogInfo("updateBestMatchingOrder: priceKey", uint(PriceType.unwrap(priceKey)), 0x0, "", address(0));
                 OrderQueue storage _orderQueue = orderQueue[_pairKey][_matchingOrderType][priceKey];
                 if (_orderQueue.exists) {
-                    emit LogInfo("updateBestMatchingOrder: orderQueue not empty", priceKey, 0x0, "", address(0));
+                    emit LogInfo("updateBestMatchingOrder: orderQueue not empty", uint(PriceType.unwrap(priceKey)), 0x0, "", address(0));
 
                     Order storage order = orders[matchingOrderKey];
                     // TODO: What happens when allowance or balance is lower than #baseTokens
@@ -370,7 +371,7 @@ contract Orders is DexzBase {
                     if (_orderQueue.head == ORDERKEY_SENTINEL) {
                         delete orderQueue[_pairKey][_matchingOrderType][priceKey];
                         priceKeys.remove(priceKey);
-                        emit LogInfo("orders remove RBT", priceKey, 0x0, "", address(0));
+                        emit LogInfo("orders remove RBT", uint(PriceType.unwrap(priceKey)), 0x0, "", address(0));
                     }
                 } else {
                     priceKeys.remove(priceKey);
@@ -382,7 +383,7 @@ contract Orders is DexzBase {
         }
         return ORDERKEY_SENTINEL;
     }
-    function _addOrder(uint8 _orderType, address maker, address baseToken, address quoteToken, uint64 price, uint64 expiry, uint baseTokens) internal returns (bytes32 _orderKey) {
+    function _addOrder(uint8 _orderType, address maker, address baseToken, address quoteToken, PriceType price, uint64 expiry, uint baseTokens) internal returns (bytes32 _orderKey) {
         bytes32 _pairKey = pairKey(baseToken, quoteToken);
         _orderKey = orderKey(_orderType, maker, baseToken, quoteToken, price, expiry);
         require(orders[_orderKey].maker == address(0));
@@ -398,9 +399,9 @@ contract Orders is DexzBase {
         // SKINNY2 }
         if (!priceKeys.exists(price)) {
             priceKeys.insert(price);
-            emit LogInfo("orders addKey RBT adding ", price, 0x0, "", address(0));
+            emit LogInfo("orders addKey RBT adding ", uint(PriceType.unwrap(price)), 0x0, "", address(0));
         } else {
-            emit LogInfo("orders addKey RBT exists ", price, 0x0, "", address(0));
+            emit LogInfo("orders addKey RBT exists ", uint(PriceType.unwrap(price)), 0x0, "", address(0));
         }
         // Above - new 148,521, existing 35,723
 
@@ -437,7 +438,7 @@ contract Orders is DexzBase {
         require(_orderQueue.exists);
 
         uint8 _orderType = order.orderType;
-        uint64 _price = order.price;
+        PriceType _price = order.price;
 
         // Only order
         if (_orderQueue.head == _orderKey && _orderQueue.tail == _orderKey) {
@@ -470,7 +471,7 @@ contract Orders is DexzBase {
             BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_orderType];
             if (priceKeys.exists(_price)) {
                 priceKeys.remove(_price);
-                emit LogInfo("orders remove RBT", _price, 0x0, "", address(0));
+                emit LogInfo("orders remove RBT", uint(PriceType.unwrap(_price)), 0x0, "", address(0));
             }
         }
     }
@@ -488,7 +489,7 @@ contract Dexz is Orders {
         uint8 orderType;
         address baseToken;
         address quoteToken;
-        uint64 price;
+        PriceType price;
         uint64 expiry;
         uint baseTokens;
         address uiFeeAccount;
@@ -547,14 +548,14 @@ contract Dexz is Orders {
 
     error InvalidPrice();
 
-    function trade(uint8 orderFlag, address baseToken, address quoteToken, uint64 price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 _orderKey) {
-        if (price < PRICE_MIN || price > PRICE_MAX) {
+    function trade(uint8 orderFlag, address baseToken, address quoteToken, PriceType price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 _orderKey) {
+        if (PriceType.unwrap(price) < PriceType.unwrap(PRICE_MIN) || PriceType.unwrap(price) > PriceType.unwrap(PRICE_MAX)) {
             revert InvalidPrice();
         }
         return _trade(TradeInfo(msg.sender, orderFlag | ORDERFLAG_FILL_AND_ADD_ORDER, uint8(orderFlag & ORDERFLAG_BUYSELL_MASK), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
     }
     function _trade(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 _orderKey) {
-        uint64 matchingPriceKey;
+        PriceType matchingPriceKey;
         bytes32 matchingOrderKey;
         (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.orderType, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price);
         emit LogInfo("_trade: matchingOrderKey", 0, matchingOrderKey, "", address(0));
@@ -628,19 +629,19 @@ contract Dexz is Orders {
             emit LogInfo("calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", matchingOrder.maker);
             if (matchingOrder.orderType == ORDERTYPE_BUY && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
             }
-            quoteTokens = baseTokens * matchingOrder.price / TENPOW9;
+            quoteTokens = baseTokens * PriceType.unwrap(matchingOrder.price) / TENPOW9;
             if (_availableQuoteTokens < quoteTokens) {
                 quoteTokens = _availableQuoteTokens;
             }
             emit LogInfo("calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker))", quoteTokens, 0x0, "", matchingOrder.maker);
             // TODO: Add code to collect dust. E.g. > 14 decimal places, check for (dp - 14) threshold to also transfer remaining dust
 
-            if (quoteTokens * TENPOW9 / matchingOrder.price < baseTokens) {
-                baseTokens = quoteTokens * TENPOW9 / matchingOrder.price;
+            if (quoteTokens * TENPOW9 / PriceType.unwrap(matchingOrder.price) < baseTokens) {
+                baseTokens = quoteTokens * TENPOW9 / PriceType.unwrap(matchingOrder.price);
             }
             // baseTokens = baseTokens.min(quoteTokens * TENPOW9 / matchingOrder.price));
             emit LogInfo("calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price)", baseTokens, 0x0, "", address(0));
-            quoteTokens = baseTokens * matchingOrder.price / TENPOW9;
+            quoteTokens = baseTokens * PriceType.unwrap(matchingOrder.price) / TENPOW9;
             emit LogInfo("calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18", quoteTokens, 0x0, "", address(0));
 
         // Maker selling base, needs to have amount in base
@@ -670,12 +671,12 @@ contract Dexz is Orders {
             }
             emit LogInfo("calculateOrder Maker Sell: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, matchingOrder.maker))", baseTokens, 0x0, "", matchingOrder.maker);
 
-            emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", baseTokens * matchingOrder.price / TENPOW9, 0x0, "", address(0));
+            emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", baseTokens * PriceType.unwrap(matchingOrder.price) / TENPOW9, 0x0, "", address(0));
             uint _availableQuoteTokens = availableTokens(matchingOrder.quoteToken, taker);
             emit LogInfo("calculateOrder Maker Sell: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", taker);
             if (matchingOrder.orderType == ORDERTYPE_BUY && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
             }
-            quoteTokens = baseTokens * matchingOrder.price / TENPOW9;
+            quoteTokens = baseTokens * PriceType.unwrap(matchingOrder.price) / TENPOW9;
             if (_availableQuoteTokens < quoteTokens) {
                 quoteTokens = _availableQuoteTokens;
             }
@@ -683,12 +684,12 @@ contract Dexz is Orders {
             // TODO: Add code to collect dust. E.g. > 14 decimal places, check for (dp - 14) threshold to also transfer remaining dust
 
             // baseTokens = baseTokens.min(quoteTokens.mul(TENPOW9).div(matchingOrder.price));
-            if (quoteTokens * TENPOW9 / matchingOrder.price < baseTokens) {
-                baseTokens = quoteTokens * TENPOW9 / matchingOrder.price;
+            if (quoteTokens * TENPOW9 / PriceType.unwrap(matchingOrder.price) < baseTokens) {
+                baseTokens = quoteTokens * TENPOW9 / PriceType.unwrap(matchingOrder.price);
             }
 
             emit LogInfo("calculateOrder Maker Sell: baseTokens = min(baseTokens, quoteTokens x 1e18 / price)", baseTokens, 0x0, "", address(0));
-            quoteTokens = baseTokens * matchingOrder.price / TENPOW9;
+            quoteTokens = baseTokens * PriceType.unwrap(matchingOrder.price) / TENPOW9;
             emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", quoteTokens, 0x0, "", address(0));
         }
         // TODO BK
