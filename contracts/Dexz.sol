@@ -545,7 +545,12 @@ contract Dexz is Orders {
     //     }
     // }
 
+    error InvalidPrice();
+
     function trade(uint8 orderFlag, address baseToken, address quoteToken, uint64 price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 _orderKey) {
+        if (price < PRICE_MIN || price > PRICE_MAX) {
+            revert InvalidPrice();
+        }
         return _trade(TradeInfo(msg.sender, orderFlag | ORDERFLAG_FILL_AND_ADD_ORDER, uint8(orderFlag & ORDERFLAG_BUYSELL_MASK), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
     }
     function _trade(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 _orderKey) {

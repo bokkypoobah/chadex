@@ -32,8 +32,8 @@ class Data {
   }
 
   async init() {
-    [this.deployerSigner, this.user0Signer, this.user1Signer, this.user2Signer, this.user3Signer, this.feeAccountSigner] = await ethers.getSigners();
-    [this.deployer, this.user0, this.user1, this.user2, this.user3, this.feeAccount] = await Promise.all([this.deployerSigner.getAddress(), this.user0Signer.getAddress(), this.user1Signer.getAddress(), this.user2Signer.getAddress(), this.user3Signer.getAddress(), this.feeAccountSigner.getAddress()]);
+    [this.deployerSigner, this.user0Signer, this.user1Signer, this.user2Signer, this.user3Signer, this.feeAccountSigner, this.uiFeeAccountSigner] = await ethers.getSigners();
+    [this.deployer, this.user0, this.user1, this.user2, this.user3, this.feeAccount, this.uiFeeAccount] = await Promise.all([this.deployerSigner.getAddress(), this.user0Signer.getAddress(), this.user1Signer.getAddress(), this.user2Signer.getAddress(), this.user3Signer.getAddress(), this.feeAccountSigner.getAddress(), this.uiFeeAccountSigner.getAddress()]);
 
     this.addAccount("0x0000000000000000000000000000000000000000", "null");
     this.addAccount(this.deployer, "deployer");
@@ -42,6 +42,7 @@ class Data {
     this.addAccount(this.user2, "user2");
     this.addAccount(this.user3, "user3");
     this.addAccount(this.feeAccount, "feeAccount");
+    this.addAccount(this.uiFeeAccount, "uiFeeAccount");
     this.baseBlock = await ethers.provider.getBlockNumber();
   }
 
@@ -190,7 +191,7 @@ class Data {
 
     console.log("          Account                                   ETH " + this.padLeft(await this.token0.symbol(), 24) + " " + this.padLeft(await this.token1.symbol(), 24) + " Blah");
     console.log("          -------------------- ------------------------ ------------------------ ------------------------ ---------------------------------------------");
-    const checkAccounts = [this.deployer, this.user0, this.user1, this.user2, this.user3, this.feeAccount];
+    const checkAccounts = [this.deployer, this.user0, this.user1, this.user2, this.user3, this.feeAccount, this.uiFeeAccount];
     if (this.dexz) {
       checkAccounts.push(this.dexz.address);
     }
