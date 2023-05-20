@@ -307,18 +307,18 @@ contract Orders is DexzBase {
         uint8 _matchingOrderType = inverseOrderType(_orderType);
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_matchingOrderType];
         // SKINNY2 if (priceKeys.initialised) {
-            emit LogInfo("getBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
+            // emit LogInfo("getBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
             _bestMatchingPriceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
             bool priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? PriceType.unwrap(_bestMatchingPriceKey) <= PriceType.unwrap(price) : PriceType.unwrap(_bestMatchingPriceKey) >= PriceType.unwrap(price);
             while (priceOk) {
-                emit LogInfo("getBestMatchingOrder: _bestMatchingPriceKey", uint(PriceType.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
+                // emit LogInfo("getBestMatchingOrder: _bestMatchingPriceKey", uint(PriceType.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
                 OrderQueue storage _orderQueue = orderQueue[_pairKey][_matchingOrderType][_bestMatchingPriceKey];
                 if (_orderQueue.exists) {
-                    emit LogInfo("getBestMatchingOrder: orderQueue not empty", uint(PriceType.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
+                    // emit LogInfo("getBestMatchingOrder: orderQueue not empty", uint(PriceType.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
                     _bestMatchingOrderKey = _orderQueue.head;
                     while (_bestMatchingOrderKey != ORDERKEY_SENTINEL) {
                         Order storage order = orders[_bestMatchingOrderKey];
-                        emit LogInfo("getBestMatchingOrder: _bestMatchingOrderKey ", order.expiry, _bestMatchingOrderKey, "", address(0));
+                        // emit LogInfo("getBestMatchingOrder: _bestMatchingOrderKey ", order.expiry, _bestMatchingOrderKey, "", address(0));
                         if (order.expiry >= block.timestamp && order.baseTokens > order.baseTokensFilled) {
                             return (_bestMatchingPriceKey, _bestMatchingOrderKey);
                         }
@@ -327,7 +327,6 @@ contract Orders is DexzBase {
                 } else {
                     // TODO: REMOVE _bestMatchingPriceKey
                     emit LogInfo("getBestMatchingOrder: orderQueue empty", 0, 0x0, "", address(0));
-
                 }
                 _bestMatchingPriceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.next(_bestMatchingPriceKey) : priceKeys.prev(_bestMatchingPriceKey);
                 priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (_orderType == ORDERTYPE_BUY) ? PriceType.unwrap(_bestMatchingPriceKey) <= PriceType.unwrap(price) : PriceType.unwrap(_bestMatchingPriceKey) >= PriceType.unwrap(price);
@@ -341,13 +340,13 @@ contract Orders is DexzBase {
         uint8 _matchingOrderType = inverseOrderType(_orderType);
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_matchingOrderType];
         // SKINNY2 if (priceKeys.initialised) {
-            emit LogInfo("updateBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
+            // emit LogInfo("updateBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
             PriceType priceKey = (_orderType == ORDERTYPE_BUY) ? priceKeys.first() : priceKeys.last();
             while (!BokkyPooBahsRedBlackTreeLibrary.isEmpty(priceKey)) {
-                emit LogInfo("updateBestMatchingOrder: priceKey", uint(PriceType.unwrap(priceKey)), 0x0, "", address(0));
+                // emit LogInfo("updateBestMatchingOrder: priceKey", uint(PriceType.unwrap(priceKey)), 0x0, "", address(0));
                 OrderQueue storage _orderQueue = orderQueue[_pairKey][_matchingOrderType][priceKey];
                 if (_orderQueue.exists) {
-                    emit LogInfo("updateBestMatchingOrder: orderQueue not empty", uint(PriceType.unwrap(priceKey)), 0x0, "", address(0));
+                    // emit LogInfo("updateBestMatchingOrder: orderQueue not empty", uint(PriceType.unwrap(priceKey)), 0x0, "", address(0));
 
                     Order storage order = orders[matchingOrderKey];
                     // TODO: What happens when allowance or balance is lower than #baseTokens
@@ -371,7 +370,7 @@ contract Orders is DexzBase {
                     if (_orderQueue.head == ORDERKEY_SENTINEL) {
                         delete orderQueue[_pairKey][_matchingOrderType][priceKey];
                         priceKeys.remove(priceKey);
-                        emit LogInfo("orders remove RBT", uint(PriceType.unwrap(priceKey)), 0x0, "", address(0));
+                        // emit LogInfo("orders remove RBT", uint(PriceType.unwrap(priceKey)), 0x0, "", address(0));
                     }
                 } else {
                     priceKeys.remove(priceKey);
@@ -399,9 +398,9 @@ contract Orders is DexzBase {
         // SKINNY2 }
         if (!priceKeys.exists(price)) {
             priceKeys.insert(price);
-            emit LogInfo("orders addKey RBT adding ", uint(PriceType.unwrap(price)), 0x0, "", address(0));
+            // emit LogInfo("orders addKey RBT adding ", uint(PriceType.unwrap(price)), 0x0, "", address(0));
         } else {
-            emit LogInfo("orders addKey RBT exists ", uint(PriceType.unwrap(price)), 0x0, "", address(0));
+            // emit LogInfo("orders addKey RBT exists ", uint(PriceType.unwrap(price)), 0x0, "", address(0));
         }
         // Above - new 148,521, existing 35,723
 
@@ -416,12 +415,12 @@ contract Orders is DexzBase {
             _orderQueue.head = _orderKey;
             _orderQueue.tail = _orderKey;
             orders[_orderKey] = Order(ORDERKEY_SENTINEL, ORDERKEY_SENTINEL, _orderType, maker, baseToken, quoteToken, price, expiry, baseTokens, 0);
-            emit LogInfo("orders addData  first", 0, _orderKey, "", address(0));
+            // emit LogInfo("orders addData  first", 0, _orderKey, "", address(0));
         } else {
             orders[_orderQueue.tail].next = _orderKey;
             orders[_orderKey] = Order(_orderQueue.tail, ORDERKEY_SENTINEL, _orderType, maker, baseToken, quoteToken, price, expiry, baseTokens, 0);
             _orderQueue.tail = _orderKey;
-            emit LogInfo("orders addData !first", 0, _orderKey, "", address(0));
+            // emit LogInfo("orders addData !first", 0, _orderKey, "", address(0));
         }
         // Above saving prev and next - new 232,985, existing 84,961
         // Above saving all - new 385,258, existing 241,975
@@ -471,7 +470,7 @@ contract Orders is DexzBase {
             BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][_orderType];
             if (priceKeys.exists(_price)) {
                 priceKeys.remove(_price);
-                emit LogInfo("orders remove RBT", uint(PriceType.unwrap(_price)), 0x0, "", address(0));
+                // emit LogInfo("orders remove RBT", uint(PriceType.unwrap(_price)), 0x0, "", address(0));
             }
         }
     }
@@ -558,7 +557,7 @@ contract Dexz is Orders {
         PriceType matchingPriceKey;
         bytes32 matchingOrderKey;
         (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.orderType, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price);
-        emit LogInfo("_trade: matchingOrderKey", 0, matchingOrderKey, "", address(0));
+        // emit LogInfo("_trade: matchingOrderKey", 0, matchingOrderKey, "", address(0));
 
         while (matchingOrderKey != ORDERKEY_SENTINEL && tradeInfo.baseTokens > 0) {
             uint _baseTokens;
@@ -626,36 +625,36 @@ contract Dexz is Orders {
 
             // emit LogInfo("calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18", baseTokens * matchingOrder.price / TENPOW18, 0x0, "", address(0));
             uint _availableQuoteTokens = availableTokens(matchingOrder.quoteToken, matchingOrder.maker);
-            emit LogInfo("calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", matchingOrder.maker);
+            // emit LogInfo("calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", matchingOrder.maker);
             if (matchingOrder.orderType == ORDERTYPE_BUY && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
             }
             quoteTokens = baseTokens * PriceType.unwrap(matchingOrder.price) / TENPOW9;
             if (_availableQuoteTokens < quoteTokens) {
                 quoteTokens = _availableQuoteTokens;
             }
-            emit LogInfo("calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker))", quoteTokens, 0x0, "", matchingOrder.maker);
+            // emit LogInfo("calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker))", quoteTokens, 0x0, "", matchingOrder.maker);
             // TODO: Add code to collect dust. E.g. > 14 decimal places, check for (dp - 14) threshold to also transfer remaining dust
 
             if (quoteTokens * TENPOW9 / PriceType.unwrap(matchingOrder.price) < baseTokens) {
                 baseTokens = quoteTokens * TENPOW9 / PriceType.unwrap(matchingOrder.price);
             }
             // baseTokens = baseTokens.min(quoteTokens * TENPOW9 / matchingOrder.price));
-            emit LogInfo("calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price)", baseTokens, 0x0, "", address(0));
+            // emit LogInfo("calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price)", baseTokens, 0x0, "", address(0));
             quoteTokens = baseTokens * PriceType.unwrap(matchingOrder.price) / TENPOW9;
-            emit LogInfo("calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18", quoteTokens, 0x0, "", address(0));
+            // emit LogInfo("calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18", quoteTokens, 0x0, "", address(0));
 
         // Maker selling base, needs to have amount in base
         // Taker buying base, needs to have amount in quote = base x price
         } else if (matchingOrder.orderType == ORDERTYPE_SELL) {
-            emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokens", matchingOrder.baseTokens, 0x0, "", address(0));
-            emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokensFilled", matchingOrder.baseTokensFilled, 0x0, "", address(0));
-            emit LogInfo("calculateOrder Maker Sell: amountBaseTokens", amountBaseTokens, 0x0, "", address(0));
+            // emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokens", matchingOrder.baseTokens, 0x0, "", address(0));
+            // emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokensFilled", matchingOrder.baseTokensFilled, 0x0, "", address(0));
+            // emit LogInfo("calculateOrder Maker Sell: amountBaseTokens", amountBaseTokens, 0x0, "", address(0));
             uint _availableBaseTokens = availableTokens(matchingOrder.baseToken, matchingOrder.maker);
-            emit LogInfo("calculateOrder Maker Sell: availableTokens(matchingOrder.baseToken, matchingOrder.maker)", _availableBaseTokens, 0x0, "", matchingOrder.maker);
+            // emit LogInfo("calculateOrder Maker Sell: availableTokens(matchingOrder.baseToken, matchingOrder.maker)", _availableBaseTokens, 0x0, "", matchingOrder.maker);
             // Update maker matchingOrder with currently available tokens
             if (matchingOrder.orderType == ORDERTYPE_SELL && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
                 matchingOrder.baseTokens = _availableBaseTokens + matchingOrder.baseTokensFilled;
-                emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokens reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
+                // emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokens reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
                 // ordersData.orders[_matchingOrderKey].baseTokens = matchingOrder.baseTokens;
             } else {
                 emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokens NOT reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
@@ -669,18 +668,18 @@ contract Dexz is Orders {
             if (_availableBaseTokens < baseTokens) {
                 baseTokens = _availableBaseTokens;
             }
-            emit LogInfo("calculateOrder Maker Sell: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, matchingOrder.maker))", baseTokens, 0x0, "", matchingOrder.maker);
+            // emit LogInfo("calculateOrder Maker Sell: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, matchingOrder.maker))", baseTokens, 0x0, "", matchingOrder.maker);
 
-            emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", baseTokens * PriceType.unwrap(matchingOrder.price) / TENPOW9, 0x0, "", address(0));
+            // emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", baseTokens * PriceType.unwrap(matchingOrder.price) / TENPOW9, 0x0, "", address(0));
             uint _availableQuoteTokens = availableTokens(matchingOrder.quoteToken, taker);
-            emit LogInfo("calculateOrder Maker Sell: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", taker);
+            // emit LogInfo("calculateOrder Maker Sell: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", taker);
             if (matchingOrder.orderType == ORDERTYPE_BUY && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
             }
             quoteTokens = baseTokens * PriceType.unwrap(matchingOrder.price) / TENPOW9;
             if (_availableQuoteTokens < quoteTokens) {
                 quoteTokens = _availableQuoteTokens;
             }
-            emit LogInfo("calculateOrder Maker Sell: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, taker))", quoteTokens, 0x0, "", taker);
+            // emit LogInfo("calculateOrder Maker Sell: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, taker))", quoteTokens, 0x0, "", taker);
             // TODO: Add code to collect dust. E.g. > 14 decimal places, check for (dp - 14) threshold to also transfer remaining dust
 
             // baseTokens = baseTokens.min(quoteTokens.mul(TENPOW9).div(matchingOrder.price));
@@ -688,9 +687,9 @@ contract Dexz is Orders {
                 baseTokens = quoteTokens * TENPOW9 / PriceType.unwrap(matchingOrder.price);
             }
 
-            emit LogInfo("calculateOrder Maker Sell: baseTokens = min(baseTokens, quoteTokens x 1e18 / price)", baseTokens, 0x0, "", address(0));
+            // emit LogInfo("calculateOrder Maker Sell: baseTokens = min(baseTokens, quoteTokens x 1e18 / price)", baseTokens, 0x0, "", address(0));
             quoteTokens = baseTokens * PriceType.unwrap(matchingOrder.price) / TENPOW9;
-            emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", quoteTokens, 0x0, "", address(0));
+            // emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", quoteTokens, 0x0, "", address(0));
         }
         // TODO BK
         _orderFilled = true;
@@ -706,7 +705,7 @@ contract Dexz is Orders {
         uint __orderBaseTokensFilled = 0;
 
         if (orderType == ORDERTYPE_BUY) {
-            emit LogInfo("transferTokens: BUY", 0, 0x0, "", address(0));
+            // emit LogInfo("transferTokens: BUY", 0, 0x0, "", address(0));
             _takerFeeInTokens = _baseTokens * takerFeeInTokens / TENPOW18;
             emit Trade(matchingOrderKey, orderType, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens - _takerFeeInTokens, _quoteTokens, _takerFeeInTokens, 0, __orderBaseTokensFilled);
             transferFrom(tradeInfo.quoteToken, tradeInfo.taker, maker, _quoteTokens);
@@ -720,7 +719,7 @@ contract Dexz is Orders {
                 }
             }
         } else {
-            emit LogInfo("transferTokens: SELL", 0, 0x0, "", address(0));
+            // emit LogInfo("transferTokens: SELL", 0, 0x0, "", address(0));
             _takerFeeInTokens = _quoteTokens * takerFeeInTokens / TENPOW18;
             emit Trade(matchingOrderKey, orderType, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens, _quoteTokens - _takerFeeInTokens, _takerFeeInTokens, 0, __orderBaseTokensFilled);
             transferFrom(tradeInfo.baseToken, tradeInfo.taker, maker, _baseTokens);
