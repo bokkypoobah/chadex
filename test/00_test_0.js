@@ -8,7 +8,7 @@ const BUYSELL_BUY = 0;
 const BUYSELL_SELL = 1;
 
 const FILL_ANY = 0;
-const FILL_ALL_OR_REVERT = 1;
+const FILL_ALL_OR_NOTHING = 1;
 const FILL_ANY_AND_ADD_ORDER = 2;
 
 let data;

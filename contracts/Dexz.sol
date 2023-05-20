@@ -464,7 +464,7 @@ contract Orders is DexzBase {
 
 enum BuySell { Buy, Sell }
 
-enum Fill { Any, AllOrRevert, AnyAndAddOrder }
+enum Fill { Any, AllOrNothing, AnyAndAddOrder }
 
 // ----------------------------------------------------------------------------
 // Dexz contract
@@ -574,7 +574,7 @@ contract Dexz is Orders {
             loop++;
             // break;
         }
-        if (tradeInfo.fill == Fill.AllOrRevert) {
+        if (tradeInfo.fill == Fill.AllOrNothing) {
             require(tradeInfo.baseTokens == 0);
         }
         if (tradeInfo.baseTokens > 0 && (tradeInfo.fill == Fill.AnyAndAddOrder)) {
