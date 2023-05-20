@@ -20,7 +20,7 @@ describe("Dexz", function () {
     console.log();
     console.log("      beforeEach");
     const Token  = await ethers.getContractFactory("Token");
-    const Weth9  = await ethers.getContractFactory("WETH9");
+    const Weth  = await ethers.getContractFactory("WETH9");
     const Dexz  = await ethers.getContractFactory("Dexz");
     data = new Data();
     await data.init();
@@ -46,14 +46,14 @@ describe("Dexz", function () {
     }
     console.log("        Token1 deployed");
 
-    const weth9 = await Weth9.deploy();
-    await weth9.deployed();
-    await data.setWeth9(weth9);
-    const weth9Receipt = await data.weth9.deployTransaction.wait();
+    const weth = await Weth.deploy();
+    await weth.deployed();
+    await data.setWeth(weth);
+    const wethReceipt = await data.weth.deployTransaction.wait();
     if (DETAILS > 0) {
-      await data.printEvents("Deployed WETH9", weth9Receipt);
+      await data.printEvents("Deployed WETH", wethReceipt);
     }
-    console.log("        WETH9 deployed");
+    console.log("        WETH deployed");
 
     const dexz = await Dexz.deploy(data.feeAccount);
     await dexz.deployed();
@@ -88,39 +88,39 @@ describe("Dexz", function () {
     }
     console.log("        Tokens transferred");
 
-    const weth9Amount = ethers.utils.parseEther("100");
+    const wethAmount = ethers.utils.parseEther("100");
 
-    const weth90Tx = await data.user0Signer.sendTransaction({ to: data.weth9.address, value: weth9Amount });
-    const weth91Tx = await data.user1Signer.sendTransaction({ to: data.weth9.address, value: weth9Amount });
-    const weth92Tx = await data.user2Signer.sendTransaction({ to: data.weth9.address, value: weth9Amount });
-    const weth93Tx = await data.user3Signer.sendTransaction({ to: data.weth9.address, value: weth9Amount });
-    await data.printEvents("Send WETH9" , await weth90Tx.wait());
-    await data.printEvents("Send WETH9" , await weth91Tx.wait());
-    await data.printEvents("Send WETH9" , await weth92Tx.wait());
-    await data.printEvents("Send WETH9" , await weth93Tx.wait());
+    const weth0Tx = await data.user0Signer.sendTransaction({ to: data.weth.address, value: wethAmount });
+    const weth1Tx = await data.user1Signer.sendTransaction({ to: data.weth.address, value: wethAmount });
+    const weth2Tx = await data.user2Signer.sendTransaction({ to: data.weth.address, value: wethAmount });
+    const weth3Tx = await data.user3Signer.sendTransaction({ to: data.weth.address, value: wethAmount });
+    await data.printEvents("Send weth" , await weth0Tx.wait());
+    await data.printEvents("Send weth" , await weth1Tx.wait());
+    await data.printEvents("Send weth" , await weth2Tx.wait());
+    await data.printEvents("Send weth" , await weth3Tx.wait());
 
     const approveAmount = ethers.utils.parseEther("1000");
     const approve00Tx = await data.token0.connect(data.user0Signer).approve(data.dexz.address, approveAmount);
     const approve10Tx = await data.token1.connect(data.user0Signer).approve(data.dexz.address, approveAmount);
-    const approve20Tx = await data.weth9.connect(data.user0Signer).approve(data.dexz.address, approveAmount);
+    const approve20Tx = await data.weth.connect(data.user0Signer).approve(data.dexz.address, approveAmount);
     const approve01Tx = await data.token0.connect(data.user1Signer).approve(data.dexz.address, approveAmount);
     const approve11Tx = await data.token1.connect(data.user1Signer).approve(data.dexz.address, approveAmount);
-    const approve21Tx = await data.weth9.connect(data.user1Signer).approve(data.dexz.address, approveAmount);
+    const approve21Tx = await data.weth.connect(data.user1Signer).approve(data.dexz.address, approveAmount);
 
     const approve02Tx = await data.token0.connect(data.user2Signer).approve(data.dexz.address, approveAmount);
     const approve12Tx = await data.token1.connect(data.user2Signer).approve(data.dexz.address, approveAmount);
-    const approve22Tx = await data.weth9.connect(data.user2Signer).approve(data.dexz.address, approveAmount);
+    const approve22Tx = await data.weth.connect(data.user2Signer).approve(data.dexz.address, approveAmount);
 
     await data.printEvents("user0->token0.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve00Tx.wait());
     await data.printEvents("user0->token1.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve10Tx.wait());
-    await data.printEvents("user0->weth9.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve20Tx.wait());
+    await data.printEvents("user0->weth.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve20Tx.wait());
     await data.printEvents("user1->token0.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve01Tx.wait());
     await data.printEvents("user1->token1.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve11Tx.wait());
-    await data.printEvents("user1->weth9.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve21Tx.wait());
+    await data.printEvents("user1->weth.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve21Tx.wait());
 
     await data.printEvents("user2->token0.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve02Tx.wait());
     await data.printEvents("user2->token1.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve12Tx.wait());
-    await data.printEvents("user2->weth9.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve22Tx.wait());
+    await data.printEvents("user2->weth.approve(dexz, " + ethers.utils.formatEther(approveAmount) + ")", await approve22Tx.wait());
 
     //   await data.printState("user0 approved user1 to transfer " + approveAmount + " umswaps");
 
@@ -139,21 +139,21 @@ describe("Dexz", function () {
     const expiry = parseInt(new Date()/1000) + 60*60;
     const baseTokens = ethers.utils.parseEther("10");
 
-    const trade1bTx = await data.dexz.connect(data.user0Signer).trade(BUYSELL_BUY, FILL_ANY_AND_ADD_ORDER, data.token0.address, data.token1.address, price1, expiry, baseTokens, data.uiFeeAccount);
-    await data.printEvents("user0->dexz.trade(BUY, FILL_ANY_AND_ADD_ORDER, token0, token1, 0.69, expiry, baseTokens, uiFeeAccount)", await trade1bTx.wait());
+    const trade1bTx = await data.dexz.connect(data.user0Signer).trade(BUYSELL_BUY, FILL_ANY_AND_ADD_ORDER, data.token0.address, data.weth.address, price1, expiry, baseTokens, data.uiFeeAccount);
+    await data.printEvents("user0->dexz.trade(BUY, FILL_ANY_AND_ADD_ORDER, token0, WETH, 0.69, expiry, baseTokens, uiFeeAccount)", await trade1bTx.wait());
 
     // const trade1sTx = await data.dexz.connect(data.user0Signer).trade(BUYSELL_BUY, data.token0.address, data.token1.address, price2, expiry, baseTokens, data.uiFeeAccount);
-    // await data.printEvents("user0->dexz.trade(BUY, token0, token1, 0.6902, expiry, baseTokens, uiFeeAccount)", await trade1sTx.wait());
+    // await data.printEvents("user0->dexz.trade(BUY, token0, WETH, 0.6902, expiry, baseTokens, uiFeeAccount)", await trade1sTx.wait());
     //
-    // const trade2bTx = await data.dexz.connect(data.user1Signer).trade(BUYSELL_BUY, data.token0.address, data.token1.address, price1, expiry, baseTokens, data.uiFeeAccount);
-    // await data.printEvents("user1->dexz.trade(BUY, token0, token1, 0.69, expiry, baseTokens, uiFeeAccount)", await trade2bTx.wait());
+    const trade2bTx = await data.dexz.connect(data.user1Signer).trade(BUYSELL_BUY, FILL_ANY_AND_ADD_ORDER, data.token0.address, data.weth.address, price1, expiry, baseTokens, data.uiFeeAccount);
+    await data.printEvents("user1->dexz.trade(BUY, token0, WETH, 0.69, expiry, baseTokens, uiFeeAccount)", await trade2bTx.wait());
 
     await data.printState("After Adding Order(s)");
 
     const sellBaseTokens = ethers.utils.parseEther("1");
 
-    const trade2sTx = await data.dexz.connect(data.user2Signer).trade(BUYSELL_SELL, FILL_ANY_AND_ADD_ORDER, data.token0.address, data.token1.address, price1, expiry, sellBaseTokens, data.uiFeeAccount);
-    await data.printEvents("user2->dexz.trade(SELL, FILL_ANY_AND_ADD_ORDER, token0, token1, 0.69, expiry, sellBaseTokens, uiFeeAccount)", await trade2sTx.wait());
+    const trade2sTx = await data.dexz.connect(data.user2Signer).trade(BUYSELL_SELL, FILL_ANY_AND_ADD_ORDER, data.token0.address, data.weth.address, price1, expiry, sellBaseTokens, data.uiFeeAccount);
+    await data.printEvents("user2->dexz.trade(SELL, FILL_ANY_AND_ADD_ORDER, token0, WETH, 0.69, expiry, sellBaseTokens, uiFeeAccount)", await trade2sTx.wait());
 
     await data.printState("After Executing Against Order(s)");
 
