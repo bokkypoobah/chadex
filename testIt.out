@@ -80,7 +80,7 @@
       00. Test 00 - Happy Path - Specified Set
         > user0->dexz.trade(BUY, FILL_ANY_AND_ADD_ORDER, token0, token1, 0.69, expiry, baseTokens, uiFeeAccount) - gasUsed: 378446 ~ ETH 0.01513784 ~ USD 30
           + Dexz:0xCf7E 26.0 PairAdded(pairKey: 0x40c0...0156, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1)
-          + Dexz:0xCf7E 26.1 OrderAdded(pairKey: 0x40c0...0156, key: 0xfe7e...d009, buySell: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000, expiry: 1684587680, baseTokens: 10.0)
+          + Dexz:0xCf7E 26.1 OrderAdded(pairKey: 0x40c0...0156, key: 0x7253...2e5a, buySell: 0, maker: user0:0x7099, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, price: 690000000, expiry: 1684587911, baseTokens: 10.0)
 
         --- After Adding Order(s) ---
           Account                                   ETH                     TOK0                     TOK1                     WETH Blah
@@ -104,11 +104,11 @@
           ----- Pair 0x40c0b7018177e4d450e64b5a473cd9fe42a2b24d0fbd58dee31d72bd5f990156 Token0:0x5FbD/Token1:0xe7f1 -----
             --- Buy Orders ---
               orderPriceKey: 0.69
-                Order key=0xfe7e7fec prev=0x00000000 next=0x00000000 Buy maker=user0:0x7099 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=59.99s baseTokens=10.0 baseTokensFilled=0.0
+                Order key=0x72536da9 prev=0x00000000 next=0x00000000 Buy maker=user0:0x7099 base=Token0:0x5FbD quote=Token1:0xe7f1 price=0.69 expiry=60.00s baseTokens=10.0 baseTokensFilled=0.0
             --- Sell Orders ---
 
         > user2->dexz.trade(SELL, FILL_ANY_AND_ADD_ORDER, token0, token1, 0.69, expiry, sellBaseTokens, uiFeeAccount) - gasUsed: 198618 ~ ETH 0.00794472 ~ USD 15
-          + Dexz:0xCf7E 27.0 Trade(key: 0xfe7e...d009, buySell: 1, taker: user2:0x90F7, maker: user0:0x7099, amount: 1.0, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, baseTokens: 1.0, quoteTokens: 0.68931, feeBaseTokens: 0.00069, feeQuoteTokens: 0.0, baseTokensFilled: 0)
+          + Dexz:0xCf7E 27.0 Trade(key: 0x7253...2e5a, buySell: 1, taker: user2:0x90F7, maker: user0:0x7099, amount: 1.0, baseToken: Token0:0x5FbD, quoteToken: Token1:0xe7f1, baseTokens: 1.0, quoteTokens: 0.68931, feeBaseTokens: 0.00069, feeQuoteTokens: 0.0, baseTokensFilled: 0)
           + Token0:0x5FbD 27.1 Transfer(from: user2:0x90F7, to: user0:0x7099, tokens: 1.0)
           + Token1:0xe7f1 27.2 Transfer(from: user0:0x7099, to: user2:0x90F7, tokens: 0.68931)
           + Token1:0xe7f1 27.3 Transfer(from: user0:0x7099, to: uiFeeAccount:0x976E, tokens: 0.000345)
@@ -137,8 +137,8 @@
             --- Buy Orders ---
             --- Sell Orders ---
 
-    ✔ 00. Test 00 (156ms)
+    ✔ 00. Test 00 (154ms)
 
 
-  1 passing (1s)
+  1 passing (990ms)
 

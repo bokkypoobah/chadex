@@ -13,125 +13,125 @@ pragma solidity ^0.8.0;
 //
 // Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2020. The MIT Licence.
 // ----------------------------------------------------------------------------
-type PriceType is uint64;
+type Price is uint64;
 
 library BokkyPooBahsRedBlackTreeLibrary {
 
     struct Node {
-        PriceType parent;
-        PriceType left;
-        PriceType right;
+        Price parent;
+        Price left;
+        Price right;
         uint8 red;
     }
 
     struct Tree {
-        PriceType root;
-        mapping(PriceType => Node) nodes;
+        Price root;
+        mapping(Price => Node) nodes;
     }
 
-    PriceType private constant EMPTY = PriceType.wrap(0);
+    Price private constant EMPTY = Price.wrap(0);
     uint8 private constant RED_TRUE = 1;
     uint8 private constant RED_FALSE = 2; // Can also be 0 - check against RED_TRUE
 
-    function first(Tree storage self) internal view returns (PriceType _key) {
+    function first(Tree storage self) internal view returns (Price _key) {
         _key = self.root;
-        if (PriceType.unwrap(_key) != PriceType.unwrap(EMPTY)) {
-            while (PriceType.unwrap(self.nodes[_key].left) != PriceType.unwrap(EMPTY)) {
+        if (Price.unwrap(_key) != Price.unwrap(EMPTY)) {
+            while (Price.unwrap(self.nodes[_key].left) != Price.unwrap(EMPTY)) {
                 _key = self.nodes[_key].left;
             }
         }
     }
-    function last(Tree storage self) internal view returns (PriceType _key) {
+    function last(Tree storage self) internal view returns (Price _key) {
         _key = self.root;
-        if (PriceType.unwrap(_key) != PriceType.unwrap(EMPTY)) {
-            while (PriceType.unwrap(self.nodes[_key].right) != PriceType.unwrap(EMPTY)) {
+        if (Price.unwrap(_key) != Price.unwrap(EMPTY)) {
+            while (Price.unwrap(self.nodes[_key].right) != Price.unwrap(EMPTY)) {
                 _key = self.nodes[_key].right;
             }
         }
     }
-    function next(Tree storage self, PriceType target) internal view returns (PriceType cursor) {
-        require(PriceType.unwrap(target) != PriceType.unwrap(EMPTY));
-        if (PriceType.unwrap(self.nodes[target].right) != PriceType.unwrap(EMPTY)) {
+    function next(Tree storage self, Price target) internal view returns (Price cursor) {
+        require(Price.unwrap(target) != Price.unwrap(EMPTY));
+        if (Price.unwrap(self.nodes[target].right) != Price.unwrap(EMPTY)) {
             cursor = treeMinimum(self, self.nodes[target].right);
         } else {
             cursor = self.nodes[target].parent;
-            while (PriceType.unwrap(cursor) != PriceType.unwrap(EMPTY) && PriceType.unwrap(target) == PriceType.unwrap(self.nodes[cursor].right)) {
+            while (Price.unwrap(cursor) != Price.unwrap(EMPTY) && Price.unwrap(target) == Price.unwrap(self.nodes[cursor].right)) {
                 target = cursor;
                 cursor = self.nodes[cursor].parent;
             }
         }
     }
-    function prev(Tree storage self, PriceType target) internal view returns (PriceType cursor) {
-        require(PriceType.unwrap(target) != PriceType.unwrap(EMPTY));
-        if (PriceType.unwrap(self.nodes[target].left) != PriceType.unwrap(EMPTY)) {
+    function prev(Tree storage self, Price target) internal view returns (Price cursor) {
+        require(Price.unwrap(target) != Price.unwrap(EMPTY));
+        if (Price.unwrap(self.nodes[target].left) != Price.unwrap(EMPTY)) {
             cursor = treeMaximum(self, self.nodes[target].left);
         } else {
             cursor = self.nodes[target].parent;
-            while (PriceType.unwrap(cursor) != PriceType.unwrap(EMPTY) && PriceType.unwrap(target) == PriceType.unwrap(self.nodes[cursor].left)) {
+            while (Price.unwrap(cursor) != Price.unwrap(EMPTY) && Price.unwrap(target) == Price.unwrap(self.nodes[cursor].left)) {
                 target = cursor;
                 cursor = self.nodes[cursor].parent;
             }
         }
     }
-    function exists(Tree storage self, PriceType key) internal view returns (bool) {
-        return (PriceType.unwrap(key) != PriceType.unwrap(EMPTY)) && ((PriceType.unwrap(key) == PriceType.unwrap(self.root)) || (PriceType.unwrap(self.nodes[key].parent) != PriceType.unwrap(EMPTY)));
+    function exists(Tree storage self, Price key) internal view returns (bool) {
+        return (Price.unwrap(key) != Price.unwrap(EMPTY)) && ((Price.unwrap(key) == Price.unwrap(self.root)) || (Price.unwrap(self.nodes[key].parent) != Price.unwrap(EMPTY)));
     }
-    function isEmpty(PriceType key) internal pure returns (bool) {
-        return PriceType.unwrap(key) == PriceType.unwrap(EMPTY);
+    function isEmpty(Price key) internal pure returns (bool) {
+        return Price.unwrap(key) == Price.unwrap(EMPTY);
     }
-    function getEmpty() internal pure returns (PriceType) {
+    function getEmpty() internal pure returns (Price) {
         return EMPTY;
     }
-    function getNode(Tree storage self, PriceType key) internal view returns (PriceType _returnKey, PriceType _parent, PriceType _left, PriceType _right, uint8 _red) {
+    function getNode(Tree storage self, Price key) internal view returns (Price _returnKey, Price _parent, Price _left, Price _right, uint8 _red) {
         require(exists(self, key));
         return(key, self.nodes[key].parent, self.nodes[key].left, self.nodes[key].right, self.nodes[key].red);
     }
 
-    function insert(Tree storage self, PriceType key) internal {
-        require(PriceType.unwrap(key) != PriceType.unwrap(EMPTY));
+    function insert(Tree storage self, Price key) internal {
+        require(Price.unwrap(key) != Price.unwrap(EMPTY));
         require(!exists(self, key));
-        PriceType cursor = EMPTY;
-        PriceType probe = self.root;
-        while (PriceType.unwrap(probe) != PriceType.unwrap(EMPTY)) {
+        Price cursor = EMPTY;
+        Price probe = self.root;
+        while (Price.unwrap(probe) != Price.unwrap(EMPTY)) {
             cursor = probe;
-            if (PriceType.unwrap(key) < PriceType.unwrap(probe)) {
+            if (Price.unwrap(key) < Price.unwrap(probe)) {
                 probe = self.nodes[probe].left;
             } else {
                 probe = self.nodes[probe].right;
             }
         }
         self.nodes[key] = Node({parent: cursor, left: EMPTY, right: EMPTY, red: RED_TRUE});
-        if (PriceType.unwrap(cursor) == PriceType.unwrap(EMPTY)) {
+        if (Price.unwrap(cursor) == Price.unwrap(EMPTY)) {
             self.root = key;
-        } else if (PriceType.unwrap(key) < PriceType.unwrap(cursor)) {
+        } else if (Price.unwrap(key) < Price.unwrap(cursor)) {
             self.nodes[cursor].left = key;
         } else {
             self.nodes[cursor].right = key;
         }
         insertFixup(self, key);
     }
-    function remove(Tree storage self, PriceType key) internal {
-        require(PriceType.unwrap(key) != PriceType.unwrap(EMPTY));
+    function remove(Tree storage self, Price key) internal {
+        require(Price.unwrap(key) != Price.unwrap(EMPTY));
         require(exists(self, key));
-        PriceType probe;
-        PriceType cursor;
-        if (PriceType.unwrap(self.nodes[key].left) == PriceType.unwrap(EMPTY) || PriceType.unwrap(self.nodes[key].right) == PriceType.unwrap(EMPTY)) {
+        Price probe;
+        Price cursor;
+        if (Price.unwrap(self.nodes[key].left) == Price.unwrap(EMPTY) || Price.unwrap(self.nodes[key].right) == Price.unwrap(EMPTY)) {
             cursor = key;
         } else {
             cursor = self.nodes[key].right;
-            while (PriceType.unwrap(self.nodes[cursor].left) != PriceType.unwrap(EMPTY)) {
+            while (Price.unwrap(self.nodes[cursor].left) != Price.unwrap(EMPTY)) {
                 cursor = self.nodes[cursor].left;
             }
         }
-        if (PriceType.unwrap(self.nodes[cursor].left) != PriceType.unwrap(EMPTY)) {
+        if (Price.unwrap(self.nodes[cursor].left) != Price.unwrap(EMPTY)) {
             probe = self.nodes[cursor].left;
         } else {
             probe = self.nodes[cursor].right;
         }
-        PriceType yParent = self.nodes[cursor].parent;
+        Price yParent = self.nodes[cursor].parent;
         self.nodes[probe].parent = yParent;
-        if (PriceType.unwrap(yParent) != PriceType.unwrap(EMPTY)) {
-            if (PriceType.unwrap(cursor) == PriceType.unwrap(self.nodes[yParent].left)) {
+        if (Price.unwrap(yParent) != Price.unwrap(EMPTY)) {
+            if (Price.unwrap(cursor) == Price.unwrap(self.nodes[yParent].left)) {
                 self.nodes[yParent].left = probe;
             } else {
                 self.nodes[yParent].right = probe;
@@ -140,7 +140,7 @@ library BokkyPooBahsRedBlackTreeLibrary {
             self.root = probe;
         }
         bool doFixup = self.nodes[cursor].red != RED_TRUE;
-        if (PriceType.unwrap(cursor) != PriceType.unwrap(key)) {
+        if (Price.unwrap(cursor) != Price.unwrap(key)) {
             replaceParent(self, cursor, key);
             self.nodes[cursor].left = self.nodes[key].left;
             self.nodes[self.nodes[cursor].left].parent = cursor;
@@ -155,31 +155,31 @@ library BokkyPooBahsRedBlackTreeLibrary {
         delete self.nodes[cursor];
     }
 
-    function treeMinimum(Tree storage self, PriceType key) private view returns (PriceType) {
-        while (PriceType.unwrap(self.nodes[key].left) != PriceType.unwrap(EMPTY)) {
+    function treeMinimum(Tree storage self, Price key) private view returns (Price) {
+        while (Price.unwrap(self.nodes[key].left) != Price.unwrap(EMPTY)) {
             key = self.nodes[key].left;
         }
         return key;
     }
-    function treeMaximum(Tree storage self, PriceType key) private view returns (PriceType) {
-        while (PriceType.unwrap(self.nodes[key].right) != PriceType.unwrap(EMPTY)) {
+    function treeMaximum(Tree storage self, Price key) private view returns (Price) {
+        while (Price.unwrap(self.nodes[key].right) != Price.unwrap(EMPTY)) {
             key = self.nodes[key].right;
         }
         return key;
     }
 
-    function rotateLeft(Tree storage self, PriceType key) private {
-        PriceType cursor = self.nodes[key].right;
-        PriceType keyParent = self.nodes[key].parent;
-        PriceType cursorLeft = self.nodes[cursor].left;
+    function rotateLeft(Tree storage self, Price key) private {
+        Price cursor = self.nodes[key].right;
+        Price keyParent = self.nodes[key].parent;
+        Price cursorLeft = self.nodes[cursor].left;
         self.nodes[key].right = cursorLeft;
-        if (PriceType.unwrap(cursorLeft) != PriceType.unwrap(EMPTY)) {
+        if (Price.unwrap(cursorLeft) != Price.unwrap(EMPTY)) {
             self.nodes[cursorLeft].parent = key;
         }
         self.nodes[cursor].parent = keyParent;
-        if (PriceType.unwrap(keyParent) == PriceType.unwrap(EMPTY)) {
+        if (Price.unwrap(keyParent) == Price.unwrap(EMPTY)) {
             self.root = cursor;
-        } else if (PriceType.unwrap(key) == PriceType.unwrap(self.nodes[keyParent].left)) {
+        } else if (Price.unwrap(key) == Price.unwrap(self.nodes[keyParent].left)) {
             self.nodes[keyParent].left = cursor;
         } else {
             self.nodes[keyParent].right = cursor;
@@ -187,18 +187,18 @@ library BokkyPooBahsRedBlackTreeLibrary {
         self.nodes[cursor].left = key;
         self.nodes[key].parent = cursor;
     }
-    function rotateRight(Tree storage self, PriceType key) private {
-        PriceType cursor = self.nodes[key].left;
-        PriceType keyParent = self.nodes[key].parent;
-        PriceType cursorRight = self.nodes[cursor].right;
+    function rotateRight(Tree storage self, Price key) private {
+        Price cursor = self.nodes[key].left;
+        Price keyParent = self.nodes[key].parent;
+        Price cursorRight = self.nodes[cursor].right;
         self.nodes[key].left = cursorRight;
-        if (PriceType.unwrap(cursorRight) != PriceType.unwrap(EMPTY)) {
+        if (Price.unwrap(cursorRight) != Price.unwrap(EMPTY)) {
             self.nodes[cursorRight].parent = key;
         }
         self.nodes[cursor].parent = keyParent;
-        if (PriceType.unwrap(keyParent) == PriceType.unwrap(EMPTY)) {
+        if (Price.unwrap(keyParent) == Price.unwrap(EMPTY)) {
             self.root = cursor;
-        } else if (PriceType.unwrap(key) == PriceType.unwrap(self.nodes[keyParent].right)) {
+        } else if (Price.unwrap(key) == Price.unwrap(self.nodes[keyParent].right)) {
             self.nodes[keyParent].right = cursor;
         } else {
             self.nodes[keyParent].left = cursor;
@@ -207,11 +207,11 @@ library BokkyPooBahsRedBlackTreeLibrary {
         self.nodes[key].parent = cursor;
     }
 
-    function insertFixup(Tree storage self, PriceType key) private {
-        PriceType cursor;
-        while (PriceType.unwrap(key) != PriceType.unwrap(self.root) && self.nodes[self.nodes[key].parent].red == RED_TRUE) {
-            PriceType keyParent = self.nodes[key].parent;
-            if (PriceType.unwrap(keyParent) == PriceType.unwrap(self.nodes[self.nodes[keyParent].parent].left)) {
+    function insertFixup(Tree storage self, Price key) private {
+        Price cursor;
+        while (Price.unwrap(key) != Price.unwrap(self.root) && self.nodes[self.nodes[key].parent].red == RED_TRUE) {
+            Price keyParent = self.nodes[key].parent;
+            if (Price.unwrap(keyParent) == Price.unwrap(self.nodes[self.nodes[keyParent].parent].left)) {
                 cursor = self.nodes[self.nodes[keyParent].parent].right;
                 if (self.nodes[cursor].red == RED_TRUE) {
                     self.nodes[keyParent].red = RED_FALSE;
@@ -219,7 +219,7 @@ library BokkyPooBahsRedBlackTreeLibrary {
                     self.nodes[self.nodes[keyParent].parent].red = RED_TRUE;
                     key = self.nodes[keyParent].parent;
                 } else {
-                    if (PriceType.unwrap(key) == PriceType.unwrap(self.nodes[keyParent].right)) {
+                    if (Price.unwrap(key) == Price.unwrap(self.nodes[keyParent].right)) {
                       key = keyParent;
                       rotateLeft(self, key);
                     }
@@ -236,7 +236,7 @@ library BokkyPooBahsRedBlackTreeLibrary {
                     self.nodes[self.nodes[keyParent].parent].red = RED_TRUE;
                     key = self.nodes[keyParent].parent;
                 } else {
-                    if (PriceType.unwrap(key) == PriceType.unwrap(self.nodes[keyParent].left)) {
+                    if (Price.unwrap(key) == Price.unwrap(self.nodes[keyParent].left)) {
                       key = keyParent;
                       rotateRight(self, key);
                     }
@@ -250,24 +250,24 @@ library BokkyPooBahsRedBlackTreeLibrary {
         self.nodes[self.root].red = RED_FALSE;
     }
 
-    function replaceParent(Tree storage self, PriceType a, PriceType b) private {
-        PriceType bParent = self.nodes[b].parent;
+    function replaceParent(Tree storage self, Price a, Price b) private {
+        Price bParent = self.nodes[b].parent;
         self.nodes[a].parent = bParent;
-        if (PriceType.unwrap(bParent) == PriceType.unwrap(EMPTY)) {
+        if (Price.unwrap(bParent) == Price.unwrap(EMPTY)) {
             self.root = a;
         } else {
-            if (PriceType.unwrap(b) == PriceType.unwrap(self.nodes[bParent].left)) {
+            if (Price.unwrap(b) == Price.unwrap(self.nodes[bParent].left)) {
                 self.nodes[bParent].left = a;
             } else {
                 self.nodes[bParent].right = a;
             }
         }
     }
-    function removeFixup(Tree storage self, PriceType key) private {
-        PriceType cursor;
-        while (PriceType.unwrap(key) != PriceType.unwrap(self.root) && self.nodes[key].red != RED_TRUE) {
-            PriceType keyParent = self.nodes[key].parent;
-            if (PriceType.unwrap(key) == PriceType.unwrap(self.nodes[keyParent].left)) {
+    function removeFixup(Tree storage self, Price key) private {
+        Price cursor;
+        while (Price.unwrap(key) != Price.unwrap(self.root) && self.nodes[key].red != RED_TRUE) {
+            Price keyParent = self.nodes[key].parent;
+            if (Price.unwrap(key) == Price.unwrap(self.nodes[keyParent].left)) {
                 cursor = self.nodes[keyParent].right;
                 if (self.nodes[cursor].red == RED_TRUE) {
                     self.nodes[cursor].red = RED_FALSE;
