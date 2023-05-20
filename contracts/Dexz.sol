@@ -32,7 +32,6 @@ interface IERC20 {
 contract Owned {
     address public owner;
     address public newOwner;
-    bool private initialised;
 
     event OwnershipTransferred(address indexed _from, address indexed _to);
 
@@ -41,11 +40,10 @@ contract Owned {
         _;
     }
 
-    function initOwned(address _owner) internal {
-        require(!initialised);
-        owner = _owner;
-        initialised = true;
+    constructor() {
+        owner = msg.sender;
     }
+
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
@@ -91,8 +89,7 @@ contract DexzBase is Owned {
     event PairAdded(bytes32 indexed pairKey, address indexed baseToken, address indexed quoteToken);
     event LogInfo(string topic, uint number, bytes32 data, string note, address addr);
 
-    constructor(address _feeAccount) {
-        initOwned(msg.sender);
+    constructor(address _feeAccount) Owned() {
         feeAccount = _feeAccount;
     }
 
@@ -373,9 +370,6 @@ contract Orders is DexzBase {
         _orderKey = orderKey(buySell, maker, baseToken, quoteToken, price, expiry);
         require(orders[_orderKey].maker == address(0));
 
-        // addToken(baseToken);
-        // addToken(quoteToken);
-        // addAccount(maker);
         addPair(_pairKey, baseToken, quoteToken);
 
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[_pairKey][buySell];
@@ -388,14 +382,12 @@ contract Orders is DexzBase {
         } else {
             // emit LogInfo("orders addKey RBT exists ", uint(Price.unwrap(price)), 0x0, "", address(0));
         }
-        // Above - new 148,521, existing 35,723
 
         OrderQueue storage _orderQueue = orderQueue[_pairKey][buySell][price];
         if (!_orderQueue.exists) {
             orderQueue[_pairKey][buySell][price] = OrderQueue(true, ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
             _orderQueue = orderQueue[_pairKey][buySell][price];
         }
-        // Above - new 179,681, existing 36,234
 
         if (_orderQueue.tail == ORDERKEY_SENTINEL) {
             _orderQueue.head = _orderKey;
