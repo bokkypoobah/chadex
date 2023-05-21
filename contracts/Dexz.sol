@@ -581,7 +581,7 @@ contract Dexz is Orders {
                 Order storage order = orders[bestMatchingOrderKey];
                 console.log("          * order - buySell: %s, baseTokens: %s, expiry: %s", uint(order.buySell), order.baseTokens, order.expiry);
                 if (order.expiry < block.timestamp) {
-                    console.log("          * Deleting Queue Item");
+                    console.log("          * Deleting Order");
                     // TODO delete and repoint head and tail
                     if (_orderQueue.head == bestMatchingOrderKey) {
                         _orderQueue.head = order.next;
@@ -596,19 +596,20 @@ contract Dexz is Orders {
                     bestMatchingOrderKey = order.next;
                     delete orders[bestMatchingOrderKey];
                 } else {
-                // TODO Check for valid order
-                //     // emit LogInfo("getBestMatchingOrder: _bestMatchingOrderKey ", order.expiry, _bestMatchingOrderKey, "", address(0));
-                //     if (order.expiry >= block.timestamp && order.baseTokens > order.baseTokensFilled) {
-                //         return (_bestMatchingPriceKey, _bestMatchingOrderKey);
-                //     }
+                    console.log("          * Processing Order");
+                    // TODO Check for valid order
+                    //     // emit LogInfo("getBestMatchingOrder: _bestMatchingOrderKey ", order.expiry, _bestMatchingOrderKey, "", address(0));
+                    //     if (order.expiry >= block.timestamp && order.baseTokens > order.baseTokensFilled) {
+                    //         return (_bestMatchingPriceKey, _bestMatchingOrderKey);
+                    //     }
                     bestMatchingOrderKey = order.next;
                 }
             }
-            console.log("          * Checking Queue - head & tail");
+            console.log("          * Checking Order Queue - head & tail");
             console.logBytes32(_orderQueue.head);
             console.logBytes32(_orderQueue.tail);
             if (_orderQueue.head == ORDERKEY_SENTINEL /*&& _orderQueue.tail == ORDERKEY_SENTINEL*/) {
-                console.log("          * Deleting Queue");
+                console.log("          * Deleting Order Queue");
                 // TODO: Delete Queue
                 delete orderQueue[tradeInfo.pairKey][inverseBS][bestMatchingPrice];
                 // TODO: Delete Price

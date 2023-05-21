@@ -239,7 +239,7 @@ class Data {
           while (orderPriceKey != 0) {
             console.log("              orderPriceKey: " + ethers.utils.formatUnits(orderPriceKey, 9));
             var orderQueue = await this.dexz.getOrderQueue(pair.pairKey, buySell, orderPriceKey);
-            // console.log("                  Price: " + ethers.utils.formatEther(orderPriceKey) + " head=" + orderQueue[1].substring(0, 18) + " tail=" + orderQueue[2].substring(0, 18));
+            console.log("                  Price: " + ethers.utils.formatEther(orderPriceKey) + " head=" + orderQueue[1].substring(0, 18) + " tail=" + orderQueue[2].substring(0, 18));
             let orderKey = orderQueue[1];
             while (orderKey != 0) {
               let order = await this.dexz.getOrder(orderKey);
