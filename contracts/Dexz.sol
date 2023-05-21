@@ -580,6 +580,22 @@ contract Dexz is Orders {
                 console.logBytes32(bestMatchingOrderKey);
                 Order storage order = orders[bestMatchingOrderKey];
                 console.log("          * order - buySell: %s, maker: %s, baseTokens: ", uint(order.buySell), order.maker, order.baseTokens);
+                if (order.expiry < block.timestamp) {
+                    console.log("          * Expired: %s - deleting", block.timestamp);
+                    // TODO delete and repoint head and tail
+                    if (_orderQueue.head == bestMatchingOrderKey) {
+                        _orderQueue.head = order.next;
+                    } else {
+                        orders[order.prev].next = order.next;
+                    }
+                    if (_orderQueue.tail == bestMatchingOrderKey) {
+                        _orderQueue.tail = order.prev;
+                    } else {
+                        orders[order.next].prev = order.prev;
+                    }
+                    delete orders[bestMatchingOrderKey];
+                }
+                // TODO Check for valid order
             //     // emit LogInfo("getBestMatchingOrder: _bestMatchingOrderKey ", order.expiry, _bestMatchingOrderKey, "", address(0));
             //     if (order.expiry >= block.timestamp && order.baseTokens > order.baseTokensFilled) {
             //         return (_bestMatchingPriceKey, _bestMatchingOrderKey);
