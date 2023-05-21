@@ -70,8 +70,8 @@ contract DexzBase is Owned {
     Price public constant PRICE_MIN = Price.wrap(1);
     Price public constant PRICE_MAX = Price.wrap(999_999_999_999_999_999); // max(uint64)=18,446,744,073,709,551,616
 
-    uint public takerFeeInEthers = 5 * 10 ** 16; // 0.05 ETH
-    uint public takerFeeInTokens = 10 * uint(10)**14; // 0.10%
+    uint public takerFeeInEthers = 0; // TODO 5 * 10 ** 16; // 0.05 ETH
+    uint public takerFeeInTokens = 0; // TODO 10 * uint(10)**14; // 0.10%
     address public feeAccount;
 
     struct PairInfo {

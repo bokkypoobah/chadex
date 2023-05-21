@@ -42,16 +42,16 @@ library BokkyPooBahsRedBlackTreeLibrary {
 
     function first(Tree storage self) internal view returns (Price _key) {
         _key = self.root;
-        if (!isEmpty(_key)) {
-            while (!isEmpty(self.nodes[_key].left)) {
+        if (isNotEmpty(_key)) {
+            while (isNotEmpty(self.nodes[_key].left)) {
                 _key = self.nodes[_key].left;
             }
         }
     }
     function last(Tree storage self) internal view returns (Price _key) {
         _key = self.root;
-        if (!isEmpty(_key)) {
-            while (!isEmpty(self.nodes[_key].right)) {
+        if (isNotEmpty(_key)) {
+            while (isNotEmpty(self.nodes[_key].right)) {
                 _key = self.nodes[_key].right;
             }
         }
@@ -60,11 +60,11 @@ library BokkyPooBahsRedBlackTreeLibrary {
         if (isEmpty(target)) {
             revert CannotFindNextEmptyKey();
         }
-        if (!isEmpty(self.nodes[target].right)) {
+        if (isNotEmpty(self.nodes[target].right)) {
             cursor = treeMinimum(self, self.nodes[target].right);
         } else {
             cursor = self.nodes[target].parent;
-            while (!isEmpty(cursor) && Price.unwrap(target) == Price.unwrap(self.nodes[cursor].right)) {
+            while (isNotEmpty(cursor) && Price.unwrap(target) == Price.unwrap(self.nodes[cursor].right)) {
                 target = cursor;
                 cursor = self.nodes[cursor].parent;
             }
@@ -74,21 +74,24 @@ library BokkyPooBahsRedBlackTreeLibrary {
         if (isEmpty(target)) {
             revert CannotFindPrevEmptyKey();
         }
-        if (!isEmpty(self.nodes[target].left)) {
+        if (isNotEmpty(self.nodes[target].left)) {
             cursor = treeMaximum(self, self.nodes[target].left);
         } else {
             cursor = self.nodes[target].parent;
-            while (!isEmpty(cursor) && Price.unwrap(target) == Price.unwrap(self.nodes[cursor].left)) {
+            while (isNotEmpty(cursor) && Price.unwrap(target) == Price.unwrap(self.nodes[cursor].left)) {
                 target = cursor;
                 cursor = self.nodes[cursor].parent;
             }
         }
     }
     function exists(Tree storage self, Price key) internal view returns (bool) {
-        return !isEmpty(key) && ((Price.unwrap(key) == Price.unwrap(self.root)) || !isEmpty(self.nodes[key].parent));
+        return isNotEmpty(key) && ((Price.unwrap(key) == Price.unwrap(self.root)) || isNotEmpty(self.nodes[key].parent));
     }
     function isEmpty(Price key) internal pure returns (bool) {
         return Price.unwrap(key) == Price.unwrap(EMPTY);
+    }
+    function isNotEmpty(Price key) internal pure returns (bool) {
+        return Price.unwrap(key) != Price.unwrap(EMPTY);
     }
     function getEmpty() internal pure returns (Price) {
         return EMPTY;
@@ -107,7 +110,7 @@ library BokkyPooBahsRedBlackTreeLibrary {
         }
         Price cursor = EMPTY;
         Price probe = self.root;
-        while (!isEmpty(probe)) {
+        while (isNotEmpty(probe)) {
             cursor = probe;
             if (Price.unwrap(key) < Price.unwrap(probe)) {
                 probe = self.nodes[probe].left;
@@ -138,18 +141,18 @@ library BokkyPooBahsRedBlackTreeLibrary {
             cursor = key;
         } else {
             cursor = self.nodes[key].right;
-            while (!isEmpty(self.nodes[cursor].left)) {
+            while (isNotEmpty(self.nodes[cursor].left)) {
                 cursor = self.nodes[cursor].left;
             }
         }
-        if (!isEmpty(self.nodes[cursor].left)) {
+        if (isNotEmpty(self.nodes[cursor].left)) {
             probe = self.nodes[cursor].left;
         } else {
             probe = self.nodes[cursor].right;
         }
         Price yParent = self.nodes[cursor].parent;
         self.nodes[probe].parent = yParent;
-        if (!isEmpty(yParent)) {
+        if (isNotEmpty(yParent)) {
             if (Price.unwrap(cursor) == Price.unwrap(self.nodes[yParent].left)) {
                 self.nodes[yParent].left = probe;
             } else {
@@ -175,13 +178,13 @@ library BokkyPooBahsRedBlackTreeLibrary {
     }
 
     function treeMinimum(Tree storage self, Price key) private view returns (Price) {
-        while (!isEmpty(self.nodes[key].left)) {
+        while (isNotEmpty(self.nodes[key].left)) {
             key = self.nodes[key].left;
         }
         return key;
     }
     function treeMaximum(Tree storage self, Price key) private view returns (Price) {
-        while (!isEmpty(self.nodes[key].right)) {
+        while (isNotEmpty(self.nodes[key].right)) {
             key = self.nodes[key].right;
         }
         return key;
@@ -192,7 +195,7 @@ library BokkyPooBahsRedBlackTreeLibrary {
         Price keyParent = self.nodes[key].parent;
         Price cursorLeft = self.nodes[cursor].left;
         self.nodes[key].right = cursorLeft;
-        if (!isEmpty(cursorLeft)) {
+        if (isNotEmpty(cursorLeft)) {
             self.nodes[cursorLeft].parent = key;
         }
         self.nodes[cursor].parent = keyParent;
@@ -211,7 +214,7 @@ library BokkyPooBahsRedBlackTreeLibrary {
         Price keyParent = self.nodes[key].parent;
         Price cursorRight = self.nodes[cursor].right;
         self.nodes[key].left = cursorRight;
-        if (!isEmpty(cursorRight)) {
+        if (isNotEmpty(cursorRight)) {
             self.nodes[cursorRight].parent = key;
         }
         self.nodes[cursor].parent = keyParent;
