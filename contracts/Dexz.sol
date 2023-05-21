@@ -579,9 +579,9 @@ contract Dexz is Orders {
             while (bestMatchingOrderKey != ORDERKEY_SENTINEL) {
                 console.logBytes32(bestMatchingOrderKey);
                 Order storage order = orders[bestMatchingOrderKey];
-                console.log("          * order - buySell: %s, maker: %s, baseTokens: ", uint(order.buySell), order.maker, order.baseTokens);
+                console.log("          * order - buySell: %s, baseTokens: %s, expiry: %s", uint(order.buySell), order.baseTokens, order.expiry);
                 if (order.expiry < block.timestamp) {
-                    console.log("          * Expired: %s - deleting", block.timestamp);
+                    console.log("          * Deleting Queue Item");
                     // TODO delete and repoint head and tail
                     if (_orderQueue.head == bestMatchingOrderKey) {
                         _orderQueue.head = order.next;
@@ -593,17 +593,37 @@ contract Dexz is Orders {
                     } else {
                         orders[order.next].prev = order.prev;
                     }
+                    bestMatchingOrderKey = order.next;
                     delete orders[bestMatchingOrderKey];
-                }
+                } else {
                 // TODO Check for valid order
-            //     // emit LogInfo("getBestMatchingOrder: _bestMatchingOrderKey ", order.expiry, _bestMatchingOrderKey, "", address(0));
-            //     if (order.expiry >= block.timestamp && order.baseTokens > order.baseTokensFilled) {
-            //         return (_bestMatchingPriceKey, _bestMatchingOrderKey);
-            //     }
-                bestMatchingOrderKey = order.next;
+                //     // emit LogInfo("getBestMatchingOrder: _bestMatchingOrderKey ", order.expiry, _bestMatchingOrderKey, "", address(0));
+                //     if (order.expiry >= block.timestamp && order.baseTokens > order.baseTokensFilled) {
+                //         return (_bestMatchingPriceKey, _bestMatchingOrderKey);
+                //     }
+                    bestMatchingOrderKey = order.next;
+                }
             }
-
-            bestMatchingPrice = getMatchingNextBestPrice(tradeInfo, bestMatchingPrice);
+            console.log("          * Checking Queue - head & tail");
+            console.logBytes32(_orderQueue.head);
+            console.logBytes32(_orderQueue.tail);
+            if (_orderQueue.head == ORDERKEY_SENTINEL /*&& _orderQueue.tail == ORDERKEY_SENTINEL*/) {
+                console.log("          * Deleting Queue");
+                // TODO: Delete Queue
+                delete orderQueue[tradeInfo.pairKey][inverseBS][bestMatchingPrice];
+                // TODO: Delete Price
+                console.log("          * Deleting Price");
+                Price tempBestMatchingPrice = getMatchingNextBestPrice(tradeInfo, bestMatchingPrice);
+                BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[tradeInfo.pairKey][inverseBS];
+                if (priceKeys.exists(bestMatchingPrice)) {
+                    priceKeys.remove(bestMatchingPrice);
+                    console.log("          * Deleting Price from RBT");
+                    // emit LogInfo("orders remove RBT", uint(Price.unwrap(_price)), 0x0, "", address(0));
+                }
+                bestMatchingPrice = tempBestMatchingPrice;
+            } else {
+                bestMatchingPrice = getMatchingNextBestPrice(tradeInfo, bestMatchingPrice);
+            }
         }
     }
 
