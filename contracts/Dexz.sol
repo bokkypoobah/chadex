@@ -560,20 +560,49 @@ contract Dexz is Orders {
     }
     function _tradeNew(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
         Price bestMatchingPrice = getMatchingBestPrice(tradeInfo);
+        BuySell inverseBS = inverseBuySell(tradeInfo.buySell);
         while (Price.unwrap(bestMatchingPrice) != Price.unwrap(PRICE_EMPTY)) {
             console.log("          * bestMatchingPrice: ", Price.unwrap(bestMatchingPrice));
-            bool _exists;
-            bytes32 head;
-            bytes32 tail;
-            (_exists, head, tail) = getMatchingOrderQueue(tradeInfo, bestMatchingPrice);
-            console.log("          * _exists: ", _exists);
-            // console.log("          * head: ", head);
-            console.logBytes32(head);
-            console.logBytes32(tail);
+
+            Orders.OrderQueue storage _orderQueue = orderQueue[tradeInfo.pairKey][inverseBS][bestMatchingPrice];
+
+            // bool _exists;
+            // bytes32 head;
+            // bytes32 tail;
+            // (_exists, head, tail) = getMatchingOrderQueue(tradeInfo, bestMatchingPrice);
+            // console.log("          * _exists: ", _exists);
+            // // console.log("          * head: ", head);
+            // console.logBytes32(head);
+            // console.logBytes32(tail);
+
+            bytes32 bestMatchingOrderKey = _orderQueue.head;
+            while (bestMatchingOrderKey != ORDERKEY_SENTINEL) {
+                console.logBytes32(bestMatchingOrderKey);
+                Order storage order = orders[bestMatchingOrderKey];
+                console.log("          * order - buySell: %s, maker: %s, baseTokens: ", uint(order.buySell), order.maker, order.baseTokens);
+            //     // emit LogInfo("getBestMatchingOrder: _bestMatchingOrderKey ", order.expiry, _bestMatchingOrderKey, "", address(0));
+            //     if (order.expiry >= block.timestamp && order.baseTokens > order.baseTokensFilled) {
+            //         return (_bestMatchingPriceKey, _bestMatchingOrderKey);
+            //     }
+                bestMatchingOrderKey = order.next;
+            }
 
             bestMatchingPrice = getMatchingNextBestPrice(tradeInfo, bestMatchingPrice);
         }
     }
+
+    // struct Order {
+    //     bytes32 prev;
+    //     bytes32 next;
+    //     BuySell buySell;
+    //     address maker;
+    //     address baseToken;      // ABC
+    //     address quoteToken;     // WETH
+    //     Price price;        // ABC/WETH = 0.123 = #quoteToken per unit baseToken
+    //     uint64 expiry;
+    //     uint baseTokens;        // Original order
+    //     uint baseTokensFilled;  // Filled order
+    // }
 
 
     function trade(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
