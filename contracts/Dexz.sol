@@ -214,6 +214,7 @@ contract Orders is DexzBase {
     // OrderKey (bytes32) => Order
     mapping(bytes32 => Order) orders;
 
+    Price public constant PRICE_EMPTY = Price.wrap(0);
     bytes32 public constant ORDERKEY_SENTINEL = 0x0;
 
     event OrderAdded(bytes32 indexed pairKey, bytes32 indexed key, BuySell buySell, address indexed maker, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens);
@@ -529,6 +530,37 @@ contract Dexz is Orders {
     // }
 
     error InvalidPrice();
+
+    function getMatchingBestPrice(TradeInfo memory tradeInfo) public view returns (Price price) {
+        console.log("          * buySell: ", uint(tradeInfo.buySell));
+        BuySell inverseBS = inverseBuySell(tradeInfo.buySell);
+        console.log("          * inverseBS: ", uint(inverseBS));
+        price = (inverseBS == BuySell.Buy) ? orderKeys[tradeInfo.pairKey][inverseBS].last() : orderKeys[tradeInfo.pairKey][inverseBS].first();
+    }
+    function getMatchingNextBestPrice(TradeInfo memory tradeInfo, Price x) public view returns (Price y) {
+        BuySell inverseBS = inverseBuySell(tradeInfo.buySell);
+        if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(x)) {
+            y = (inverseBS == BuySell.Buy) ? orderKeys[tradeInfo.pairKey][inverseBS].last() : orderKeys[tradeInfo.pairKey][inverseBS].first();
+        } else {
+            y = (inverseBS == BuySell.Buy) ? orderKeys[tradeInfo.pairKey][inverseBS].prev(x) : orderKeys[tradeInfo.pairKey][inverseBS].next(x);
+        }
+    }
+
+
+    function tradeNew(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
+        if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
+            revert InvalidPrice();
+        }
+        return _tradeNew(TradeInfo(msg.sender, buySell, fill, generatePairKey(baseToken, quoteToken), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
+    }
+    function _tradeNew(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
+        Price bestMatchingPrice = getMatchingBestPrice(tradeInfo);
+        while (Price.unwrap(bestMatchingPrice) != Price.unwrap(PRICE_EMPTY)) {
+            console.log("          * bestMatchingPrice: ", Price.unwrap(bestMatchingPrice));
+            bestMatchingPrice = getMatchingNextBestPrice(tradeInfo, bestMatchingPrice);
+        }
+    }
+
 
     function trade(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
         if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
