@@ -267,13 +267,13 @@ contract Orders is DexzBase {
 
 
     function getBestPrice(bytes32 pairKey, BuySell buySell) public view returns (Price key) {
-        key = (buySell == BuySell.Buy) ? orderKeys[pairKey][buySell].first() : orderKeys[pairKey][buySell].last();
+        key = (buySell == BuySell.Buy) ? orderKeys[pairKey][buySell].last() : orderKeys[pairKey][buySell].first();
     }
     function getNextBestPrice(bytes32 pairKey, BuySell buySell, Price x) public view returns (Price y) {
         if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(x)) {
-            y = (buySell == BuySell.Buy) ? orderKeys[pairKey][buySell].first() : orderKeys[pairKey][buySell].last();
+            y = (buySell == BuySell.Buy) ? orderKeys[pairKey][buySell].last() : orderKeys[pairKey][buySell].first();
         } else {
-            y = (buySell == BuySell.Buy) ? orderKeys[pairKey][buySell].next(x) : orderKeys[pairKey][buySell].prev(x);
+            y = (buySell == BuySell.Buy) ? orderKeys[pairKey][buySell].prev(x) : orderKeys[pairKey][buySell].next(x);
         }
     }
 
@@ -545,6 +545,11 @@ contract Dexz is Orders {
             y = (inverseBS == BuySell.Buy) ? orderKeys[tradeInfo.pairKey][inverseBS].prev(x) : orderKeys[tradeInfo.pairKey][inverseBS].next(x);
         }
     }
+    function getMatchingOrderQueue(TradeInfo memory tradeInfo, Price price) public view returns (bool _exists, bytes32 head, bytes32 tail) {
+        BuySell inverseBS = inverseBuySell(tradeInfo.buySell);
+        Orders.OrderQueue memory _orderQueue = orderQueue[tradeInfo.pairKey][inverseBS][price];
+        return (_orderQueue.exists, _orderQueue.head, _orderQueue.tail);
+    }
 
 
     function tradeNew(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
@@ -557,6 +562,15 @@ contract Dexz is Orders {
         Price bestMatchingPrice = getMatchingBestPrice(tradeInfo);
         while (Price.unwrap(bestMatchingPrice) != Price.unwrap(PRICE_EMPTY)) {
             console.log("          * bestMatchingPrice: ", Price.unwrap(bestMatchingPrice));
+            bool _exists;
+            bytes32 head;
+            bytes32 tail;
+            (_exists, head, tail) = getMatchingOrderQueue(tradeInfo, bestMatchingPrice);
+            console.log("          * _exists: ", _exists);
+            // console.log("          * head: ", head);
+            console.logBytes32(head);
+            console.logBytes32(tail);
+
             bestMatchingPrice = getMatchingNextBestPrice(tradeInfo, bestMatchingPrice);
         }
     }
