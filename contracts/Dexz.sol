@@ -74,14 +74,13 @@ contract DexzBase is Owned {
     uint public takerFeeInTokens = 0; // TODO 10 * uint(10)**14; // 0.10%
     address public feeAccount;
 
-    struct PairInfo {
-        bytes32 pairKey;
+    struct Pair {
         address baseToken;
         address quoteToken;
     }
 
-    mapping(bytes32 => uint) public pairBlockNumbers;
-    PairInfo[] public pairInfoList;
+    mapping(bytes32 => Pair) public pairs;
+    bytes32[] public pairKeys;
 
     event TakerFeeInEthersUpdated(uint oldTakerFeeInEthers, uint newTakerFeeInEthers);
     event TakerFeeInTokensUpdated(uint oldTakerFeeInTokens, uint newTakerFeeInTokens);
@@ -105,13 +104,18 @@ contract DexzBase is Owned {
         emit FeeAccountUpdated(feeAccount, _feeAccount);
         feeAccount = _feeAccount;
     }
-    function pairInfoListLength() public view returns (uint) {
-        return pairInfoList.length;
+    function pair(uint i) public view returns (bytes32 pairKey, address baseToken, address quoteToken) {
+        pairKey = pairKeys[i];
+        Pair memory _pair = pairs[pairKey];
+        return (pairKey, _pair.baseToken, _pair.quoteToken);
+    }
+    function pairsLength() public view returns (uint) {
+        return pairKeys.length;
     }
     function addPair(bytes32 pairKey, address baseToken, address quoteToken) internal {
-        if (pairBlockNumbers[pairKey] == 0) {
-            pairBlockNumbers[pairKey] = block.number;
-            pairInfoList.push(PairInfo(pairKey, baseToken, quoteToken));
+        if (pairs[pairKey].baseToken == address(0)) {
+            pairs[pairKey] = Pair(baseToken, quoteToken);
+            pairKeys.push(pairKey);
             emit PairAdded(pairKey, baseToken, quoteToken);
         }
     }
@@ -190,13 +194,13 @@ contract Orders is DexzBase {
     // 0.00054087 = new BigNumber(54087).shift(10);
     // GNT/ETH = base/quote = 0.00054087
     struct Order {
-        bytes32 prev;
+        // bytes32 prev;
         bytes32 next;
         BuySell buySell;
         address maker;
         address baseToken;      // ABC
         address quoteToken;     // WETH
-        Price price;        // ABC/WETH = 0.123 = #quoteToken per unit baseToken
+        Price price;            // ABC/WETH = 0.123 = #quoteToken per unit baseToken
         uint64 expiry;
         uint baseTokens;        // Original order
         uint baseTokensFilled;  // Filled order
@@ -282,9 +286,9 @@ contract Orders is DexzBase {
         return (_orderQueue.exists, _orderQueue.head, _orderQueue.tail);
     }
     // TODO check type _orderType
-    function getOrder(bytes32 orderKey) public view returns (bytes32 _prev, bytes32 _next, BuySell buySell, address maker, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, uint baseTokensFilled) {
+    function getOrder(bytes32 orderKey) public view returns (bytes32 _next, BuySell buySell, address maker, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, uint baseTokensFilled) {
         Orders.Order memory order = orders[orderKey];
-        return (order.prev, order.next, order.buySell, order.maker, order.baseToken, order.quoteToken, order.price, order.expiry, order.baseTokens, order.baseTokensFilled);
+        return (order.next, order.buySell, order.maker, order.baseToken, order.quoteToken, order.price, order.expiry, order.baseTokens, order.baseTokensFilled);
     }
 
 
@@ -336,10 +340,11 @@ contract Orders is DexzBase {
                     // TODO: What happens when allowance or balance is lower than #baseTokens
                     if (_orderFilled) {
                         _orderQueue.head = order.next;
-                        if (order.next != ORDERKEY_SENTINEL) {
-                            orders[order.next].prev = ORDERKEY_SENTINEL;
-                        }
-                        order.prev = ORDERKEY_SENTINEL;
+                        // TODO
+                        // if (order.next != ORDERKEY_SENTINEL) {
+                        //     orders[order.next].prev = ORDERKEY_SENTINEL;
+                        // }
+                        // order.prev = ORDERKEY_SENTINEL;
                         if (_orderQueue.tail == matchingOrderKey) {
                             _orderQueue.tail = ORDERKEY_SENTINEL;
                         }
@@ -370,40 +375,26 @@ contract Orders is DexzBase {
         bytes32 pairKey = generatePairKey(baseToken, quoteToken);
         orderKey = generateOrderKey(buySell, maker, baseToken, quoteToken, price, expiry);
         require(orders[orderKey].maker == address(0));
-
         addPair(pairKey, baseToken, quoteToken);
-
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[pairKey][buySell];
-        // SKINNY2 if (!priceKeys.initialised) {
-        // SKINNY2     priceKeys.init();
-        // SKINNY2 }
         if (!priceKeys.exists(price)) {
             priceKeys.insert(price);
-            // emit LogInfo("orders addKey RBT adding ", uint(Price.unwrap(price)), 0x0, "", address(0));
         } else {
-            // emit LogInfo("orders addKey RBT exists ", uint(Price.unwrap(price)), 0x0, "", address(0));
         }
-
         OrderQueue storage _orderQueue = orderQueue[pairKey][buySell][price];
         if (!_orderQueue.exists) {
             orderQueue[pairKey][buySell][price] = OrderQueue(true, ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
             _orderQueue = orderQueue[pairKey][buySell][price];
         }
-
         if (_orderQueue.tail == ORDERKEY_SENTINEL) {
             _orderQueue.head = orderKey;
             _orderQueue.tail = orderKey;
-            orders[orderKey] = Order(ORDERKEY_SENTINEL, ORDERKEY_SENTINEL, buySell, maker, baseToken, quoteToken, price, expiry, baseTokens, 0);
-            // emit LogInfo("orders addData  first", 0, orderKey, "", address(0));
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, buySell, maker, baseToken, quoteToken, price, expiry, baseTokens, 0);
         } else {
             orders[_orderQueue.tail].next = orderKey;
-            orders[orderKey] = Order(_orderQueue.tail, ORDERKEY_SENTINEL, buySell, maker, baseToken, quoteToken, price, expiry, baseTokens, 0);
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, buySell, maker, baseToken, quoteToken, price, expiry, baseTokens, 0);
             _orderQueue.tail = orderKey;
-            // emit LogInfo("orders addData !first", 0, orderKey, "", address(0));
         }
-        // Above saving prev and next - new 232,985, existing 84,961
-        // Above saving all - new 385,258, existing 241,975
-
         emit OrderAdded(pairKey, orderKey, buySell, maker, baseToken, quoteToken, price, expiry, baseTokens);
     }
     function _removeOrder(bytes32 orderKey, address msgSender) internal {
@@ -426,21 +417,26 @@ contract Orders is DexzBase {
         // First item
         } else if (_orderQueue.head == orderKey) {
             bytes32 _next = orders[orderKey].next;
-            orders[_next].prev = ORDERKEY_SENTINEL;
+            // TODO
+            // orders[_next].prev = ORDERKEY_SENTINEL;
             _orderQueue.head = _next;
             delete orders[orderKey];
         // Last item
         } else if (_orderQueue.tail == orderKey) {
-            bytes32 _prev = orders[orderKey].prev;
-            orders[_prev].next = ORDERKEY_SENTINEL;
-            _orderQueue.tail = _prev;
+            // TODO
+            // bytes32 _prev = orders[orderKey].prev;
+            // orders[_prev].next = ORDERKEY_SENTINEL;
+            // _orderQueue.tail = _prev;
+            // TODO
+            _orderQueue.tail = ORDERKEY_SENTINEL;
             delete orders[orderKey];
         // Item in the middle
         } else {
-            bytes32 _prev = orders[orderKey].prev;
+            // TODO
+            // bytes32 _prev = orders[orderKey].prev;
             bytes32 _next = orders[orderKey].next;
-            orders[_prev].next = ORDERKEY_SENTINEL;
-            orders[_next].prev = _prev;
+            // orders[_prev].next = ORDERKEY_SENTINEL;
+            // orders[_next].prev = _prev;
             delete orders[orderKey];
         }
         emit OrderRemoved(orderKey);
@@ -586,12 +582,15 @@ contract Dexz is Orders {
                     if (_orderQueue.head == bestMatchingOrderKey) {
                         _orderQueue.head = order.next;
                     } else {
-                        orders[order.prev].next = order.next;
+                        // TODO
+                        // orders[order.prev].next = order.next;
                     }
                     if (_orderQueue.tail == bestMatchingOrderKey) {
-                        _orderQueue.tail = order.prev;
+                        // TODO
+                        // _orderQueue.tail = order.prev;
                     } else {
-                        orders[order.next].prev = order.prev;
+                        // TODO
+                        // orders[order.next].prev = order.prev;
                     }
                     bestMatchingOrderKey = order.next;
                     delete orders[bestMatchingOrderKey];
