@@ -100,7 +100,7 @@ describe("Dexz", function () {
     await data.printEvents("Send weth" , await weth3Tx.wait());
 
     const approveAmount = ethers.utils.parseEther("1000");
-    const approve00Tx = await data.token0.connect(data.user0Signer).approve(data.dexz.address, approveAmount);
+    const approve00Tx = await data.token0.connect(data.user0Signer).approve(data.dexz.address, ethers.utils.parseEther("0.1234"));
     const approve10Tx = await data.token1.connect(data.user0Signer).approve(data.dexz.address, approveAmount);
     const approve20Tx = await data.weth.connect(data.user0Signer).approve(data.dexz.address, approveAmount);
     const approve01Tx = await data.token0.connect(data.user1Signer).approve(data.dexz.address, approveAmount);

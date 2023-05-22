@@ -555,14 +555,14 @@ contract Dexz is Orders {
     function _tradeNew(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
         if (tradeInfo.buySell == BuySell.Buy) {
             uint allowance = IERC20(tradeInfo.quoteToken).allowance(msg.sender, address(this));
-            console.log("          * BUY - quoteTokenAllowance %s: ", allowance);
+            console.log("          * BUY - Taker quoteTokenAllowance %s: ", allowance);
             uint quoteTokens = tradeInfo.baseTokens * Price.unwrap(tradeInfo.price) / TENPOW9;
             if (allowance < quoteTokens) {
                 revert InsufficientQuoteTokenAllowance(tradeInfo.quoteToken, quoteTokens, allowance);
             }
         } else {
             uint allowance = IERC20(tradeInfo.baseToken).allowance(msg.sender, address(this));
-            console.log("          * SELL - baseTokenAllowance %s: ", allowance);
+            console.log("          * SELL - Taker baseTokenAllowance %s: ", allowance);
             if (allowance < tradeInfo.baseTokens) {
                 revert InsufficientBaseTokenAllowance(tradeInfo.baseToken, tradeInfo.baseTokens, allowance);
             }
@@ -589,9 +589,42 @@ contract Dexz is Orders {
                 bool deleteOrder = false;
                 if (order.expiry == 0 || order.expiry >= block.timestamp) {
                     // TODO Check maker's allowance and balance
-                    if (takerBaseTokensToFill >= (order.baseTokens - order.baseTokensFilled)) {
-                        takerBaseTokensToFill -= (order.baseTokens - order.baseTokensFilled);
-                        order.baseTokensFilled = order.baseTokens;
+                    // uint _balance = IERC20(token).balanceOf(wallet);
+
+                    uint makerBaseTokensToFill = order.baseTokens - order.baseTokensFilled;
+                    if (tradeInfo.buySell == BuySell.Buy) {
+                        // Maker selling quoteToken
+                        uint allowance = IERC20(tradeInfo.baseToken).allowance(order.maker, address(this));
+                        uint balance = IERC20(tradeInfo.baseToken).balanceOf(order.maker);
+                        console.log("          * Maker SELL - baseTokenAllowance: %s, balance: %s", allowance, balance);
+                        if (makerBaseTokensToFill > balance) {
+                            makerBaseTokensToFill = balance;
+                        }
+                        if (makerBaseTokensToFill > allowance) {
+                            makerBaseTokensToFill = allowance;
+                        }
+                        // uint allowance = IERC20(tradeInfo.quoteToken).allowance(msg.sender, address(this));
+                        // console.log("          * BUY - quoteTokenAllowance %s: ", allowance);
+                        // uint quoteTokens = tradeInfo.baseTokens * Price.unwrap(tradeInfo.price) / TENPOW9;
+                        // if (allowance < quoteTokens) {
+                        //     revert InsufficientQuoteTokenAllowance(tradeInfo.quoteToken, quoteTokens, allowance);
+                        // }
+                    } else {
+                        // Maker buying baseTokens
+                        uint allowance = IERC20(tradeInfo.quoteToken).allowance(order.maker, address(this));
+                        uint balance = IERC20(tradeInfo.quoteToken).balanceOf(order.maker);
+                        console.log("          * Maker SELL - quoteTokenAllowance: %s, balance: %s", allowance, balance);
+                        // uint allowance = IERC20(tradeInfo.baseToken).allowance(msg.sender, address(this));
+                        // console.log("          * SELL - baseTokenAllowance %s: ", allowance);
+                        // if (allowance < tradeInfo.baseTokens) {
+                        //     revert InsufficientBaseTokenAllowance(tradeInfo.baseToken, tradeInfo.baseTokens, allowance);
+                        // }
+                    }
+
+
+                    if (takerBaseTokensToFill >= makerBaseTokensToFill) {
+                        takerBaseTokensToFill -= makerBaseTokensToFill;
+                        order.baseTokensFilled += makerBaseTokensToFill;
                         deleteOrder = true;
                     } else {
                         order.baseTokensFilled += takerBaseTokensToFill;
