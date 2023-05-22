@@ -191,22 +191,17 @@ contract Orders is DexzBase {
     uint constant public ORDERFLAG_FILLALL_OR_REVERT = 0x10;
     uint constant public ORDERFLAG_FILL_AND_ADD_ORDER = 0x20;
 
-    // 0.00054087 = new BigNumber(54087).shift(10);
-    // GNT/ETH = base/quote = 0.00054087
     struct Order {
-        // bytes32 prev;
         bytes32 next;
-        BuySell buySell;
         address maker;
-        // address baseToken;      // ABC
-        // address quoteToken;     // WETH
+        BuySell buySell;
         Price price;            // ABC/WETH = 0.123 = #quoteToken per unit baseToken
         uint64 expiry;
         uint baseTokens;        // Original order
         uint baseTokensFilled;  // Filled order
     }
     struct OrderQueue {
-        bool exists;
+        bool exists; // TODO Delete?
         bytes32 head;
         bytes32 tail;
     }
@@ -221,7 +216,7 @@ contract Orders is DexzBase {
     Price public constant PRICE_EMPTY = Price.wrap(0);
     bytes32 public constant ORDERKEY_SENTINEL = 0x0;
 
-    event OrderAdded(bytes32 indexed pairKey, bytes32 indexed key, BuySell buySell, address indexed maker, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens);
+    event OrderAdded(bytes32 indexed pairKey, bytes32 indexed key, address indexed maker, BuySell buySell, Price price, uint64 expiry, uint baseTokens);
     event OrderRemoved(bytes32 indexed key);
     event OrderUpdated(bytes32 indexed key, uint baseTokens, uint newBaseTokens);
 
@@ -286,9 +281,9 @@ contract Orders is DexzBase {
         return (_orderQueue.exists, _orderQueue.head, _orderQueue.tail);
     }
     // TODO check type _orderType
-    function getOrder(bytes32 orderKey) public view returns (bytes32 _next, BuySell buySell, address maker, Price price, uint64 expiry, uint baseTokens, uint baseTokensFilled) {
+    function getOrder(bytes32 orderKey) public view returns (bytes32 _next, address maker, BuySell buySell, Price price, uint64 expiry, uint baseTokens, uint baseTokensFilled) {
         Orders.Order memory order = orders[orderKey];
-        return (order.next, order.buySell, order.maker, order.price, order.expiry, order.baseTokens, order.baseTokensFilled);
+        return (order.next, order.maker, order.buySell, order.price, order.expiry, order.baseTokens, order.baseTokensFilled);
     }
 
 
@@ -389,13 +384,13 @@ contract Orders is DexzBase {
         if (_orderQueue.tail == ORDERKEY_SENTINEL) {
             _orderQueue.head = orderKey;
             _orderQueue.tail = orderKey;
-            orders[orderKey] = Order(ORDERKEY_SENTINEL, buySell, maker, price, expiry, baseTokens, 0);
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, maker, buySell, price, expiry, baseTokens, 0);
         } else {
             orders[_orderQueue.tail].next = orderKey;
-            orders[orderKey] = Order(ORDERKEY_SENTINEL, buySell, maker, price, expiry, baseTokens, 0);
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, maker, buySell, price, expiry, baseTokens, 0);
             _orderQueue.tail = orderKey;
         }
-        emit OrderAdded(pairKey, orderKey, buySell, maker, baseToken, quoteToken, price, expiry, baseTokens);
+        emit OrderAdded(pairKey, orderKey, maker, buySell, price, expiry, baseTokens);
     }
     /*
     function _removeOrder(bytes32 orderKey, address msgSender) internal {
