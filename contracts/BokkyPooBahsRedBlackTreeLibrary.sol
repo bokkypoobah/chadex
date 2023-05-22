@@ -40,19 +40,19 @@ library BokkyPooBahsRedBlackTreeLibrary {
     error CannotRemoveEmptyKey();
     error CannotRemoveMissingKey();
 
-    function first(Tree storage self) internal view returns (Price _key) {
-        _key = self.root;
-        if (isNotEmpty(_key)) {
-            while (isNotEmpty(self.nodes[_key].left)) {
-                _key = self.nodes[_key].left;
+    function first(Tree storage self) internal view returns (Price key) {
+        key = self.root;
+        if (isNotEmpty(key)) {
+            while (isNotEmpty(self.nodes[key].left)) {
+                key = self.nodes[key].left;
             }
         }
     }
-    function last(Tree storage self) internal view returns (Price _key) {
-        _key = self.root;
-        if (isNotEmpty(_key)) {
-            while (isNotEmpty(self.nodes[_key].right)) {
-                _key = self.nodes[_key].right;
+    function last(Tree storage self) internal view returns (Price key) {
+        key = self.root;
+        if (isNotEmpty(key)) {
+            while (isNotEmpty(self.nodes[key].right)) {
+                key = self.nodes[key].right;
             }
         }
     }
@@ -96,7 +96,7 @@ library BokkyPooBahsRedBlackTreeLibrary {
     function getEmpty() internal pure returns (Price) {
         return EMPTY;
     }
-    function getNode(Tree storage self, Price key) internal view returns (Price _returnKey, Price _parent, Price _left, Price _right, uint8 _red) {
+    function getNode(Tree storage self, Price key) internal view returns (Price returnKey, Price parent, Price left, Price right, uint8 red) {
         require(exists(self, key));
         return(key, self.nodes[key].parent, self.nodes[key].left, self.nodes[key].right, self.nodes[key].red);
     }
