@@ -181,8 +181,8 @@ describe("Dexz", function () {
 
     const sellBaseTokens = ethers.utils.parseEther("2.5");
 
-    const trade4Tx = await data.dexz.connect(data.user3Signer).tradeNew(BUYSELL_BUY, FILL_ANY_AND_ADD_ORDER, data.token0.address, data.weth.address, ethers.utils.parseUnits(price2, 9), expiry, sellBaseTokens, data.uiFeeAccount);
-    await data.printEvents("user3->dexz.tradeNew(BUY, FILL_ANY_AND_ADD_ORDER, token0, WETH, " + price2 + ", expiry, sellBaseTokens, uiFeeAccount)", await trade4Tx.wait());
+    const trade4Tx = await data.dexz.connect(data.user3Signer).tradeNew(BUYSELL_BUY, FILL_ANY_AND_ADD_ORDER, data.token0.address, data.weth.address, ethers.utils.parseUnits(price1, 9), expiry, sellBaseTokens, data.uiFeeAccount);
+    await data.printEvents("user3->dexz.tradeNew(BUY, FILL_ANY_AND_ADD_ORDER, token0, WETH, " + price1 + ", expiry, sellBaseTokens, uiFeeAccount)", await trade4Tx.wait());
 
     await data.printState("After Executing Against Order(s)");
 

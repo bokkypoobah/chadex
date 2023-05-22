@@ -549,6 +549,8 @@ contract Dexz is Orders {
     }
 
     function _tradeNew(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
+        // TODO: Check msg.sender has allowance set
+
         Price bestMatchingPrice = getMatchingBestPrice(tradeInfo);
         while (
             BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
@@ -557,11 +559,13 @@ contract Dexz is Orders {
             ) {
             console.log("          * bestMatchingPrice: ", Price.unwrap(bestMatchingPrice));
             Orders.OrderQueue storage _orderQueue = orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
+            bytes32 prevBestMatchingOrderKey = ORDERKEY_SENTINEL;
             bytes32 bestMatchingOrderKey = _orderQueue.head;
             while (bestMatchingOrderKey != ORDERKEY_SENTINEL) {
-                console.logBytes32(bestMatchingOrderKey);
                 Order storage order = orders[bestMatchingOrderKey];
                 console.log("          * order - buySell: %s, baseTokens: %s, expiry: %s", uint(order.buySell), order.baseTokens, order.expiry);
+                console.logBytes32(prevBestMatchingOrderKey);
+                console.logBytes32(bestMatchingOrderKey);
                 if (order.expiry < block.timestamp) {
                     console.log("          * Deleting Order");
                     // TODO delete and repoint head and tail
@@ -578,6 +582,7 @@ contract Dexz is Orders {
                         // TODO
                         // orders[order.next].prev = order.prev;
                     }
+                    prevBestMatchingOrderKey = bestMatchingOrderKey;
                     bestMatchingOrderKey = order.next;
                     delete orders[bestMatchingOrderKey];
                 } else {
@@ -587,6 +592,7 @@ contract Dexz is Orders {
                     //     if (order.expiry >= block.timestamp && order.baseTokens > order.baseTokensFilled) {
                     //         return (_bestMatchingPriceKey, _bestMatchingOrderKey);
                     //     }
+                    prevBestMatchingOrderKey = bestMatchingOrderKey;
                     bestMatchingOrderKey = order.next;
                 }
             }
