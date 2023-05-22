@@ -299,6 +299,13 @@ contract Orders is DexzBase {
         }
     }
 
+    function isSentinel(OrderKey orderKey) internal pure returns (bool) {
+        return OrderKey.unwrap(orderKey) == OrderKey.unwrap(ORDERKEY_SENTINEL);
+    }
+    function isNotSentinel(OrderKey orderKey) internal pure returns (bool) {
+        return OrderKey.unwrap(orderKey) != OrderKey.unwrap(ORDERKEY_SENTINEL);
+    }
+
     function getOrderQueue(PairKey pairKey, BuySell buySell, Price price) public view returns (bool _exists, OrderKey head, OrderKey tail) {
         Orders.OrderQueue memory _orderQueue = orderQueue[pairKey][buySell][price];
         return (_orderQueue.exists, _orderQueue.head, _orderQueue.tail);
@@ -323,7 +330,7 @@ contract Orders is DexzBase {
                 if (_orderQueue.exists) {
                     // emit LogInfo("getBestMatchingOrder: orderQueue not empty", uint(Price.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
                     _bestMatchingOrderKey = _orderQueue.head;
-                    while (OrderKey.unwrap(_bestMatchingOrderKey) != OrderKey.unwrap(ORDERKEY_SENTINEL)) {
+                    while (isNotSentinel(_bestMatchingOrderKey)) {
                         Order storage order = orders[_bestMatchingOrderKey];
                         // emit LogInfo("getBestMatchingOrder: _bestMatchingOrderKey ", order.expiry, _bestMatchingOrderKey, "", address(0));
                         if (order.expiry >= block.timestamp && order.baseTokens > order.baseTokensFilled) {
@@ -374,7 +381,7 @@ contract Orders is DexzBase {
                         }
                     }
                     // Clear out queue info, and prie tree if necessary
-                    if (OrderKey.unwrap(_orderQueue.head) == OrderKey.unwrap(ORDERKEY_SENTINEL)) {
+                    if (isSentinel(_orderQueue.head)) {
                         delete orderQueue[pairKey][_matchingBuySell][priceKey];
                         priceTree.remove(priceKey);
                         // emit LogInfo("orders remove RBT", uint(Price.unwrap(priceKey)), 0x0, "", address(0));
@@ -404,7 +411,7 @@ contract Orders is DexzBase {
             orderQueue[pairKey][buySell][price] = OrderQueue(true, ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
             _orderQueue = orderQueue[pairKey][buySell][price];
         }
-        if (OrderKey.unwrap(_orderQueue.tail) == OrderKey.unwrap(ORDERKEY_SENTINEL)) {
+        if (isSentinel(_orderQueue.tail)) {
             _orderQueue.head = orderKey;
             _orderQueue.tail = orderKey;
             orders[orderKey] = Order(ORDERKEY_SENTINEL, maker, buySell, price, expiry, baseTokens, 0);
@@ -616,7 +623,7 @@ contract Dexz is Orders, ReentrancyGuard {
             Orders.OrderQueue storage _orderQueue = orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
             // bytes32 prevBestMatchingOrderKey = ORDERKEY_SENTINEL;
             OrderKey bestMatchingOrderKey = _orderQueue.head;
-            while (OrderKey.unwrap(bestMatchingOrderKey) != OrderKey.unwrap(ORDERKEY_SENTINEL) /*&& tradeInfo.baseTokens > 0*/) {
+            while (isNotSentinel(bestMatchingOrderKey) /*&& tradeInfo.baseTokens > 0*/) {
                 Order storage order = orders[bestMatchingOrderKey];
                 console.log("            * order - buySell: %s, baseTokens: %s, expiry: %s", uint(order.buySell), order.baseTokens, order.expiry);
                 // console.logBytes32(prevBestMatchingOrderKey);
@@ -735,7 +742,7 @@ contract Dexz is Orders, ReentrancyGuard {
             // console.log("          * Checking Order Queue - head & tail");
             // console.logBytes32(_orderQueue.head);
             // console.logBytes32(_orderQueue.tail);
-            if (OrderKey.unwrap(_orderQueue.head) == OrderKey.unwrap(ORDERKEY_SENTINEL) /*&& _orderQueue.tail == ORDERKEY_SENTINEL*/) {
+            if (isSentinel(_orderQueue.head) /*&& _orderQueue.tail == ORDERKEY_SENTINEL*/) {
                 console.log("          * Deleting Order Queue");
                 // TODO: Delete Queue
                 delete orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
@@ -769,7 +776,7 @@ contract Dexz is Orders, ReentrancyGuard {
         // emit LogInfo("_trade: matchingOrderKey", 0, matchingOrderKey, "", address(0));
 
         uint loop = 0;
-        while (OrderKey.unwrap(matchingOrderKey) != OrderKey.unwrap(ORDERKEY_SENTINEL) && tradeInfo.baseTokens > 0 && loop < 10) {
+        while (isNotSentinel(matchingOrderKey) && tradeInfo.baseTokens > 0 && loop < 10) {
             uint _baseTokens;
             uint _quoteTokens;
             bool _orderFilled;
