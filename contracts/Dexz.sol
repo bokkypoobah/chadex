@@ -578,7 +578,7 @@ contract Dexz is Orders {
             Orders.OrderQueue storage _orderQueue = orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
             bytes32 prevBestMatchingOrderKey = ORDERKEY_SENTINEL;
             bytes32 bestMatchingOrderKey = _orderQueue.head;
-            while (bestMatchingOrderKey != ORDERKEY_SENTINEL) {
+            while (bestMatchingOrderKey != ORDERKEY_SENTINEL /*&& takerBaseTokensToFill > 0*/) {
                 Order storage order = orders[bestMatchingOrderKey];
                 console.log("            * order - buySell: %s, baseTokens: %s, expiry: %s", uint(order.buySell), order.baseTokens, order.expiry);
                 // console.logBytes32(prevBestMatchingOrderKey);
@@ -642,32 +642,31 @@ contract Dexz is Orders {
                     console.log("              * takerBaseTokensToFill: %s, makerBaseTokens: %s, makerBaseTokensFilled: %s", takerBaseTokensToFill, order.baseTokens, order.baseTokensFilled);
                     console.log("              * baseTokensToTransfer: %s, quoteTokensToTransfer: %s", baseTokensToTransfer, quoteTokensToTransfer);
                 } else {
-                    // TODO: Expired
-                    console.log("              * TODO: Delete");
+                    console.log("              * Expired");
                     deleteOrder = true;
                 }
                 console.log("              * Delete? %s", deleteOrder);
 
                 // TODO
-                if (false && order.expiry < block.timestamp) {
+                if (deleteOrder) {
                     console.log("          * Deleting Order");
-                    // TODO delete and repoint head and tail
-                    if (_orderQueue.head == bestMatchingOrderKey) {
-                        _orderQueue.head = order.next;
-                    } else {
-                        // TODO
-                        // orders[order.prev].next = order.next;
-                    }
-                    if (_orderQueue.tail == bestMatchingOrderKey) {
-                        // TODO
-                        // _orderQueue.tail = order.prev;
-                    } else {
-                        // TODO
-                        // orders[order.next].prev = order.prev;
-                    }
+                    // // TODO delete and repoint head and tail
+                    // if (_orderQueue.head == bestMatchingOrderKey) {
+                    //     _orderQueue.head = order.next;
+                    // } else {
+                    //     // TODO
+                    //     // orders[order.prev].next = order.next;
+                    // }
+                    // if (_orderQueue.tail == bestMatchingOrderKey) {
+                    //     // TODO
+                    //     // _orderQueue.tail = order.prev;
+                    // } else {
+                    //     // TODO
+                    //     // orders[order.next].prev = order.prev;
+                    // }
                     prevBestMatchingOrderKey = bestMatchingOrderKey;
                     bestMatchingOrderKey = order.next;
-                    delete orders[bestMatchingOrderKey];
+                    // delete orders[bestMatchingOrderKey];
                 } else {
                     // console.log("          * Processing Order");
                     // TODO Check for valid order
@@ -677,6 +676,9 @@ contract Dexz is Orders {
                     //     }
                     prevBestMatchingOrderKey = bestMatchingOrderKey;
                     bestMatchingOrderKey = order.next;
+                }
+                if (takerBaseTokensToFill == 0) {
+                    break;
                 }
             }
             // console.log("          * Checking Order Queue - head & tail");
