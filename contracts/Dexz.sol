@@ -218,7 +218,7 @@ contract Orders is DexzBase {
         OrderKey next;
         address maker;
         BuySell buySell;
-        Price price;            // TODO: Delete as available in Price - ABC/WETH = 0.123 = #quoteToken per unit baseToken
+        // Price price;            // TODO: Delete as available in Price - ABC/WETH = 0.123 = #quoteToken per unit baseToken
         uint64 expiry;
         uint baseTokens;        // TODO: 128 - Original order
         uint baseTokensFilled;  // TODO: 128 - Filled order
@@ -308,9 +308,9 @@ contract Orders is DexzBase {
         return (_orderQueue.exists, _orderQueue.head, _orderQueue.tail);
     }
     // TODO check type _orderType
-    function getOrder(OrderKey orderKey) public view returns (OrderKey _next, address maker, BuySell buySell, Price price, uint64 expiry, uint baseTokens, uint baseTokensFilled) {
+    function getOrder(OrderKey orderKey) public view returns (OrderKey _next, address maker, BuySell buySell, uint64 expiry, uint baseTokens, uint baseTokensFilled) {
         Orders.Order memory order = orders[orderKey];
-        return (order.next, order.maker, order.buySell, order.price, order.expiry, order.baseTokens, order.baseTokensFilled);
+        return (order.next, order.maker, order.buySell, order.expiry, order.baseTokens, order.baseTokensFilled);
     }
 
 
@@ -411,10 +411,10 @@ contract Orders is DexzBase {
         if (isSentinel(_orderQueue.tail)) {
             _orderQueue.head = orderKey;
             _orderQueue.tail = orderKey;
-            orders[orderKey] = Order(ORDERKEY_SENTINEL, maker, buySell, price, expiry, baseTokens, 0);
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, maker, buySell, expiry, baseTokens, 0);
         } else {
             orders[_orderQueue.tail].next = orderKey;
-            orders[orderKey] = Order(ORDERKEY_SENTINEL, maker, buySell, price, expiry, baseTokens, 0);
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, maker, buySell, expiry, baseTokens, 0);
             _orderQueue.tail = orderKey;
         }
         emit OrderAdded(pairKey, orderKey, maker, buySell, price, expiry, baseTokens);
@@ -500,9 +500,9 @@ contract Dexz is Orders, ReentrancyGuard {
     }
 
     // web3.sha3("trade(uint256,address,address,uint256,uint256,uint256,address)").substring(0, 10) => "0xcbb924e2"
-    bytes4 public constant tradeSig = "\xcb\xb9\x24\xe2";
+    // bytes4 public constant tradeSig = "\xcb\xb9\x24\xe2";
 
-    event TradeOld(OrderKey indexed orderKey, BuySell buySell, address indexed taker, address indexed maker, uint amount, address baseToken, address quoteToken, uint baseTokens, uint quoteTokens, uint feeBaseTokens, uint feeQuoteTokens, uint baseTokensFilled);
+    // event TradeOld(OrderKey indexed orderKey, BuySell buySell, address indexed taker, address indexed maker, uint amount, address baseToken, address quoteToken, uint baseTokens, uint quoteTokens, uint feeBaseTokens, uint feeQuoteTokens, uint baseTokensFilled);
     event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, address indexed taker, address maker, uint baseTokens, uint quoteTokens, Price price);
 
 
@@ -734,7 +734,7 @@ contract Dexz is Orders, ReentrancyGuard {
             orderKey = _addOrder(tradeInfo.buySell, tradeInfo.taker, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
             baseTokensOnOrder = tradeInfo.baseTokens;
         }
-        console.log("          * baseTokensFilled: %s, quoteTokensFilled: %s, baseTokensOnOrder: %s", baseTokensFilled, quoteTokensFilled, baseTokensOnOrder);
+        // console.log("          * baseTokensFilled: %s, quoteTokensFilled: %s, baseTokensOnOrder: %s", baseTokensFilled, quoteTokensFilled, baseTokensOnOrder);
     }
 
     // function tradeOld(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
