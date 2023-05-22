@@ -668,10 +668,13 @@ contract Dexz is Orders {
                     //     // orders[order.next].prev = order.prev;
                     // }
                     // prevBestMatchingOrderKey = bestMatchingOrderKey;
-                    // bytes32 temp = bestMatchingOrderKey;
+                    bytes32 temp = bestMatchingOrderKey;
                     bestMatchingOrderKey = order.next;
-                    // _orderQueue.head = order.next;
-                    // delete orders[temp];
+                    _orderQueue.head = order.next;
+                    if (_orderQueue.tail == bestMatchingOrderKey) {
+                        _orderQueue.tail = ORDERKEY_SENTINEL;
+                    }
+                    delete orders[temp];
                 } else {
                     // console.log("          * Processing Order");
                     // TODO Check for valid order
@@ -690,7 +693,7 @@ contract Dexz is Orders {
             // console.logBytes32(_orderQueue.head);
             // console.logBytes32(_orderQueue.tail);
             if (_orderQueue.head == ORDERKEY_SENTINEL /*&& _orderQueue.tail == ORDERKEY_SENTINEL*/) {
-                // console.log("          * Deleting Order Queue");
+                console.log("          * Deleting Order Queue");
                 // TODO: Delete Queue
                 delete orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
                 // TODO: Delete Price
