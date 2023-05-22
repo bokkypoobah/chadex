@@ -23,7 +23,7 @@ interface IERC20 {
     function name() external view returns (string memory);
     function symbol() external view returns (string memory);
     function decimals() external view returns (uint8);
-    
+
     function totalSupply() external view returns (uint);
     function balanceOf(address tokenOwner) external view returns (uint balance);
     function allowance(address tokenOwner, address spender) external view returns (uint remaining);
@@ -97,6 +97,8 @@ contract DexzBase is Owned {
     struct Pair {
         address baseToken;
         address quoteToken;
+        uint8 baseDecimals;
+        uint8 quoteDecimals;
     }
 
     mapping(bytes32 => Pair) public pairs;
@@ -105,7 +107,7 @@ contract DexzBase is Owned {
     event TakerFeeInEthersUpdated(uint oldTakerFeeInEthers, uint newTakerFeeInEthers);
     event TakerFeeInTokensUpdated(uint oldTakerFeeInTokens, uint newTakerFeeInTokens);
     event FeeAccountUpdated(address oldFeeAccount, address newFeeAccount);
-    event PairAdded(bytes32 indexed pairKey, address indexed baseToken, address indexed quoteToken);
+    event PairAdded(bytes32 indexed pairKey, address indexed baseToken, address indexed quoteToken, uint8 baseDecimals, uint8 quoteDecimals);
     event LogInfo(string topic, uint number, bytes32 data, string note, address addr);
 
     constructor(address _feeAccount) Owned() {
@@ -134,9 +136,11 @@ contract DexzBase is Owned {
     }
     function addPair(bytes32 pairKey, address baseToken, address quoteToken) internal {
         if (pairs[pairKey].baseToken == address(0)) {
-            pairs[pairKey] = Pair(baseToken, quoteToken);
+            uint8 baseDecimals = IERC20(baseToken).decimals();
+            uint8 quoteDecimals = IERC20(quoteToken).decimals();
+            pairs[pairKey] = Pair(baseToken, quoteToken, baseDecimals, quoteDecimals);
             pairKeys.push(pairKey);
-            emit PairAdded(pairKey, baseToken, quoteToken);
+            emit PairAdded(pairKey, baseToken, quoteToken, baseDecimals, quoteDecimals);
         }
     }
     function availableTokens(address token, address wallet) internal view returns (uint _tokens) {
