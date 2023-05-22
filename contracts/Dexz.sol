@@ -219,7 +219,7 @@ contract Orders is DexzBase {
     }
 
     // PairKey (bytes32) => BuySell => BPBRBTL(Price)
-    mapping(bytes32 => mapping(BuySell => BokkyPooBahsRedBlackTreeLibrary.Tree)) orderKeys;
+    mapping(bytes32 => mapping(BuySell => BokkyPooBahsRedBlackTreeLibrary.Tree)) priceTrees;
     // PairKey (bytes32) => BuySell => Price => OrderQueue
     mapping(bytes32 => mapping(BuySell => mapping(Price => OrderQueue))) orderQueue;
     // OrderKey (bytes32) => Order
@@ -239,25 +239,25 @@ contract Orders is DexzBase {
 
     // Price tree navigating
     // BK TODO function count(bytes32 pairKey, uint _orderType) public view returns (uint _count) {
-    // BK TODO     _count = orderKeys[pairKey][_orderType].count();
+    // BK TODO     _count = priceTrees[pairKey][_orderType].count();
     // BK TODO }
     function first(bytes32 pairKey, BuySell buySell) public view returns (Price key) {
-        key = orderKeys[pairKey][buySell].first();
+        key = priceTrees[pairKey][buySell].first();
     }
     function last(bytes32 pairKey, BuySell buySell) public view returns (Price key) {
-        key = orderKeys[pairKey][buySell].last();
+        key = priceTrees[pairKey][buySell].last();
     }
     function next(bytes32 pairKey, BuySell buySell, Price x) public view returns (Price y) {
-        y = orderKeys[pairKey][buySell].next(x);
+        y = priceTrees[pairKey][buySell].next(x);
     }
     function prev(bytes32 pairKey, BuySell buySell, Price x) public view returns (Price y) {
-        y = orderKeys[pairKey][buySell].prev(x);
+        y = priceTrees[pairKey][buySell].prev(x);
     }
     function exists(bytes32 pairKey, BuySell buySell, Price key) public view returns (bool) {
-        return orderKeys[pairKey][buySell].exists(key);
+        return priceTrees[pairKey][buySell].exists(key);
     }
     function getNode(bytes32 pairKey, BuySell buySell, Price key) public view returns (Price returnKey, Price parent, Price left, Price right, uint8 red) {
-        return orderKeys[pairKey][buySell].getNode(key);
+        return priceTrees[pairKey][buySell].getNode(key);
     }
     // Don't need parent, grandparent, sibling, uncle
 
@@ -278,13 +278,13 @@ contract Orders is DexzBase {
 
 
     function getBestPrice(bytes32 pairKey, BuySell buySell) public view returns (Price key) {
-        key = (buySell == BuySell.Buy) ? orderKeys[pairKey][buySell].last() : orderKeys[pairKey][buySell].first();
+        key = (buySell == BuySell.Buy) ? priceTrees[pairKey][buySell].last() : priceTrees[pairKey][buySell].first();
     }
     function getNextBestPrice(bytes32 pairKey, BuySell buySell, Price x) public view returns (Price y) {
         if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(x)) {
-            y = (buySell == BuySell.Buy) ? orderKeys[pairKey][buySell].last() : orderKeys[pairKey][buySell].first();
+            y = (buySell == BuySell.Buy) ? priceTrees[pairKey][buySell].last() : priceTrees[pairKey][buySell].first();
         } else {
-            y = (buySell == BuySell.Buy) ? orderKeys[pairKey][buySell].prev(x) : orderKeys[pairKey][buySell].next(x);
+            y = (buySell == BuySell.Buy) ? priceTrees[pairKey][buySell].prev(x) : priceTrees[pairKey][buySell].next(x);
         }
     }
 
@@ -301,10 +301,10 @@ contract Orders is DexzBase {
 
     function _getBestMatchingOrder(bytes32 pairKey, BuySell buySell, Price price) internal returns (Price _bestMatchingPriceKey, bytes32 _bestMatchingOrderKey) {
         BuySell _matchingBuySell = inverseBuySell(buySell);
-        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[pairKey][_matchingBuySell];
-        // SKINNY2 if (priceKeys.initialised) {
-            // emit LogInfo("getBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
-            _bestMatchingPriceKey = (buySell == BuySell.Buy) ? priceKeys.first() : priceKeys.last();
+        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][_matchingBuySell];
+        // SKINNY2 if (priceTree.initialised) {
+            // emit LogInfo("getBestMatchingOrder: priceTree.initialised", 0, 0x0, "", address(0));
+            _bestMatchingPriceKey = (buySell == BuySell.Buy) ? priceTree.first() : priceTree.last();
             bool priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (buySell == BuySell.Buy) ? Price.unwrap(_bestMatchingPriceKey) <= Price.unwrap(price) : Price.unwrap(_bestMatchingPriceKey) >= Price.unwrap(price);
             while (priceOk) {
                 // emit LogInfo("getBestMatchingOrder: _bestMatchingPriceKey", uint(Price.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
@@ -324,7 +324,7 @@ contract Orders is DexzBase {
                     // TODO: REMOVE _bestMatchingPriceKey
                     emit LogInfo("getBestMatchingOrder: orderQueue empty", 0, 0x0, "", address(0));
                 }
-                _bestMatchingPriceKey = (buySell == BuySell.Buy) ? priceKeys.next(_bestMatchingPriceKey) : priceKeys.prev(_bestMatchingPriceKey);
+                _bestMatchingPriceKey = (buySell == BuySell.Buy) ? priceTree.next(_bestMatchingPriceKey) : priceTree.prev(_bestMatchingPriceKey);
                 priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (buySell == BuySell.Buy) ? Price.unwrap(_bestMatchingPriceKey) <= Price.unwrap(price) : Price.unwrap(_bestMatchingPriceKey) >= Price.unwrap(price);
             // SKINNY2 }
             // OrderQueue storage orderQueue = self.orderQueue[pairKey][_orderType][price];
@@ -333,10 +333,10 @@ contract Orders is DexzBase {
     }
     function _updateBestMatchingOrder(bytes32 pairKey, BuySell buySell, Price matchingPriceKey, bytes32 matchingOrderKey, bool _orderFilled) internal returns (bytes32 orderKey) {
         BuySell _matchingBuySell = inverseBuySell(buySell);
-        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[pairKey][_matchingBuySell];
-        // SKINNY2 if (priceKeys.initialised) {
-            // emit LogInfo("updateBestMatchingOrder: priceKeys.initialised", 0, 0x0, "", address(0));
-            Price priceKey = (buySell == BuySell.Buy) ? priceKeys.first() : priceKeys.last();
+        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][_matchingBuySell];
+        // SKINNY2 if (priceTree.initialised) {
+            // emit LogInfo("updateBestMatchingOrder: priceTree.initialised", 0, 0x0, "", address(0));
+            Price priceKey = (buySell == BuySell.Buy) ? priceTree.first() : priceTree.last();
             while (!BokkyPooBahsRedBlackTreeLibrary.isEmpty(priceKey)) {
                 // emit LogInfo("updateBestMatchingOrder: priceKey", uint(Price.unwrap(priceKey)), 0x0, "", address(0));
                 OrderQueue storage _orderQueue = orderQueue[pairKey][_matchingBuySell][priceKey];
@@ -365,15 +365,15 @@ contract Orders is DexzBase {
                     // Clear out queue info, and prie tree if necessary
                     if (_orderQueue.head == ORDERKEY_SENTINEL) {
                         delete orderQueue[pairKey][_matchingBuySell][priceKey];
-                        priceKeys.remove(priceKey);
+                        priceTree.remove(priceKey);
                         // emit LogInfo("orders remove RBT", uint(Price.unwrap(priceKey)), 0x0, "", address(0));
                     }
                 } else {
-                    priceKeys.remove(priceKey);
+                    priceTree.remove(priceKey);
                     emit LogInfo("updateBestMatchingOrder: orderQueue empty", 0, 0x0, "", address(0));
 
                 }
-                priceKey = (buySell == BuySell.Buy) ? priceKeys.next(priceKey) : priceKeys.prev(priceKey);
+                priceKey = (buySell == BuySell.Buy) ? priceTree.next(priceKey) : priceTree.prev(priceKey);
             // SKINNY2 }
         }
         return ORDERKEY_SENTINEL;
@@ -383,9 +383,9 @@ contract Orders is DexzBase {
         orderKey = generateOrderKey(buySell, maker, baseToken, quoteToken, price, expiry);
         require(orders[orderKey].maker == address(0));
         addPair(pairKey, baseToken, quoteToken);
-        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[pairKey][buySell];
-        if (!priceKeys.exists(price)) {
-            priceKeys.insert(price);
+        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][buySell];
+        if (!priceTree.exists(price)) {
+            priceTree.insert(price);
         } else {
         }
         OrderQueue storage _orderQueue = orderQueue[pairKey][buySell][price];
@@ -450,9 +450,9 @@ contract Orders is DexzBase {
         emit OrderRemoved(orderKey);
         if (_orderQueue.head == ORDERKEY_SENTINEL && _orderQueue.tail == ORDERKEY_SENTINEL) {
             delete orderQueue[pairKey][buySell][_price];
-            BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[pairKey][buySell];
-            if (priceKeys.exists(_price)) {
-                priceKeys.remove(_price);
+            BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][buySell];
+            if (priceTree.exists(_price)) {
+                priceTree.remove(_price);
                 // emit LogInfo("orders remove RBT", uint(Price.unwrap(_price)), 0x0, "", address(0));
             }
         }
@@ -538,13 +538,13 @@ contract Dexz is Orders, ReentrancyGuard {
     error InvalidPrice();
 
     function getMatchingBestPrice(TradeInfo memory tradeInfo) public view returns (Price price) {
-        price = (tradeInfo.inverseBuySell == BuySell.Buy) ? orderKeys[tradeInfo.pairKey][tradeInfo.inverseBuySell].last() : orderKeys[tradeInfo.pairKey][tradeInfo.inverseBuySell].first();
+        price = (tradeInfo.inverseBuySell == BuySell.Buy) ? priceTrees[tradeInfo.pairKey][tradeInfo.inverseBuySell].last() : priceTrees[tradeInfo.pairKey][tradeInfo.inverseBuySell].first();
     }
     function getMatchingNextBestPrice(TradeInfo memory tradeInfo, Price x) public view returns (Price y) {
         if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(x)) {
-            y = (tradeInfo.inverseBuySell == BuySell.Buy) ? orderKeys[tradeInfo.pairKey][tradeInfo.inverseBuySell].last() : orderKeys[tradeInfo.pairKey][tradeInfo.inverseBuySell].first();
+            y = (tradeInfo.inverseBuySell == BuySell.Buy) ? priceTrees[tradeInfo.pairKey][tradeInfo.inverseBuySell].last() : priceTrees[tradeInfo.pairKey][tradeInfo.inverseBuySell].first();
         } else {
-            y = (tradeInfo.inverseBuySell == BuySell.Buy) ? orderKeys[tradeInfo.pairKey][tradeInfo.inverseBuySell].prev(x) : orderKeys[tradeInfo.pairKey][tradeInfo.inverseBuySell].next(x);
+            y = (tradeInfo.inverseBuySell == BuySell.Buy) ? priceTrees[tradeInfo.pairKey][tradeInfo.inverseBuySell].prev(x) : priceTrees[tradeInfo.pairKey][tradeInfo.inverseBuySell].next(x);
         }
     }
     function getMatchingOrderQueue(TradeInfo memory tradeInfo, Price price) public view returns (bool _exists, bytes32 head, bytes32 tail) {
@@ -731,9 +731,9 @@ contract Dexz is Orders, ReentrancyGuard {
                 // TODO: Delete Price
                 // console.log("          * Deleting Price");
                 Price tempBestMatchingPrice = getMatchingNextBestPrice(tradeInfo, bestMatchingPrice);
-                BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[tradeInfo.pairKey][tradeInfo.inverseBuySell];
-                if (priceKeys.exists(bestMatchingPrice)) {
-                    priceKeys.remove(bestMatchingPrice);
+                BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[tradeInfo.pairKey][tradeInfo.inverseBuySell];
+                if (priceTree.exists(bestMatchingPrice)) {
+                    priceTree.remove(bestMatchingPrice);
                     // console.log("          * Deleting Price from RBT");
                     // emit LogInfo("orders remove RBT", uint(Price.unwrap(_price)), 0x0, "", address(0));
                 }
