@@ -548,6 +548,8 @@ contract Dexz is Orders {
     error InsufficientBaseTokenBalanceOrAllowance(address baseToken, uint baseTokens, uint allowance);
     error InsufficientQuoteTokenBalanceOrAllowance(address quoteToken, uint quoteTokens, uint allowance);
 
+    event Trade1(bytes32 indexed key, BuySell buySell, address indexed taker, address indexed maker, uint baseTokens, uint quoteTokens, Price price);
+
     function _tradeNew(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
         if (tradeInfo.buySell == BuySell.Buy) {
             uint availableTokens = availableTokens(tradeInfo.quoteToken, msg.sender);
@@ -617,6 +619,8 @@ contract Dexz is Orders {
                         require(IERC20(tradeInfo.quoteToken).transferFrom(msg.sender, order.maker, quoteTokensToTransfer));
                         require(IERC20(tradeInfo.baseToken).transferFrom(order.maker, msg.sender, baseTokensToTransfer));
 
+                        emit Trade1(bestMatchingOrderKey, tradeInfo.buySell, msg.sender, order.maker, baseTokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
+
                     } else {
                         // Taker Sell Base / Maker Buy Quote
                         uint availableQuoteTokens = availableTokens(tradeInfo.quoteToken, order.maker);
@@ -625,6 +629,8 @@ contract Dexz is Orders {
                         console.log("              * Maker BUY quote - availableQuoteTokensInBaseTokens: %s", availableQuoteTokensInBaseTokens);
                         if (makerBaseTokensToFill > availableQuoteTokensInBaseTokens) {
                             makerBaseTokensToFill = availableQuoteTokensInBaseTokens;
+                        } else {
+                            availableQuoteTokens = makerBaseTokensToFill * Price.unwrap(bestMatchingPrice) / TENPOW9;
                         }
                         if (tradeInfo.baseTokens >= makerBaseTokensToFill) {
                             baseTokensToTransfer = makerBaseTokensToFill;
@@ -639,6 +645,7 @@ contract Dexz is Orders {
 
                         require(IERC20(tradeInfo.baseToken).transferFrom(msg.sender, order.maker, baseTokensToTransfer));
                         require(IERC20(tradeInfo.quoteToken).transferFrom(order.maker, msg.sender, quoteTokensToTransfer));
+                        emit Trade1(bestMatchingOrderKey, tradeInfo.buySell, msg.sender, order.maker, baseTokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
                     }
                     order.baseTokensFilled += baseTokensToTransfer;
                     tradeInfo.baseTokens -= baseTokensToTransfer;
