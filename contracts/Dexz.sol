@@ -608,6 +608,10 @@ contract Dexz is Orders {
                         }
                         quoteTokensToTransfer = baseTokensToTransfer * Price.unwrap(bestMatchingPrice) / TENPOW9;
 
+                        // console.log("              * Base Transfer %s from %s to %s", baseTokensToTransfer, order.maker, msg.sender);
+                        require(IERC20(tradeInfo.baseToken).transferFrom(order.maker, msg.sender, baseTokensToTransfer));
+                        require(IERC20(tradeInfo.quoteToken).transferFrom(msg.sender, order.maker, quoteTokensToTransfer));
+
                     } else {
                         // Maker buying baseTokens - get allowance and balance for equivalent quoteTokens
                         uint allowance = IERC20(tradeInfo.quoteToken).allowance(order.maker, address(this));
@@ -629,6 +633,9 @@ contract Dexz is Orders {
                             baseTokensToTransfer = takerBaseTokensToFill;
                             quoteTokensToTransfer = baseTokensToTransfer * Price.unwrap(bestMatchingPrice) / TENPOW9;
                         }
+
+                        require(IERC20(tradeInfo.baseToken).transferFrom(msg.sender, order.maker, baseTokensToTransfer));
+                        require(IERC20(tradeInfo.quoteToken).transferFrom(order.maker, msg.sender, quoteTokensToTransfer));
                     }
                     order.baseTokensFilled += baseTokensToTransfer;
                     takerBaseTokensToFill -= baseTokensToTransfer;
