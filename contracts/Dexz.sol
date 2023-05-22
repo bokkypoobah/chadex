@@ -79,6 +79,8 @@ contract Owned {
     }
 }
 
+type PairKey is bytes32;
+type OrderKey is bytes32;
 
 // ----------------------------------------------------------------------------
 // DexzBase
@@ -101,13 +103,13 @@ contract DexzBase is Owned {
         uint8 quoteDecimals;
     }
 
-    mapping(bytes32 => Pair) public pairs;
-    bytes32[] public pairKeys;
+    mapping(PairKey => Pair) public pairs;
+    PairKey[] public pairKeys;
 
     event TakerFeeInEthersUpdated(uint oldTakerFeeInEthers, uint newTakerFeeInEthers);
     event TakerFeeInTokensUpdated(uint oldTakerFeeInTokens, uint newTakerFeeInTokens);
     event FeeAccountUpdated(address oldFeeAccount, address newFeeAccount);
-    event PairAdded(bytes32 indexed pairKey, address indexed baseToken, address indexed quoteToken, uint8 baseDecimals, uint8 quoteDecimals);
+    event PairAdded(PairKey indexed pairKey, address indexed baseToken, address indexed quoteToken, uint8 baseDecimals, uint8 quoteDecimals);
     event LogInfo(string topic, uint number, bytes32 data, string note, address addr);
 
     constructor(address _feeAccount) Owned() {
@@ -126,7 +128,7 @@ contract DexzBase is Owned {
         emit FeeAccountUpdated(feeAccount, _feeAccount);
         feeAccount = _feeAccount;
     }
-    function pair(uint i) public view returns (bytes32 pairKey, address baseToken, address quoteToken) {
+    function pair(uint i) public view returns (PairKey pairKey, address baseToken, address quoteToken) {
         pairKey = pairKeys[i];
         Pair memory _pair = pairs[pairKey];
         return (pairKey, _pair.baseToken, _pair.quoteToken);
@@ -134,7 +136,7 @@ contract DexzBase is Owned {
     function pairsLength() public view returns (uint) {
         return pairKeys.length;
     }
-    function addPair(bytes32 pairKey, address baseToken, address quoteToken) internal {
+    function addPair(PairKey pairKey, address baseToken, address quoteToken) internal {
         if (pairs[pairKey].baseToken == address(0)) {
             uint8 baseDecimals = IERC20(baseToken).decimals();
             uint8 quoteDecimals = IERC20(quoteToken).decimals();
@@ -196,6 +198,7 @@ contract DexzBase is Owned {
 // End - DexzBase
 // ----------------------------------------------------------------------------
 
+
 // ----------------------------------------------------------------------------
 // Orders Data Structure
 // ----------------------------------------------------------------------------
@@ -227,16 +230,16 @@ contract Orders is DexzBase {
     }
 
     // PairKey (bytes32) => BuySell => BPBRBTL(Price)
-    mapping(bytes32 => mapping(BuySell => BokkyPooBahsRedBlackTreeLibrary.Tree)) priceTrees;
+    mapping(PairKey => mapping(BuySell => BokkyPooBahsRedBlackTreeLibrary.Tree)) priceTrees;
     // PairKey (bytes32) => BuySell => Price => OrderQueue
-    mapping(bytes32 => mapping(BuySell => mapping(Price => OrderQueue))) orderQueue;
+    mapping(PairKey => mapping(BuySell => mapping(Price => OrderQueue))) orderQueue;
     // OrderKey (bytes32) => Order
     mapping(bytes32 => Order) orders;
 
     Price public constant PRICE_EMPTY = Price.wrap(0);
     bytes32 public constant ORDERKEY_SENTINEL = 0x0;
 
-    event OrderAdded(bytes32 indexed pairKey, bytes32 indexed key, address indexed maker, BuySell buySell, Price price, uint64 expiry, uint baseTokens);
+    event OrderAdded(PairKey indexed pairKey, bytes32 indexed key, address indexed maker, BuySell buySell, Price price, uint64 expiry, uint baseTokens);
     event OrderRemoved(bytes32 indexed key);
     event OrderUpdated(bytes32 indexed key, uint baseTokens, uint newBaseTokens);
 
@@ -249,30 +252,30 @@ contract Orders is DexzBase {
     // BK TODO function count(bytes32 pairKey, uint _orderType) public view returns (uint _count) {
     // BK TODO     _count = priceTrees[pairKey][_orderType].count();
     // BK TODO }
-    function first(bytes32 pairKey, BuySell buySell) public view returns (Price key) {
+    function first(PairKey pairKey, BuySell buySell) public view returns (Price key) {
         key = priceTrees[pairKey][buySell].first();
     }
-    function last(bytes32 pairKey, BuySell buySell) public view returns (Price key) {
+    function last(PairKey pairKey, BuySell buySell) public view returns (Price key) {
         key = priceTrees[pairKey][buySell].last();
     }
-    function next(bytes32 pairKey, BuySell buySell, Price x) public view returns (Price y) {
+    function next(PairKey pairKey, BuySell buySell, Price x) public view returns (Price y) {
         y = priceTrees[pairKey][buySell].next(x);
     }
-    function prev(bytes32 pairKey, BuySell buySell, Price x) public view returns (Price y) {
+    function prev(PairKey pairKey, BuySell buySell, Price x) public view returns (Price y) {
         y = priceTrees[pairKey][buySell].prev(x);
     }
-    function exists(bytes32 pairKey, BuySell buySell, Price key) public view returns (bool) {
+    function exists(PairKey pairKey, BuySell buySell, Price key) public view returns (bool) {
         return priceTrees[pairKey][buySell].exists(key);
     }
-    function getNode(bytes32 pairKey, BuySell buySell, Price key) public view returns (Price returnKey, Price parent, Price left, Price right, uint8 red) {
+    function getNode(PairKey pairKey, BuySell buySell, Price key) public view returns (Price returnKey, Price parent, Price left, Price right, uint8 red) {
         return priceTrees[pairKey][buySell].getNode(key);
     }
     // Don't need parent, grandparent, sibling, uncle
 
 
     // Orders navigating
-    function generatePairKey(address _baseToken, address _quoteToken) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked(_baseToken, _quoteToken));
+    function generatePairKey(address _baseToken, address _quoteToken) internal pure returns (PairKey) {
+        return PairKey.wrap(keccak256(abi.encodePacked(_baseToken, _quoteToken)));
     }
     function generateOrderKey(BuySell buySell, address _maker, address _baseToken, address _quoteToken, Price _price, uint64 _expiry) internal pure returns (bytes32) {
         return keccak256(abi.encodePacked(buySell, _maker, _baseToken, _quoteToken, _price, _expiry));
@@ -285,10 +288,10 @@ contract Orders is DexzBase {
     }
 
 
-    function getBestPrice(bytes32 pairKey, BuySell buySell) public view returns (Price key) {
+    function getBestPrice(PairKey pairKey, BuySell buySell) public view returns (Price key) {
         key = (buySell == BuySell.Buy) ? priceTrees[pairKey][buySell].last() : priceTrees[pairKey][buySell].first();
     }
-    function getNextBestPrice(bytes32 pairKey, BuySell buySell, Price x) public view returns (Price y) {
+    function getNextBestPrice(PairKey pairKey, BuySell buySell, Price x) public view returns (Price y) {
         if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(x)) {
             y = (buySell == BuySell.Buy) ? priceTrees[pairKey][buySell].last() : priceTrees[pairKey][buySell].first();
         } else {
@@ -296,7 +299,7 @@ contract Orders is DexzBase {
         }
     }
 
-    function getOrderQueue(bytes32 pairKey, BuySell buySell, Price price) public view returns (bool _exists, bytes32 head, bytes32 tail) {
+    function getOrderQueue(PairKey pairKey, BuySell buySell, Price price) public view returns (bool _exists, bytes32 head, bytes32 tail) {
         Orders.OrderQueue memory _orderQueue = orderQueue[pairKey][buySell][price];
         return (_orderQueue.exists, _orderQueue.head, _orderQueue.tail);
     }
@@ -307,7 +310,7 @@ contract Orders is DexzBase {
     }
 
 
-    function _getBestMatchingOrder(bytes32 pairKey, BuySell buySell, Price price) internal returns (Price _bestMatchingPriceKey, bytes32 _bestMatchingOrderKey) {
+    function _getBestMatchingOrder(PairKey pairKey, BuySell buySell, Price price) internal returns (Price _bestMatchingPriceKey, bytes32 _bestMatchingOrderKey) {
         BuySell _matchingBuySell = inverseBuySell(buySell);
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][_matchingBuySell];
         // SKINNY2 if (priceTree.initialised) {
@@ -339,7 +342,7 @@ contract Orders is DexzBase {
         }
         return (BokkyPooBahsRedBlackTreeLibrary.getEmpty(), ORDERKEY_SENTINEL);
     }
-    function _updateBestMatchingOrder(bytes32 pairKey, BuySell buySell, Price matchingPriceKey, bytes32 matchingOrderKey, bool _orderFilled) internal returns (bytes32 orderKey) {
+    function _updateBestMatchingOrder(PairKey pairKey, BuySell buySell, Price matchingPriceKey, bytes32 matchingOrderKey, bool _orderFilled) internal returns (bytes32 orderKey) {
         BuySell _matchingBuySell = inverseBuySell(buySell);
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][_matchingBuySell];
         // SKINNY2 if (priceTree.initialised) {
@@ -387,7 +390,7 @@ contract Orders is DexzBase {
         return ORDERKEY_SENTINEL;
     }
     function _addOrder(BuySell buySell, address maker, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens) internal returns (bytes32 orderKey) {
-        bytes32 pairKey = generatePairKey(baseToken, quoteToken);
+        PairKey pairKey = generatePairKey(baseToken, quoteToken);
         orderKey = generateOrderKey(buySell, maker, baseToken, quoteToken, price, expiry);
         require(orders[orderKey].maker == address(0));
         addPair(pairKey, baseToken, quoteToken);
@@ -483,7 +486,7 @@ contract Dexz is Orders, ReentrancyGuard {
         BuySell buySell;
         BuySell inverseBuySell;
         Fill fill;
-        bytes32 pairKey;
+        PairKey pairKey;
         address baseToken;
         address quoteToken;
         Price price;
@@ -572,7 +575,7 @@ contract Dexz is Orders, ReentrancyGuard {
     error InsufficientBaseTokenBalanceOrAllowance(address baseToken, uint baseTokens, uint allowance);
     error InsufficientQuoteTokenBalanceOrAllowance(address quoteToken, uint quoteTokens, uint allowance);
 
-    event Trade1(bytes32 indexed pairKey, bytes32 indexed orderKey, BuySell buySell, address indexed taker, address maker, uint baseTokens, uint quoteTokens, Price price);
+    event Trade1(PairKey indexed pairKey, bytes32 indexed orderKey, BuySell buySell, address indexed taker, address maker, uint baseTokens, uint quoteTokens, Price price);
 
     function _tradeNew(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
         if (tradeInfo.buySell == BuySell.Buy) {
