@@ -195,7 +195,7 @@ contract Orders is DexzBase {
         bytes32 next;
         address maker;
         BuySell buySell;
-        Price price;            // ABC/WETH = 0.123 = #quoteToken per unit baseToken
+        Price price;            // TODO: Delete as available in Price - ABC/WETH = 0.123 = #quoteToken per unit baseToken
         uint64 expiry;
         uint baseTokens;        // Original order
         uint baseTokensFilled;  // Filled order
