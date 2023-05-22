@@ -65,10 +65,10 @@ describe("Dexz", function () {
     console.log("        Dexz deployed");
 
     const setup1 = [];
-    setup1.push(token0.transfer(data.user0, ethers.utils.parseEther("100")));
-    setup1.push(token0.transfer(data.user1, ethers.utils.parseEther("100")));
-    setup1.push(token0.transfer(data.user2, ethers.utils.parseEther("100")));
-    setup1.push(token0.transfer(data.user3, ethers.utils.parseEther("100")));
+    setup1.push(token0.transfer(data.user0, ethers.utils.parseUnits("100", 18)));
+    setup1.push(token0.transfer(data.user1, ethers.utils.parseUnits("100", 18)));
+    setup1.push(token0.transfer(data.user2, ethers.utils.parseUnits("100", 18)));
+    setup1.push(token0.transfer(data.user3, ethers.utils.parseUnits("100", 18)));
     const [transferToken00Tx, transferToken01Tx, transferToken02Tx, transferToken03Tx] = await Promise.all(setup1);
     if (DETAILS > 0) {
       [transferToken00Tx, transferToken01Tx, transferToken02Tx, transferToken03Tx].forEach( async function (a) {
