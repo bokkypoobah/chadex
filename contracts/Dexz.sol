@@ -570,12 +570,10 @@ contract Dexz is Orders {
 
         uint takerBaseTokensToFill = tradeInfo.baseTokens;
         Price bestMatchingPrice = getMatchingBestPrice(tradeInfo);
-        while (
-            BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
-            ((tradeInfo.buySell == BuySell.Buy && Price.unwrap(bestMatchingPrice) <= Price.unwrap(tradeInfo.price)) ||
-            (tradeInfo.buySell == BuySell.Sell && Price.unwrap(bestMatchingPrice) >= Price.unwrap(tradeInfo.price))) &&
-            takerBaseTokensToFill > 0
-            ) {
+        while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
+               ((tradeInfo.buySell == BuySell.Buy && Price.unwrap(bestMatchingPrice) <= Price.unwrap(tradeInfo.price)) ||
+                (tradeInfo.buySell == BuySell.Sell && Price.unwrap(bestMatchingPrice) >= Price.unwrap(tradeInfo.price))) &&
+               takerBaseTokensToFill > 0) {
             console.log("          * bestMatchingPrice: %s, takerBaseTokensToFill: %s", Price.unwrap(bestMatchingPrice), takerBaseTokensToFill);
             Orders.OrderQueue storage _orderQueue = orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
             bytes32 prevBestMatchingOrderKey = ORDERKEY_SENTINEL;
