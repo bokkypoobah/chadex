@@ -587,6 +587,8 @@ contract Dexz is Orders {
                 bool deleteOrder = false;
                 if (order.expiry == 0 || order.expiry >= block.timestamp) {
                     uint makerBaseTokensToFill = order.baseTokens - order.baseTokensFilled;
+                    uint baseTokensToTransfer;
+                    uint quoteTokensToTransfer;
                     if (tradeInfo.buySell == BuySell.Buy) {
                         // Maker selling quoteToken
                         uint allowance = IERC20(tradeInfo.baseToken).allowance(order.maker, address(this));
@@ -598,6 +600,14 @@ contract Dexz is Orders {
                         if (makerBaseTokensToFill > balance) {
                             makerBaseTokensToFill = balance;
                         }
+                        if (takerBaseTokensToFill >= makerBaseTokensToFill) {
+                            baseTokensToTransfer = makerBaseTokensToFill;
+                            deleteOrder = true;
+                        } else {
+                            baseTokensToTransfer = takerBaseTokensToFill;
+                        }
+                        quoteTokensToTransfer = baseTokensToTransfer * Price.unwrap(bestMatchingPrice) / TENPOW9;
+
                     } else {
                         // Maker buying baseTokens - get allowance and balance for equivalent quoteTokens
                         uint allowance = IERC20(tradeInfo.quoteToken).allowance(order.maker, address(this));
@@ -611,18 +621,19 @@ contract Dexz is Orders {
                         if (makerBaseTokensToFill > balanceInBaseTokens) {
                             makerBaseTokensToFill = balanceInBaseTokens;
                         }
+                        if (takerBaseTokensToFill >= makerBaseTokensToFill) {
+                            baseTokensToTransfer = makerBaseTokensToFill;
+                            quoteTokensToTransfer = balance;
+                            deleteOrder = true;
+                        } else {
+                            baseTokensToTransfer = takerBaseTokensToFill;
+                            quoteTokensToTransfer = baseTokensToTransfer * Price.unwrap(bestMatchingPrice) / TENPOW9;
+                        }
                     }
-
-
-                    if (takerBaseTokensToFill >= makerBaseTokensToFill) {
-                        takerBaseTokensToFill -= makerBaseTokensToFill;
-                        order.baseTokensFilled += makerBaseTokensToFill;
-                        deleteOrder = true;
-                    } else {
-                        order.baseTokensFilled += takerBaseTokensToFill;
-                        takerBaseTokensToFill = 0;
-                    }
+                    order.baseTokensFilled += baseTokensToTransfer;
+                    takerBaseTokensToFill -= baseTokensToTransfer;
                     console.log("              * takerBaseTokensToFill: %s, makerBaseTokens: %s, makerBaseTokensFilled: %s", takerBaseTokensToFill, order.baseTokens, order.baseTokensFilled);
+                    console.log("              * baseTokensToTransfer: %s, quoteTokensToTransfer: %s", baseTokensToTransfer, quoteTokensToTransfer);
                 } else {
                     // TODO: Expired
                     console.log("              * TODO: Delete");
