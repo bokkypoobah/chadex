@@ -461,6 +461,7 @@ contract Dexz is Orders {
     struct TradeInfo {
         address taker;
         BuySell buySell;
+        BuySell inverseBuySell;
         Fill fill;
         bytes32 pairKey;
         address baseToken;
@@ -525,22 +526,17 @@ contract Dexz is Orders {
     error InvalidPrice();
 
     function getMatchingBestPrice(TradeInfo memory tradeInfo) public view returns (Price price) {
-        console.log("          * buySell: ", uint(tradeInfo.buySell));
-        BuySell inverseBS = inverseBuySell(tradeInfo.buySell);
-        console.log("          * inverseBS: ", uint(inverseBS));
-        price = (inverseBS == BuySell.Buy) ? orderKeys[tradeInfo.pairKey][inverseBS].last() : orderKeys[tradeInfo.pairKey][inverseBS].first();
+        price = (tradeInfo.inverseBuySell == BuySell.Buy) ? orderKeys[tradeInfo.pairKey][tradeInfo.inverseBuySell].last() : orderKeys[tradeInfo.pairKey][tradeInfo.inverseBuySell].first();
     }
     function getMatchingNextBestPrice(TradeInfo memory tradeInfo, Price x) public view returns (Price y) {
-        BuySell inverseBS = inverseBuySell(tradeInfo.buySell);
         if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(x)) {
-            y = (inverseBS == BuySell.Buy) ? orderKeys[tradeInfo.pairKey][inverseBS].last() : orderKeys[tradeInfo.pairKey][inverseBS].first();
+            y = (tradeInfo.inverseBuySell == BuySell.Buy) ? orderKeys[tradeInfo.pairKey][tradeInfo.inverseBuySell].last() : orderKeys[tradeInfo.pairKey][tradeInfo.inverseBuySell].first();
         } else {
-            y = (inverseBS == BuySell.Buy) ? orderKeys[tradeInfo.pairKey][inverseBS].prev(x) : orderKeys[tradeInfo.pairKey][inverseBS].next(x);
+            y = (tradeInfo.inverseBuySell == BuySell.Buy) ? orderKeys[tradeInfo.pairKey][tradeInfo.inverseBuySell].prev(x) : orderKeys[tradeInfo.pairKey][tradeInfo.inverseBuySell].next(x);
         }
     }
     function getMatchingOrderQueue(TradeInfo memory tradeInfo, Price price) public view returns (bool _exists, bytes32 head, bytes32 tail) {
-        BuySell inverseBS = inverseBuySell(tradeInfo.buySell);
-        Orders.OrderQueue memory _orderQueue = orderQueue[tradeInfo.pairKey][inverseBS][price];
+        Orders.OrderQueue memory _orderQueue = orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][price];
         return (_orderQueue.exists, _orderQueue.head, _orderQueue.tail);
     }
 
@@ -549,15 +545,14 @@ contract Dexz is Orders {
         if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice();
         }
-        return _tradeNew(TradeInfo(msg.sender, buySell, fill, generatePairKey(baseToken, quoteToken), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
+        return _tradeNew(TradeInfo(msg.sender, buySell, inverseBuySell(buySell), fill, generatePairKey(baseToken, quoteToken), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
     }
     function _tradeNew(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
         Price bestMatchingPrice = getMatchingBestPrice(tradeInfo);
-        BuySell inverseBS = inverseBuySell(tradeInfo.buySell);
         while (Price.unwrap(bestMatchingPrice) != Price.unwrap(PRICE_EMPTY)) {
             console.log("          * bestMatchingPrice: ", Price.unwrap(bestMatchingPrice));
 
-            Orders.OrderQueue storage _orderQueue = orderQueue[tradeInfo.pairKey][inverseBS][bestMatchingPrice];
+            Orders.OrderQueue storage _orderQueue = orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
 
             // bool _exists;
             // bytes32 head;
@@ -607,11 +602,11 @@ contract Dexz is Orders {
             if (_orderQueue.head == ORDERKEY_SENTINEL /*&& _orderQueue.tail == ORDERKEY_SENTINEL*/) {
                 console.log("          * Deleting Order Queue");
                 // TODO: Delete Queue
-                delete orderQueue[tradeInfo.pairKey][inverseBS][bestMatchingPrice];
+                delete orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
                 // TODO: Delete Price
                 console.log("          * Deleting Price");
                 Price tempBestMatchingPrice = getMatchingNextBestPrice(tradeInfo, bestMatchingPrice);
-                BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[tradeInfo.pairKey][inverseBS];
+                BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[tradeInfo.pairKey][tradeInfo.inverseBuySell];
                 if (priceKeys.exists(bestMatchingPrice)) {
                     priceKeys.remove(bestMatchingPrice);
                     console.log("          * Deleting Price from RBT");
@@ -624,25 +619,11 @@ contract Dexz is Orders {
         }
     }
 
-    // struct Order {
-    //     bytes32 prev;
-    //     bytes32 next;
-    //     BuySell buySell;
-    //     address maker;
-    //     address baseToken;      // ABC
-    //     address quoteToken;     // WETH
-    //     Price price;        // ABC/WETH = 0.123 = #quoteToken per unit baseToken
-    //     uint64 expiry;
-    //     uint baseTokens;        // Original order
-    //     uint baseTokensFilled;  // Filled order
-    // }
-
-
     function trade(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
         if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice();
         }
-        return _trade(TradeInfo(msg.sender, buySell, fill, generatePairKey(baseToken, quoteToken), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
+        return _trade(TradeInfo(msg.sender, buySell, inverseBuySell(buySell), fill, generatePairKey(baseToken, quoteToken), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
     }
     function _trade(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
         Price matchingPriceKey;

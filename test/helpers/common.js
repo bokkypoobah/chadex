@@ -237,15 +237,14 @@ class Data {
           let orderPriceKey = 0;
           orderPriceKey = await this.dexz.getBestPrice(pair.pairKey, buySell);
           while (orderPriceKey != 0) {
-            console.log("              orderPriceKey: " + ethers.utils.formatUnits(orderPriceKey, 9));
             var orderQueue = await this.dexz.getOrderQueue(pair.pairKey, buySell, orderPriceKey);
-            console.log("                  Price: " + ethers.utils.formatEther(orderPriceKey) + " head=" + orderQueue[1].substring(0, 18) + " tail=" + orderQueue[2].substring(0, 18));
+            console.log("              orderPriceKey: " + ethers.utils.formatUnits(orderPriceKey, 9) + " head=" + orderQueue[1].substring(0, 18) + " tail=" + orderQueue[2].substring(0, 18));
             let orderKey = orderQueue[1];
             while (orderKey != 0) {
               let order = await this.dexz.getOrder(orderKey);
               var minutes = (order[6] - new Date() / 1000) / 60;
               console.log("                Order key=" + orderKey.substring(0, 10) + " next=" + order[0].substring(0, 10) +
-                " maker=" + this.getShortAccountName(order[1]) + (parseInt(order[2]) == 1 ? " Sell": " Buy") + 
+                " maker=" + this.getShortAccountName(order[1]) + (parseInt(order[2]) == 1 ? " Sell": " Buy") +
                 " price=" + ethers.utils.formatUnits(order[3], 9) +
                 " expiry=" + minutes.toFixed(2) + "s baseTokens=" + ethers.utils.formatEther(order[5]) + " baseTokensFilled=" + ethers.utils.formatEther(order[6]));
               orderKey = order[0];
