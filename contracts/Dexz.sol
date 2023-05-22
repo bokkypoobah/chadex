@@ -568,7 +568,7 @@ contract Dexz is Orders, ReentrancyGuard {
     }
 
     // TODO Handle decimals
-    function tradeNew(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable reentrancyGuard returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
+    function tradeNew(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable reentrancyGuard returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
         if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice();
         }
@@ -578,10 +578,12 @@ contract Dexz is Orders, ReentrancyGuard {
     // TODO: Delete the address fields?
     error InsufficientBaseTokenBalanceOrAllowance(address baseToken, uint baseTokens, uint allowance);
     error InsufficientQuoteTokenBalanceOrAllowance(address quoteToken, uint quoteTokens, uint allowance);
+    error UnableToFillOrder(uint baseTokensUnfilled);
 
     event Trade1(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, address indexed taker, address maker, uint baseTokens, uint quoteTokens, Price price);
 
-    function _tradeNew(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
+    function _tradeNew(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
+        console.log("          * fill: %s", uint(tradeInfo.fill));
         if (tradeInfo.buySell == BuySell.Buy) {
             uint availableTokens = availableTokens(tradeInfo.quoteToken, msg.sender);
             // console.log("          * BUY - Taker quoteTokenAllowance %s: ", availableTokens);
@@ -718,6 +720,17 @@ contract Dexz is Orders, ReentrancyGuard {
             } else {
                 bestMatchingPrice = getMatchingNextBestPrice(tradeInfo, bestMatchingPrice);
             }
+        }
+        if (tradeInfo.fill == Fill.AllOrNothing) {
+            if (tradeInfo.baseTokens > 0) {
+                revert UnableToFillOrder(tradeInfo.baseTokens);
+            }
+        }
+        if (tradeInfo.baseTokens > 0 && (tradeInfo.fill == Fill.AnyAndAddOrder)) {
+            // TODO Skip and remove expired items
+            // TODO require(tradeInfo.expiry > block.timestamp);
+            orderKey = _addOrder(tradeInfo.buySell, tradeInfo.taker, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
+            _baseTokensOnOrder = tradeInfo.baseTokens;
         }
     }
 
