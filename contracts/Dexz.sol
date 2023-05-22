@@ -619,49 +619,56 @@ contract Dexz is Orders, ReentrancyGuard {
                     if (tradeInfo.buySell == BuySell.Buy) {
                         // Taker Buy Base / Maker Sell Quote
                         uint availableBaseTokens = availableTokens(tradeInfo.baseToken, order.maker);
-                        console.log("              * Maker SELL base - availableBaseTokens: %s", availableBaseTokens);
-                        if (makerBaseTokensToFill > availableBaseTokens) {
-                            makerBaseTokensToFill = availableBaseTokens;
-                        }
-                        if (tradeInfo.baseTokens >= makerBaseTokensToFill) {
-                            baseTokensToTransfer = makerBaseTokensToFill;
-                            deleteOrder = true;
+                        if (availableBaseTokens > 0) {
+                            console.log("              * Maker SELL base - availableBaseTokens: %s", availableBaseTokens);
+                            if (makerBaseTokensToFill > availableBaseTokens) {
+                                makerBaseTokensToFill = availableBaseTokens;
+                            }
+                            if (tradeInfo.baseTokens >= makerBaseTokensToFill) {
+                                baseTokensToTransfer = makerBaseTokensToFill;
+                                deleteOrder = true;
+                            } else {
+                                baseTokensToTransfer = tradeInfo.baseTokens;
+                            }
+                            quoteTokensToTransfer = baseTokensToTransfer * Price.unwrap(bestMatchingPrice) / TENPOW9;
+
+                            // console.log("              * Base Transfer %s from %s to %s", baseTokensToTransfer, order.maker, msg.sender);
+                            require(IERC20(tradeInfo.quoteToken).transferFrom(msg.sender, order.maker, quoteTokensToTransfer));
+                            require(IERC20(tradeInfo.baseToken).transferFrom(order.maker, msg.sender, baseTokensToTransfer));
+
+                            emit Trade1(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, msg.sender, order.maker, baseTokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
                         } else {
-                            baseTokensToTransfer = tradeInfo.baseTokens;
+                            deleteOrder = true;
                         }
-                        quoteTokensToTransfer = baseTokensToTransfer * Price.unwrap(bestMatchingPrice) / TENPOW9;
-
-                        // console.log("              * Base Transfer %s from %s to %s", baseTokensToTransfer, order.maker, msg.sender);
-                        require(IERC20(tradeInfo.quoteToken).transferFrom(msg.sender, order.maker, quoteTokensToTransfer));
-                        require(IERC20(tradeInfo.baseToken).transferFrom(order.maker, msg.sender, baseTokensToTransfer));
-
-                        emit Trade1(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, msg.sender, order.maker, baseTokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
-
                     } else {
                         // Taker Sell Base / Maker Buy Quote
                         uint availableQuoteTokens = availableTokens(tradeInfo.quoteToken, order.maker);
-                        console.log("              * Maker BUY quote - availableQuoteTokens: %s", availableQuoteTokens);
-                        uint availableQuoteTokensInBaseTokens = availableQuoteTokens * TENPOW9 / Price.unwrap(bestMatchingPrice);
-                        console.log("              * Maker BUY quote - availableQuoteTokensInBaseTokens: %s", availableQuoteTokensInBaseTokens);
-                        if (makerBaseTokensToFill > availableQuoteTokensInBaseTokens) {
-                            makerBaseTokensToFill = availableQuoteTokensInBaseTokens;
+                        if (availableQuoteTokens > 0) {
+                            console.log("              * Maker BUY quote - availableQuoteTokens: %s", availableQuoteTokens);
+                            uint availableQuoteTokensInBaseTokens = availableQuoteTokens * TENPOW9 / Price.unwrap(bestMatchingPrice);
+                            console.log("              * Maker BUY quote - availableQuoteTokensInBaseTokens: %s", availableQuoteTokensInBaseTokens);
+                            if (makerBaseTokensToFill > availableQuoteTokensInBaseTokens) {
+                                makerBaseTokensToFill = availableQuoteTokensInBaseTokens;
+                            } else {
+                                availableQuoteTokens = makerBaseTokensToFill * Price.unwrap(bestMatchingPrice) / TENPOW9;
+                            }
+                            if (tradeInfo.baseTokens >= makerBaseTokensToFill) {
+                                baseTokensToTransfer = makerBaseTokensToFill;
+                                quoteTokensToTransfer = availableQuoteTokens;
+                                deleteOrder = true;
+                            } else {
+                                baseTokensToTransfer = tradeInfo.baseTokens;
+                                quoteTokensToTransfer = baseTokensToTransfer * Price.unwrap(bestMatchingPrice) / TENPOW9;
+                            }
+
+                            console.log("              * Maker BUY quote - baseTokensToTransfer: %s", baseTokensToTransfer);
+
+                            require(IERC20(tradeInfo.baseToken).transferFrom(msg.sender, order.maker, baseTokensToTransfer));
+                            require(IERC20(tradeInfo.quoteToken).transferFrom(order.maker, msg.sender, quoteTokensToTransfer));
+                            emit Trade1(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, msg.sender, order.maker, baseTokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
                         } else {
-                            availableQuoteTokens = makerBaseTokensToFill * Price.unwrap(bestMatchingPrice) / TENPOW9;
-                        }
-                        if (tradeInfo.baseTokens >= makerBaseTokensToFill) {
-                            baseTokensToTransfer = makerBaseTokensToFill;
-                            quoteTokensToTransfer = availableQuoteTokens;
                             deleteOrder = true;
-                        } else {
-                            baseTokensToTransfer = tradeInfo.baseTokens;
-                            quoteTokensToTransfer = baseTokensToTransfer * Price.unwrap(bestMatchingPrice) / TENPOW9;
                         }
-
-                        console.log("              * Maker BUY quote - baseTokensToTransfer: %s", baseTokensToTransfer);
-
-                        require(IERC20(tradeInfo.baseToken).transferFrom(msg.sender, order.maker, baseTokensToTransfer));
-                        require(IERC20(tradeInfo.quoteToken).transferFrom(order.maker, msg.sender, quoteTokensToTransfer));
-                        emit Trade1(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, msg.sender, order.maker, baseTokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
                     }
                     order.baseTokensFilled += baseTokensToTransfer;
                     tradeInfo.baseTokens -= baseTokensToTransfer;
