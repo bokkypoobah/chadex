@@ -605,7 +605,8 @@ contract Dexz is Orders {
                 }
                 console.log("          * Delete? %s", deleteOrder);
 
-                if (order.expiry < block.timestamp) {
+                // TODO
+                if (false && order.expiry < block.timestamp) {
                     console.log("          * Deleting Order");
                     // TODO delete and repoint head and tail
                     if (_orderQueue.head == bestMatchingOrderKey) {
@@ -625,7 +626,7 @@ contract Dexz is Orders {
                     bestMatchingOrderKey = order.next;
                     delete orders[bestMatchingOrderKey];
                 } else {
-                    console.log("          * Processing Order");
+                    // console.log("          * Processing Order");
                     // TODO Check for valid order
                     //     // emit LogInfo("getBestMatchingOrder: _bestMatchingOrderKey ", order.expiry, _bestMatchingOrderKey, "", address(0));
                     //     if (order.expiry >= block.timestamp && order.baseTokens > order.baseTokensFilled) {
