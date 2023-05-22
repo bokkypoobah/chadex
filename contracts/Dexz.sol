@@ -229,11 +229,8 @@ contract Orders is DexzBase {
         OrderKey tail;
     }
 
-    // PairKey (bytes32) => BuySell => BPBRBTL(Price)
     mapping(PairKey => mapping(BuySell => BokkyPooBahsRedBlackTreeLibrary.Tree)) priceTrees;
-    // PairKey (bytes32) => BuySell => Price => OrderQueue
     mapping(PairKey => mapping(BuySell => mapping(Price => OrderQueue))) orderQueue;
-    // OrderKey (bytes32) => Order
     mapping(OrderKey => Order) orders;
 
     Price public constant PRICE_EMPTY = Price.wrap(0);
