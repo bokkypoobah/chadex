@@ -90,9 +90,11 @@ class Data {
             result = result + separator + a.name + ": ";
             if (a.type == 'address') {
               result = result + this.getShortAccountName(data.args[a.name].toString());
-            } else if (a.type == 'uint256' || a.type == 'uint128') {
+            } else if (a.type == 'uint256' || a.type == 'uint128' || a.type == 'uint64') {
               if (a.name == 'tokens' || a.name == 'baseTokens' || a.name == 'quoteTokens' || a.name == 'feeBaseTokens' || a.name == 'feeQuoteTokens' || a.name == 'wad' || a.name == 'amount' || a.name == 'balance' || a.name == 'value' || a.name == 'integratorTip' || a.name == 'remainingTip') {
                 result = result + ethers.utils.formatUnits(data.args[a.name], 18);
+              } if (a.name == 'price') {
+                result = result + ethers.utils.formatUnits(data.args[a.name], 9);
               } else {
                 result = result + data.args[a.name].toString();
               }
