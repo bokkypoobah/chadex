@@ -242,7 +242,7 @@ class Data {
             let orderKey = orderQueue[1];
             while (orderKey != 0) {
               let order = await this.dexz.getOrder(orderKey);
-              var minutes = (order[6] - new Date() / 1000) / 60;
+              var minutes = (order[4] - new Date() / 1000) / 60;
               console.log("                Order key=" + orderKey.substring(0, 10) + " next=" + order[0].substring(0, 10) +
                 " maker=" + this.getShortAccountName(order[1]) + (parseInt(order[2]) == 1 ? " Sell": " Buy") +
                 " price=" + ethers.utils.formatUnits(order[3], 9) +
