@@ -547,22 +547,16 @@ contract Dexz is Orders {
         }
         return _tradeNew(TradeInfo(msg.sender, buySell, inverseBuySell(buySell), fill, generatePairKey(baseToken, quoteToken), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
     }
+
     function _tradeNew(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
         Price bestMatchingPrice = getMatchingBestPrice(tradeInfo);
-        while (Price.unwrap(bestMatchingPrice) != Price.unwrap(PRICE_EMPTY)) {
+        while (
+            BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
+            ((tradeInfo.buySell == BuySell.Buy && Price.unwrap(bestMatchingPrice) <= Price.unwrap(tradeInfo.price)) ||
+            (tradeInfo.buySell == BuySell.Sell && Price.unwrap(bestMatchingPrice) >= Price.unwrap(tradeInfo.price)))
+            ) {
             console.log("          * bestMatchingPrice: ", Price.unwrap(bestMatchingPrice));
-
             Orders.OrderQueue storage _orderQueue = orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
-
-            // bool _exists;
-            // bytes32 head;
-            // bytes32 tail;
-            // (_exists, head, tail) = getMatchingOrderQueue(tradeInfo, bestMatchingPrice);
-            // console.log("          * _exists: ", _exists);
-            // // console.log("          * head: ", head);
-            // console.logBytes32(head);
-            // console.logBytes32(tail);
-
             bytes32 bestMatchingOrderKey = _orderQueue.head;
             while (bestMatchingOrderKey != ORDERKEY_SENTINEL) {
                 console.logBytes32(bestMatchingOrderKey);
