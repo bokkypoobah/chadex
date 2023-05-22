@@ -29,6 +29,22 @@ interface IERC20 {
 }
 
 
+contract ReentrancyGuard {
+    uint private _executing;
+
+    error ReentrancyAttempted();
+
+    modifier reentrancyGuard() {
+        if (_executing == 1) {
+            revert ReentrancyAttempted();
+        }
+        _executing = 1;
+        _;
+        _executing = 2;
+    }
+}
+
+
 contract Owned {
     address public owner;
     address public newOwner;
@@ -451,7 +467,7 @@ enum Fill { Any, AllOrNothing, AnyAndAddOrder }
 // ----------------------------------------------------------------------------
 // Dexz contract
 // ----------------------------------------------------------------------------
-contract Dexz is Orders {
+contract Dexz is Orders, ReentrancyGuard {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
     struct TradeInfo {
@@ -537,7 +553,7 @@ contract Dexz is Orders {
     }
 
 
-    function tradeNew(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
+    function tradeNew(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable reentrancyGuard returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
         if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice();
         }
