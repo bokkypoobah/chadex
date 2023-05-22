@@ -314,85 +314,85 @@ contract Orders is DexzBase {
     }
 
 
-    function _getBestMatchingOrder(PairKey pairKey, BuySell buySell, Price price) internal returns (Price _bestMatchingPriceKey, OrderKey _bestMatchingOrderKey) {
-        BuySell _matchingBuySell = inverseBuySell(buySell);
-        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][_matchingBuySell];
-        // SKINNY2 if (priceTree.initialised) {
-            // emit LogInfo("getBestMatchingOrder: priceTree.initialised", 0, 0x0, "", address(0));
-            _bestMatchingPriceKey = (buySell == BuySell.Buy) ? priceTree.first() : priceTree.last();
-            bool priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (buySell == BuySell.Buy) ? Price.unwrap(_bestMatchingPriceKey) <= Price.unwrap(price) : Price.unwrap(_bestMatchingPriceKey) >= Price.unwrap(price);
-            while (priceOk) {
-                // emit LogInfo("getBestMatchingOrder: _bestMatchingPriceKey", uint(Price.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
-                OrderQueue storage _orderQueue = orderQueue[pairKey][_matchingBuySell][_bestMatchingPriceKey];
-                if (_orderQueue.exists) {
-                    // emit LogInfo("getBestMatchingOrder: orderQueue not empty", uint(Price.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
-                    _bestMatchingOrderKey = _orderQueue.head;
-                    while (isNotSentinel(_bestMatchingOrderKey)) {
-                        Order storage order = orders[_bestMatchingOrderKey];
-                        // emit LogInfo("getBestMatchingOrder: _bestMatchingOrderKey ", order.expiry, _bestMatchingOrderKey, "", address(0));
-                        if (order.expiry >= block.timestamp && order.baseTokens > order.baseTokensFilled) {
-                            return (_bestMatchingPriceKey, _bestMatchingOrderKey);
-                        }
-                        _bestMatchingOrderKey = orders[_bestMatchingOrderKey].next;
-                    }
-                } else {
-                    // TODO: REMOVE _bestMatchingPriceKey
-                    emit LogInfo("getBestMatchingOrder: orderQueue empty", 0, 0x0, "", address(0));
-                }
-                _bestMatchingPriceKey = (buySell == BuySell.Buy) ? priceTree.next(_bestMatchingPriceKey) : priceTree.prev(_bestMatchingPriceKey);
-                priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (buySell == BuySell.Buy) ? Price.unwrap(_bestMatchingPriceKey) <= Price.unwrap(price) : Price.unwrap(_bestMatchingPriceKey) >= Price.unwrap(price);
-            // SKINNY2 }
-            // OrderQueue storage orderQueue = self.orderQueue[pairKey][_orderType][price];
-        }
-        return (BokkyPooBahsRedBlackTreeLibrary.getEmpty(), ORDERKEY_SENTINEL);
-    }
-    function _updateBestMatchingOrder(PairKey pairKey, BuySell buySell, Price matchingPriceKey, OrderKey matchingOrderKey, bool _orderFilled) internal returns (OrderKey orderKey) {
-        BuySell _matchingBuySell = inverseBuySell(buySell);
-        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][_matchingBuySell];
-        // SKINNY2 if (priceTree.initialised) {
-            // emit LogInfo("updateBestMatchingOrder: priceTree.initialised", 0, 0x0, "", address(0));
-            Price priceKey = (buySell == BuySell.Buy) ? priceTree.first() : priceTree.last();
-            while (!BokkyPooBahsRedBlackTreeLibrary.isEmpty(priceKey)) {
-                // emit LogInfo("updateBestMatchingOrder: priceKey", uint(Price.unwrap(priceKey)), 0x0, "", address(0));
-                OrderQueue storage _orderQueue = orderQueue[pairKey][_matchingBuySell][priceKey];
-                if (_orderQueue.exists) {
-                    // emit LogInfo("updateBestMatchingOrder: orderQueue not empty", uint(Price.unwrap(priceKey)), 0x0, "", address(0));
-
-                    Order storage order = orders[matchingOrderKey];
-                    // TODO: What happens when allowance or balance is lower than #baseTokens
-                    if (_orderFilled) {
-                        _orderQueue.head = order.next;
-                        // TODO
-                        // if (order.next != ORDERKEY_SENTINEL) {
-                        //     orders[order.next].prev = ORDERKEY_SENTINEL;
-                        // }
-                        // order.prev = ORDERKEY_SENTINEL;
-                        if (OrderKey.unwrap(_orderQueue.tail) == OrderKey.unwrap(matchingOrderKey)) {
-                            _orderQueue.tail = ORDERKEY_SENTINEL;
-                        }
-                        delete orders[matchingOrderKey];
-                    // Else update head to current if not (skipped expired)
-                    } else {
-                        if (OrderKey.unwrap(_orderQueue.head) != OrderKey.unwrap(matchingOrderKey)) {
-                            _orderQueue.head = matchingOrderKey;
-                        }
-                    }
-                    // Clear out queue info, and prie tree if necessary
-                    if (isSentinel(_orderQueue.head)) {
-                        delete orderQueue[pairKey][_matchingBuySell][priceKey];
-                        priceTree.remove(priceKey);
-                        // emit LogInfo("orders remove RBT", uint(Price.unwrap(priceKey)), 0x0, "", address(0));
-                    }
-                } else {
-                    priceTree.remove(priceKey);
-                    emit LogInfo("updateBestMatchingOrder: orderQueue empty", 0, 0x0, "", address(0));
-
-                }
-                priceKey = (buySell == BuySell.Buy) ? priceTree.next(priceKey) : priceTree.prev(priceKey);
-            // SKINNY2 }
-        }
-        return ORDERKEY_SENTINEL;
-    }
+    // function _getBestMatchingOrder(PairKey pairKey, BuySell buySell, Price price) internal returns (Price _bestMatchingPriceKey, OrderKey _bestMatchingOrderKey) {
+    //     BuySell _matchingBuySell = inverseBuySell(buySell);
+    //     BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][_matchingBuySell];
+    //     // SKINNY2 if (priceTree.initialised) {
+    //         // emit LogInfo("getBestMatchingOrder: priceTree.initialised", 0, 0x0, "", address(0));
+    //         _bestMatchingPriceKey = (buySell == BuySell.Buy) ? priceTree.first() : priceTree.last();
+    //         bool priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (buySell == BuySell.Buy) ? Price.unwrap(_bestMatchingPriceKey) <= Price.unwrap(price) : Price.unwrap(_bestMatchingPriceKey) >= Price.unwrap(price);
+    //         while (priceOk) {
+    //             // emit LogInfo("getBestMatchingOrder: _bestMatchingPriceKey", uint(Price.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
+    //             OrderQueue storage _orderQueue = orderQueue[pairKey][_matchingBuySell][_bestMatchingPriceKey];
+    //             if (_orderQueue.exists) {
+    //                 // emit LogInfo("getBestMatchingOrder: orderQueue not empty", uint(Price.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
+    //                 _bestMatchingOrderKey = _orderQueue.head;
+    //                 while (isNotSentinel(_bestMatchingOrderKey)) {
+    //                     Order storage order = orders[_bestMatchingOrderKey];
+    //                     // emit LogInfo("getBestMatchingOrder: _bestMatchingOrderKey ", order.expiry, _bestMatchingOrderKey, "", address(0));
+    //                     if (order.expiry >= block.timestamp && order.baseTokens > order.baseTokensFilled) {
+    //                         return (_bestMatchingPriceKey, _bestMatchingOrderKey);
+    //                     }
+    //                     _bestMatchingOrderKey = orders[_bestMatchingOrderKey].next;
+    //                 }
+    //             } else {
+    //                 // TODO: REMOVE _bestMatchingPriceKey
+    //                 emit LogInfo("getBestMatchingOrder: orderQueue empty", 0, 0x0, "", address(0));
+    //             }
+    //             _bestMatchingPriceKey = (buySell == BuySell.Buy) ? priceTree.next(_bestMatchingPriceKey) : priceTree.prev(_bestMatchingPriceKey);
+    //             priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (buySell == BuySell.Buy) ? Price.unwrap(_bestMatchingPriceKey) <= Price.unwrap(price) : Price.unwrap(_bestMatchingPriceKey) >= Price.unwrap(price);
+    //         // SKINNY2 }
+    //         // OrderQueue storage orderQueue = self.orderQueue[pairKey][_orderType][price];
+    //     }
+    //     return (BokkyPooBahsRedBlackTreeLibrary.getEmpty(), ORDERKEY_SENTINEL);
+    // }
+    // function _updateBestMatchingOrder(PairKey pairKey, BuySell buySell, Price matchingPriceKey, OrderKey matchingOrderKey, bool _orderFilled) internal returns (OrderKey orderKey) {
+    //     BuySell _matchingBuySell = inverseBuySell(buySell);
+    //     BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][_matchingBuySell];
+    //     // SKINNY2 if (priceTree.initialised) {
+    //         // emit LogInfo("updateBestMatchingOrder: priceTree.initialised", 0, 0x0, "", address(0));
+    //         Price priceKey = (buySell == BuySell.Buy) ? priceTree.first() : priceTree.last();
+    //         while (!BokkyPooBahsRedBlackTreeLibrary.isEmpty(priceKey)) {
+    //             // emit LogInfo("updateBestMatchingOrder: priceKey", uint(Price.unwrap(priceKey)), 0x0, "", address(0));
+    //             OrderQueue storage _orderQueue = orderQueue[pairKey][_matchingBuySell][priceKey];
+    //             if (_orderQueue.exists) {
+    //                 // emit LogInfo("updateBestMatchingOrder: orderQueue not empty", uint(Price.unwrap(priceKey)), 0x0, "", address(0));
+    //
+    //                 Order storage order = orders[matchingOrderKey];
+    //                 // TODO: What happens when allowance or balance is lower than #baseTokens
+    //                 if (_orderFilled) {
+    //                     _orderQueue.head = order.next;
+    //                     // TODO
+    //                     // if (order.next != ORDERKEY_SENTINEL) {
+    //                     //     orders[order.next].prev = ORDERKEY_SENTINEL;
+    //                     // }
+    //                     // order.prev = ORDERKEY_SENTINEL;
+    //                     if (OrderKey.unwrap(_orderQueue.tail) == OrderKey.unwrap(matchingOrderKey)) {
+    //                         _orderQueue.tail = ORDERKEY_SENTINEL;
+    //                     }
+    //                     delete orders[matchingOrderKey];
+    //                 // Else update head to current if not (skipped expired)
+    //                 } else {
+    //                     if (OrderKey.unwrap(_orderQueue.head) != OrderKey.unwrap(matchingOrderKey)) {
+    //                         _orderQueue.head = matchingOrderKey;
+    //                     }
+    //                 }
+    //                 // Clear out queue info, and prie tree if necessary
+    //                 if (isSentinel(_orderQueue.head)) {
+    //                     delete orderQueue[pairKey][_matchingBuySell][priceKey];
+    //                     priceTree.remove(priceKey);
+    //                     // emit LogInfo("orders remove RBT", uint(Price.unwrap(priceKey)), 0x0, "", address(0));
+    //                 }
+    //             } else {
+    //                 priceTree.remove(priceKey);
+    //                 emit LogInfo("updateBestMatchingOrder: orderQueue empty", 0, 0x0, "", address(0));
+    //
+    //             }
+    //             priceKey = (buySell == BuySell.Buy) ? priceTree.next(priceKey) : priceTree.prev(priceKey);
+    //         // SKINNY2 }
+    //     }
+    //     return ORDERKEY_SENTINEL;
+    // }
     function _addOrder(BuySell buySell, address maker, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens) internal returns (OrderKey orderKey) {
         PairKey pairKey = generatePairKey(baseToken, quoteToken);
         orderKey = generateOrderKey(buySell, maker, baseToken, quoteToken, price, expiry);
@@ -502,7 +502,9 @@ contract Dexz is Orders, ReentrancyGuard {
     // web3.sha3("trade(uint256,address,address,uint256,uint256,uint256,address)").substring(0, 10) => "0xcbb924e2"
     bytes4 public constant tradeSig = "\xcb\xb9\x24\xe2";
 
-    event Trade(OrderKey indexed orderKey, BuySell buySell, address indexed taker, address indexed maker, uint amount, address baseToken, address quoteToken, uint baseTokens, uint quoteTokens, uint feeBaseTokens, uint feeQuoteTokens, uint baseTokensFilled);
+    event TradeOld(OrderKey indexed orderKey, BuySell buySell, address indexed taker, address indexed maker, uint amount, address baseToken, address quoteToken, uint baseTokens, uint quoteTokens, uint feeBaseTokens, uint feeQuoteTokens, uint baseTokensFilled);
+    event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, address indexed taker, address maker, uint baseTokens, uint quoteTokens, Price price);
+
 
     constructor(address _feeAccount) Orders(_feeAccount) {
     }
@@ -581,10 +583,7 @@ contract Dexz is Orders, ReentrancyGuard {
     error InsufficientQuoteTokenBalanceOrAllowance(address quoteToken, uint quoteTokens, uint allowance);
     error UnableToFillOrder(uint baseTokensUnfilled);
 
-    event Trade1(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, address indexed taker, address maker, uint baseTokens, uint quoteTokens, Price price);
-
-    function _trade(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
-        console.log("          * fill: %s", uint(tradeInfo.fill));
+    function _trade(TradeInfo memory tradeInfo) internal returns (uint baseTokensFilled, uint quoteTokensFilled, uint baseTokensOnOrder, OrderKey orderKey) {
         if (tradeInfo.buySell == BuySell.Buy) {
             uint availableTokens = availableTokens(tradeInfo.quoteToken, msg.sender);
             // console.log("          * BUY - Taker quoteTokenAllowance %s: ", availableTokens);
@@ -649,7 +648,7 @@ contract Dexz is Orders, ReentrancyGuard {
                             // console.log("              * Base Transfer %s from %s to %s", baseTokensToTransfer, order.maker, msg.sender);
                             require(IERC20(tradeInfo.quoteToken).transferFrom(msg.sender, order.maker, quoteTokensToTransfer));
                             require(IERC20(tradeInfo.baseToken).transferFrom(order.maker, msg.sender, baseTokensToTransfer));
-                            emit Trade1(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, msg.sender, order.maker, baseTokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
+                            emit Trade(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, msg.sender, order.maker, baseTokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
                         } else {
                             deleteOrder = true;
                         }
@@ -676,12 +675,14 @@ contract Dexz is Orders, ReentrancyGuard {
                             // console.log("              * Maker BUY quote - baseTokensToTransfer: %s", baseTokensToTransfer);
                             require(IERC20(tradeInfo.baseToken).transferFrom(msg.sender, order.maker, baseTokensToTransfer));
                             require(IERC20(tradeInfo.quoteToken).transferFrom(order.maker, msg.sender, quoteTokensToTransfer));
-                            emit Trade1(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, msg.sender, order.maker, baseTokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
+                            emit Trade(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, msg.sender, order.maker, baseTokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
                         } else {
                             deleteOrder = true;
                         }
                     }
                     order.baseTokensFilled += baseTokensToTransfer;
+                    baseTokensFilled += baseTokensToTransfer;
+                    quoteTokensFilled += quoteTokensToTransfer;
                     tradeInfo.baseTokens -= baseTokensToTransfer;
                     // console.log("              * tradeInfo.baseTokens: %s, makerBaseTokens: %s, makerBaseTokensFilled: %s", tradeInfo.baseTokens, order.baseTokens, order.baseTokensFilled);
                     // console.log("              * baseTokensToTransfer: %s, quoteTokensToTransfer: %s", baseTokensToTransfer, quoteTokensToTransfer);
@@ -731,199 +732,200 @@ contract Dexz is Orders, ReentrancyGuard {
             // TODO Skip and remove expired items
             // TODO require(tradeInfo.expiry > block.timestamp);
             orderKey = _addOrder(tradeInfo.buySell, tradeInfo.taker, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
-            _baseTokensOnOrder = tradeInfo.baseTokens;
+            baseTokensOnOrder = tradeInfo.baseTokens;
         }
+        console.log("          * baseTokensFilled: %s, quoteTokensFilled: %s, baseTokensOnOrder: %s", baseTokensFilled, quoteTokensFilled, baseTokensOnOrder);
     }
 
-    function tradeOld(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
-        if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
-            revert InvalidPrice();
-        }
-        return _tradeOld(TradeInfo(msg.sender, buySell, inverseBuySell(buySell), fill, generatePairKey(baseToken, quoteToken), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
-    }
-    function _tradeOld(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
-        Price matchingPriceKey;
-        OrderKey matchingOrderKey;
-        (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.pairKey, tradeInfo.buySell, tradeInfo.price);
-        // emit LogInfo("_trade: matchingOrderKey", 0, matchingOrderKey, "", address(0));
+    // function tradeOld(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
+    //     if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
+    //         revert InvalidPrice();
+    //     }
+    //     return _tradeOld(TradeInfo(msg.sender, buySell, inverseBuySell(buySell), fill, generatePairKey(baseToken, quoteToken), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
+    // }
+    // function _tradeOld(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
+    //     Price matchingPriceKey;
+    //     OrderKey matchingOrderKey;
+    //     (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.pairKey, tradeInfo.buySell, tradeInfo.price);
+    //     // emit LogInfo("_trade: matchingOrderKey", 0, matchingOrderKey, "", address(0));
+    //
+    //     uint loop = 0;
+    //     while (isNotSentinel(matchingOrderKey) && tradeInfo.baseTokens > 0 && loop < 10) {
+    //         uint _baseTokens;
+    //         uint _quoteTokens;
+    //         bool _orderFilled;
+    //         Orders.Order storage order = orders[matchingOrderKey];
+    //         // emit LogInfo("_trade: order", order.baseTokens, matchingOrderKey, "", order.maker);
+    //         (_baseTokens, _quoteTokens, _orderFilled) = calculateOrder(matchingOrderKey, tradeInfo);
+    //         // emit LogInfo("_trade: order._baseTokens", _baseTokens, matchingOrderKey, "", order.maker);
+    //         // emit LogInfo("_trade: order._quoteTokens", _quoteTokens, matchingOrderKey, "", order.maker);
+    //
+    //         if (_baseTokens > 0 && _quoteTokens > 0) {
+    //             order.baseTokensFilled = order.baseTokensFilled + _baseTokens;
+    //             transferTokens(tradeInfo, tradeInfo.buySell, order.maker, _baseTokens, _quoteTokens, matchingOrderKey);
+    //             tradeInfo.baseTokens = tradeInfo.baseTokens - _baseTokens;
+    //             _baseTokensFilled = _baseTokensFilled + _baseTokens;
+    //             _quoteTokensFilled = _quoteTokensFilled + _quoteTokens;
+    //             _updateBestMatchingOrder(tradeInfo.pairKey, tradeInfo.buySell, matchingPriceKey, matchingOrderKey, _orderFilled);
+    //             // matchingOrderKey = ORDERKEY_SENTINEL;
+    //             (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.pairKey, tradeInfo.buySell, tradeInfo.price);
+    //         }
+    //         loop++;
+    //         // break;
+    //     }
+    //     if (tradeInfo.fill == Fill.AllOrNothing) {
+    //         require(tradeInfo.baseTokens == 0);
+    //     }
+    //     if (tradeInfo.baseTokens > 0 && (tradeInfo.fill == Fill.AnyAndAddOrder)) {
+    //         // TODO Skip and remove expired items
+    //         // TODO require(tradeInfo.expiry > block.timestamp);
+    //         orderKey = _addOrder(tradeInfo.buySell, tradeInfo.taker, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
+    //         _baseTokensOnOrder = tradeInfo.baseTokens;
+    //     }
+    // }
 
-        uint loop = 0;
-        while (isNotSentinel(matchingOrderKey) && tradeInfo.baseTokens > 0 && loop < 10) {
-            uint _baseTokens;
-            uint _quoteTokens;
-            bool _orderFilled;
-            Orders.Order storage order = orders[matchingOrderKey];
-            // emit LogInfo("_trade: order", order.baseTokens, matchingOrderKey, "", order.maker);
-            (_baseTokens, _quoteTokens, _orderFilled) = calculateOrder(matchingOrderKey, tradeInfo);
-            // emit LogInfo("_trade: order._baseTokens", _baseTokens, matchingOrderKey, "", order.maker);
-            // emit LogInfo("_trade: order._quoteTokens", _quoteTokens, matchingOrderKey, "", order.maker);
-
-            if (_baseTokens > 0 && _quoteTokens > 0) {
-                order.baseTokensFilled = order.baseTokensFilled + _baseTokens;
-                transferTokens(tradeInfo, tradeInfo.buySell, order.maker, _baseTokens, _quoteTokens, matchingOrderKey);
-                tradeInfo.baseTokens = tradeInfo.baseTokens - _baseTokens;
-                _baseTokensFilled = _baseTokensFilled + _baseTokens;
-                _quoteTokensFilled = _quoteTokensFilled + _quoteTokens;
-                _updateBestMatchingOrder(tradeInfo.pairKey, tradeInfo.buySell, matchingPriceKey, matchingOrderKey, _orderFilled);
-                // matchingOrderKey = ORDERKEY_SENTINEL;
-                (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.pairKey, tradeInfo.buySell, tradeInfo.price);
-            }
-            loop++;
-            // break;
-        }
-        if (tradeInfo.fill == Fill.AllOrNothing) {
-            require(tradeInfo.baseTokens == 0);
-        }
-        if (tradeInfo.baseTokens > 0 && (tradeInfo.fill == Fill.AnyAndAddOrder)) {
-            // TODO Skip and remove expired items
-            // TODO require(tradeInfo.expiry > block.timestamp);
-            orderKey = _addOrder(tradeInfo.buySell, tradeInfo.taker, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
-            _baseTokensOnOrder = tradeInfo.baseTokens;
-        }
-    }
-
-    function calculateOrder(OrderKey _matchingOrderKey, TradeInfo memory tradeInfo) internal returns (uint baseTokens, uint quoteTokens, bool _orderFilled) {
-        Orders.Order storage matchingOrder = orders[_matchingOrderKey];
-        require(block.timestamp <= matchingOrder.expiry);
-
-        // // Maker buying base, needs to have amount in quote = base x price
-        // // Taker selling base, needs to have amount in base
-        if (matchingOrder.buySell == BuySell.Buy) {
-            // emit LogInfo("calculateOrder Maker Buy: matchingOrder.baseTokens", matchingOrder.baseTokens, 0x0, "", address(0));
-            // emit LogInfo("calculateOrder Maker Buy: matchingOrder.baseTokensFilled", matchingOrder.baseTokensFilled, 0x0, "", address(0));
-            // emit LogInfo("calculateOrder Maker Buy: amountBaseTokens", amountBaseTokens, 0x0, "", address(0));
-            uint _availableBaseTokens = availableTokens(tradeInfo.baseToken, tradeInfo.taker);
-            // emit LogInfo("calculateOrder Maker Buy: availableTokens(baseToken, taker)", _availableBaseTokens, 0x0, "", taker);
-            // Update maker matchingOrder with currently available tokens
-            if (matchingOrder.baseTokens - matchingOrder.baseTokensFilled > _availableBaseTokens) {
-                matchingOrder.baseTokens = _availableBaseTokens + matchingOrder.baseTokensFilled;
-                // emit LogInfo("calculateOrder Maker Buy: matchingOrder.baseTokens reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
-                // ordersData.orders[_matchingOrderKey].baseTokens = matchingOrder.baseTokens;
-            } else {
-                // emit LogInfo("calculateOrder Maker Buy: matchingOrder.baseTokens NOT reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
-            }
-            // baseTokens = matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled).min(amountBaseTokens);
-            // baseTokens = baseTokens.min(_availableBaseTokens);
-            baseTokens = matchingOrder.baseTokens - matchingOrder.baseTokensFilled;
-            if (tradeInfo.baseTokens < baseTokens) {
-                baseTokens = tradeInfo.baseTokens;
-            }
-            if (_availableBaseTokens < baseTokens) {
-                baseTokens = _availableBaseTokens;
-            }
-            // emit LogInfo("calculateOrder Maker Buy: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, taker))", baseTokens, 0x0, "", taker);
-
-            // emit LogInfo("calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18", baseTokens * matchingOrder.price / TENPOW18, 0x0, "", address(0));
-            uint _availableQuoteTokens = availableTokens(tradeInfo.quoteToken, matchingOrder.maker);
-            // emit LogInfo("calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", matchingOrder.maker);
-            if (matchingOrder.buySell == BuySell.Buy && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
-            }
-            quoteTokens = baseTokens * Price.unwrap(matchingOrder.price) / TENPOW9;
-            if (_availableQuoteTokens < quoteTokens) {
-                quoteTokens = _availableQuoteTokens;
-            }
-            // emit LogInfo("calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker))", quoteTokens, 0x0, "", matchingOrder.maker);
-            // TODO: Add code to collect dust. E.g. > 14 decimal places, check for (dp - 14) threshold to also transfer remaining dust
-
-            if (quoteTokens * TENPOW9 / Price.unwrap(matchingOrder.price) < baseTokens) {
-                baseTokens = quoteTokens * TENPOW9 / Price.unwrap(matchingOrder.price);
-            }
-            // baseTokens = baseTokens.min(quoteTokens * TENPOW9 / matchingOrder.price));
-            // emit LogInfo("calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price)", baseTokens, 0x0, "", address(0));
-            quoteTokens = baseTokens * Price.unwrap(matchingOrder.price) / TENPOW9;
-            // emit LogInfo("calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18", quoteTokens, 0x0, "", address(0));
-
-        // Maker selling base, needs to have amount in base
-        // Taker buying base, needs to have amount in quote = base x price
-        } else if (matchingOrder.buySell == BuySell.Sell) {
-            // emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokens", matchingOrder.baseTokens, 0x0, "", address(0));
-            // emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokensFilled", matchingOrder.baseTokensFilled, 0x0, "", address(0));
-            // emit LogInfo("calculateOrder Maker Sell: amountBaseTokens", amountBaseTokens, 0x0, "", address(0));
-            uint _availableBaseTokens = availableTokens(tradeInfo.baseToken, matchingOrder.maker);
-            // emit LogInfo("calculateOrder Maker Sell: availableTokens(matchingOrder.baseToken, matchingOrder.maker)", _availableBaseTokens, 0x0, "", matchingOrder.maker);
-            // Update maker matchingOrder with currently available tokens
-            if (matchingOrder.buySell == BuySell.Sell && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
-                matchingOrder.baseTokens = _availableBaseTokens + matchingOrder.baseTokensFilled;
-                // emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokens reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
-                // ordersData.orders[_matchingOrderKey].baseTokens = matchingOrder.baseTokens;
-            } else {
-                emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokens NOT reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
-            }
-            // baseTokens = matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled).min(amountBaseTokens);
-            // baseTokens = baseTokens.min(_availableBaseTokens);
-            baseTokens = matchingOrder.baseTokens - matchingOrder.baseTokensFilled;
-            if (tradeInfo.baseTokens < baseTokens) {
-                baseTokens = tradeInfo.baseTokens;
-            }
-            if (_availableBaseTokens < baseTokens) {
-                baseTokens = _availableBaseTokens;
-            }
-            // emit LogInfo("calculateOrder Maker Sell: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, matchingOrder.maker))", baseTokens, 0x0, "", matchingOrder.maker);
-
-            // emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", baseTokens * Price.unwrap(matchingOrder.price) / TENPOW9, 0x0, "", address(0));
-            uint _availableQuoteTokens = availableTokens(tradeInfo.quoteToken, tradeInfo.taker);
-            // emit LogInfo("calculateOrder Maker Sell: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", taker);
-            if (matchingOrder.buySell == BuySell.Buy && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
-            }
-            quoteTokens = baseTokens * Price.unwrap(matchingOrder.price) / TENPOW9;
-            if (_availableQuoteTokens < quoteTokens) {
-                quoteTokens = _availableQuoteTokens;
-            }
-            // emit LogInfo("calculateOrder Maker Sell: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, taker))", quoteTokens, 0x0, "", taker);
-            // TODO: Add code to collect dust. E.g. > 14 decimal places, check for (dp - 14) threshold to also transfer remaining dust
-
-            // baseTokens = baseTokens.min(quoteTokens.mul(TENPOW9).div(matchingOrder.price));
-            if (quoteTokens * TENPOW9 / Price.unwrap(matchingOrder.price) < baseTokens) {
-                baseTokens = quoteTokens * TENPOW9 / Price.unwrap(matchingOrder.price);
-            }
-
-            // emit LogInfo("calculateOrder Maker Sell: baseTokens = min(baseTokens, quoteTokens x 1e18 / price)", baseTokens, 0x0, "", address(0));
-            quoteTokens = baseTokens * Price.unwrap(matchingOrder.price) / TENPOW9;
-            // emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", quoteTokens, 0x0, "", address(0));
-        }
-        // TODO BK
-        _orderFilled = true;
-    }
+    // function calculateOrder(OrderKey _matchingOrderKey, TradeInfo memory tradeInfo) internal returns (uint baseTokens, uint quoteTokens, bool _orderFilled) {
+    //     Orders.Order storage matchingOrder = orders[_matchingOrderKey];
+    //     require(block.timestamp <= matchingOrder.expiry);
+    //
+    //     // // Maker buying base, needs to have amount in quote = base x price
+    //     // // Taker selling base, needs to have amount in base
+    //     if (matchingOrder.buySell == BuySell.Buy) {
+    //         // emit LogInfo("calculateOrder Maker Buy: matchingOrder.baseTokens", matchingOrder.baseTokens, 0x0, "", address(0));
+    //         // emit LogInfo("calculateOrder Maker Buy: matchingOrder.baseTokensFilled", matchingOrder.baseTokensFilled, 0x0, "", address(0));
+    //         // emit LogInfo("calculateOrder Maker Buy: amountBaseTokens", amountBaseTokens, 0x0, "", address(0));
+    //         uint _availableBaseTokens = availableTokens(tradeInfo.baseToken, tradeInfo.taker);
+    //         // emit LogInfo("calculateOrder Maker Buy: availableTokens(baseToken, taker)", _availableBaseTokens, 0x0, "", taker);
+    //         // Update maker matchingOrder with currently available tokens
+    //         if (matchingOrder.baseTokens - matchingOrder.baseTokensFilled > _availableBaseTokens) {
+    //             matchingOrder.baseTokens = _availableBaseTokens + matchingOrder.baseTokensFilled;
+    //             // emit LogInfo("calculateOrder Maker Buy: matchingOrder.baseTokens reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
+    //             // ordersData.orders[_matchingOrderKey].baseTokens = matchingOrder.baseTokens;
+    //         } else {
+    //             // emit LogInfo("calculateOrder Maker Buy: matchingOrder.baseTokens NOT reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
+    //         }
+    //         // baseTokens = matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled).min(amountBaseTokens);
+    //         // baseTokens = baseTokens.min(_availableBaseTokens);
+    //         baseTokens = matchingOrder.baseTokens - matchingOrder.baseTokensFilled;
+    //         if (tradeInfo.baseTokens < baseTokens) {
+    //             baseTokens = tradeInfo.baseTokens;
+    //         }
+    //         if (_availableBaseTokens < baseTokens) {
+    //             baseTokens = _availableBaseTokens;
+    //         }
+    //         // emit LogInfo("calculateOrder Maker Buy: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, taker))", baseTokens, 0x0, "", taker);
+    //
+    //         // emit LogInfo("calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18", baseTokens * matchingOrder.price / TENPOW18, 0x0, "", address(0));
+    //         uint _availableQuoteTokens = availableTokens(tradeInfo.quoteToken, matchingOrder.maker);
+    //         // emit LogInfo("calculateOrder Maker Buy: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", matchingOrder.maker);
+    //         if (matchingOrder.buySell == BuySell.Buy && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
+    //         }
+    //         quoteTokens = baseTokens * Price.unwrap(matchingOrder.price) / TENPOW9;
+    //         if (_availableQuoteTokens < quoteTokens) {
+    //             quoteTokens = _availableQuoteTokens;
+    //         }
+    //         // emit LogInfo("calculateOrder Maker Buy: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, matchingOrder.maker))", quoteTokens, 0x0, "", matchingOrder.maker);
+    //         // TODO: Add code to collect dust. E.g. > 14 decimal places, check for (dp - 14) threshold to also transfer remaining dust
+    //
+    //         if (quoteTokens * TENPOW9 / Price.unwrap(matchingOrder.price) < baseTokens) {
+    //             baseTokens = quoteTokens * TENPOW9 / Price.unwrap(matchingOrder.price);
+    //         }
+    //         // baseTokens = baseTokens.min(quoteTokens * TENPOW9 / matchingOrder.price));
+    //         // emit LogInfo("calculateOrder Maker Buy: baseTokens = min(baseTokens, quoteTokens x 1e18 / price)", baseTokens, 0x0, "", address(0));
+    //         quoteTokens = baseTokens * Price.unwrap(matchingOrder.price) / TENPOW9;
+    //         // emit LogInfo("calculateOrder Maker Buy: quoteTokens = baseTokens x price / 1e18", quoteTokens, 0x0, "", address(0));
+    //
+    //     // Maker selling base, needs to have amount in base
+    //     // Taker buying base, needs to have amount in quote = base x price
+    //     } else if (matchingOrder.buySell == BuySell.Sell) {
+    //         // emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokens", matchingOrder.baseTokens, 0x0, "", address(0));
+    //         // emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokensFilled", matchingOrder.baseTokensFilled, 0x0, "", address(0));
+    //         // emit LogInfo("calculateOrder Maker Sell: amountBaseTokens", amountBaseTokens, 0x0, "", address(0));
+    //         uint _availableBaseTokens = availableTokens(tradeInfo.baseToken, matchingOrder.maker);
+    //         // emit LogInfo("calculateOrder Maker Sell: availableTokens(matchingOrder.baseToken, matchingOrder.maker)", _availableBaseTokens, 0x0, "", matchingOrder.maker);
+    //         // Update maker matchingOrder with currently available tokens
+    //         if (matchingOrder.buySell == BuySell.Sell && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
+    //             matchingOrder.baseTokens = _availableBaseTokens + matchingOrder.baseTokensFilled;
+    //             // emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokens reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
+    //             // ordersData.orders[_matchingOrderKey].baseTokens = matchingOrder.baseTokens;
+    //         } else {
+    //             emit LogInfo("calculateOrder Maker Sell: matchingOrder.baseTokens NOT reduced due to available tokens", matchingOrder.baseTokens, 0x0, "", address(0));
+    //         }
+    //         // baseTokens = matchingOrder.baseTokens.sub(matchingOrder.baseTokensFilled).min(amountBaseTokens);
+    //         // baseTokens = baseTokens.min(_availableBaseTokens);
+    //         baseTokens = matchingOrder.baseTokens - matchingOrder.baseTokensFilled;
+    //         if (tradeInfo.baseTokens < baseTokens) {
+    //             baseTokens = tradeInfo.baseTokens;
+    //         }
+    //         if (_availableBaseTokens < baseTokens) {
+    //             baseTokens = _availableBaseTokens;
+    //         }
+    //         // emit LogInfo("calculateOrder Maker Sell: baseTokens = baseTokens.min(availableTokens(matchingOrder.baseToken, matchingOrder.maker))", baseTokens, 0x0, "", matchingOrder.maker);
+    //
+    //         // emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", baseTokens * Price.unwrap(matchingOrder.price) / TENPOW9, 0x0, "", address(0));
+    //         uint _availableQuoteTokens = availableTokens(tradeInfo.quoteToken, tradeInfo.taker);
+    //         // emit LogInfo("calculateOrder Maker Sell: availableTokens(matchingOrder.quoteToken, matchingOrder.maker)", _availableQuoteTokens, 0x0, "", taker);
+    //         if (matchingOrder.buySell == BuySell.Buy && (matchingOrder.baseTokens - matchingOrder.baseTokensFilled) > _availableBaseTokens) {
+    //         }
+    //         quoteTokens = baseTokens * Price.unwrap(matchingOrder.price) / TENPOW9;
+    //         if (_availableQuoteTokens < quoteTokens) {
+    //             quoteTokens = _availableQuoteTokens;
+    //         }
+    //         // emit LogInfo("calculateOrder Maker Sell: quoteTokens = quoteTokens.min(availableTokens(matchingOrder.quoteToken, taker))", quoteTokens, 0x0, "", taker);
+    //         // TODO: Add code to collect dust. E.g. > 14 decimal places, check for (dp - 14) threshold to also transfer remaining dust
+    //
+    //         // baseTokens = baseTokens.min(quoteTokens.mul(TENPOW9).div(matchingOrder.price));
+    //         if (quoteTokens * TENPOW9 / Price.unwrap(matchingOrder.price) < baseTokens) {
+    //             baseTokens = quoteTokens * TENPOW9 / Price.unwrap(matchingOrder.price);
+    //         }
+    //
+    //         // emit LogInfo("calculateOrder Maker Sell: baseTokens = min(baseTokens, quoteTokens x 1e18 / price)", baseTokens, 0x0, "", address(0));
+    //         quoteTokens = baseTokens * Price.unwrap(matchingOrder.price) / TENPOW9;
+    //         // emit LogInfo("calculateOrder Maker Sell: quoteTokens = baseTokens x price / 1e18", quoteTokens, 0x0, "", address(0));
+    //     }
+    //     // TODO BK
+    //     _orderFilled = true;
+    // }
 
 
-    // function trade(uint orderType, address taker, address maker, address uiFeeAccount, address baseToken, address quoteToken, uint[2] memory tokens) internal {
-    function transferTokens(TradeInfo memory tradeInfo, BuySell buySell, address maker, uint _baseTokens, uint _quoteTokens, OrderKey matchingOrderKey) internal {
-        uint _takerFeeInTokens;
-        // bool feeInEthers = (msg.value >= takerFeeInEthers);
-
-        // TODO
-        uint __orderBaseTokensFilled = 0;
-
-        if (buySell == BuySell.Buy) {
-            // emit LogInfo("transferTokens: BUY", 0, 0x0, "", address(0));
-            _takerFeeInTokens = _baseTokens * takerFeeInTokens / TENPOW18;
-            emit Trade(matchingOrderKey, buySell, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens - _takerFeeInTokens, _quoteTokens, _takerFeeInTokens, 0, __orderBaseTokensFilled);
-            transferFrom(tradeInfo.quoteToken, tradeInfo.taker, maker, _quoteTokens);
-            transferFrom(tradeInfo.baseToken, maker, tradeInfo.taker, _baseTokens - _takerFeeInTokens);
-            if (_takerFeeInTokens > 0) {
-                if (feeAccount == tradeInfo.uiFeeAccount || _takerFeeInTokens == 1) {
-                    transferFrom(tradeInfo.baseToken, maker, feeAccount, _takerFeeInTokens);
-                } else {
-                    transferFrom(tradeInfo.baseToken, maker, tradeInfo.uiFeeAccount, _takerFeeInTokens / 2);
-                    transferFrom(tradeInfo.baseToken, maker, feeAccount, _takerFeeInTokens - _takerFeeInTokens / 2);
-                }
-            }
-        } else {
-            // emit LogInfo("transferTokens: SELL", 0, 0x0, "", address(0));
-            _takerFeeInTokens = _quoteTokens * takerFeeInTokens / TENPOW18;
-            emit Trade(matchingOrderKey, buySell, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens, _quoteTokens - _takerFeeInTokens, _takerFeeInTokens, 0, __orderBaseTokensFilled);
-            transferFrom(tradeInfo.baseToken, tradeInfo.taker, maker, _baseTokens);
-            transferFrom(tradeInfo.quoteToken, maker, tradeInfo.taker, _quoteTokens - _takerFeeInTokens);
-            if (_takerFeeInTokens > 0) {
-                if (feeAccount == tradeInfo.uiFeeAccount || _takerFeeInTokens == 1) {
-                    transferFrom(tradeInfo.quoteToken, maker, feeAccount, _takerFeeInTokens);
-                } else {
-                    transferFrom(tradeInfo.quoteToken, maker, tradeInfo.uiFeeAccount, _takerFeeInTokens / 2);
-                    transferFrom(tradeInfo.quoteToken, maker, feeAccount, _takerFeeInTokens - _takerFeeInTokens / 2);
-                }
-            }
-        }
-    }
+    // // function trade(uint orderType, address taker, address maker, address uiFeeAccount, address baseToken, address quoteToken, uint[2] memory tokens) internal {
+    // function transferTokens(TradeInfo memory tradeInfo, BuySell buySell, address maker, uint _baseTokens, uint _quoteTokens, OrderKey matchingOrderKey) internal {
+    //     uint _takerFeeInTokens;
+    //     // bool feeInEthers = (msg.value >= takerFeeInEthers);
+    //
+    //     // TODO
+    //     uint __orderBaseTokensFilled = 0;
+    //
+    //     if (buySell == BuySell.Buy) {
+    //         // emit LogInfo("transferTokens: BUY", 0, 0x0, "", address(0));
+    //         _takerFeeInTokens = _baseTokens * takerFeeInTokens / TENPOW18;
+    //         emit TradeOld(matchingOrderKey, buySell, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens - _takerFeeInTokens, _quoteTokens, _takerFeeInTokens, 0, __orderBaseTokensFilled);
+    //         transferFrom(tradeInfo.quoteToken, tradeInfo.taker, maker, _quoteTokens);
+    //         transferFrom(tradeInfo.baseToken, maker, tradeInfo.taker, _baseTokens - _takerFeeInTokens);
+    //         if (_takerFeeInTokens > 0) {
+    //             if (feeAccount == tradeInfo.uiFeeAccount || _takerFeeInTokens == 1) {
+    //                 transferFrom(tradeInfo.baseToken, maker, feeAccount, _takerFeeInTokens);
+    //             } else {
+    //                 transferFrom(tradeInfo.baseToken, maker, tradeInfo.uiFeeAccount, _takerFeeInTokens / 2);
+    //                 transferFrom(tradeInfo.baseToken, maker, feeAccount, _takerFeeInTokens - _takerFeeInTokens / 2);
+    //             }
+    //         }
+    //     } else {
+    //         // emit LogInfo("transferTokens: SELL", 0, 0x0, "", address(0));
+    //         _takerFeeInTokens = _quoteTokens * takerFeeInTokens / TENPOW18;
+    //         emit TradeOld(matchingOrderKey, buySell, tradeInfo.taker, maker, _baseTokens, tradeInfo.baseToken, tradeInfo.quoteToken, _baseTokens, _quoteTokens - _takerFeeInTokens, _takerFeeInTokens, 0, __orderBaseTokensFilled);
+    //         transferFrom(tradeInfo.baseToken, tradeInfo.taker, maker, _baseTokens);
+    //         transferFrom(tradeInfo.quoteToken, maker, tradeInfo.taker, _quoteTokens - _takerFeeInTokens);
+    //         if (_takerFeeInTokens > 0) {
+    //             if (feeAccount == tradeInfo.uiFeeAccount || _takerFeeInTokens == 1) {
+    //                 transferFrom(tradeInfo.quoteToken, maker, feeAccount, _takerFeeInTokens);
+    //             } else {
+    //                 transferFrom(tradeInfo.quoteToken, maker, tradeInfo.uiFeeAccount, _takerFeeInTokens / 2);
+    //                 transferFrom(tradeInfo.quoteToken, maker, feeAccount, _takerFeeInTokens - _takerFeeInTokens / 2);
+    //             }
+    //         }
+    //     }
+    // }
 
 
     /*
