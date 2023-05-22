@@ -568,13 +568,15 @@ contract Dexz is Orders {
             }
         }
 
+        uint takerBaseTokensToFill = tradeInfo.baseTokens;
         Price bestMatchingPrice = getMatchingBestPrice(tradeInfo);
         while (
             BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
             ((tradeInfo.buySell == BuySell.Buy && Price.unwrap(bestMatchingPrice) <= Price.unwrap(tradeInfo.price)) ||
-            (tradeInfo.buySell == BuySell.Sell && Price.unwrap(bestMatchingPrice) >= Price.unwrap(tradeInfo.price)))
+            (tradeInfo.buySell == BuySell.Sell && Price.unwrap(bestMatchingPrice) >= Price.unwrap(tradeInfo.price))) &&
+            takerBaseTokensToFill > 0
             ) {
-            console.log("          * bestMatchingPrice: ", Price.unwrap(bestMatchingPrice));
+            console.log("          * bestMatchingPrice: %s, takerBaseTokensToFill: %s", Price.unwrap(bestMatchingPrice), takerBaseTokensToFill);
             Orders.OrderQueue storage _orderQueue = orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
             bytes32 prevBestMatchingOrderKey = ORDERKEY_SENTINEL;
             bytes32 bestMatchingOrderKey = _orderQueue.head;
@@ -583,6 +585,26 @@ contract Dexz is Orders {
                 console.log("          * order - buySell: %s, baseTokens: %s, expiry: %s", uint(order.buySell), order.baseTokens, order.expiry);
                 console.logBytes32(prevBestMatchingOrderKey);
                 console.logBytes32(bestMatchingOrderKey);
+
+                bool deleteOrder = false;
+                if (order.expiry == 0 || order.expiry >= block.timestamp) {
+                    // TODO Check maker's allowance and balance
+                    if (takerBaseTokensToFill >= (order.baseTokens - order.baseTokensFilled)) {
+                        takerBaseTokensToFill -= (order.baseTokens - order.baseTokensFilled);
+                        order.baseTokensFilled = order.baseTokens;
+                        deleteOrder = true;
+                    } else {
+                        order.baseTokensFilled += takerBaseTokensToFill;
+                        takerBaseTokensToFill = 0;
+                    }
+                    console.log("          * takerBaseTokensToFill: %s, makerBaseTokens: %s, makerBaseTokensFilled: %s", takerBaseTokensToFill, order.baseTokens, order.baseTokensFilled);
+                } else {
+                    // TODO: Expired
+                    console.log("          * TODO: Delete");
+                    deleteOrder = true;
+                }
+                console.log("          * Delete? %s", deleteOrder);
+
                 if (order.expiry < block.timestamp) {
                     console.log("          * Deleting Order");
                     // TODO delete and repoint head and tail
