@@ -548,8 +548,25 @@ contract Dexz is Orders {
         return _tradeNew(TradeInfo(msg.sender, buySell, inverseBuySell(buySell), fill, generatePairKey(baseToken, quoteToken), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
     }
 
+    error InsufficientBaseTokenAllowance(uint baseTokens, uint allowance);
+    error InsufficientQuoteTokenAllowance(uint quoteTokens, uint allowance);
+
     function _tradeNew(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 orderKey) {
         // TODO: Check msg.sender has allowance set
+        if (tradeInfo.buySell == BuySell.Buy) {
+            uint _allowance = IERC20(tradeInfo.quoteToken).allowance(msg.sender, address(this));
+            console.log("          * BUY - quoteTokenAllowance %s: ", _allowance);
+            uint quoteTokens = tradeInfo.baseTokens * Price.unwrap(tradeInfo.price) / TENPOW9;
+            if (_allowance < quoteTokens) {
+                revert InsufficientQuoteTokenAllowance(quoteTokens, _allowance);
+            }
+        } else {
+            uint _allowance = IERC20(tradeInfo.baseToken).allowance(msg.sender, address(this));
+            console.log("          * SELL - baseTokenAllowance %s: ", _allowance);
+            if (_allowance < tradeInfo.baseTokens) {
+                revert InsufficientBaseTokenAllowance(tradeInfo.baseTokens, _allowance);
+            }
+        }
 
         Price bestMatchingPrice = getMatchingBestPrice(tradeInfo);
         while (
