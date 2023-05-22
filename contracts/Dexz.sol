@@ -582,43 +582,37 @@ contract Dexz is Orders {
             bytes32 bestMatchingOrderKey = _orderQueue.head;
             while (bestMatchingOrderKey != ORDERKEY_SENTINEL) {
                 Order storage order = orders[bestMatchingOrderKey];
-                console.log("          * order - buySell: %s, baseTokens: %s, expiry: %s", uint(order.buySell), order.baseTokens, order.expiry);
-                console.logBytes32(prevBestMatchingOrderKey);
-                console.logBytes32(bestMatchingOrderKey);
+                console.log("            * order - buySell: %s, baseTokens: %s, expiry: %s", uint(order.buySell), order.baseTokens, order.expiry);
+                // console.logBytes32(prevBestMatchingOrderKey);
+                // console.logBytes32(bestMatchingOrderKey);
 
                 bool deleteOrder = false;
                 if (order.expiry == 0 || order.expiry >= block.timestamp) {
-                    // TODO Check maker's allowance and balance
-                    // uint _balance = IERC20(token).balanceOf(wallet);
-
                     uint makerBaseTokensToFill = order.baseTokens - order.baseTokensFilled;
                     if (tradeInfo.buySell == BuySell.Buy) {
                         // Maker selling quoteToken
                         uint allowance = IERC20(tradeInfo.baseToken).allowance(order.maker, address(this));
                         uint balance = IERC20(tradeInfo.baseToken).balanceOf(order.maker);
-                        console.log("          * Maker SELL - baseTokenAllowance: %s, balance: %s", allowance, balance);
+                        console.log("              * Maker SELL base - baseTokenAllowance: %s, balance: %s", allowance, balance);
+                        if (balance > allowance) {
+                            balance = allowance;
+                        }
                         if (makerBaseTokensToFill > balance) {
                             makerBaseTokensToFill = balance;
                         }
-                        if (makerBaseTokensToFill > allowance) {
-                            makerBaseTokensToFill = allowance;
-                        }
-                        // uint allowance = IERC20(tradeInfo.quoteToken).allowance(msg.sender, address(this));
-                        // console.log("          * BUY - quoteTokenAllowance %s: ", allowance);
-                        // uint quoteTokens = tradeInfo.baseTokens * Price.unwrap(tradeInfo.price) / TENPOW9;
-                        // if (allowance < quoteTokens) {
-                        //     revert InsufficientQuoteTokenAllowance(tradeInfo.quoteToken, quoteTokens, allowance);
-                        // }
                     } else {
-                        // Maker buying baseTokens
+                        // Maker buying baseTokens - get allowance and balance for equivalent quoteTokens
                         uint allowance = IERC20(tradeInfo.quoteToken).allowance(order.maker, address(this));
                         uint balance = IERC20(tradeInfo.quoteToken).balanceOf(order.maker);
-                        console.log("          * Maker SELL - quoteTokenAllowance: %s, balance: %s", allowance, balance);
-                        // uint allowance = IERC20(tradeInfo.baseToken).allowance(msg.sender, address(this));
-                        // console.log("          * SELL - baseTokenAllowance %s: ", allowance);
-                        // if (allowance < tradeInfo.baseTokens) {
-                        //     revert InsufficientBaseTokenAllowance(tradeInfo.baseToken, tradeInfo.baseTokens, allowance);
-                        // }
+                        console.log("              * Maker BUY base - quoteTokenAllowance: %s, balance: %s", allowance, balance);
+                        if (balance > allowance) {
+                            balance = allowance;
+                        }
+                        uint balanceInBaseTokens = balance * TENPOW9 / Price.unwrap(bestMatchingPrice);
+                        console.log("              * Maker BUY base - balanceInBaseTokens: %s", balanceInBaseTokens);
+                        if (makerBaseTokensToFill > balanceInBaseTokens) {
+                            makerBaseTokensToFill = balanceInBaseTokens;
+                        }
                     }
 
 
@@ -630,13 +624,13 @@ contract Dexz is Orders {
                         order.baseTokensFilled += takerBaseTokensToFill;
                         takerBaseTokensToFill = 0;
                     }
-                    console.log("          * takerBaseTokensToFill: %s, makerBaseTokens: %s, makerBaseTokensFilled: %s", takerBaseTokensToFill, order.baseTokens, order.baseTokensFilled);
+                    console.log("              * takerBaseTokensToFill: %s, makerBaseTokens: %s, makerBaseTokensFilled: %s", takerBaseTokensToFill, order.baseTokens, order.baseTokensFilled);
                 } else {
                     // TODO: Expired
-                    console.log("          * TODO: Delete");
+                    console.log("              * TODO: Delete");
                     deleteOrder = true;
                 }
-                console.log("          * Delete? %s", deleteOrder);
+                console.log("              * Delete? %s", deleteOrder);
 
                 // TODO
                 if (false && order.expiry < block.timestamp) {
@@ -669,20 +663,20 @@ contract Dexz is Orders {
                     bestMatchingOrderKey = order.next;
                 }
             }
-            console.log("          * Checking Order Queue - head & tail");
-            console.logBytes32(_orderQueue.head);
-            console.logBytes32(_orderQueue.tail);
+            // console.log("          * Checking Order Queue - head & tail");
+            // console.logBytes32(_orderQueue.head);
+            // console.logBytes32(_orderQueue.tail);
             if (_orderQueue.head == ORDERKEY_SENTINEL /*&& _orderQueue.tail == ORDERKEY_SENTINEL*/) {
-                console.log("          * Deleting Order Queue");
+                // console.log("          * Deleting Order Queue");
                 // TODO: Delete Queue
                 delete orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
                 // TODO: Delete Price
-                console.log("          * Deleting Price");
+                // console.log("          * Deleting Price");
                 Price tempBestMatchingPrice = getMatchingNextBestPrice(tradeInfo, bestMatchingPrice);
                 BokkyPooBahsRedBlackTreeLibrary.Tree storage priceKeys = orderKeys[tradeInfo.pairKey][tradeInfo.inverseBuySell];
                 if (priceKeys.exists(bestMatchingPrice)) {
                     priceKeys.remove(bestMatchingPrice);
-                    console.log("          * Deleting Price from RBT");
+                    // console.log("          * Deleting Price from RBT");
                     // emit LogInfo("orders remove RBT", uint(Price.unwrap(_price)), 0x0, "", address(0));
                 }
                 bestMatchingPrice = tempBestMatchingPrice;
