@@ -568,21 +568,22 @@ contract Dexz is Orders, ReentrancyGuard {
     }
 
     // TODO Handle decimals
-    function tradeNew(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable reentrancyGuard returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
+    function trade(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable reentrancyGuard returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
         if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice();
         }
-        return _tradeNew(TradeInfo(msg.sender, buySell, inverseBuySell(buySell), fill, generatePairKey(baseToken, quoteToken), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
+        return _trade(TradeInfo(msg.sender, buySell, inverseBuySell(buySell), fill, generatePairKey(baseToken, quoteToken), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
     }
 
     // TODO: Delete the address fields?
+    // TODO: What happens when maker == taker?
     error InsufficientBaseTokenBalanceOrAllowance(address baseToken, uint baseTokens, uint allowance);
     error InsufficientQuoteTokenBalanceOrAllowance(address quoteToken, uint quoteTokens, uint allowance);
     error UnableToFillOrder(uint baseTokensUnfilled);
 
     event Trade1(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, address indexed taker, address maker, uint baseTokens, uint quoteTokens, Price price);
 
-    function _tradeNew(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
+    function _trade(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
         console.log("          * fill: %s", uint(tradeInfo.fill));
         if (tradeInfo.buySell == BuySell.Buy) {
             uint availableTokens = availableTokens(tradeInfo.quoteToken, msg.sender);
@@ -734,13 +735,13 @@ contract Dexz is Orders, ReentrancyGuard {
         }
     }
 
-    function trade(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
+    function tradeOld(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
         if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice();
         }
-        return _trade(TradeInfo(msg.sender, buySell, inverseBuySell(buySell), fill, generatePairKey(baseToken, quoteToken), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
+        return _tradeOld(TradeInfo(msg.sender, buySell, inverseBuySell(buySell), fill, generatePairKey(baseToken, quoteToken), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
     }
-    function _trade(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
+    function _tradeOld(TradeInfo memory tradeInfo) internal returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
         Price matchingPriceKey;
         OrderKey matchingOrderKey;
         (matchingPriceKey, matchingOrderKey) = _getBestMatchingOrder(tradeInfo.pairKey, tradeInfo.buySell, tradeInfo.price);
