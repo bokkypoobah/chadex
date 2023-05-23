@@ -45,8 +45,8 @@ class Data {
     this.addAccount(this.user1, "user1");
     this.addAccount(this.user2, "user2");
     this.addAccount(this.user3, "user3");
-    this.addAccount(this.feeAccount, "feeAccount");
-    this.addAccount(this.uiFeeAccount, "uiFeeAccount");
+    // this.addAccount(this.feeAccount, "feeAccount");
+    // this.addAccount(this.uiFeeAccount, "uiFeeAccount");
     this.baseBlock = await ethers.provider.getBlockNumber();
   }
 
@@ -206,7 +206,7 @@ class Data {
 
     console.log("          Account                                   ETH " + this.padLeft(await this.token0.symbol() + "[" + this.decimals0 + "]", 24) + " " + this.padLeft(await this.token1.symbol() + "[" + this.decimals1 + "]", 24) + " " + this.padLeft(await this.weth.symbol() + "[" + this.decimalsWeth + "]", 24) + " Blah");
     console.log("          -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------");
-    const checkAccounts = [this.deployer, this.user0, this.user1, this.user2, this.user3, this.feeAccount, this.uiFeeAccount];
+    const checkAccounts = [this.deployer, this.user0, this.user1, this.user2, this.user3/*, this.feeAccount, this.uiFeeAccount*/];
     if (this.dexz) {
       checkAccounts.push(this.dexz.address);
     }
@@ -220,17 +220,8 @@ class Data {
     console.log();
 
     if (this.dexz) {
-      const owner = await this.dexz.owner();
-      const newOwner = await this.dexz.newOwner();
-      const takerFeeInEthers = await this.dexz.takerFeeInEthers();
-      const takerFeeInTokens = await this.dexz.takerFeeInTokens();
-      const feeAccount = await this.dexz.feeAccount();
       const pairsLength = parseInt(await this.dexz.pairsLength());
-      console.log("          Dexz: " + this.getShortAccountName(this.dexz.address) +
-        ", owner: " + this.getShortAccountName(owner) +
-        ", newOwner: " + this.getShortAccountName(newOwner) +
-        ", takerFeeInEthers: " + ethers.utils.formatEther(takerFeeInEthers) +
-        ", takerFeeInTokens: " + ethers.utils.formatUnits(takerFeeInTokens, 16) + "%" + ", feeAccount: " + this.getShortAccountName(feeAccount));
+      console.log("          Dexz: " + this.getShortAccountName(this.dexz.address));
       const pairInfos = [];
       for (let j = 0; j < pairsLength; j++) {
         const info = await this.dexz.pair(j);

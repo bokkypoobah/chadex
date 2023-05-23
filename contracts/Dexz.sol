@@ -52,36 +52,6 @@ contract ReentrancyGuard {
 }
 
 
-contract Owned {
-    address public owner;
-    address public newOwner;
-
-    event OwnershipTransferred(address indexed _from, address indexed _to);
-
-    modifier onlyOwner {
-        require(msg.sender == owner);
-        _;
-    }
-
-    constructor() {
-        owner = msg.sender;
-    }
-
-    function transferOwnership(address _newOwner) public onlyOwner {
-        newOwner = _newOwner;
-    }
-    function acceptOwnership() public {
-        require(msg.sender == newOwner);
-        emit OwnershipTransferred(owner, newOwner);
-        owner = newOwner;
-        newOwner = address(0);
-    }
-    function transferOwnershipImmediately(address _newOwner) public onlyOwner {
-        emit OwnershipTransferred(owner, _newOwner);
-        owner = _newOwner;
-    }
-}
-
 type PairKey is bytes32;
 type OrderKey is bytes32;
 type Tokens is uint128;
@@ -92,7 +62,7 @@ enum Fill { Any, AllOrNothing, AnyAndAddOrder }
 // ----------------------------------------------------------------------------
 // DexzBase
 // ----------------------------------------------------------------------------
-contract DexzBase is Owned {
+contract DexzBase {
     uint constant public TENPOW9 = uint(10)**9;
     uint constant public TENPOW18 = uint(10)**18;
 
@@ -101,10 +71,6 @@ contract DexzBase is Owned {
 
     Tokens public constant TOKENS_MIN = Tokens.wrap(0);
     Tokens public constant TOKENS_MAX = Tokens.wrap(999_999_999_999_999_999_999_999_999_999_999); // 2^128 = 340,282,366,920,938,463,463,374,607,431,768,211,456
-
-    uint public takerFeeInEthers = 0; // TODO 5 * 10 ** 16; // 0.05 ETH
-    uint public takerFeeInTokens = 0; // TODO 10 * uint(10)**14; // 0.10%
-    address public feeAccount;
 
     struct Pair {
         address baseToken;
@@ -118,28 +84,12 @@ contract DexzBase is Owned {
     mapping(PairKey => Pair) public pairs;
     PairKey[] public pairKeys;
 
-    event TakerFeeInEthersUpdated(uint oldTakerFeeInEthers, uint newTakerFeeInEthers);
-    event TakerFeeInTokensUpdated(uint oldTakerFeeInTokens, uint newTakerFeeInTokens);
-    event FeeAccountUpdated(address oldFeeAccount, address newFeeAccount);
     event PairAdded(PairKey indexed pairKey, address indexed baseToken, address indexed quoteToken, uint8 baseDecimals, uint8 quoteDecimals, uint multiplier, uint divisor);
     event LogInfo(string topic, uint number, bytes32 data, string note, address addr);
 
-    constructor(address _feeAccount) Owned() {
-        feeAccount = _feeAccount;
+    constructor() {
     }
 
-    function setTakerFeeInEthers(uint _takerFeeInEthers) public onlyOwner {
-        emit TakerFeeInEthersUpdated(takerFeeInEthers, _takerFeeInEthers);
-        takerFeeInEthers = _takerFeeInEthers;
-    }
-    function setTakerFeeInTokens(uint _takerFeeInTokens) public onlyOwner {
-        emit TakerFeeInTokensUpdated(takerFeeInTokens, _takerFeeInTokens);
-        takerFeeInTokens = _takerFeeInTokens;
-    }
-    function setFeeAccount(address _feeAccount) public onlyOwner {
-        emit FeeAccountUpdated(feeAccount, _feeAccount);
-        feeAccount = _feeAccount;
-    }
     function pair(uint i) public view returns (PairKey pairKey, address baseToken, address quoteToken, uint8 baseDecimals, uint8 quoteDecimals, uint multiplier, uint divisor) {
         pairKey = pairKeys[i];
         Pair memory _pair = pairs[pairKey];
@@ -233,7 +183,7 @@ contract Orders is DexzBase {
     event OrderRemoved(OrderKey indexed key);
     event OrderUpdated(OrderKey indexed key, uint baseTokens, uint newBaseTokens);
 
-    constructor(address _feeAccount) DexzBase(_feeAccount) {
+    constructor() DexzBase() {
     }
 
     // Price tree navigating
@@ -377,7 +327,6 @@ contract Dexz is Orders, ReentrancyGuard {
         Price price;
         Unixtime expiry;
         Tokens baseTokens;
-        address uiFeeAccount;
     }
 
     // web3.sha3("trade(uint256,address,address,uint256,uint256,uint256,address)").substring(0, 10) => "0xcbb924e2"
@@ -388,7 +337,7 @@ contract Dexz is Orders, ReentrancyGuard {
     event TradeSummary(BuySell buySell, address indexed taker, Tokens baseTokensFilled, Tokens quoteTokensFilled, Price price, Tokens baseTokensOnOrder);
 
 
-    constructor(address _feeAccount) Orders(_feeAccount) {
+    constructor() Orders() {
     }
 
     // // length = 4 + 7 * 32 = 228
@@ -459,8 +408,8 @@ contract Dexz is Orders, ReentrancyGuard {
     //     console.log("multiplier: %s, divisor: %s", multiplier, divisor);
     //     console.log("gasleft - start: %s, end: %s, diff: %s", startGas, endGas, startGas - endGas);
     // }
-    function trade(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, Unixtime expiry, Tokens baseTokens, address uiFeeAccount) public payable reentrancyGuard returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
-        return _trade(getTradeInfo(msg.sender, buySell, fill, baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
+    function trade(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, Unixtime expiry, Tokens baseTokens) public payable reentrancyGuard returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
+        return _trade(getTradeInfo(msg.sender, buySell, fill, baseToken, quoteToken, price, expiry, baseTokens));
     }
 
     // TODO: Delete the address fields?
@@ -469,7 +418,7 @@ contract Dexz is Orders, ReentrancyGuard {
     error InsufficientQuoteTokenBalanceOrAllowance(address quoteToken, Tokens quoteTokens, Tokens availableTokens);
     error UnableToFillOrder(Tokens baseTokensUnfilled);
 
-    function getTradeInfo(address taker, BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, Unixtime expiry, Tokens baseTokens, address uiFeeAccount) internal returns (TradeInfo memory tradeInfo) {
+    function getTradeInfo(address taker, BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, Unixtime expiry, Tokens baseTokens) internal returns (TradeInfo memory tradeInfo) {
         if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice(price, PRICE_MAX);
         }
@@ -495,7 +444,7 @@ contract Dexz is Orders, ReentrancyGuard {
             emit PairAdded(pairKey, baseToken, quoteToken, baseDecimals, quoteDecimals, multiplier, divisor);
             pair = pairs[pairKey];
         }
-        return TradeInfo(taker, buySell, inverseBuySell(buySell), fill, pairKey, baseToken, quoteToken, pair.multiplier, pair.divisor, price, expiry, baseTokens, uiFeeAccount);
+        return TradeInfo(taker, buySell, inverseBuySell(buySell), fill, pairKey, baseToken, quoteToken, pair.multiplier, pair.divisor, price, expiry, baseTokens);
     }
 
     // quoteTokens = divisor * baseTokens * price / 10^9 / multiplier
