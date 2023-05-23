@@ -19,6 +19,9 @@ class Data {
     this.token0 = null;
     this.token1 = null;
     this.weth = null;
+    this.decimals0 = null;
+    this.decimals1 = null;
+    this.decimalsWeth = null;
 
     this.dexz = null;
 
@@ -141,14 +144,17 @@ class Data {
 
   async setToken0(token) {
     this.token0 = token;
+    this.decimals0 = await this.token0.decimals();
     this.addContract(token, "Token0");
   }
   async setToken1(token) {
     this.token1 = token;
+    this.decimals1 = await this.token1.decimals();
     this.addContract(token, "Token1");
   }
   async setWeth(weth) {
     this.weth = weth;
+    this.decimalsWeth = await this.weth.decimals();
     this.addContract(weth, "WETH");
   }
   async setDexz(dexz) {
@@ -198,7 +204,7 @@ class Data {
     //   umswapTitle = " ".repeat(23 - umswapTitle.length) + umswapTitle;
     // }
 
-    console.log("          Account                                   ETH " + this.padLeft(await this.token0.symbol(), 24) + " " + this.padLeft(await this.token1.symbol(), 24) + " " + this.padLeft(await this.weth.symbol(), 24) + " Blah");
+    console.log("          Account                                   ETH " + this.padLeft(await this.token0.symbol() + "[" + this.decimals0 + "]", 24) + " " + this.padLeft(await this.token1.symbol() + "[" + this.decimals1 + "]", 24) + " " + this.padLeft(await this.weth.symbol() + "[" + this.decimalsWeth + "]", 24) + " Blah");
     console.log("          -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------");
     const checkAccounts = [this.deployer, this.user0, this.user1, this.user2, this.user3, this.feeAccount, this.uiFeeAccount];
     if (this.dexz) {
@@ -209,7 +215,7 @@ class Data {
       const token0Balance = this.token0 == null ? 0 : await this.token0.balanceOf(checkAccounts[i]);
       const token1Balance = this.token1 == null ? 0 : await this.token1.balanceOf(checkAccounts[i]);
       const wethBalance = this.weth == null ? 0 : await this.weth.balanceOf(checkAccounts[i]);
-      console.log("          " + this.padRight(this.getShortAccountName(checkAccounts[i]), 20) + " " + this.padLeft(ethers.utils.formatEther(balance), 24) + " " + this.padLeft(ethers.utils.formatEther(token0Balance), 24) + " " + this.padLeft(ethers.utils.formatEther(token1Balance), 24) + " " + this.padLeft(ethers.utils.formatEther(wethBalance), 24));
+      console.log("          " + this.padRight(this.getShortAccountName(checkAccounts[i]), 20) + " " + this.padLeft(ethers.utils.formatEther(balance), 24) + " " + this.padLeft(ethers.utils.formatUnits(token0Balance, this.decimals0), 24) + " " + this.padLeft(ethers.utils.formatUnits(token1Balance, this.decimals1), 24) + " " + this.padLeft(ethers.utils.formatUnits(wethBalance, this.decimalsWeth), 24));
     }
     console.log();
 
