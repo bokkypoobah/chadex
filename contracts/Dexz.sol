@@ -149,10 +149,8 @@ contract DexzBase is Owned {
         if (pairs[pairKey].baseToken == address(0)) {
             uint8 baseDecimals = IERC20(baseToken).decimals();
             uint8 quoteDecimals = IERC20(quoteToken).decimals();
-
             uint multiplier;
             uint divisor;
-
             if (baseDecimals >= quoteDecimals) {
                 multiplier = 10 ** uint(baseDecimals - quoteDecimals);
                 divisor = 1;
