@@ -225,35 +225,13 @@ contract DexzBase {
         uint _balance = IERC20(token).balanceOf(wallet);
         _tokens = _allowance < _balance ? _allowance : _balance;
     }
-
     function transferFrom(address token, address from, address to, uint _tokens) internal {
-        // TODO: Remove check?
-        // uint balanceToBefore = IERC20(token).balanceOf(to);
-        // require(IERC20(token).transferFrom(from, to, _tokens));
-        // uint balanceToAfter = IERC20(token).balanceOf(to);
-        // require(balanceToBefore + _tokens == balanceToAfter);
-
-        // uint _allowance = IERC20(token).allowance(from, address(this));
-        // console.log("_allowance", _allowance);
-        //
-        // if (_allowance < _tokens) {
-        //     revert TransferFromFailedApproval(token, from, to, _tokens, _allowance);
-        // }
-
         // Handle ERC20 tokens that do not return true/false
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, _tokens));
-        // require(success && (data.length == 0 || abi.decode(data, (bool))), 'TF');
-
         if (success && (data.length == 0 || abi.decode(data, (bool)))) {
         } else {
             revert TransferFromFailed(token, from, to, _tokens);
         }
-
-        // try token.call(abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, _tokens)) returns (bool success, bytes memory data) {
-        //     return;
-        // } catch (bytes memory) {
-        //     revert TransferFromFailed(token, from, to, _tokens);
-        // }
     }
 }
 // ----------------------------------------------------------------------------
@@ -354,14 +332,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
         //     if (Tokens.unwrap(tradeInfo.baseTokens) == 0) {
         //         break;
         //     }
-            // console.log("          * bestMatchingPrice: %s, tradeInfo.baseTokens: %s", Price.unwrap(bestMatchingPrice), tradeInfo.baseTokens);
             OrderQueue storage orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
             OrderKey bestMatchingOrderKey = orderQueue.head;
             while (isNotSentinel(bestMatchingOrderKey) /*&& tradeInfo.baseTokens > 0*/) {
                 Order storage order = orders[bestMatchingOrderKey];
-                // console.log("            * order - buySell: %s, baseTokens: %s, expiry: %s", uint(order.buySell), order.baseTokens, order.expiry);
-                // console.logBytes32(prevBestMatchingOrderKey);
-                // console.logBytes32(bestMatchingOrderKey);
                 bool deleteOrder = false;
                 if (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) >= block.timestamp) {
                     uint makerBaseTokensToFill = Tokens.unwrap(order.baseTokens) - Tokens.unwrap(order.baseTokensFilled);
@@ -371,7 +345,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
                         // Taker Buy Base / Maker Sell Quote
                         uint availableBaseTokens = availableTokens(tradeInfo.baseToken, order.maker);
                         if (availableBaseTokens > 0) {
-                            // console.log("              * Maker SELL base - availableBaseTokens: %s", availableBaseTokens);
                             if (makerBaseTokensToFill > availableBaseTokens) {
                                 makerBaseTokensToFill = availableBaseTokens;
                             }
@@ -382,9 +355,8 @@ contract Dexz is DexzBase, ReentrancyGuard {
                                 baseTokensToTransfer = uint(Tokens.unwrap(tradeInfo.baseTokens));
                             }
                             quoteTokensToTransfer = tradeInfo.divisor * baseTokensToTransfer * uint(Price.unwrap(bestMatchingPrice)) / TENPOW9 / tradeInfo.multiplier;
-                            // console.log("              * Base Transfer %s from %s to %s", baseTokensToTransfer, order.maker, msg.sender);
-                            require(IERC20(tradeInfo.quoteToken).transferFrom(msg.sender, order.maker, quoteTokensToTransfer));
-                            require(IERC20(tradeInfo.baseToken).transferFrom(order.maker, msg.sender, baseTokensToTransfer));
+                            transferFrom(tradeInfo.quoteToken, msg.sender, order.maker, quoteTokensToTransfer);
+                            transferFrom(tradeInfo.baseToken, order.maker, msg.sender, baseTokensToTransfer);
                             emit Trade(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, msg.sender, order.maker, baseTokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
                         } else {
                             deleteOrder = true;
@@ -393,9 +365,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                         // Taker Sell Base / Maker Buy Quote
                         uint availableQuoteTokens = availableTokens(tradeInfo.quoteToken, order.maker);
                         if (availableQuoteTokens > 0) {
-                            // console.log("              * Maker BUY quote - availableQuoteTokens: %s", availableQuoteTokens);
                             uint availableQuoteTokensInBaseTokens = tradeInfo.multiplier * availableQuoteTokens * TENPOW9 / uint(Price.unwrap(bestMatchingPrice)) / tradeInfo.divisor;
-                            // console.log("              * Maker BUY quote - availableQuoteTokensInBaseTokens: %s", availableQuoteTokensInBaseTokens);
                             if (makerBaseTokensToFill > availableQuoteTokensInBaseTokens) {
                                 makerBaseTokensToFill = availableQuoteTokensInBaseTokens;
                             } else {
@@ -409,9 +379,8 @@ contract Dexz is DexzBase, ReentrancyGuard {
                                 baseTokensToTransfer = uint(Tokens.unwrap(tradeInfo.baseTokens));
                                 quoteTokensToTransfer = tradeInfo.divisor * baseTokensToTransfer * uint(Price.unwrap(bestMatchingPrice)) / TENPOW9 / tradeInfo.multiplier;
                             }
-                            // console.log("              * Maker BUY quote - baseTokensToTransfer: %s", baseTokensToTransfer);
-                            require(IERC20(tradeInfo.baseToken).transferFrom(msg.sender, order.maker, baseTokensToTransfer));
-                            require(IERC20(tradeInfo.quoteToken).transferFrom(order.maker, msg.sender, quoteTokensToTransfer));
+                            transferFrom(tradeInfo.baseToken, msg.sender, order.maker, baseTokensToTransfer);
+                            transferFrom(tradeInfo.quoteToken, order.maker, msg.sender, quoteTokensToTransfer);
                             emit Trade(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, msg.sender, order.maker, baseTokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
                         } else {
                             deleteOrder = true;
@@ -421,15 +390,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
                     baseTokensFilled = Tokens.wrap(Tokens.unwrap(baseTokensFilled) + uint128(baseTokensToTransfer));
                     quoteTokensFilled = Tokens.wrap(Tokens.unwrap(quoteTokensFilled) + uint128(quoteTokensToTransfer));
                     tradeInfo.baseTokens = Tokens.wrap(Tokens.unwrap(tradeInfo.baseTokens) - uint128(baseTokensToTransfer));
-                    // console.log("              * tradeInfo.baseTokens: %s, makerBaseTokens: %s, makerBaseTokensFilled: %s", tradeInfo.baseTokens, order.baseTokens, order.baseTokensFilled);
-                    // console.log("              * baseTokensToTransfer: %s, quoteTokensToTransfer: %s", baseTokensToTransfer, quoteTokensToTransfer);
                 } else {
-                    // console.log("              * Expired");
                     deleteOrder = true;
                 }
-                // console.log("              * Delete? %s", deleteOrder);
                 if (deleteOrder) {
-                    // console.log("            - Deleting Order");
                     OrderKey temp = bestMatchingOrderKey;
                     bestMatchingOrderKey = order.next;
                     orderQueue.head = order.next;
@@ -483,7 +447,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[tradeInfo.pairKey][tradeInfo.buySell];
         if (!priceTree.exists(tradeInfo.price)) {
             priceTree.insert(tradeInfo.price);
-        } else {
         }
         OrderQueue storage orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.buySell][tradeInfo.price];
         if (!orderQueue.exists) {
