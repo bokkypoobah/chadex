@@ -10,6 +10,9 @@ pragma solidity ^0.8.0;
 //   baseTokens = multiplier * quoteTokens * 10^9 / price / divisor
 //   price = multiplier * quoteTokens * 10^9 / baseTokens / divisor
 //
+// TODO:
+//   What happens when maker == taker?
+//
 //
 // https://github.com/bokkypoobah/Dexz
 //
@@ -22,7 +25,16 @@ pragma solidity ^0.8.0;
 // ----------------------------------------------------------------------------
 
 import "./BokkyPooBahsRedBlackTreeLibrary.sol";
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
+
+
+type PairKey is bytes32;
+type OrderKey is bytes32;
+type Tokens is uint128;
+type Unixtime is uint64;
+
+enum BuySell { Buy, Sell }
+enum Fill { Any, AllOrNothing, AnyAndAddOrder }
 
 
 interface IERC20 {
@@ -58,25 +70,11 @@ contract ReentrancyGuard {
 }
 
 
-type PairKey is bytes32;
-type OrderKey is bytes32;
-type Tokens is uint128;
-type Unixtime is uint64;
-enum BuySell { Buy, Sell }
-enum Fill { Any, AllOrNothing, AnyAndAddOrder }
-
 // ----------------------------------------------------------------------------
 // DexzBase
 // ----------------------------------------------------------------------------
 contract DexzBase {
-    uint constant public TENPOW9 = uint(10)**9;
-    uint constant public TENPOW18 = uint(10)**18;
-
-    Price public constant PRICE_MIN = Price.wrap(1);
-    Price public constant PRICE_MAX = Price.wrap(999_999_999_999_999_999); // 2^64 = 18,446,744,073,709,551,616
-
-    Tokens public constant TOKENS_MIN = Tokens.wrap(0);
-    Tokens public constant TOKENS_MAX = Tokens.wrap(999_999_999_999_999_999_999_999_999_999_999); // 2^128 = 340,282,366,920,938,463,463,374,607,431,768,211,456
+    using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
     struct Pair {
         address baseToken;
@@ -86,12 +84,64 @@ contract DexzBase {
         uint multiplier;
         uint divisor;
     }
+    struct OrderQueue {
+        bool exists; // TODO Delete?
+        OrderKey head;
+        OrderKey tail;
+    }
+    struct Order {
+        OrderKey next;
+        address maker;
+        BuySell buySell;
+        Unixtime expiry;
+        Tokens baseTokens;
+        Tokens baseTokensFilled;
+    }
+    struct TradeInfo {
+        address taker;
+        BuySell buySell;
+        BuySell inverseBuySell;
+        Fill fill;
+        PairKey pairKey;
+        address baseToken;
+        address quoteToken;
+        uint multiplier;
+        uint divisor;
+        Price price;
+        Unixtime expiry;
+        Tokens baseTokens;
+    }
+
+    uint constant public TENPOW9 = uint(10)**9;
+    uint constant public TENPOW18 = uint(10)**18;
+    Price public constant PRICE_EMPTY = Price.wrap(0);
+    Price public constant PRICE_MIN = Price.wrap(1);
+    Price public constant PRICE_MAX = Price.wrap(999_999_999_999_999_999); // 2^64 = 18,446,744,073,709,551,616
+    Tokens public constant TOKENS_MIN = Tokens.wrap(0);
+    Tokens public constant TOKENS_MAX = Tokens.wrap(999_999_999_999_999_999_999_999_999_999_999); // 2^128 = 340,282,366,920,938,463,463,374,607,431,768,211,456
+    OrderKey public constant ORDERKEY_SENTINEL = OrderKey.wrap(0x0);
 
     mapping(PairKey => Pair) public pairs;
     PairKey[] public pairKeys;
+    mapping(PairKey => mapping(BuySell => BokkyPooBahsRedBlackTreeLibrary.Tree)) priceTrees;
+    mapping(PairKey => mapping(BuySell => mapping(Price => OrderQueue))) orderQueues;
+    mapping(OrderKey => Order) orders;
 
     event PairAdded(PairKey indexed pairKey, address indexed baseToken, address indexed quoteToken, uint8 baseDecimals, uint8 quoteDecimals, uint multiplier, uint divisor);
+    event OrderAdded(PairKey indexed pairKey, OrderKey indexed key, address indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens baseTokens);
+    event OrderRemoved(OrderKey indexed key);
+    event OrderUpdated(OrderKey indexed key, uint baseTokens, uint newBaseTokens);
+    event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, address indexed taker, address maker, uint baseTokens, uint quoteTokens, Price price);
+    event TradeSummary(BuySell buySell, address indexed taker, Tokens baseTokensFilled, Tokens quoteTokensFilled, Price price, Tokens baseTokensOnOrder);
     event LogInfo(string topic, uint number, bytes32 data, string note, address addr);
+
+    error InvalidPrice(Price price, Price priceMax);
+    error InvalidTokens(Tokens tokenAmount, Tokens tokenAmountMax);
+    error TransferFromFailedApproval(address token, address from, address to, uint _tokens, uint _approved);
+    error TransferFromFailed(address token, address from, address to, uint _tokens);
+    error InsufficientBaseTokenBalanceOrAllowance(address baseToken, Tokens baseTokens, Tokens availableTokens);
+    error InsufficientQuoteTokenBalanceOrAllowance(address quoteToken, Tokens quoteTokens, Tokens availableTokens);
+    error UnableToFillOrder(Tokens baseTokensUnfilled);
 
     constructor() {
     }
@@ -103,93 +153,6 @@ contract DexzBase {
     }
     function pairsLength() public view returns (uint) {
         return pairKeys.length;
-    }
-    function availableTokens(address token, address wallet) internal view returns (uint _tokens) {
-        uint _allowance = IERC20(token).allowance(wallet, address(this));
-        uint _balance = IERC20(token).balanceOf(wallet);
-        _tokens = _allowance < _balance ? _allowance : _balance;
-    }
-
-    error TransferFromFailedApproval(address token, address from, address to, uint _tokens, uint _approved);
-    error TransferFromFailed(address token, address from, address to, uint _tokens);
-
-    function transferFrom(address token, address from, address to, uint _tokens) internal {
-        // TODO: Remove check?
-        // uint balanceToBefore = IERC20(token).balanceOf(to);
-        // require(IERC20(token).transferFrom(from, to, _tokens));
-        // uint balanceToAfter = IERC20(token).balanceOf(to);
-        // require(balanceToBefore + _tokens == balanceToAfter);
-
-        // uint _allowance = IERC20(token).allowance(from, address(this));
-        // console.log("_allowance", _allowance);
-        //
-        // if (_allowance < _tokens) {
-        //     revert TransferFromFailedApproval(token, from, to, _tokens, _allowance);
-        // }
-
-        // Handle ERC20 tokens that do not return true/false
-        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, _tokens));
-        // require(success && (data.length == 0 || abi.decode(data, (bool))), 'TF');
-
-        if (success && (data.length == 0 || abi.decode(data, (bool)))) {
-        } else {
-            revert TransferFromFailed(token, from, to, _tokens);
-        }
-
-        // try token.call(abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, _tokens)) returns (bool success, bytes memory data) {
-        //     return;
-        // } catch (bytes memory) {
-        //     revert TransferFromFailed(token, from, to, _tokens);
-        // }
-    }
-
-
-    // TODO
-    // function recoverTokens(address token, uint tokens) public onlyOwner {
-    //     if (token == address(0)) {
-    //         payable(uint160(owner)).transfer((tokens == 0 ? address(this).balance : tokens));
-    //     } else {
-    //         IERC20(token).transfer(owner, tokens == 0 ? IERC20(token).balanceOf(address(this)) : tokens);
-    //     }
-    // }
-}
-// ----------------------------------------------------------------------------
-// End - DexzBase
-// ----------------------------------------------------------------------------
-
-
-// ----------------------------------------------------------------------------
-// Orders Data Structure
-// ----------------------------------------------------------------------------
-contract Orders is DexzBase {
-    using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
-
-    struct Order {
-        OrderKey next;
-        address maker;
-        BuySell buySell;
-        Unixtime expiry;
-        Tokens baseTokens;
-        Tokens baseTokensFilled;
-    }
-    struct OrderQueue {
-        bool exists; // TODO Delete?
-        OrderKey head;
-        OrderKey tail;
-    }
-
-    mapping(PairKey => mapping(BuySell => BokkyPooBahsRedBlackTreeLibrary.Tree)) priceTrees;
-    mapping(PairKey => mapping(BuySell => mapping(Price => OrderQueue))) orderQueues;
-    mapping(OrderKey => Order) orders;
-
-    Price public constant PRICE_EMPTY = Price.wrap(0);
-    OrderKey public constant ORDERKEY_SENTINEL = OrderKey.wrap(0x0);
-
-    event OrderAdded(PairKey indexed pairKey, OrderKey indexed key, address indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens baseTokens);
-    event OrderRemoved(OrderKey indexed key);
-    event OrderUpdated(OrderKey indexed key, uint baseTokens, uint newBaseTokens);
-
-    constructor() DexzBase() {
     }
 
     // Price tree navigating
@@ -249,148 +212,63 @@ contract Orders is DexzBase {
     }
 
     function getOrderQueue(PairKey pairKey, BuySell buySell, Price price) public view returns (bool _exists, OrderKey head, OrderKey tail) {
-        Orders.OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
+        OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
         return (orderQueue.exists, orderQueue.head, orderQueue.tail);
     }
     function getOrder(OrderKey orderKey) public view returns (OrderKey _next, address maker, BuySell buySell, Unixtime expiry, Tokens baseTokens, Tokens baseTokensFilled) {
-        Orders.Order memory order = orders[orderKey];
+        Order memory order = orders[orderKey];
         return (order.next, order.maker, order.buySell, order.expiry, order.baseTokens, order.baseTokensFilled);
     }
 
-    /*
-    function _removeOrder(bytes32 orderKey, address msgSender) internal {
-        require(orderKey != ORDERKEY_SENTINEL);
-        Order memory order = orders[orderKey];
-        require(order.maker == msgSender);
-
-        bytes32 pairKey = generatePairKey(order.baseToken, order.quoteToken);
-        OrderQueue storage orderQueue = orderQueues[pairKey][order.buySell][order.price];
-        require(orderQueue.exists);
-
-        BuySell buySell = order.buySell;
-        Price _price = order.price;
-
-        // Only order
-        if (orderQueue.head == orderKey && orderQueue.tail == orderKey) {
-            orderQueue.head = ORDERKEY_SENTINEL;
-            orderQueue.tail = ORDERKEY_SENTINEL;
-            delete orders[orderKey];
-        // First item
-    } else if (orderQueue.head == orderKey) {
-            bytes32 _next = orders[orderKey].next;
-            // TODO
-            // orders[_next].prev = ORDERKEY_SENTINEL;
-            orderQueue.head = _next;
-            delete orders[orderKey];
-        // Last item
-    } else if (orderQueue.tail == orderKey) {
-            // TODO
-            // bytes32 _prev = orders[orderKey].prev;
-            // orders[_prev].next = ORDERKEY_SENTINEL;
-            // orderQueue.tail = _prev;
-            // TODO
-            orderQueue.tail = ORDERKEY_SENTINEL;
-            delete orders[orderKey];
-        // Item in the middle
-        } else {
-            // TODO
-            // bytes32 _prev = orders[orderKey].prev;
-            bytes32 _next = orders[orderKey].next;
-            // orders[_prev].next = ORDERKEY_SENTINEL;
-            // orders[_next].prev = _prev;
-            delete orders[orderKey];
-        }
-        emit OrderRemoved(orderKey);
-        if (orderQueue.head == ORDERKEY_SENTINEL && orderQueue.tail == ORDERKEY_SENTINEL) {
-            delete orderQueues[pairKey][buySell][_price];
-            BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][buySell];
-            if (priceTree.exists(_price)) {
-                priceTree.remove(_price);
-                // emit LogInfo("orders remove RBT", uint(Price.unwrap(_price)), 0x0, "", address(0));
-            }
-        }
+    function availableTokens(address token, address wallet) internal view returns (uint _tokens) {
+        uint _allowance = IERC20(token).allowance(wallet, address(this));
+        uint _balance = IERC20(token).balanceOf(wallet);
+        _tokens = _allowance < _balance ? _allowance : _balance;
     }
-    */
+
+    function transferFrom(address token, address from, address to, uint _tokens) internal {
+        // TODO: Remove check?
+        // uint balanceToBefore = IERC20(token).balanceOf(to);
+        // require(IERC20(token).transferFrom(from, to, _tokens));
+        // uint balanceToAfter = IERC20(token).balanceOf(to);
+        // require(balanceToBefore + _tokens == balanceToAfter);
+
+        // uint _allowance = IERC20(token).allowance(from, address(this));
+        // console.log("_allowance", _allowance);
+        //
+        // if (_allowance < _tokens) {
+        //     revert TransferFromFailedApproval(token, from, to, _tokens, _allowance);
+        // }
+
+        // Handle ERC20 tokens that do not return true/false
+        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, _tokens));
+        // require(success && (data.length == 0 || abi.decode(data, (bool))), 'TF');
+
+        if (success && (data.length == 0 || abi.decode(data, (bool)))) {
+        } else {
+            revert TransferFromFailed(token, from, to, _tokens);
+        }
+
+        // try token.call(abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, _tokens)) returns (bool success, bytes memory data) {
+        //     return;
+        // } catch (bytes memory) {
+        //     revert TransferFromFailed(token, from, to, _tokens);
+        // }
+    }
 }
+// ----------------------------------------------------------------------------
+// End - DexzBase
+// ----------------------------------------------------------------------------
 
 
 // ----------------------------------------------------------------------------
 // Dexz contract
 // ----------------------------------------------------------------------------
-contract Dexz is Orders, ReentrancyGuard {
+contract Dexz is DexzBase, ReentrancyGuard {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
-    struct TradeInfo {
-        address taker;
-        BuySell buySell;
-        BuySell inverseBuySell;
-        Fill fill;
-        PairKey pairKey;
-        address baseToken;
-        address quoteToken;
-        uint multiplier;
-        uint divisor;
-        Price price;
-        Unixtime expiry;
-        Tokens baseTokens;
+    constructor() DexzBase() {
     }
-
-    // web3.sha3("trade(uint256,address,address,uint256,uint256,uint256,address)").substring(0, 10) => "0xcbb924e2"
-    // bytes4 public constant tradeSig = "\xcb\xb9\x24\xe2";
-
-    // event TradeOld(OrderKey indexed orderKey, BuySell buySell, address indexed taker, address indexed maker, uint amount, address baseToken, address quoteToken, uint baseTokens, uint quoteTokens, uint feeBaseTokens, uint feeQuoteTokens, uint baseTokensFilled);
-    event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, address indexed taker, address maker, uint baseTokens, uint quoteTokens, Price price);
-    event TradeSummary(BuySell buySell, address indexed taker, Tokens baseTokensFilled, Tokens quoteTokensFilled, Price price, Tokens baseTokensOnOrder);
-
-
-    constructor() Orders() {
-    }
-
-    // // length = 4 + 7 * 32 = 228
-    // uint private constant TRADE_DATA_LENGTH = 228;
-    // function receiveApproval(address _from, uint256 _tokens, address _token, bytes memory _data) public {
-    //     // emit LogInfo("receiveApproval: from", 0, 0x0, "", _from);
-    //     // emit LogInfo("receiveApproval: tokens & token", _tokens, 0x0, "", _token);
-    //     uint length;
-    //     bytes4 functionSignature;
-    //     uint orderFlag;
-    //     uint baseToken;
-    //     uint quoteToken;
-    //     uint price;
-    //     uint expiry;
-    //     uint baseTokens;
-    //     uint uiFeeAccount;
-    //     assembly {
-    //         length := mload(_data)
-    //         functionSignature := mload(add(_data, 0x20))
-    //         orderFlag := mload(add(_data, 0x24))
-    //         baseToken := mload(add(_data, 0x44))
-    //         quoteToken := mload(add(_data, 0x64))
-    //         price := mload(add(_data, 0x84))
-    //         expiry := mload(add(_data, 0xa4))
-    //         baseTokens := mload(add(_data, 0xc4))
-    //         uiFeeAccount := mload(add(_data, 0xe4))
-    //     }
-    //     // emit LogInfo("receiveApproval: length", length, 0x0, "", address(0));
-    //     // emit LogInfo("receiveApproval: functionSignature", 0, bytes32(functionSignature), "", address(0));
-    //     // emit LogInfo("receiveApproval: p1 orderFlag", orderFlag, 0x0, "", address(0));
-    //     // emit LogInfo("receiveApproval: p2 baseToken", 0, 0x0, "", address(baseToken));
-    //     // emit LogInfo("receiveApproval: p3 quoteToken", 0, 0x0, "", address(quoteToken));
-    //     // emit LogInfo("receiveApproval: p4 price", price, 0x0, "", address(0));
-    //     // emit LogInfo("receiveApproval: p5 expiry", expiry, 0x0, "", address(0));
-    //     // emit LogInfo("receiveApproval: p6 baseTokens", baseTokens, 0x0, "", address(0));
-    //     // emit LogInfo("receiveApproval: p7 uiFeeAccount", 0, 0x0, "", address(uiFeeAccount));
-    //
-    //     if (functionSignature == tradeSig) {
-    //         require(length >= TRADE_DATA_LENGTH);
-    //         require(_token == address(uint160(baseToken)) || _token == address(uint160(quoteToken)));
-    //         require(_tokens >= baseTokens);
-    //         _trade(TradeInfo(_from, orderFlag | ORDERFLAG_FILL_AND_ADD_ORDER, orderFlag & ORDERFLAG_BUYSELL_MASK, address(uint160(baseToken)), address(uint160(quoteToken)), price, expiry, baseTokens, address(uint160(uiFeeAccount))));
-    //     }
-    // }
-
-    error InvalidPrice(Price price, Price priceMax);
-    error InvalidTokens(Tokens tokenAmount, Tokens tokenAmountMax);
 
     function getMatchingBestPrice(TradeInfo memory tradeInfo) public view returns (Price price) {
         price = (tradeInfo.inverseBuySell == BuySell.Buy) ? priceTrees[tradeInfo.pairKey][tradeInfo.inverseBuySell].last() : priceTrees[tradeInfo.pairKey][tradeInfo.inverseBuySell].first();
@@ -403,26 +281,13 @@ contract Dexz is Orders, ReentrancyGuard {
         }
     }
     function getMatchingOrderQueue(TradeInfo memory tradeInfo, Price price) public view returns (bool _exists, OrderKey head, OrderKey tail) {
-        Orders.OrderQueue memory orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.inverseBuySell][price];
+        OrderQueue memory orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.inverseBuySell][price];
         return (orderQueue.exists, orderQueue.head, orderQueue.tail);
     }
 
-    // function doSomething(address baseToken, address quoteToken) internal view {
-    //     uint startGas = gasleft();
-    //     (uint multiplier, uint divisor) = getMultiplierAndDivisor(baseToken, quoteToken);
-    //     uint endGas = gasleft();
-    //     console.log("multiplier: %s, divisor: %s", multiplier, divisor);
-    //     console.log("gasleft - start: %s, end: %s, diff: %s", startGas, endGas, startGas - endGas);
-    // }
     function trade(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, Unixtime expiry, Tokens baseTokens) public payable reentrancyGuard returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
         return _trade(getTradeInfo(msg.sender, buySell, fill, baseToken, quoteToken, price, expiry, baseTokens));
     }
-
-    // TODO: Delete the address fields?
-    // TODO: What happens when maker == taker?
-    error InsufficientBaseTokenBalanceOrAllowance(address baseToken, Tokens baseTokens, Tokens availableTokens);
-    error InsufficientQuoteTokenBalanceOrAllowance(address quoteToken, Tokens quoteTokens, Tokens availableTokens);
-    error UnableToFillOrder(Tokens baseTokensUnfilled);
 
     function getTradeInfo(address taker, BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, Unixtime expiry, Tokens baseTokens) internal returns (TradeInfo memory tradeInfo) {
         if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
@@ -454,7 +319,6 @@ contract Dexz is Orders, ReentrancyGuard {
         }
         return TradeInfo(taker, buySell, inverseBuySell(buySell), fill, pairKey, baseToken, quoteToken, pair.multiplier, pair.divisor, price, expiry, baseTokens);
     }
-
     function checkTakerAvailableTokens(TradeInfo memory tradeInfo) internal view {
         if (tradeInfo.buySell == BuySell.Buy) {
             uint availableTokens = availableTokens(tradeInfo.quoteToken, msg.sender);
@@ -469,7 +333,6 @@ contract Dexz is Orders, ReentrancyGuard {
             }
         }
     }
-
     function _trade(TradeInfo memory tradeInfo) internal returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
         checkTakerAvailableTokens(tradeInfo);
 
@@ -492,7 +355,7 @@ contract Dexz is Orders, ReentrancyGuard {
         //         break;
         //     }
             // console.log("          * bestMatchingPrice: %s, tradeInfo.baseTokens: %s", Price.unwrap(bestMatchingPrice), tradeInfo.baseTokens);
-            Orders.OrderQueue storage orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
+            OrderQueue storage orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
             OrderKey bestMatchingOrderKey = orderQueue.head;
             while (isNotSentinel(bestMatchingOrderKey) /*&& tradeInfo.baseTokens > 0*/) {
                 Order storage order = orders[bestMatchingOrderKey];
@@ -614,7 +477,6 @@ contract Dexz is Orders, ReentrancyGuard {
         }
         // console.log("          * baseTokensFilled: %s, quoteTokensFilled: %s, baseTokensOnOrder: %s", baseTokensFilled, quoteTokensFilled, baseTokensOnOrder);
     }
-
     function _addOrder(TradeInfo memory tradeInfo) internal returns (OrderKey orderKey) {
         orderKey = generateOrderKey(tradeInfo.buySell, tradeInfo.taker, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price, tradeInfo.expiry);
         require(orders[orderKey].maker == address(0));
@@ -639,7 +501,6 @@ contract Dexz is Orders, ReentrancyGuard {
         }
         emit OrderAdded(tradeInfo.pairKey, orderKey, tradeInfo.taker, tradeInfo.buySell, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
     }
-
 
     /*
     function increaseOrderBaseTokens(bytes32 key, uint baseTokens) public returns (uint _newBaseTokens, uint _baseTokensFilled) {
@@ -700,4 +561,60 @@ contract Dexz is Orders, ReentrancyGuard {
         _removeOrder(key, msg.sender);
     }
     */
+
+    /*
+    function _removeOrder(bytes32 orderKey, address msgSender) internal {
+        require(orderKey != ORDERKEY_SENTINEL);
+        Order memory order = orders[orderKey];
+        require(order.maker == msgSender);
+
+        bytes32 pairKey = generatePairKey(order.baseToken, order.quoteToken);
+        OrderQueue storage orderQueue = orderQueues[pairKey][order.buySell][order.price];
+        require(orderQueue.exists);
+
+        BuySell buySell = order.buySell;
+        Price _price = order.price;
+
+        // Only order
+        if (orderQueue.head == orderKey && orderQueue.tail == orderKey) {
+            orderQueue.head = ORDERKEY_SENTINEL;
+            orderQueue.tail = ORDERKEY_SENTINEL;
+            delete orders[orderKey];
+        // First item
+    } else if (orderQueue.head == orderKey) {
+            bytes32 _next = orders[orderKey].next;
+            // TODO
+            // orders[_next].prev = ORDERKEY_SENTINEL;
+            orderQueue.head = _next;
+            delete orders[orderKey];
+        // Last item
+    } else if (orderQueue.tail == orderKey) {
+            // TODO
+            // bytes32 _prev = orders[orderKey].prev;
+            // orders[_prev].next = ORDERKEY_SENTINEL;
+            // orderQueue.tail = _prev;
+            // TODO
+            orderQueue.tail = ORDERKEY_SENTINEL;
+            delete orders[orderKey];
+        // Item in the middle
+        } else {
+            // TODO
+            // bytes32 _prev = orders[orderKey].prev;
+            bytes32 _next = orders[orderKey].next;
+            // orders[_prev].next = ORDERKEY_SENTINEL;
+            // orders[_next].prev = _prev;
+            delete orders[orderKey];
+        }
+        emit OrderRemoved(orderKey);
+        if (orderQueue.head == ORDERKEY_SENTINEL && orderQueue.tail == ORDERKEY_SENTINEL) {
+            delete orderQueues[pairKey][buySell][_price];
+            BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][buySell];
+            if (priceTree.exists(_price)) {
+                priceTree.remove(_price);
+                // emit LogInfo("orders remove RBT", uint(Price.unwrap(_price)), 0x0, "", address(0));
+            }
+        }
+    }
+    */
+
 }

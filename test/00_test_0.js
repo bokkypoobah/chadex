@@ -184,7 +184,7 @@ describe("Dexz", function () {
 
     await data.printState("After Adding Order(s)");
 
-    const sellBaseTokens = ethers.utils.parseUnits("16.9", data.decimals0);
+    const sellBaseTokens = ethers.utils.parseUnits("69", data.decimals0);
 
     // const FILL_ANY = 0;
     // const FILL_ALL_OR_NOTHING = 1;
