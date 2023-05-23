@@ -85,6 +85,7 @@ contract Owned {
 type PairKey is bytes32;
 type OrderKey is bytes32;
 type Tokens is uint128;
+type Unixtime is uint64;
 
 // ----------------------------------------------------------------------------
 // DexzBase
@@ -222,7 +223,7 @@ contract Orders is DexzBase {
         OrderKey next;
         address maker;
         BuySell buySell;
-        uint64 expiry;
+        Unixtime expiry;
         Tokens baseTokens;        // Original order
         Tokens baseTokensFilled;  // Filled order
     }
@@ -239,7 +240,7 @@ contract Orders is DexzBase {
     Price public constant PRICE_EMPTY = Price.wrap(0);
     OrderKey public constant ORDERKEY_SENTINEL = OrderKey.wrap(0x0);
 
-    event OrderAdded(PairKey indexed pairKey, OrderKey indexed key, address indexed maker, BuySell buySell, Price price, uint64 expiry, Tokens baseTokens);
+    event OrderAdded(PairKey indexed pairKey, OrderKey indexed key, address indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens baseTokens);
     event OrderRemoved(OrderKey indexed key);
     event OrderUpdated(OrderKey indexed key, uint baseTokens, uint newBaseTokens);
 
@@ -274,11 +275,11 @@ contract Orders is DexzBase {
     function generatePairKey(address _baseToken, address _quoteToken) internal pure returns (PairKey) {
         return PairKey.wrap(keccak256(abi.encodePacked(_baseToken, _quoteToken)));
     }
-    function generateOrderKey(BuySell buySell, address _maker, address _baseToken, address _quoteToken, Price _price, uint64 _expiry) internal pure returns (OrderKey) {
+    function generateOrderKey(BuySell buySell, address _maker, address _baseToken, address _quoteToken, Price _price, Unixtime _expiry) internal pure returns (OrderKey) {
         return OrderKey.wrap(keccak256(abi.encodePacked(buySell, _maker, _baseToken, _quoteToken, _price, _expiry)));
     }
     function exists(OrderKey key) internal view returns (bool) {
-        return orders[key].expiry != 0;
+        return Unixtime.unwrap(orders[key].expiry) != 0;
     }
     function inverseBuySell(BuySell buySell) internal pure returns (BuySell inverse) {
         inverse = (buySell == BuySell.Buy) ? BuySell.Sell : BuySell.Buy;
@@ -306,7 +307,7 @@ contract Orders is DexzBase {
         Orders.OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
         return (orderQueue.exists, orderQueue.head, orderQueue.tail);
     }
-    function getOrder(OrderKey orderKey) public view returns (OrderKey _next, address maker, BuySell buySell, uint64 expiry, Tokens baseTokens, Tokens baseTokensFilled) {
+    function getOrder(OrderKey orderKey) public view returns (OrderKey _next, address maker, BuySell buySell, Unixtime expiry, Tokens baseTokens, Tokens baseTokensFilled) {
         Orders.Order memory order = orders[orderKey];
         return (order.next, order.maker, order.buySell, order.expiry, order.baseTokens, order.baseTokensFilled);
     }
@@ -388,7 +389,7 @@ contract Dexz is Orders, ReentrancyGuard {
         uint multiplier;
         uint divisor;
         Price price;
-        uint64 expiry;
+        Unixtime expiry;
         Tokens baseTokens;
         address uiFeeAccount;
     }
@@ -472,7 +473,7 @@ contract Dexz is Orders, ReentrancyGuard {
     //     console.log("multiplier: %s, divisor: %s", multiplier, divisor);
     //     console.log("gasleft - start: %s, end: %s, diff: %s", startGas, endGas, startGas - endGas);
     // }
-    function trade(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, Tokens baseTokens, address uiFeeAccount) public payable reentrancyGuard returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
+    function trade(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, Unixtime expiry, Tokens baseTokens, address uiFeeAccount) public payable reentrancyGuard returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
         return _trade(getTradeInfo(msg.sender, buySell, fill, baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
     }
 
@@ -482,7 +483,7 @@ contract Dexz is Orders, ReentrancyGuard {
     error InsufficientQuoteTokenBalanceOrAllowance(address quoteToken, Tokens quoteTokens, Tokens availableTokens);
     error UnableToFillOrder(Tokens baseTokensUnfilled);
 
-    function getTradeInfo(address taker, BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, Tokens baseTokens, address uiFeeAccount) internal returns (TradeInfo memory tradeInfo) {
+    function getTradeInfo(address taker, BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, Unixtime expiry, Tokens baseTokens, address uiFeeAccount) internal returns (TradeInfo memory tradeInfo) {
         if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice(price, PRICE_MAX);
         }
@@ -560,7 +561,7 @@ contract Dexz is Orders, ReentrancyGuard {
                 // console.logBytes32(prevBestMatchingOrderKey);
                 // console.logBytes32(bestMatchingOrderKey);
                 bool deleteOrder = false;
-                if (order.expiry == 0 || order.expiry >= block.timestamp) {
+                if (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) >= block.timestamp) {
                     uint makerBaseTokensToFill = Tokens.unwrap(order.baseTokens) - Tokens.unwrap(order.baseTokensFilled);
                     uint baseTokensToTransfer;
                     uint quoteTokensToTransfer;
