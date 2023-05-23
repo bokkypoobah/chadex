@@ -237,8 +237,8 @@ class Data {
           price = await this.dexz.getBestPrice(pair.pairKey, buySell);
           while (price != 0) {
             var orderQueue = await this.dexz.getOrderQueue(pair.pairKey, buySell, price);
-            console.log("              price: " + ethers.utils.formatUnits(price, 9) + " head=" + orderQueue[1].substring(0, 10) + " tail=" + orderQueue[2].substring(0, 10));
-            let orderKey = orderQueue[1];
+            console.log("              price: " + ethers.utils.formatUnits(price, 9) + " head=" + orderQueue[0].substring(0, 10) + " tail=" + orderQueue[1].substring(0, 10));
+            let orderKey = orderQueue[0];
             while (orderKey != 0) {
               let order = await this.dexz.getOrder(orderKey);
               var minutes = (order[3] - new Date() / 1000) / 60;

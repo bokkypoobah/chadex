@@ -89,7 +89,6 @@ contract DexzBase {
         uint divisor;
     }
     struct OrderQueue {
-        bool exists; // TODO Delete?
         OrderKey head;
         OrderKey tail;
     }
@@ -120,8 +119,8 @@ contract DexzBase {
     Tokens public constant TOKENS_MAX = Tokens.wrap(999_999_999_999_999_999_999_999_999_999_999); // 2^128 = 340,282,366,920,938,463,463,374,607,431,768,211,456
     OrderKey public constant ORDERKEY_SENTINEL = OrderKey.wrap(0x0);
 
-    mapping(PairKey => Pair) public pairs;
     PairKey[] public pairKeys;
+    mapping(PairKey => Pair) public pairs;
     mapping(PairKey => mapping(BuySell => BokkyPooBahsRedBlackTreeLibrary.Tree)) priceTrees;
     mapping(PairKey => mapping(BuySell => mapping(Price => OrderQueue))) orderQueues;
     mapping(OrderKey => Order) orders;
@@ -210,9 +209,9 @@ contract DexzBase {
         return OrderKey.unwrap(orderKey) != OrderKey.unwrap(ORDERKEY_SENTINEL);
     }
 
-    function getOrderQueue(PairKey pairKey, BuySell buySell, Price price) public view returns (bool _exists, OrderKey head, OrderKey tail) {
+    function getOrderQueue(PairKey pairKey, BuySell buySell, Price price) public view returns (OrderKey head, OrderKey tail) {
         OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
-        return (orderQueue.exists, orderQueue.head, orderQueue.tail);
+        return (orderQueue.head, orderQueue.tail);
     }
     function getOrder(OrderKey orderKey) public view returns (OrderKey _next, address maker, BuySell buySell, Unixtime expiry, Tokens baseTokens, Tokens baseTokensFilled) {
         Order memory order = orders[orderKey];
@@ -257,10 +256,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
             y = (tradeInfo.inverseBuySell == BuySell.Buy) ? priceTrees[tradeInfo.pairKey][tradeInfo.inverseBuySell].prev(x) : priceTrees[tradeInfo.pairKey][tradeInfo.inverseBuySell].next(x);
         }
     }
-    function getMatchingOrderQueue(TradeInfo memory tradeInfo, Price price) public view returns (bool _exists, OrderKey head, OrderKey tail) {
-        OrderQueue memory orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.inverseBuySell][price];
-        return (orderQueue.exists, orderQueue.head, orderQueue.tail);
-    }
+    // function getMatchingOrderQueue(TradeInfo memory tradeInfo, Price price) public view returns (bool _exists, OrderKey head, OrderKey tail) {
+    //     OrderQueue memory orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.inverseBuySell][price];
+    //     return (orderQueue.exists, orderQueue.head, orderQueue.tail);
+    // }
 
     function trade(Action action, BuySell buySell, address baseToken, address quoteToken, Price price, Unixtime expiry, Tokens baseTokens) public payable reentrancyGuard returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
         return _trade(getTradeInfo(msg.sender, action, buySell, baseToken, quoteToken, price, expiry, baseTokens));
@@ -447,8 +446,8 @@ contract Dexz is DexzBase, ReentrancyGuard {
             priceTree.insert(tradeInfo.price);
         }
         OrderQueue storage orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.buySell][tradeInfo.price];
-        if (!orderQueue.exists) {
-            orderQueues[tradeInfo.pairKey][tradeInfo.buySell][tradeInfo.price] = OrderQueue(true, ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
+        if (isSentinel(orderQueue.head)) {
+            orderQueues[tradeInfo.pairKey][tradeInfo.buySell][tradeInfo.price] = OrderQueue(ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
             orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.buySell][tradeInfo.price];
         }
         if (isSentinel(orderQueue.tail)) {
