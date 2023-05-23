@@ -5,6 +5,12 @@ pragma solidity ^0.8.0;
 //
 // STATUS: In Development
 //
+// Notes:
+//   quoteTokens = divisor * baseTokens * price / 10^9 / multiplier
+//   baseTokens = multiplier * quoteTokens * 10^9 / price / divisor
+//   price = multiplier * quoteTokens * 10^9 / baseTokens / divisor
+//
+//
 // https://github.com/bokkypoobah/Dexz
 //
 // SPDX-License-Identifier: MIT
@@ -433,9 +439,11 @@ contract Dexz is Orders, ReentrancyGuard {
             uint multiplier;
             uint divisor;
             if (baseDecimals >= quoteDecimals) {
+                // multiplier = 10 ** uint(baseDecimals - quoteDecimals + 9);
                 multiplier = 10 ** uint(baseDecimals - quoteDecimals);
                 divisor = 1;
             } else {
+                // multiplier = 10 ** uint(9);
                 multiplier = 1;
                 divisor = 10 ** uint(quoteDecimals - baseDecimals);
             }
@@ -446,10 +454,6 @@ contract Dexz is Orders, ReentrancyGuard {
         }
         return TradeInfo(taker, buySell, inverseBuySell(buySell), fill, pairKey, baseToken, quoteToken, pair.multiplier, pair.divisor, price, expiry, baseTokens);
     }
-
-    // quoteTokens = divisor * baseTokens * price / 10^9 / multiplier
-    // baseTokens = multiplier * quoteTokens * 10^9 / price / divisor
-    // price = multiplier * quoteTokens * 10^9 / baseTokens / divisor
 
     function checkTakerAvailableTokens(TradeInfo memory tradeInfo) internal view {
         if (tradeInfo.buySell == BuySell.Buy) {
