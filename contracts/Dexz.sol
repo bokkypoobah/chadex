@@ -38,7 +38,7 @@ type Tokens is uint128;
 type Unixtime is uint64;
 
 enum BuySell { Buy, Sell }
-enum Action { FillAny, FillAllOrNothing, FillAnyAndAddOrder }
+enum Action { FillAny, FillAllOrNothing, FillAnyAndAddOrder, RemoveOrder }
 
 
 interface IERC20 {
