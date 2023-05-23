@@ -145,6 +145,19 @@ contract DexzBase is Owned {
     function pairsLength() public view returns (uint) {
         return pairKeys.length;
     }
+    function getMultiplierAndDivisor(address baseToken, address quoteToken) internal view returns (uint multiplier, uint divisor) {
+        // console.log("gasleft: ", gasleft());
+        uint8 baseDecimals = IERC20(baseToken).decimals();
+        uint8 quoteDecimals = IERC20(quoteToken).decimals();
+        if (baseDecimals >= quoteDecimals) {
+            multiplier = 10 ** uint(baseDecimals - quoteDecimals);
+            divisor = 1;
+        } else {
+            multiplier = 1;
+            divisor = 10 ** uint(quoteDecimals - baseDecimals);
+        }
+        // console.log("gasleft: ", gasleft());
+    }
     function addPair(PairKey pairKey, address baseToken, address quoteToken) internal {
         if (pairs[pairKey].baseToken == address(0)) {
             uint8 baseDecimals = IERC20(baseToken).decimals();
@@ -511,6 +524,8 @@ contract Dexz is Orders, ReentrancyGuard {
         PairKey pairKey;
         address baseToken;
         address quoteToken;
+        uint multiplier;
+        uint divisor;
         Price price;
         uint64 expiry;
         Tokens baseTokens;
@@ -589,15 +604,24 @@ contract Dexz is Orders, ReentrancyGuard {
         return (orderQueue.exists, orderQueue.head, orderQueue.tail);
     }
 
+    // function doSomething(address baseToken, address quoteToken) internal view {
+    //     uint startGas = gasleft();
+    //     (uint multiplier, uint divisor) = getMultiplierAndDivisor(baseToken, quoteToken);
+    //     uint endGas = gasleft();
+    //     console.log("multiplier: %s, divisor: %s", multiplier, divisor);
+    //     console.log("gasleft - start: %s, end: %s, diff: %s", startGas, endGas, startGas - endGas);
+    // }
     // TODO Handle decimals
     function trade(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, Tokens baseTokens, address uiFeeAccount) public payable reentrancyGuard returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
+        // doSomething(baseToken, quoteToken);
         if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice(price, PRICE_MAX);
         }
         if (Tokens.unwrap(baseTokens) > Tokens.unwrap(TOKENS_MAX)) {
             revert InvalidTokens(baseTokens, TOKENS_MAX);
         }
-        return _trade(TradeInfo(msg.sender, buySell, inverseBuySell(buySell), fill, generatePairKey(baseToken, quoteToken), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
+        // return _trade(TradeInfo(msg.sender, buySell, inverseBuySell(buySell), fill, generatePairKey(baseToken, quoteToken), baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
+        return _trade(getTradeInfo(msg.sender, buySell, fill, baseToken, quoteToken, price, expiry, baseTokens, uiFeeAccount));
     }
 
     // TODO: Delete the address fields?
@@ -606,14 +630,38 @@ contract Dexz is Orders, ReentrancyGuard {
     error InsufficientQuoteTokenBalanceOrAllowance(address quoteToken, Tokens quoteTokens, Tokens availableTokens);
     error UnableToFillOrder(Tokens baseTokensUnfilled);
 
-    function _trade(TradeInfo memory tradeInfo) internal returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
-        Pair memory pair = pairs[tradeInfo.pairKey];
+    function getTradeInfo(address taker, BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, Tokens baseTokens, address uiFeeAccount) internal returns (TradeInfo memory tradeInfo) {
+        PairKey pairKey = generatePairKey(baseToken, quoteToken);
+        Pair memory pair = pairs[pairKey];
+        if (pairs[pairKey].baseToken == address(0)) {
+            uint8 baseDecimals = IERC20(baseToken).decimals();
+            uint8 quoteDecimals = IERC20(quoteToken).decimals();
+            uint multiplier;
+            uint divisor;
+            if (baseDecimals >= quoteDecimals) {
+                multiplier = 10 ** uint(baseDecimals - quoteDecimals);
+                divisor = 1;
+            } else {
+                multiplier = 1;
+                divisor = 10 ** uint(quoteDecimals - baseDecimals);
+            }
+            pairs[pairKey] = Pair(baseToken, quoteToken, baseDecimals, quoteDecimals, multiplier, divisor);
+            pairKeys.push(pairKey);
+            emit PairAdded(pairKey, baseToken, quoteToken, baseDecimals, quoteDecimals, multiplier, divisor);
+            pair = pairs[pairKey];
+        }
+        return TradeInfo(taker, buySell, inverseBuySell(buySell), fill, pairKey, baseToken, quoteToken, pair.multiplier, pair.divisor, price, expiry, baseTokens, uiFeeAccount);
+    }
+
+    // quoteTokens = divisor * baseTokens * price / 10^9 / multiplier
+    // baseTokens = multiplier * quoteTokens * 10^9 / price / divisor
+    // price = multiplier * quoteTokens * 10^9 / baseTokens / divisor
+
+    function checkTakerAvailableTokens(TradeInfo memory tradeInfo) internal view {
         if (tradeInfo.buySell == BuySell.Buy) {
             uint availableTokens = availableTokens(tradeInfo.quoteToken, msg.sender);
-            uint multiplier = pair.multiplier == 0 ? 1 : pair.multiplier;
-            uint divisor = pair.divisor == 0 ? 1 : pair.divisor;
             // console.log("          * BUY - Taker quoteTokenAllowance %s: ", availableTokens);
-            uint quoteTokens = divisor * uint(Tokens.unwrap(tradeInfo.baseTokens)) * Price.unwrap(tradeInfo.price) / TENPOW9 / multiplier;
+            uint quoteTokens = tradeInfo.divisor * uint(Tokens.unwrap(tradeInfo.baseTokens)) * Price.unwrap(tradeInfo.price) / TENPOW9 / tradeInfo.multiplier;
             if (availableTokens < quoteTokens) {
                 revert InsufficientQuoteTokenBalanceOrAllowance(tradeInfo.quoteToken, Tokens.wrap(uint128(quoteTokens)), Tokens.wrap(uint128(availableTokens)));
             }
@@ -624,6 +672,10 @@ contract Dexz is Orders, ReentrancyGuard {
                 revert InsufficientBaseTokenBalanceOrAllowance(tradeInfo.baseToken, tradeInfo.baseTokens, Tokens.wrap(uint128(availableTokens)));
             }
         }
+    }
+
+    function _trade(TradeInfo memory tradeInfo) internal returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
+        checkTakerAvailableTokens(tradeInfo);
 
         Price bestMatchingPrice = getMatchingBestPrice(tradeInfo);
         while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
@@ -670,7 +722,7 @@ contract Dexz is Orders, ReentrancyGuard {
                             } else {
                                 baseTokensToTransfer = uint(Tokens.unwrap(tradeInfo.baseTokens));
                             }
-                            quoteTokensToTransfer = pair.divisor * baseTokensToTransfer * Price.unwrap(bestMatchingPrice) / TENPOW9 / pair.multiplier;
+                            quoteTokensToTransfer = tradeInfo.divisor * baseTokensToTransfer * Price.unwrap(bestMatchingPrice) / TENPOW9 / tradeInfo.multiplier;
                             // console.log("              * Base Transfer %s from %s to %s", baseTokensToTransfer, order.maker, msg.sender);
                             require(IERC20(tradeInfo.quoteToken).transferFrom(msg.sender, order.maker, quoteTokensToTransfer));
                             require(IERC20(tradeInfo.baseToken).transferFrom(order.maker, msg.sender, baseTokensToTransfer));
@@ -683,12 +735,12 @@ contract Dexz is Orders, ReentrancyGuard {
                         uint availableQuoteTokens = availableTokens(tradeInfo.quoteToken, order.maker);
                         if (availableQuoteTokens > 0) {
                             // console.log("              * Maker BUY quote - availableQuoteTokens: %s", availableQuoteTokens);
-                            uint availableQuoteTokensInBaseTokens = pair.multiplier * availableQuoteTokens * TENPOW9 / Price.unwrap(bestMatchingPrice) / pair.divisor;
+                            uint availableQuoteTokensInBaseTokens = tradeInfo.multiplier * availableQuoteTokens * TENPOW9 / Price.unwrap(bestMatchingPrice) / tradeInfo.divisor;
                             // console.log("              * Maker BUY quote - availableQuoteTokensInBaseTokens: %s", availableQuoteTokensInBaseTokens);
                             if (makerBaseTokensToFill > availableQuoteTokensInBaseTokens) {
                                 makerBaseTokensToFill = availableQuoteTokensInBaseTokens;
                             } else {
-                                availableQuoteTokens = pair.divisor * makerBaseTokensToFill * Price.unwrap(bestMatchingPrice) / TENPOW9 / pair.multiplier;
+                                availableQuoteTokens = tradeInfo.divisor * makerBaseTokensToFill * Price.unwrap(bestMatchingPrice) / TENPOW9 / tradeInfo.multiplier;
                             }
                             if (Tokens.unwrap(tradeInfo.baseTokens) >= makerBaseTokensToFill) {
                                 baseTokensToTransfer = makerBaseTokensToFill;
@@ -696,7 +748,7 @@ contract Dexz is Orders, ReentrancyGuard {
                                 deleteOrder = true;
                             } else {
                                 baseTokensToTransfer = uint(Tokens.unwrap(tradeInfo.baseTokens));
-                                quoteTokensToTransfer = pair.divisor * baseTokensToTransfer * Price.unwrap(bestMatchingPrice) / TENPOW9 / pair.multiplier;
+                                quoteTokensToTransfer = tradeInfo.divisor * baseTokensToTransfer * Price.unwrap(bestMatchingPrice) / TENPOW9 / tradeInfo.multiplier;
                             }
                             // console.log("              * Maker BUY quote - baseTokensToTransfer: %s", baseTokensToTransfer);
                             require(IERC20(tradeInfo.baseToken).transferFrom(msg.sender, order.maker, baseTokensToTransfer));
@@ -761,7 +813,7 @@ contract Dexz is Orders, ReentrancyGuard {
             baseTokensOnOrder = tradeInfo.baseTokens;
         }
         if (Tokens.unwrap(baseTokensFilled) > 0 || Tokens.unwrap(quoteTokensFilled) > 0) {
-            uint256 price = Tokens.unwrap(baseTokensFilled) > 0 ? uint(pair.multiplier * Tokens.unwrap(quoteTokensFilled)) * TENPOW9 / uint(Tokens.unwrap(baseTokensFilled) / pair.divisor) : 0;
+            uint256 price = Tokens.unwrap(baseTokensFilled) > 0 ? tradeInfo.multiplier * uint(Tokens.unwrap(quoteTokensFilled)) * TENPOW9 / uint(Tokens.unwrap(baseTokensFilled)) / tradeInfo.divisor : 0;
             emit TradeSummary(tradeInfo.buySell, msg.sender, baseTokensFilled, quoteTokensFilled, Price.wrap(uint64(price)), baseTokensOnOrder);
         }
         // console.log("          * baseTokensFilled: %s, quoteTokensFilled: %s, baseTokensOnOrder: %s", baseTokensFilled, quoteTokensFilled, baseTokensOnOrder);
