@@ -9,6 +9,9 @@ pragma solidity ^0.8.0;
 //
 // SPDX-License-Identifier: MIT
 //
+// If you earn fees using your deployment of this code, or derivatives of this
+// code, please send a proportionate amount to bokkypoobah.eth .
+//
 // Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2023
 // ----------------------------------------------------------------------------
 
@@ -609,23 +612,23 @@ contract Dexz is Orders, ReentrancyGuard {
         }
 
         Price bestMatchingPrice = getMatchingBestPrice(tradeInfo);
-        // while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
-        //        ((tradeInfo.buySell == BuySell.Buy && Price.unwrap(bestMatchingPrice) <= Price.unwrap(tradeInfo.price)) ||
-        //         (tradeInfo.buySell == BuySell.Sell && Price.unwrap(bestMatchingPrice) >= Price.unwrap(tradeInfo.price))) &&
-        //        tradeInfo.baseTokens > 0) {
-        while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice)) {
-            if (tradeInfo.buySell == BuySell.Buy) {
-                if (Price.unwrap(bestMatchingPrice) > Price.unwrap(tradeInfo.price)) {
-                    break;
-                }
-            } else if (tradeInfo.buySell == BuySell.Sell) {
-                if (Price.unwrap(bestMatchingPrice) < Price.unwrap(tradeInfo.price)) {
-                    break;
-                }
-            }
-            if (TokenAmount.unwrap(tradeInfo.baseTokens) == 0) {
-                break;
-            }
+        while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
+               ((tradeInfo.buySell == BuySell.Buy && Price.unwrap(bestMatchingPrice) <= Price.unwrap(tradeInfo.price)) ||
+                (tradeInfo.buySell == BuySell.Sell && Price.unwrap(bestMatchingPrice) >= Price.unwrap(tradeInfo.price))) &&
+               TokenAmount.unwrap(tradeInfo.baseTokens) > 0) {
+        // while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice)) {
+        //     if (tradeInfo.buySell == BuySell.Buy) {
+        //         if (Price.unwrap(bestMatchingPrice) > Price.unwrap(tradeInfo.price)) {
+        //             break;
+        //         }
+        //     } else if (tradeInfo.buySell == BuySell.Sell) {
+        //         if (Price.unwrap(bestMatchingPrice) < Price.unwrap(tradeInfo.price)) {
+        //             break;
+        //         }
+        //     }
+        //     if (TokenAmount.unwrap(tradeInfo.baseTokens) == 0) {
+        //         break;
+        //     }
             // console.log("          * bestMatchingPrice: %s, tradeInfo.baseTokens: %s", Price.unwrap(bestMatchingPrice), tradeInfo.baseTokens);
             Orders.OrderQueue storage _orderQueue = orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
             OrderKey bestMatchingOrderKey = _orderQueue.head;
