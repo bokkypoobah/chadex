@@ -660,14 +660,12 @@ contract Dexz is Orders, ReentrancyGuard {
     function checkTakerAvailableTokens(TradeInfo memory tradeInfo) internal view {
         if (tradeInfo.buySell == BuySell.Buy) {
             uint availableTokens = availableTokens(tradeInfo.quoteToken, msg.sender);
-            // console.log("          * BUY - Taker quoteTokenAllowance %s: ", availableTokens);
             uint quoteTokens = tradeInfo.divisor * uint(Tokens.unwrap(tradeInfo.baseTokens)) * Price.unwrap(tradeInfo.price) / TENPOW9 / tradeInfo.multiplier;
             if (availableTokens < quoteTokens) {
                 revert InsufficientQuoteTokenBalanceOrAllowance(tradeInfo.quoteToken, Tokens.wrap(uint128(quoteTokens)), Tokens.wrap(uint128(availableTokens)));
             }
         } else {
             uint availableTokens = availableTokens(tradeInfo.baseToken, msg.sender);
-            // console.log("          * SELL - Taker baseTokenAllowance %s: ", availableTokens);
             if (availableTokens < uint(Tokens.unwrap(tradeInfo.baseTokens))) {
                 revert InsufficientBaseTokenBalanceOrAllowance(tradeInfo.baseToken, tradeInfo.baseTokens, Tokens.wrap(uint128(availableTokens)));
             }
@@ -722,7 +720,7 @@ contract Dexz is Orders, ReentrancyGuard {
                             } else {
                                 baseTokensToTransfer = uint(Tokens.unwrap(tradeInfo.baseTokens));
                             }
-                            quoteTokensToTransfer = tradeInfo.divisor * baseTokensToTransfer * Price.unwrap(bestMatchingPrice) / TENPOW9 / tradeInfo.multiplier;
+                            quoteTokensToTransfer = tradeInfo.divisor * baseTokensToTransfer * uint(Price.unwrap(bestMatchingPrice)) / TENPOW9 / tradeInfo.multiplier;
                             // console.log("              * Base Transfer %s from %s to %s", baseTokensToTransfer, order.maker, msg.sender);
                             require(IERC20(tradeInfo.quoteToken).transferFrom(msg.sender, order.maker, quoteTokensToTransfer));
                             require(IERC20(tradeInfo.baseToken).transferFrom(order.maker, msg.sender, baseTokensToTransfer));
@@ -735,7 +733,7 @@ contract Dexz is Orders, ReentrancyGuard {
                         uint availableQuoteTokens = availableTokens(tradeInfo.quoteToken, order.maker);
                         if (availableQuoteTokens > 0) {
                             // console.log("              * Maker BUY quote - availableQuoteTokens: %s", availableQuoteTokens);
-                            uint availableQuoteTokensInBaseTokens = tradeInfo.multiplier * availableQuoteTokens * TENPOW9 / Price.unwrap(bestMatchingPrice) / tradeInfo.divisor;
+                            uint availableQuoteTokensInBaseTokens = tradeInfo.multiplier * availableQuoteTokens * TENPOW9 / uint(Price.unwrap(bestMatchingPrice)) / tradeInfo.divisor;
                             // console.log("              * Maker BUY quote - availableQuoteTokensInBaseTokens: %s", availableQuoteTokensInBaseTokens);
                             if (makerBaseTokensToFill > availableQuoteTokensInBaseTokens) {
                                 makerBaseTokensToFill = availableQuoteTokensInBaseTokens;
@@ -748,7 +746,7 @@ contract Dexz is Orders, ReentrancyGuard {
                                 deleteOrder = true;
                             } else {
                                 baseTokensToTransfer = uint(Tokens.unwrap(tradeInfo.baseTokens));
-                                quoteTokensToTransfer = tradeInfo.divisor * baseTokensToTransfer * Price.unwrap(bestMatchingPrice) / TENPOW9 / tradeInfo.multiplier;
+                                quoteTokensToTransfer = tradeInfo.divisor * baseTokensToTransfer * uint(Price.unwrap(bestMatchingPrice)) / TENPOW9 / tradeInfo.multiplier;
                             }
                             // console.log("              * Maker BUY quote - baseTokensToTransfer: %s", baseTokensToTransfer);
                             require(IERC20(tradeInfo.baseToken).transferFrom(msg.sender, order.maker, baseTokensToTransfer));
