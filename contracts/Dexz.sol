@@ -250,7 +250,7 @@ contract Orders is DexzBase {
     }
 
     mapping(PairKey => mapping(BuySell => BokkyPooBahsRedBlackTreeLibrary.Tree)) priceTrees;
-    mapping(PairKey => mapping(BuySell => mapping(Price => OrderQueue))) orderQueue;
+    mapping(PairKey => mapping(BuySell => mapping(Price => OrderQueue))) orderQueues;
     mapping(OrderKey => Order) orders;
 
     Price public constant PRICE_EMPTY = Price.wrap(0);
@@ -324,8 +324,8 @@ contract Orders is DexzBase {
     }
 
     function getOrderQueue(PairKey pairKey, BuySell buySell, Price price) public view returns (bool _exists, OrderKey head, OrderKey tail) {
-        Orders.OrderQueue memory _orderQueue = orderQueue[pairKey][buySell][price];
-        return (_orderQueue.exists, _orderQueue.head, _orderQueue.tail);
+        Orders.OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
+        return (orderQueue.exists, orderQueue.head, orderQueue.tail);
     }
     // TODO check type _orderType
     function getOrder(OrderKey orderKey) public view returns (OrderKey _next, address maker, BuySell buySell, uint64 expiry, TokenAmount baseTokens, TokenAmount baseTokensFilled) {
@@ -343,10 +343,10 @@ contract Orders is DexzBase {
     //         bool priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (buySell == BuySell.Buy) ? Price.unwrap(_bestMatchingPriceKey) <= Price.unwrap(price) : Price.unwrap(_bestMatchingPriceKey) >= Price.unwrap(price);
     //         while (priceOk) {
     //             // emit LogInfo("getBestMatchingOrder: _bestMatchingPriceKey", uint(Price.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
-    //             OrderQueue storage _orderQueue = orderQueue[pairKey][_matchingBuySell][_bestMatchingPriceKey];
-    //             if (_orderQueue.exists) {
-    //                 // emit LogInfo("getBestMatchingOrder: orderQueue not empty", uint(Price.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
-    //                 _bestMatchingOrderKey = _orderQueue.head;
+    //             OrderQueue storage orderQueue = orderQueues[pairKey][_matchingBuySell][_bestMatchingPriceKey];
+    //             if (orderQueue.exists) {
+    //                 // emit LogInfo("getBestMatchingOrder: orderQueues not empty", uint(Price.unwrap(_bestMatchingPriceKey)), 0x0, "", address(0));
+    //                 _bestMatchingOrderKey = orderQueue.head;
     //                 while (isNotSentinel(_bestMatchingOrderKey)) {
     //                     Order storage order = orders[_bestMatchingOrderKey];
     //                     // emit LogInfo("getBestMatchingOrder: _bestMatchingOrderKey ", order.expiry, _bestMatchingOrderKey, "", address(0));
@@ -357,12 +357,12 @@ contract Orders is DexzBase {
     //                 }
     //             } else {
     //                 // TODO: REMOVE _bestMatchingPriceKey
-    //                 emit LogInfo("getBestMatchingOrder: orderQueue empty", 0, 0x0, "", address(0));
+    //                 emit LogInfo("getBestMatchingOrder: orderQueues empty", 0, 0x0, "", address(0));
     //             }
     //             _bestMatchingPriceKey = (buySell == BuySell.Buy) ? priceTree.next(_bestMatchingPriceKey) : priceTree.prev(_bestMatchingPriceKey);
     //             priceOk = BokkyPooBahsRedBlackTreeLibrary.isEmpty(_bestMatchingPriceKey) ? false : (buySell == BuySell.Buy) ? Price.unwrap(_bestMatchingPriceKey) <= Price.unwrap(price) : Price.unwrap(_bestMatchingPriceKey) >= Price.unwrap(price);
     //         // SKINNY2 }
-    //         // OrderQueue storage orderQueue = self.orderQueue[pairKey][_orderType][price];
+    //         // OrderQueue storage orderQueues = self.orderQueues[pairKey][_orderType][price];
     //     }
     //     return (BokkyPooBahsRedBlackTreeLibrary.getEmpty(), ORDERKEY_SENTINEL);
     // }
@@ -374,38 +374,38 @@ contract Orders is DexzBase {
     //         Price priceKey = (buySell == BuySell.Buy) ? priceTree.first() : priceTree.last();
     //         while (!BokkyPooBahsRedBlackTreeLibrary.isEmpty(priceKey)) {
     //             // emit LogInfo("updateBestMatchingOrder: priceKey", uint(Price.unwrap(priceKey)), 0x0, "", address(0));
-    //             OrderQueue storage _orderQueue = orderQueue[pairKey][_matchingBuySell][priceKey];
-    //             if (_orderQueue.exists) {
-    //                 // emit LogInfo("updateBestMatchingOrder: orderQueue not empty", uint(Price.unwrap(priceKey)), 0x0, "", address(0));
+    //             OrderQueue storage orderQueue = orderQueues[pairKey][_matchingBuySell][priceKey];
+    //             if (orderQueue.exists) {
+    //                 // emit LogInfo("updateBestMatchingOrder: orderQueues not empty", uint(Price.unwrap(priceKey)), 0x0, "", address(0));
     //
     //                 Order storage order = orders[matchingOrderKey];
     //                 // TODO: What happens when allowance or balance is lower than #baseTokens
     //                 if (_orderFilled) {
-    //                     _orderQueue.head = order.next;
+    //                     orderQueue.head = order.next;
     //                     // TODO
     //                     // if (order.next != ORDERKEY_SENTINEL) {
     //                     //     orders[order.next].prev = ORDERKEY_SENTINEL;
     //                     // }
     //                     // order.prev = ORDERKEY_SENTINEL;
-    //                     if (OrderKey.unwrap(_orderQueue.tail) == OrderKey.unwrap(matchingOrderKey)) {
-    //                         _orderQueue.tail = ORDERKEY_SENTINEL;
+    //                     if (OrderKey.unwrap(orderQueue.tail) == OrderKey.unwrap(matchingOrderKey)) {
+    //                         orderQueue.tail = ORDERKEY_SENTINEL;
     //                     }
     //                     delete orders[matchingOrderKey];
     //                 // Else update head to current if not (skipped expired)
     //                 } else {
-    //                     if (OrderKey.unwrap(_orderQueue.head) != OrderKey.unwrap(matchingOrderKey)) {
-    //                         _orderQueue.head = matchingOrderKey;
+    //                     if (OrderKey.unwrap(orderQueue.head) != OrderKey.unwrap(matchingOrderKey)) {
+    //                         orderQueue.head = matchingOrderKey;
     //                     }
     //                 }
     //                 // Clear out queue info, and prie tree if necessary
-    //                 if (isSentinel(_orderQueue.head)) {
-    //                     delete orderQueue[pairKey][_matchingBuySell][priceKey];
+    //                 if (isSentinel(orderQueue.head)) {
+    //                     delete orderQueues[pairKey][_matchingBuySell][priceKey];
     //                     priceTree.remove(priceKey);
     //                     // emit LogInfo("orders remove RBT", uint(Price.unwrap(priceKey)), 0x0, "", address(0));
     //                 }
     //             } else {
     //                 priceTree.remove(priceKey);
-    //                 emit LogInfo("updateBestMatchingOrder: orderQueue empty", 0, 0x0, "", address(0));
+    //                 emit LogInfo("updateBestMatchingOrder: orderQueues empty", 0, 0x0, "", address(0));
     //
     //             }
     //             priceKey = (buySell == BuySell.Buy) ? priceTree.next(priceKey) : priceTree.prev(priceKey);
@@ -423,19 +423,19 @@ contract Orders is DexzBase {
             priceTree.insert(price);
         } else {
         }
-        OrderQueue storage _orderQueue = orderQueue[pairKey][buySell][price];
-        if (!_orderQueue.exists) {
-            orderQueue[pairKey][buySell][price] = OrderQueue(true, ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
-            _orderQueue = orderQueue[pairKey][buySell][price];
+        OrderQueue storage orderQueue = orderQueues[pairKey][buySell][price];
+        if (!orderQueue.exists) {
+            orderQueues[pairKey][buySell][price] = OrderQueue(true, ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
+            orderQueue = orderQueues[pairKey][buySell][price];
         }
-        if (isSentinel(_orderQueue.tail)) {
-            _orderQueue.head = orderKey;
-            _orderQueue.tail = orderKey;
+        if (isSentinel(orderQueue.tail)) {
+            orderQueue.head = orderKey;
+            orderQueue.tail = orderKey;
             orders[orderKey] = Order(ORDERKEY_SENTINEL, maker, buySell, expiry, baseTokens, TokenAmount.wrap(0));
         } else {
-            orders[_orderQueue.tail].next = orderKey;
+            orders[orderQueue.tail].next = orderKey;
             orders[orderKey] = Order(ORDERKEY_SENTINEL, maker, buySell, expiry, baseTokens, TokenAmount.wrap(0));
-            _orderQueue.tail = orderKey;
+            orderQueue.tail = orderKey;
         }
         emit OrderAdded(pairKey, orderKey, maker, buySell, price, expiry, baseTokens);
     }
@@ -446,32 +446,32 @@ contract Orders is DexzBase {
         require(order.maker == msgSender);
 
         bytes32 pairKey = generatePairKey(order.baseToken, order.quoteToken);
-        OrderQueue storage _orderQueue = orderQueue[pairKey][order.buySell][order.price];
-        require(_orderQueue.exists);
+        OrderQueue storage orderQueue = orderQueues[pairKey][order.buySell][order.price];
+        require(orderQueue.exists);
 
         BuySell buySell = order.buySell;
         Price _price = order.price;
 
         // Only order
-        if (_orderQueue.head == orderKey && _orderQueue.tail == orderKey) {
-            _orderQueue.head = ORDERKEY_SENTINEL;
-            _orderQueue.tail = ORDERKEY_SENTINEL;
+        if (orderQueue.head == orderKey && orderQueue.tail == orderKey) {
+            orderQueue.head = ORDERKEY_SENTINEL;
+            orderQueue.tail = ORDERKEY_SENTINEL;
             delete orders[orderKey];
         // First item
-        } else if (_orderQueue.head == orderKey) {
+    } else if (orderQueue.head == orderKey) {
             bytes32 _next = orders[orderKey].next;
             // TODO
             // orders[_next].prev = ORDERKEY_SENTINEL;
-            _orderQueue.head = _next;
+            orderQueue.head = _next;
             delete orders[orderKey];
         // Last item
-        } else if (_orderQueue.tail == orderKey) {
+    } else if (orderQueue.tail == orderKey) {
             // TODO
             // bytes32 _prev = orders[orderKey].prev;
             // orders[_prev].next = ORDERKEY_SENTINEL;
-            // _orderQueue.tail = _prev;
+            // orderQueue.tail = _prev;
             // TODO
-            _orderQueue.tail = ORDERKEY_SENTINEL;
+            orderQueue.tail = ORDERKEY_SENTINEL;
             delete orders[orderKey];
         // Item in the middle
         } else {
@@ -483,8 +483,8 @@ contract Orders is DexzBase {
             delete orders[orderKey];
         }
         emit OrderRemoved(orderKey);
-        if (_orderQueue.head == ORDERKEY_SENTINEL && _orderQueue.tail == ORDERKEY_SENTINEL) {
-            delete orderQueue[pairKey][buySell][_price];
+        if (orderQueue.head == ORDERKEY_SENTINEL && orderQueue.tail == ORDERKEY_SENTINEL) {
+            delete orderQueues[pairKey][buySell][_price];
             BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][buySell];
             if (priceTree.exists(_price)) {
                 priceTree.remove(_price);
@@ -587,8 +587,8 @@ contract Dexz is Orders, ReentrancyGuard {
         }
     }
     function getMatchingOrderQueue(TradeInfo memory tradeInfo, Price price) public view returns (bool _exists, OrderKey head, OrderKey tail) {
-        Orders.OrderQueue memory _orderQueue = orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][price];
-        return (_orderQueue.exists, _orderQueue.head, _orderQueue.tail);
+        Orders.OrderQueue memory orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.inverseBuySell][price];
+        return (orderQueue.exists, orderQueue.head, orderQueue.tail);
     }
 
     // TODO Handle decimals
@@ -643,8 +643,8 @@ contract Dexz is Orders, ReentrancyGuard {
         //         break;
         //     }
             // console.log("          * bestMatchingPrice: %s, tradeInfo.baseTokens: %s", Price.unwrap(bestMatchingPrice), tradeInfo.baseTokens);
-            Orders.OrderQueue storage _orderQueue = orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
-            OrderKey bestMatchingOrderKey = _orderQueue.head;
+            Orders.OrderQueue storage orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
+            OrderKey bestMatchingOrderKey = orderQueue.head;
             while (isNotSentinel(bestMatchingOrderKey) /*&& tradeInfo.baseTokens > 0*/) {
                 Order storage order = orders[bestMatchingOrderKey];
                 // console.log("            * order - buySell: %s, baseTokens: %s, expiry: %s", uint(order.buySell), order.baseTokens, order.expiry);
@@ -720,9 +720,9 @@ contract Dexz is Orders, ReentrancyGuard {
                     // console.log("            - Deleting Order");
                     OrderKey temp = bestMatchingOrderKey;
                     bestMatchingOrderKey = order.next;
-                    _orderQueue.head = order.next;
-                    if (OrderKey.unwrap(_orderQueue.tail) == OrderKey.unwrap(bestMatchingOrderKey)) {
-                        _orderQueue.tail = ORDERKEY_SENTINEL;
+                    orderQueue.head = order.next;
+                    if (OrderKey.unwrap(orderQueue.tail) == OrderKey.unwrap(bestMatchingOrderKey)) {
+                        orderQueue.tail = ORDERKEY_SENTINEL;
                     }
                     delete orders[temp];
                 } else {
@@ -733,11 +733,11 @@ contract Dexz is Orders, ReentrancyGuard {
                 }
             }
             // console.log("          * Checking Order Queue - head & tail");
-            // console.logBytes32(_orderQueue.head);
-            // console.logBytes32(_orderQueue.tail);
-            if (isSentinel(_orderQueue.head) /*&& _orderQueue.tail == ORDERKEY_SENTINEL*/) {
+            // console.logBytes32(orderQueue.head);
+            // console.logBytes32(orderQueue.tail);
+            if (isSentinel(orderQueue.head) /*&& orderQueue.tail == ORDERKEY_SENTINEL*/) {
                 // console.log("          * Deleting Order Queue");
-                delete orderQueue[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
+                delete orderQueues[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
                 Price tempBestMatchingPrice = getMatchingNextBestPrice(tradeInfo, bestMatchingPrice);
                 BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[tradeInfo.pairKey][tradeInfo.inverseBuySell];
                 if (priceTree.exists(bestMatchingPrice)) {
