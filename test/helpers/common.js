@@ -228,12 +228,12 @@ class Data {
       const pairInfos = [];
       for (let j = 0; j < pairsLength; j++) {
         const info = await this.dexz.pair(j);
-        pairInfos.push({ pairKey: info[0], baseToken: info[1], quoteToken: info[2] })
+        pairInfos.push({ pairKey: info[0], baseToken: info[1], quoteToken: info[2], baseDecimals: info[3], quoteDecimals: info[4], multiplier: info[5], divisor: info[6] })
       }
 
       for (let j = 0; j < pairInfos.length; j++) {
         const pair = pairInfos[j];
-        console.log("          ----- Pair " + pair.pairKey + " " + this.getShortAccountName(pair.baseToken) + "/" + this.getShortAccountName(pair.quoteToken) + " -----");
+        console.log("          ----- Pair " + pair.pairKey + " " + this.getShortAccountName(pair.baseToken) + "/" + this.getShortAccountName(pair.quoteToken) + " " + pair.baseDecimals + "/" + pair.quoteDecimals + " " + pair.multiplier + " " + pair.divisor + " -----");
         for (let buySell = 0; buySell < 2; buySell++) {
           console.log("            --- " + (buySell == 0 ? "Buy" : "Sell") + " Orders ---");
           let orderPriceKey = 0;

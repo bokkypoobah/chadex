@@ -108,6 +108,8 @@ contract DexzBase is Owned {
         address quoteToken;
         uint8 baseDecimals;
         uint8 quoteDecimals;
+        uint multiplier;
+        uint divisor;
     }
 
     mapping(PairKey => Pair) public pairs;
@@ -116,7 +118,7 @@ contract DexzBase is Owned {
     event TakerFeeInEthersUpdated(uint oldTakerFeeInEthers, uint newTakerFeeInEthers);
     event TakerFeeInTokensUpdated(uint oldTakerFeeInTokens, uint newTakerFeeInTokens);
     event FeeAccountUpdated(address oldFeeAccount, address newFeeAccount);
-    event PairAdded(PairKey indexed pairKey, address indexed baseToken, address indexed quoteToken, uint8 baseDecimals, uint8 quoteDecimals);
+    event PairAdded(PairKey indexed pairKey, address indexed baseToken, address indexed quoteToken, uint8 baseDecimals, uint8 quoteDecimals, uint multiplier, uint divisor);
     event LogInfo(string topic, uint number, bytes32 data, string note, address addr);
 
     constructor(address _feeAccount) Owned() {
@@ -135,10 +137,10 @@ contract DexzBase is Owned {
         emit FeeAccountUpdated(feeAccount, _feeAccount);
         feeAccount = _feeAccount;
     }
-    function pair(uint i) public view returns (PairKey pairKey, address baseToken, address quoteToken) {
+    function pair(uint i) public view returns (PairKey pairKey, address baseToken, address quoteToken, uint8 baseDecimals, uint8 quoteDecimals, uint multiplier, uint divisor) {
         pairKey = pairKeys[i];
         Pair memory _pair = pairs[pairKey];
-        return (pairKey, _pair.baseToken, _pair.quoteToken);
+        return (pairKey, _pair.baseToken, _pair.quoteToken, _pair.baseDecimals, _pair.quoteDecimals, _pair.multiplier, _pair.divisor);
     }
     function pairsLength() public view returns (uint) {
         return pairKeys.length;
@@ -147,9 +149,20 @@ contract DexzBase is Owned {
         if (pairs[pairKey].baseToken == address(0)) {
             uint8 baseDecimals = IERC20(baseToken).decimals();
             uint8 quoteDecimals = IERC20(quoteToken).decimals();
-            pairs[pairKey] = Pair(baseToken, quoteToken, baseDecimals, quoteDecimals);
+
+            uint multiplier;
+            uint divisor;
+
+            if (baseDecimals >= quoteDecimals) {
+                multiplier = 10 ** uint(baseDecimals - quoteDecimals);
+                divisor = 1;
+            } else {
+                multiplier = 1;
+                divisor = 10 ** uint(quoteDecimals - baseDecimals);
+            }
+            pairs[pairKey] = Pair(baseToken, quoteToken, baseDecimals, quoteDecimals, multiplier, divisor);
             pairKeys.push(pairKey);
-            emit PairAdded(pairKey, baseToken, quoteToken, baseDecimals, quoteDecimals);
+            emit PairAdded(pairKey, baseToken, quoteToken, baseDecimals, quoteDecimals, multiplier, divisor);
         }
     }
     function availableTokens(address token, address wallet) internal view returns (uint _tokens) {
