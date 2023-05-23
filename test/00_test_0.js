@@ -13,7 +13,7 @@ const Action = {
   FillAny: 0,
   FillAllOrNothing: 1,
   FillAnyAndAddOrder:2,
-  RemoveOrder:3
+  AddOrder:3
 }
 
 let data;
@@ -148,12 +148,10 @@ describe("Dexz", function () {
   it("00. Test 00", async function () {
     console.log("      00. Test 00 - Happy Path - Specified Set");
 
-    // function trade(uint orderFlag, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 _orderKey) {
-
+    // Add Orders
     const price1 = "0.69";
     const price2 = "0.69012345";
     const price3 = "0.6902";
-    // const price = ethers.utils.parseUnits("500", 18);
     const expired = parseInt(new Date()/1000) - 60*60;
     const expiry = parseInt(new Date()/1000) + 60*60;
     const baseTokens1 = ethers.utils.parseUnits("1", data.decimals0);
@@ -189,6 +187,7 @@ describe("Dexz", function () {
 
     await data.printState("After Adding Order(s)");
 
+    // Execute against orders
     const sellBaseTokens = ethers.utils.parseUnits("0.69", data.decimals0);
 
     const trade4Tx = await data.dexz.connect(data.user3Signer).trade(Action.FillAnyAndAddOrder, BuySell.Buy, data.token0.address, data.weth.address, ethers.utils.parseUnits(price2, 9), expiry, sellBaseTokens);

@@ -233,6 +233,11 @@ class Data {
         console.log("          ----- Pair " + pair.pairKey + " " + this.getShortAccountName(pair.baseToken) + "/" + this.getShortAccountName(pair.quoteToken) + " " + pair.multiplier + " " + pair.divisor + " -----");
         for (let buySell = 0; buySell < 2; buySell++) {
           console.log("            --- " + (buySell == 0 ? "Buy" : "Sell") + " Orders ---");
+
+          const results = await this.dexz.getOrders(pair.pairKey, buySell, 10, 0, "0x0000000000000000000000000000000000000000000000000000000000000000");
+          console.log("results: " + JSON.stringify(results));
+
+
           let price = 0;
           price = await this.dexz.getBestPrice(pair.pairKey, buySell);
           while (price != 0) {
