@@ -94,7 +94,7 @@ contract DexzBase is Owned {
     Price public constant PRICE_MAX = Price.wrap(999_999_999_999_999_999); // 2^64 = 18,446,744,073,709,551,616
 
     TokenAmount public constant TOKENAMOUNT_MIN = TokenAmount.wrap(0);
-    TokenAmount public constant TOKENAMOUNT_MAX = TokenAmount.wrap(999_999_999_999_999_999_999_999_999_999_999_999); // 2^128 = 340,282,366,920,938,463,463,374,607,431,768,211,456
+    TokenAmount public constant TOKENAMOUNT_MAX = TokenAmount.wrap(999_999_999_999_999_999_999_999_999_999_999); // 2^128 = 340,282,366,920,938,463,463,374,607,431,768,211,456
 
     uint public takerFeeInEthers = 0; // TODO 5 * 10 ** 16; // 0.05 ETH
     uint public takerFeeInTokens = 0; // TODO 10 * uint(10)**14; // 0.10%
