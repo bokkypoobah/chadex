@@ -83,8 +83,6 @@ contract DexzBase {
     struct Pair {
         address baseToken;
         address quoteToken;
-        uint8 baseDecimals;
-        uint8 quoteDecimals;
         uint multiplier;
         uint divisor;
     }
@@ -144,10 +142,10 @@ contract DexzBase {
     constructor() {
     }
 
-    function pair(uint i) public view returns (PairKey pairKey, address baseToken, address quoteToken, uint8 baseDecimals, uint8 quoteDecimals, uint multiplier, uint divisor) {
+    function pair(uint i) public view returns (PairKey pairKey, address baseToken, address quoteToken, uint multiplier, uint divisor) {
         pairKey = pairKeys[i];
-        Pair memory _pair = pairs[pairKey];
-        return (pairKey, _pair.baseToken, _pair.quoteToken, _pair.baseDecimals, _pair.quoteDecimals, _pair.multiplier, _pair.divisor);
+        Pair memory p = pairs[pairKey];
+        return (pairKey, p.baseToken, p.quoteToken, p.multiplier, p.divisor);
     }
     function pairsLength() public view returns (uint) {
         return pairKeys.length;
@@ -285,7 +283,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 multiplier = 10 ** uint(9);
                 divisor = 10 ** uint(quoteDecimals - baseDecimals);
             }
-            pairs[pairKey] = Pair(baseToken, quoteToken, baseDecimals, quoteDecimals, multiplier, divisor);
+            pairs[pairKey] = Pair(baseToken, quoteToken, multiplier, divisor);
             pairKeys.push(pairKey);
             emit PairAdded(pairKey, baseToken, quoteToken, baseDecimals, quoteDecimals, multiplier, divisor);
         }
