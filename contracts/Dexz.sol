@@ -504,6 +504,7 @@ contract Dexz is Orders, ReentrancyGuard {
 
     // event TradeOld(OrderKey indexed orderKey, BuySell buySell, address indexed taker, address indexed maker, uint amount, address baseToken, address quoteToken, uint baseTokens, uint quoteTokens, uint feeBaseTokens, uint feeQuoteTokens, uint baseTokensFilled);
     event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, address indexed taker, address maker, uint baseTokens, uint quoteTokens, Price price);
+    event TradeSummary(BuySell buySell, address indexed taker, uint baseTokensFilled, uint quoteTokensFilled, Price price, uint baseTokensOnOrder);
 
 
     constructor(address _feeAccount) Orders(_feeAccount) {
@@ -734,6 +735,10 @@ contract Dexz is Orders, ReentrancyGuard {
             orderKey = _addOrder(tradeInfo.buySell, tradeInfo.taker, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
             baseTokensOnOrder = tradeInfo.baseTokens;
         }
+        // if (baseTokensFilled > 0 || quoteTokensFilled > 0) {
+        uint256 price = baseTokensFilled > 0 ? quoteTokensFilled * TENPOW9 / baseTokensFilled : 0;
+        emit TradeSummary(tradeInfo.buySell, msg.sender, baseTokensFilled, quoteTokensFilled, Price.wrap(uint64(price)), baseTokensOnOrder);
+        // }
         // console.log("          * baseTokensFilled: %s, quoteTokensFilled: %s, baseTokensOnOrder: %s", baseTokensFilled, quoteTokensFilled, baseTokensOnOrder);
     }
 

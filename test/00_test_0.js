@@ -142,7 +142,7 @@ describe("Dexz", function () {
     // function trade(uint orderFlag, address baseToken, address quoteToken, uint price, uint expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, bytes32 _orderKey) {
 
     const price1 = "0.69";
-    const price2 = "0.6901";
+    const price2 = "0.69012345";
     const price3 = "0.6902";
     // const price = ethers.utils.parseUnits("500", 18);
     const expired = parseInt(new Date()/1000) - 60*60;
