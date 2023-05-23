@@ -459,8 +459,15 @@ contract Dexz is DexzBase, ReentrancyGuard {
 
     function getOrders(PairKey pairKey, BuySell buySell, uint size, Price price, OrderKey orderKey) public view returns (uint[] memory item) {
         item = new uint[](size);
-        for (uint i = 0; i < size; i++) {
-            item[i] = i;
+        // for (uint i = 0; i < size; i++) {
+        //     item[i] = i;
+        // }
+        uint i;
+        price = getNextBestPrice(pairKey, buySell, price);
+        while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(price) && i < size) {
+            item[i] = Price.unwrap(price);
+            price = getNextBestPrice(pairKey, buySell, price);
+            i++;
         }
     }
 
