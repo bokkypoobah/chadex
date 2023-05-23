@@ -32,7 +32,7 @@ describe("Dexz", function () {
 
     console.log("        --- Setup Tokens and Dexz Contracts. Assuming gasPrice: " + ethers.utils.formatUnits(data.gasPrice, "gwei") + " gwei, ethUsd: " + ethers.utils.formatUnits(data.ethUsd, 18) + " ---");
 
-    const token0 = await Token.deploy("TOK0", "Token0", 24, ethers.utils.parseUnits("400", 24));
+    const token0 = await Token.deploy("TOK0", "Token0", 18, ethers.utils.parseUnits("400", 18));
     // const token0 = await Token.deploy("TOK0", "Token0", 18, ethers.utils.parseUnits("20000", 18));
     await token0.deployed();
     await data.setToken0(token0);
