@@ -86,6 +86,8 @@ type PairKey is bytes32;
 type OrderKey is bytes32;
 type Tokens is uint128;
 type Unixtime is uint64;
+enum BuySell { Buy, Sell }
+enum Fill { Any, AllOrNothing, AnyAndAddOrder }
 
 // ----------------------------------------------------------------------------
 // DexzBase
@@ -145,19 +147,6 @@ contract DexzBase is Owned {
     }
     function pairsLength() public view returns (uint) {
         return pairKeys.length;
-    }
-    function getMultiplierAndDivisor(address baseToken, address quoteToken) internal view returns (uint multiplier, uint divisor) {
-        // console.log("gasleft: ", gasleft());
-        uint8 baseDecimals = IERC20(baseToken).decimals();
-        uint8 quoteDecimals = IERC20(quoteToken).decimals();
-        if (baseDecimals >= quoteDecimals) {
-            multiplier = 10 ** uint(baseDecimals - quoteDecimals);
-            divisor = 1;
-        } else {
-            multiplier = 1;
-            divisor = 10 ** uint(quoteDecimals - baseDecimals);
-        }
-        // console.log("gasleft: ", gasleft());
     }
     function availableTokens(address token, address wallet) internal view returns (uint _tokens) {
         uint _allowance = IERC20(token).allowance(wallet, address(this));
@@ -224,8 +213,8 @@ contract Orders is DexzBase {
         address maker;
         BuySell buySell;
         Unixtime expiry;
-        Tokens baseTokens;        // Original order
-        Tokens baseTokensFilled;  // Filled order
+        Tokens baseTokens;
+        Tokens baseTokensFilled;
     }
     struct OrderQueue {
         bool exists; // TODO Delete?
@@ -368,9 +357,6 @@ contract Orders is DexzBase {
     */
 }
 
-enum BuySell { Buy, Sell }
-
-enum Fill { Any, AllOrNothing, AnyAndAddOrder }
 
 // ----------------------------------------------------------------------------
 // Dexz contract
