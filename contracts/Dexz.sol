@@ -736,7 +736,7 @@ contract Dexz is Orders, ReentrancyGuard {
             baseTokensOnOrder = tradeInfo.baseTokens;
         }
         // if (baseTokensFilled > 0 || quoteTokensFilled > 0) {
-        uint256 price = baseTokensFilled > 0 ? quoteTokensFilled * TENPOW9 / baseTokensFilled : 0;
+        uint256 price = baseTokensFilled > 0 ? quoteTokensFilled * TENPOW9 / baseTokensFilled : Price.unwrap(PRICE_MAX);
         emit TradeSummary(tradeInfo.buySell, msg.sender, baseTokensFilled, quoteTokensFilled, Price.wrap(uint64(price)), baseTokensOnOrder);
         // }
         // console.log("          * baseTokensFilled: %s, quoteTokensFilled: %s, baseTokensOnOrder: %s", baseTokensFilled, quoteTokensFilled, baseTokensOnOrder);
