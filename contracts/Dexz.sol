@@ -424,32 +424,32 @@ contract Orders is DexzBase {
     //     }
     //     return ORDERKEY_SENTINEL;
     // }
-    function _addOrder(BuySell buySell, address maker, address baseToken, address quoteToken, Price price, uint64 expiry, Tokens baseTokens) internal returns (OrderKey orderKey) {
-        PairKey pairKey = generatePairKey(baseToken, quoteToken);
-        orderKey = generateOrderKey(buySell, maker, baseToken, quoteToken, price, expiry);
-        require(orders[orderKey].maker == address(0));
-        addPair(pairKey, baseToken, quoteToken);
-        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][buySell];
-        if (!priceTree.exists(price)) {
-            priceTree.insert(price);
-        } else {
-        }
-        OrderQueue storage orderQueue = orderQueues[pairKey][buySell][price];
-        if (!orderQueue.exists) {
-            orderQueues[pairKey][buySell][price] = OrderQueue(true, ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
-            orderQueue = orderQueues[pairKey][buySell][price];
-        }
-        if (isSentinel(orderQueue.tail)) {
-            orderQueue.head = orderKey;
-            orderQueue.tail = orderKey;
-            orders[orderKey] = Order(ORDERKEY_SENTINEL, maker, buySell, expiry, baseTokens, Tokens.wrap(0));
-        } else {
-            orders[orderQueue.tail].next = orderKey;
-            orders[orderKey] = Order(ORDERKEY_SENTINEL, maker, buySell, expiry, baseTokens, Tokens.wrap(0));
-            orderQueue.tail = orderKey;
-        }
-        emit OrderAdded(pairKey, orderKey, maker, buySell, price, expiry, baseTokens);
-    }
+    // function _addOrderOld(BuySell buySell, address maker, address baseToken, address quoteToken, Price price, uint64 expiry, Tokens baseTokens) internal returns (OrderKey orderKey) {
+    //     PairKey pairKey = generatePairKey(baseToken, quoteToken);
+    //     orderKey = generateOrderKey(buySell, maker, baseToken, quoteToken, price, expiry);
+    //     require(orders[orderKey].maker == address(0));
+    //     addPair(pairKey, baseToken, quoteToken);
+    //     BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][buySell];
+    //     if (!priceTree.exists(price)) {
+    //         priceTree.insert(price);
+    //     } else {
+    //     }
+    //     OrderQueue storage orderQueue = orderQueues[pairKey][buySell][price];
+    //     if (!orderQueue.exists) {
+    //         orderQueues[pairKey][buySell][price] = OrderQueue(true, ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
+    //         orderQueue = orderQueues[pairKey][buySell][price];
+    //     }
+    //     if (isSentinel(orderQueue.tail)) {
+    //         orderQueue.head = orderKey;
+    //         orderQueue.tail = orderKey;
+    //         orders[orderKey] = Order(ORDERKEY_SENTINEL, maker, buySell, expiry, baseTokens, Tokens.wrap(0));
+    //     } else {
+    //         orders[orderQueue.tail].next = orderKey;
+    //         orders[orderKey] = Order(ORDERKEY_SENTINEL, maker, buySell, expiry, baseTokens, Tokens.wrap(0));
+    //         orderQueue.tail = orderKey;
+    //     }
+    //     emit OrderAdded(pairKey, orderKey, maker, buySell, price, expiry, baseTokens);
+    // }
     /*
     function _removeOrder(bytes32 orderKey, address msgSender) internal {
         require(orderKey != ORDERKEY_SENTINEL);
@@ -807,7 +807,7 @@ contract Dexz is Orders, ReentrancyGuard {
         if (Tokens.unwrap(tradeInfo.baseTokens) > 0 && (tradeInfo.fill == Fill.AnyAndAddOrder)) {
             // TODO Skip and remove expired items
             // TODO require(tradeInfo.expiry > block.timestamp);
-            orderKey = _addOrder(tradeInfo.buySell, tradeInfo.taker, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
+            orderKey = _addOrder(tradeInfo);
             baseTokensOnOrder = tradeInfo.baseTokens;
         }
         if (Tokens.unwrap(baseTokensFilled) > 0 || Tokens.unwrap(quoteTokensFilled) > 0) {
@@ -816,6 +816,32 @@ contract Dexz is Orders, ReentrancyGuard {
         }
         // console.log("          * baseTokensFilled: %s, quoteTokensFilled: %s, baseTokensOnOrder: %s", baseTokensFilled, quoteTokensFilled, baseTokensOnOrder);
     }
+
+    function _addOrder(TradeInfo memory tradeInfo) internal returns (OrderKey orderKey) {
+        orderKey = generateOrderKey(tradeInfo.buySell, tradeInfo.taker, tradeInfo.baseToken, tradeInfo.quoteToken, tradeInfo.price, tradeInfo.expiry);
+        require(orders[orderKey].maker == address(0));
+        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[tradeInfo.pairKey][tradeInfo.buySell];
+        if (!priceTree.exists(tradeInfo.price)) {
+            priceTree.insert(tradeInfo.price);
+        } else {
+        }
+        OrderQueue storage orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.buySell][tradeInfo.price];
+        if (!orderQueue.exists) {
+            orderQueues[tradeInfo.pairKey][tradeInfo.buySell][tradeInfo.price] = OrderQueue(true, ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
+            orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.buySell][tradeInfo.price];
+        }
+        if (isSentinel(orderQueue.tail)) {
+            orderQueue.head = orderKey;
+            orderQueue.tail = orderKey;
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, tradeInfo.taker, tradeInfo.buySell, tradeInfo.expiry, tradeInfo.baseTokens, Tokens.wrap(0));
+        } else {
+            orders[orderQueue.tail].next = orderKey;
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, tradeInfo.taker, tradeInfo.buySell, tradeInfo.expiry, tradeInfo.baseTokens, Tokens.wrap(0));
+            orderQueue.tail = orderKey;
+        }
+        emit OrderAdded(tradeInfo.pairKey, orderKey, tradeInfo.taker, tradeInfo.buySell, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
+    }
+
 
     // function tradeOld(BuySell buySell, Fill fill, address baseToken, address quoteToken, Price price, uint64 expiry, uint baseTokens, address uiFeeAccount) public payable returns (uint _baseTokensFilled, uint _quoteTokensFilled, uint _baseTokensOnOrder, OrderKey orderKey) {
     //     if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
