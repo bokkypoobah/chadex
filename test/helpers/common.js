@@ -262,10 +262,10 @@ class Data {
             let orderKey = orderQueue[0];
             while (orderKey != 0) {
               let order = await this.dexz.getOrder(orderKey);
-              var minutes = (order[3] - new Date() / 1000) / 60;
+              var minutes = (order[2] - new Date() / 1000) / 60;
               console.log("                Order key=" + orderKey.substring(0, 10) + " next=" + order[0].substring(0, 10) +
-                " maker=" + this.getShortAccountName(order[1]) + (parseInt(order[2]) == 1 ? " Sell": " Buy") +
-                " expiry=" + minutes.toFixed(2) + "s baseTokens=" + ethers.utils.formatUnits(order[4], pair.baseDecimals) + " baseTokensFilled=" + ethers.utils.formatUnits(order[5], pair.baseDecimals));
+                " maker=" + this.getShortAccountName(order[1]) +
+                " expiry=" + minutes.toFixed(2) + "s baseTokens=" + ethers.utils.formatUnits(order[3], pair.baseDecimals) + " baseTokensFilled=" + ethers.utils.formatUnits(order[4], pair.baseDecimals));
               orderKey = order[0];
             }
             price = await this.dexz.getNextBestPrice(pair.pairKey, buySell, price);

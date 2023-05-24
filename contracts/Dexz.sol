@@ -94,7 +94,6 @@ contract DexzBase {
     struct Order {
         OrderKey next;
         address maker;
-        BuySell buySell; // TODO Delete
         Unixtime expiry;
         Tokens baseTokens;
         Tokens baseTokensFilled;
@@ -212,9 +211,9 @@ contract DexzBase {
         OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
         return (orderQueue.head, orderQueue.tail);
     }
-    function getOrder(OrderKey orderKey) public view returns (OrderKey _next, address maker, BuySell buySell, Unixtime expiry, Tokens baseTokens, Tokens baseTokensFilled) {
+    function getOrder(OrderKey orderKey) public view returns (OrderKey _next, address maker, Unixtime expiry, Tokens baseTokens, Tokens baseTokensFilled) {
         Order memory order = orders[orderKey];
-        return (order.next, order.maker, order.buySell, order.expiry, order.baseTokens, order.baseTokensFilled);
+        return (order.next, order.maker, order.expiry, order.baseTokens, order.baseTokensFilled);
     }
 
     function getMatchingBestPrice(TradeInfo memory tradeInfo) public view returns (Price price) {
@@ -315,10 +314,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
         if (isSentinel(orderQueue.tail)) {
             orderQueue.head = orderKey;
             orderQueue.tail = orderKey;
-            orders[orderKey] = Order(ORDERKEY_SENTINEL, tradeInfo.taker, tradeInfo.buySell, tradeInfo.expiry, tradeInfo.baseTokens, Tokens.wrap(0));
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, tradeInfo.taker, tradeInfo.expiry, tradeInfo.baseTokens, Tokens.wrap(0));
         } else {
             orders[orderQueue.tail].next = orderKey;
-            orders[orderKey] = Order(ORDERKEY_SENTINEL, tradeInfo.taker, tradeInfo.buySell, tradeInfo.expiry, tradeInfo.baseTokens, Tokens.wrap(0));
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, tradeInfo.taker, tradeInfo.expiry, tradeInfo.baseTokens, Tokens.wrap(0));
             orderQueue.tail = orderKey;
         }
         emit OrderAdded(tradeInfo.pairKey, orderKey, tradeInfo.taker, tradeInfo.buySell, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
