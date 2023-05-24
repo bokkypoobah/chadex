@@ -1,4 +1,5 @@
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+const ORDERKEY_SENTINEL = "0x0000000000000000000000000000000000000000000000000000000000000000";
 const BUYORSELL = { BUY: 0, SELL: 1 };
 const ANYORALL = { ANY: 0, ALL: 1 };
 const BUYORSELLSTRING = [ "Buy", "Sell" ];
@@ -39,7 +40,7 @@ class Data {
     [this.deployerSigner, this.user0Signer, this.user1Signer, this.user2Signer, this.user3Signer, this.feeAccountSigner, this.uiFeeAccountSigner] = await ethers.getSigners();
     [this.deployer, this.user0, this.user1, this.user2, this.user3, this.feeAccount, this.uiFeeAccount] = await Promise.all([this.deployerSigner.getAddress(), this.user0Signer.getAddress(), this.user1Signer.getAddress(), this.user2Signer.getAddress(), this.user3Signer.getAddress(), this.feeAccountSigner.getAddress(), this.uiFeeAccountSigner.getAddress()]);
 
-    this.addAccount("0x0000000000000000000000000000000000000000", "null");
+    this.addAccount(ZERO_ADDRESS, "null");
     this.addAccount(this.deployer, "deployer");
     this.addAccount(this.user0, "user0");
     this.addAccount(this.user1, "user1");
@@ -235,7 +236,7 @@ class Data {
         for (let buySell = 0; buySell < 2; buySell++) {
           console.log("            --- " + (buySell == 0 ? "Buy" : "Sell") + " Orders ---");
 
-          const results = await this.dexz.getOrders(pair.pairKey, buySell, 10, 0, "0x0000000000000000000000000000000000000000000000000000000000000000");
+          const results = await this.dexz.getOrders(pair.pairKey, buySell, 10, 0, ORDERKEY_SENTINEL);
           for (let k = 0; k < results[0].length; k++) {
             if (parseInt(results[0][k]) == 0) {
               break;
@@ -246,9 +247,9 @@ class Data {
               this.padLeft(ethers.utils.formatUnits(results[0][k], 9), 12) + " " +
               results[1][k].substring(0, 10) + " " +
               this.getShortAccountName(results[2][k]) + " " +
-              minutes.toFixed(2) + " " +
-              ethers.utils.formatUnits(results[4][k], pair.baseDecimals) + " " +
-              ethers.utils.formatUnits(results[5][k], pair.baseDecimals));
+              this.padLeft(minutes.toFixed(2), 10) + " " +
+              this.padLeft(ethers.utils.formatUnits(results[4][k], pair.baseDecimals), 12) + " " +
+              this.padLeft(ethers.utils.formatUnits(results[5][k], pair.baseDecimals), 12));
           }
 
           let price = 0;
@@ -385,6 +386,7 @@ const generateRange = (start, stop, step) => Array.from({ length: (stop - start)
 /* Exporting the module */
 module.exports = {
     ZERO_ADDRESS,
+    ORDERKEY_SENTINEL,
     BUYORSELL,
     ANYORALL,
     BUYORSELLSTRING,
