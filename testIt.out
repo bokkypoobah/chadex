@@ -78,23 +78,23 @@
       00. Test 00 - Happy Path - Specified Set
         > user0->dexz.trade(FillAnyAndAddOrder, SELL, token0, WETH, 0.69, expiry, baseTokens1, []) - gasUsed: 304326 ~ ETH 0.01217304 ~ USD 24
           + Dexz:0xCf7E 29.0 PairAdded(pairKey: 0x4c03...1e77, baseToken: Token0:0x5FbD, quoteToken: WETH:0x9fE4, baseDecimals: 18, quoteDecimals: 18, multiplier: 9, divisor: 0)
-          + Dexz:0xCf7E 29.1 OrderAdded(pairKey: 0x4c03...1e77, key: 0x5059...f249, maker: user0:0x7099, buySell: 1, price: 0.69, expiry: 1684908054, baseTokens: 1.0)
+          + Dexz:0xCf7E 29.1 OrderAdded(pairKey: 0x4c03...1e77, key: 0xeccf...3ae8, maker: user0:0x7099, buySell: 1, price: 0.69, expiry: 1684908637, baseTokens: 1.0)
         > user1->dexz.trade(FillAnyAndAddOrder, SELL, token0, WETH, 0.69, expiry, baseTokens2, []) - gasUsed: 126765 ~ ETH 0.0050706 ~ USD 10
-          + Dexz:0xCf7E 30.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0xa069...d4e6, maker: user1:0x3C44, buySell: 1, price: 0.69, expiry: 1684908054, baseTokens: 2.0)
+          + Dexz:0xCf7E 30.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0x1e36...9a6e, maker: user1:0x3C44, buySell: 1, price: 0.69, expiry: 1684908637, baseTokens: 2.0)
         > user2->dexz.trade(FillAnyAndAddOrder, SELL, token0, WETH, 0.69, expiry, baseTokens3, []) - gasUsed: 126765 ~ ETH 0.0050706 ~ USD 10
-          + Dexz:0xCf7E 31.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0xb77f...7b1d, maker: user2:0x90F7, buySell: 1, price: 0.69, expiry: 1684908054, baseTokens: 3.0)
+          + Dexz:0xCf7E 31.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0xdc5a...a874, maker: user2:0x90F7, buySell: 1, price: 0.69, expiry: 1684908637, baseTokens: 3.0)
         > user0->dexz.trade(FillAnyAndAddOrder, SELL, token0, WETH, 0.69012345, expiry, baseTokens1, []) - gasUsed: 173603 ~ ETH 0.00694412 ~ USD 13
-          + Dexz:0xCf7E 32.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0x11da...dea1, maker: user0:0x7099, buySell: 1, price: 0.69012345, expiry: 1684908054, baseTokens: 1.0)
+          + Dexz:0xCf7E 32.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0xeab7...6f01, maker: user0:0x7099, buySell: 1, price: 0.69012345, expiry: 1684908637, baseTokens: 1.0)
         > user1->dexz.trade(FillAnyAndAddOrder, SELL, token0, WETH, 0.69012345, expiry, baseTokens2, []) - gasUsed: 128968 ~ ETH 0.00515872 ~ USD 10
-          + Dexz:0xCf7E 33.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0x6bd6...bc2c, maker: user1:0x3C44, buySell: 1, price: 0.69012345, expiry: 1684908054, baseTokens: 2.0)
+          + Dexz:0xCf7E 33.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0xce7f...f105, maker: user1:0x3C44, buySell: 1, price: 0.69012345, expiry: 1684908637, baseTokens: 2.0)
         > user2->dexz.trade(FillAnyAndAddOrder, SELL, token0, WETH, 0.69012345, expiry, baseTokens3, []) - gasUsed: 128968 ~ ETH 0.00515872 ~ USD 10
-          + Dexz:0xCf7E 34.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0xbdf6...078d, maker: user2:0x90F7, buySell: 1, price: 0.69012345, expiry: 1684908054, baseTokens: 3.0)
+          + Dexz:0xCf7E 34.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0x996e...3c71, maker: user2:0x90F7, buySell: 1, price: 0.69012345, expiry: 1684908637, baseTokens: 3.0)
         > user0->dexz.trade(FillAnyAndAddOrder, SELL, token0, WETH, 0.6902, expiry, baseTokens1, []) - gasUsed: 188280 ~ ETH 0.0075312 ~ USD 15
-          + Dexz:0xCf7E 35.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0x6b53...305f, maker: user0:0x7099, buySell: 1, price: 0.6902, expiry: 1684908054, baseTokens: 1.0)
+          + Dexz:0xCf7E 35.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0x6008...ee20, maker: user0:0x7099, buySell: 1, price: 0.6902, expiry: 1684908637, baseTokens: 1.0)
         > user1->dexz.trade(FillAnyAndAddOrder, SELL, token0, WETH, 0.6902, expiry, baseTokens2, []) - gasUsed: 128968 ~ ETH 0.00515872 ~ USD 10
-          + Dexz:0xCf7E 36.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0x4745...75d9, maker: user1:0x3C44, buySell: 1, price: 0.6902, expiry: 1684908054, baseTokens: 2.0)
+          + Dexz:0xCf7E 36.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0x3a0e...4e1a, maker: user1:0x3C44, buySell: 1, price: 0.6902, expiry: 1684908637, baseTokens: 2.0)
         > user2->dexz.trade(FillAnyAndAddOrder, SELL, token0, WETH, 0.6902, expiry, baseTokens3, []) - gasUsed: 128968 ~ ETH 0.00515872 ~ USD 10
-          + Dexz:0xCf7E 37.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0xd36e...b3da, maker: user2:0x90F7, buySell: 1, price: 0.6902, expiry: 1684908054, baseTokens: 3.0)
+          + Dexz:0xCf7E 37.0 OrderAdded(pairKey: 0x4c03...1e77, key: 0x41d7...5fa1, maker: user2:0x90F7, buySell: 1, price: 0.6902, expiry: 1684908637, baseTokens: 3.0)
 
         --- After Adding Order(s) ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
@@ -113,109 +113,20 @@
 
               #   SELL Price OrderKey   Next       Maker         Expiry(s)   BaseTokens       Filled
             --- ------------ ---------- ---------- ------------ ---------- ------------ ------------
-              0         0.69 0x505994f4 0xa069d297 user0:0x7099      60.00          1.0          0.0
-              1         0.69 0xa069d297 0xb77fae85 user1:0x3C44      60.00          2.0          0.0
-              2         0.69 0xb77fae85 0x00000000 user2:0x90F7      60.00          3.0          0.0
-              3   0.69012345 0x11da98b8 0x6bd61b6d user0:0x7099      60.00          1.0          0.0
-              4   0.69012345 0x6bd61b6d 0xbdf64cae user1:0x3C44      60.00          2.0          0.0
-              5   0.69012345 0xbdf64cae 0x00000000 user2:0x90F7      60.00          3.0          0.0
-              6       0.6902 0x6b53e411 0x4745869d user0:0x7099      60.00          1.0          0.0
-              7       0.6902 0x4745869d 0xd36ead58 user1:0x3C44      60.00          2.0          0.0
-              8       0.6902 0xd36ead58 0x00000000 user2:0x90F7      60.00          3.0          0.0
+              0         0.69 0xeccf538c 0x1e3650b9 user0:0x7099      59.99          1.0          0.0
+              1         0.69 0x1e3650b9 0xdc5a1e13 user1:0x3C44      59.99          2.0          0.0
+              2         0.69 0xdc5a1e13 0x00000000 user2:0x90F7      59.99          3.0          0.0
+              3   0.69012345 0xeab7f8d2 0xce7fb5b0 user0:0x7099      59.99          1.0          0.0
+              4   0.69012345 0xce7fb5b0 0x996e6ccc user1:0x3C44      59.99          2.0          0.0
+              5   0.69012345 0x996e6ccc 0x00000000 user2:0x90F7      59.99          3.0          0.0
+              6       0.6902 0x6008e373 0x3a0ed926 user0:0x7099      59.99          1.0          0.0
+              7       0.6902 0x3a0ed926 0x41d73e92 user1:0x3C44      59.99          2.0          0.0
+              8       0.6902 0x41d73e92 0x00000000 user2:0x90F7      59.99          3.0          0.0
 
-          dexzData: {
-  "0x4c038ad6bfca2133ee6f20ac54377d10fb6f3756d2321ead7428e24817161e77": {
-    "baseToken": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-    "quoteToken": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
-    "multiplier": 9,
-    "divisor": 0,
-    "baseDecimals": 18,
-    "quoteDecimals": 18,
-    "orders": [
-      {
-        "price": 690000000,
-        "orderKey": "0x505994f47869ecf8bc2039b15649f9dae5fa2a52b9071db49575fd0b4308f249",
-        "nextOrderKey": "0xa069d29780d8c06c4d96d6135853f0b30560d63c48f49fee2370cfb77389d4e6",
-        "maker": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
-        "expiry": 1684908054,
-        "baseTokens": "1000000000000000000",
-        "baseTokensFilled": "0"
-      },
-      {
-        "price": 690000000,
-        "orderKey": "0xa069d29780d8c06c4d96d6135853f0b30560d63c48f49fee2370cfb77389d4e6",
-        "nextOrderKey": "0xb77fae85c380a7c540e8a495fc395132b8c48ce95caa70478afa4480a2be7b1d",
-        "maker": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-        "expiry": 1684908054,
-        "baseTokens": "2000000000000000000",
-        "baseTokensFilled": "0"
-      },
-      {
-        "price": 690000000,
-        "orderKey": "0xb77fae85c380a7c540e8a495fc395132b8c48ce95caa70478afa4480a2be7b1d",
-        "nextOrderKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
-        "maker": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-        "expiry": 1684908054,
-        "baseTokens": "3000000000000000000",
-        "baseTokensFilled": "0"
-      },
-      {
-        "price": 690123450,
-        "orderKey": "0x11da98b812b5fc861b05acab9aaf25d04635940614b519e6141f239d5c70dea1",
-        "nextOrderKey": "0x6bd61b6d2972ed4e5e204b3ec7416d06f3c7afa8d8ec1a21765c4c7ae172bc2c",
-        "maker": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
-        "expiry": 1684908054,
-        "baseTokens": "1000000000000000000",
-        "baseTokensFilled": "0"
-      },
-      {
-        "price": 690123450,
-        "orderKey": "0x6bd61b6d2972ed4e5e204b3ec7416d06f3c7afa8d8ec1a21765c4c7ae172bc2c",
-        "nextOrderKey": "0xbdf64cae151ef417a4d171c075e0fd3c049612bea0b5cea2daa54c812162078d",
-        "maker": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-        "expiry": 1684908054,
-        "baseTokens": "2000000000000000000",
-        "baseTokensFilled": "0"
-      },
-      {
-        "price": 690123450,
-        "orderKey": "0xbdf64cae151ef417a4d171c075e0fd3c049612bea0b5cea2daa54c812162078d",
-        "nextOrderKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
-        "maker": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-        "expiry": 1684908054,
-        "baseTokens": "3000000000000000000",
-        "baseTokensFilled": "0"
-      },
-      {
-        "price": 690200000,
-        "orderKey": "0x6b53e411f41c69249f77bbb971d27c05d4935030e334b4586ccd6f059a12305f",
-        "nextOrderKey": "0x4745869dac6c58083241ddfc5f1b653cff855f96dbf9c2deec119d39055b75d9",
-        "maker": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
-        "expiry": 1684908054,
-        "baseTokens": "1000000000000000000",
-        "baseTokensFilled": "0"
-      },
-      {
-        "price": 690200000,
-        "orderKey": "0x4745869dac6c58083241ddfc5f1b653cff855f96dbf9c2deec119d39055b75d9",
-        "nextOrderKey": "0xd36ead5818ac7d3a3ef9576afb055501202524da39c1389a35e48d935b36b3da",
-        "maker": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-        "expiry": 1684908054,
-        "baseTokens": "2000000000000000000",
-        "baseTokensFilled": "0"
-      },
-      {
-        "price": 690200000,
-        "orderKey": "0xd36ead5818ac7d3a3ef9576afb055501202524da39c1389a35e48d935b36b3da",
-        "nextOrderKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
-        "maker": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-        "expiry": 1684908054,
-        "baseTokens": "3000000000000000000",
-        "baseTokensFilled": "0"
-      }
-    ]
-  }
-}
+          Pair 0x4c038ad6bfca2133ee6f20ac54377d10fb6f3756d2321ead7428e24817161e77 Token0:0x5FbD WETH:0x9fE4 9 0 18 18
+{"price":690000000,"orderKey":"0xeccf538ca72e2cc79b5bde0ee246c7501f4c3f327900e06cf380173158123ae8","nextOrderKey":"0x1e3650b9ae9b48d56ee683b49530a333e1476ca0e05cf47d37a8c0bcc2939a6e","maker":"0x70997970C51812dc3A010C7d01b50e0d17dc79C8","expiry":1684908637,"baseTokens":"1000000000000000000","baseTokensFilled":"0"}
+{"price":690123450,"orderKey":"0xeab7f8d260956a438b7ff5f711fb832b1bfe439df83ed9e1e5cbc757e7a66f01","nextOrderKey":"0xce7fb5b0650f752026bf75c10c1b5b8123e1736ce75a86d601a8038ebe77f105","maker":"0x70997970C51812dc3A010C7d01b50e0d17dc79C8","expiry":1684908637,"baseTokens":"1000000000000000000","baseTokensFilled":"0"}
+{"price":690200000,"orderKey":"0x6008e373637c8f2da9b36637a405b63b6ef00da8bf7c5999b8f8a4c6bd3dee20","nextOrderKey":"0x3a0ed926e0435bf3adccd964e69e7d820f05a211a087afe72d3e069c64994e1a","maker":"0x70997970C51812dc3A010C7d01b50e0d17dc79C8","expiry":1684908637,"baseTokens":"1000000000000000000","baseTokensFilled":"0"}
 
         --- After Executing Against Order(s) ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
@@ -234,17 +145,17 @@
 
               #   SELL Price OrderKey   Next       Maker         Expiry(s)   BaseTokens       Filled
             --- ------------ ---------- ---------- ------------ ---------- ------------ ------------
-              0         0.69 0x505994f4 0xa069d297 user0:0x7099      59.99          1.0          0.0
-              1         0.69 0xa069d297 0xb77fae85 user1:0x3C44      59.99          2.0          0.0
-              2         0.69 0xb77fae85 0x00000000 user2:0x90F7      59.99          3.0          0.0
-              3   0.69012345 0x11da98b8 0x6bd61b6d user0:0x7099      59.99          1.0          0.0
-              4   0.69012345 0x6bd61b6d 0xbdf64cae user1:0x3C44      59.99          2.0          0.0
-              5   0.69012345 0xbdf64cae 0x00000000 user2:0x90F7      59.99          3.0          0.0
-              6       0.6902 0x6b53e411 0x4745869d user0:0x7099      59.99          1.0          0.0
-              7       0.6902 0x4745869d 0xd36ead58 user1:0x3C44      59.99          2.0          0.0
-              8       0.6902 0xd36ead58 0x00000000 user2:0x90F7      59.99          3.0          0.0
+              0         0.69 0xeccf538c 0x1e3650b9 user0:0x7099      59.99          1.0          0.0
+              1         0.69 0x1e3650b9 0xdc5a1e13 user1:0x3C44      59.99          2.0          0.0
+              2         0.69 0xdc5a1e13 0x00000000 user2:0x90F7      59.99          3.0          0.0
+              3   0.69012345 0xeab7f8d2 0xce7fb5b0 user0:0x7099      59.99          1.0          0.0
+              4   0.69012345 0xce7fb5b0 0x996e6ccc user1:0x3C44      59.99          2.0          0.0
+              5   0.69012345 0x996e6ccc 0x00000000 user2:0x90F7      59.99          3.0          0.0
+              6       0.6902 0x6008e373 0x3a0ed926 user0:0x7099      59.99          1.0          0.0
+              7       0.6902 0x3a0ed926 0x41d73e92 user1:0x3C44      59.99          2.0          0.0
+              8       0.6902 0x41d73e92 0x00000000 user2:0x90F7      59.99          3.0          0.0
 
-    ✔ 00. Test 00 (332ms)
+    ✔ 00. Test 00 (305ms)
 
 
   1 passing (1s)

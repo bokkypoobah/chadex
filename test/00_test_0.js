@@ -194,8 +194,24 @@ describe("Dexz", function () {
 
     // Delete orders
     const dexzData = await data.getDexzData();
-    console.log("          dexzData: " + JSON.stringify(dexzData, null, 2));
+    // console.log("          dexzData: " + JSON.stringify(dexzData, null, 2));
 
+    for (const [pairKey, pair] of Object.entries(dexzData)) {
+      console.log("          Pair " + pairKey + " " + data.getShortAccountName(pair.baseToken) + " " + data.getShortAccountName(pair.quoteToken) + " " + pair.multiplier + " " + pair.divisor + " " + pair.baseDecimals + " " + pair.quoteDecimals);
+
+      // "baseToken": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      // "quoteToken": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+      // "multiplier": 9,
+      // "divisor": 0,
+      // "baseDecimals": 18,
+      // "quoteDecimals": 18,
+
+      for (const order of pair.orders) {
+        if (order.maker == data.user0) {
+          console.log(JSON.stringify(order));
+        }
+      }
+    }
 
     await data.printState("After Executing Against Order(s)");
   });
