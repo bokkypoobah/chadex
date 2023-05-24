@@ -125,8 +125,8 @@ contract DexzBase {
     mapping(OrderKey => Order) orders;
 
     event PairAdded(PairKey indexed pairKey, address indexed baseToken, address indexed quoteToken, uint8 baseDecimals, uint8 quoteDecimals, Factor multiplier, Factor divisor);
-    event OrderAdded(PairKey indexed pairKey, OrderKey indexed key, address indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens baseTokens);
-    event OrderRemoved(OrderKey indexed key);
+    event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, address indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens baseTokens);
+    event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, address indexed maker, BuySell buySell, Price price);
     event OrderUpdated(OrderKey indexed key, uint baseTokens, uint newBaseTokens);
     event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, address indexed taker, address maker, uint baseTokens, uint quoteTokens, Price price);
     event TradeSummary(BuySell buySell, address indexed taker, Tokens baseTokensFilled, Tokens quoteTokensFilled, Price price, Tokens baseTokensOnOrder);
@@ -263,8 +263,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
 
-    event RemoveOrderKey(Price price, OrderKey previousOrderKey, OrderKey orderKey);
-    event RemovePrice(Price price);
+    // event RemovePrice(Price price);
     function removeOrders(PairKey[] calldata _pairKeys, BuySell[] calldata buySells, OrderKey[][] calldata orderKeyss) public {
         for (uint i = 0; i < _pairKeys.length; i++) {
             PairKey pairKey = _pairKeys[i];
@@ -285,7 +284,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                     Order memory order = orders[orderKey];
                     if (deleteOrder) {
                         OrderKey temp = orderKey;
-                        emit RemoveOrderKey(price, previousOrderKey, orderKey);
+                        emit OrderRemoved(pairKey, orderKey, order.maker, buySell, price);
                         if (OrderKey.unwrap(orderQueue.head) == OrderKey.unwrap(orderKey)) {
                             orderQueue.head = order.next;
                         } else {
@@ -307,7 +306,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                     Price tempPrice = getNextBestPrice(pairKey, buySell, price);
                     BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][buySell];
                     if (priceTree.exists(price)) {
-                        emit RemovePrice(price);
+                        // emit RemovePrice(price);
                         priceTree.remove(price);
                     }
                     price = tempPrice;
@@ -593,60 +592,4 @@ contract Dexz is DexzBase, ReentrancyGuard {
         _removeOrder(key, msg.sender);
     }
     */
-
-    /*
-    function _removeOrder(bytes32 orderKey, address msgSender) internal {
-        require(orderKey != ORDERKEY_SENTINEL);
-        Order memory order = orders[orderKey];
-        require(order.maker == msgSender);
-
-        bytes32 pairKey = generatePairKey(order.baseToken, order.quoteToken);
-        OrderQueue storage orderQueue = orderQueues[pairKey][order.buySell][order.price];
-        require(orderQueue.exists);
-
-        BuySell buySell = order.buySell;
-        Price _price = order.price;
-
-        // Only order
-        if (orderQueue.head == orderKey && orderQueue.tail == orderKey) {
-            orderQueue.head = ORDERKEY_SENTINEL;
-            orderQueue.tail = ORDERKEY_SENTINEL;
-            delete orders[orderKey];
-        // First item
-    } else if (orderQueue.head == orderKey) {
-            bytes32 _next = orders[orderKey].next;
-            // TODO
-            // orders[_next].prev = ORDERKEY_SENTINEL;
-            orderQueue.head = _next;
-            delete orders[orderKey];
-        // Last item
-    } else if (orderQueue.tail == orderKey) {
-            // TODO
-            // bytes32 _prev = orders[orderKey].prev;
-            // orders[_prev].next = ORDERKEY_SENTINEL;
-            // orderQueue.tail = _prev;
-            // TODO
-            orderQueue.tail = ORDERKEY_SENTINEL;
-            delete orders[orderKey];
-        // Item in the middle
-        } else {
-            // TODO
-            // bytes32 _prev = orders[orderKey].prev;
-            bytes32 _next = orders[orderKey].next;
-            // orders[_prev].next = ORDERKEY_SENTINEL;
-            // orders[_next].prev = _prev;
-            delete orders[orderKey];
-        }
-        emit OrderRemoved(orderKey);
-        if (orderQueue.head == ORDERKEY_SENTINEL && orderQueue.tail == ORDERKEY_SENTINEL) {
-            delete orderQueues[pairKey][buySell][_price];
-            BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][buySell];
-            if (priceTree.exists(_price)) {
-                priceTree.remove(_price);
-                // emit LogInfo("orders remove RBT", uint(Price.unwrap(_price)), 0x0, "", address(0));
-            }
-        }
-    }
-    */
-
 }
