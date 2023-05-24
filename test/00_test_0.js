@@ -208,7 +208,7 @@ describe("Dexz", function () {
     for (const [pairKey, pair] of Object.entries(dexzData)) {
       console.log("          Pair " + pairKey + " " + data.getShortAccountName(pair.baseToken) + " " + data.getShortAccountName(pair.quoteToken) + " " + pair.multiplier + " " + pair.divisor + " " + pair.baseDecimals + " " + pair.quoteDecimals);
       for (let buySell = 0; buySell < 2; buySell++) {
-        const myOrders = pair.orders[buySell].filter(e => e.maker == data.user0).map(e => e.orderKey);
+        const myOrders = pair.orders[buySell].filter(e => e.maker == data.user1).map(e => e.orderKey);
         if (myOrders.length > 0) {
           pairKeys.push(pairKey);
           buySells.push(buySell);
@@ -221,8 +221,8 @@ describe("Dexz", function () {
     console.log("          buySells: " + JSON.stringify(buySells));
     console.log("          orders: " + JSON.stringify(orders));
 
-    const removeOrders1Tx = await data.dexz.connect(data.user0Signer).removeOrders(pairKeys, buySells, orders);
-    await data.printEvents("user0->dexz.removeOrders(pairKeys, buySells, orders)", await removeOrders1Tx.wait());
+    const removeOrders1Tx = await data.dexz.connect(data.user1Signer).removeOrders(pairKeys, buySells, orders);
+    await data.printEvents("user1->dexz.removeOrders(pairKeys, buySells, orders)", await removeOrders1Tx.wait());
 
 
     await data.printState("After Removing Orders");

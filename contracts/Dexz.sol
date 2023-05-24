@@ -134,7 +134,7 @@ contract DexzBase {
     event PairAdded(PairKey indexed pairKey, Token indexed base, Token indexed quote, uint8 baseDecimals, uint8 quoteDecimals, Factor multiplier, Factor divisor);
     event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens);
     event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, Tokens filled);
-    event OrderUpdated(OrderKey indexed key, uint baseTokens, uint newBaseTokens);
+    event OrderUpdated(OrderKey indexed key, uint tokens, uint newTokens);
     event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, Account indexed taker, Account maker, uint tokens, uint quoteTokens, Price price);
     event TradeSummary(BuySell buySell, Account indexed taker, Tokens filled, Tokens quoteTokensFilled, Price price, Tokens tokensOnOrder);
     event LogInfo(string topic, uint number, bytes32 data, string note, address addr);
@@ -143,9 +143,9 @@ contract DexzBase {
     error InvalidTokens(Tokens tokenAmount, Tokens tokenAmountMax);
     error TransferFromFailedApproval(Token token, Account from, Account to, uint _tokens, uint _approved);
     error TransferFromFailed(Token token, Account from, Account to, uint _tokens);
-    error InsufficientBaseTokenBalanceOrAllowance(Token base, Tokens baseTokens, Tokens availableTokens);
+    error InsufficientTokenBalanceOrAllowance(Token base, Tokens tokens, Tokens availableTokens);
     error InsufficientQuoteTokenBalanceOrAllowance(Token quote, Tokens quoteTokens, Tokens availableTokens);
-    error UnableToFillOrder(Tokens baseTokensUnfilled);
+    error UnableToFillOrder(Tokens unfilled);
 
     constructor() {
     }
@@ -219,7 +219,7 @@ contract DexzBase {
         OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
         return (orderQueue.head, orderQueue.tail);
     }
-    function getOrder(OrderKey orderKey) public view returns (OrderKey _next, Account maker, Unixtime expiry, Tokens baseTokens, Tokens filled) {
+    function getOrder(OrderKey orderKey) public view returns (OrderKey _next, Account maker, Unixtime expiry, Tokens tokens, Tokens filled) {
         Order memory order = orders[orderKey];
         return (order.next, order.maker, order.expiry, order.tokens, order.filled);
     }
@@ -241,7 +241,6 @@ contract DexzBase {
         tokens = allowance < balance ? allowance : balance;
     }
     function transferFrom(Token token, Account from, Account to, uint tokens) internal {
-        // Handle ERC20 tokens that do not return true/false
         (bool success, bytes memory data) = Token.unwrap(token).call(abi.encodeWithSelector(IERC20.transferFrom.selector, Account.unwrap(from), Account.unwrap(to), tokens));
         if (!success || (data.length != 0 && !abi.decode(data, (bool)))) {
             revert TransferFromFailed(token, from, to, tokens);
@@ -262,9 +261,9 @@ contract Dexz is DexzBase, ReentrancyGuard {
     constructor() DexzBase() {
     }
 
-    function trade(Action action, BuySell buySell, Token base, Token quote, Price price, Unixtime expiry, Tokens baseTokens, OrderKey[] calldata orderKeys) public reentrancyGuard returns (Tokens filled, Tokens quoteTokensFilled, Tokens tokensOnOrder, OrderKey orderKey) {
+    function trade(Action action, BuySell buySell, Token base, Token quote, Price price, Unixtime expiry, Tokens tokens, OrderKey[] calldata orderKeys) public reentrancyGuard returns (Tokens filled, Tokens quoteTokensFilled, Tokens tokensOnOrder, OrderKey orderKey) {
         if (uint(action) <= uint(Action.FillAnyAndAddOrder)) {
-            return _trade(_getTradeInfo(Account.wrap(msg.sender), action, buySell, base, quote, price, expiry, baseTokens));
+            return _trade(_getTradeInfo(Account.wrap(msg.sender), action, buySell, base, quote, price, expiry, tokens));
         }
     }
 
@@ -278,7 +277,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
             while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(price)) {
                 OrderQueue storage orderQueue = orderQueues[pairKey][buySell][price];
                 OrderKey orderKey = orderQueue.head;
-                OrderKey previousOrderKey;
+                OrderKey prevOrderKey;
                 while (isNotSentinel(orderKey)) {
                     bool deleteOrder = false;
                     for (uint j = 0; j< orderKeys.length && !deleteOrder; j = onePlus(j)) {
@@ -296,16 +295,16 @@ contract Dexz is DexzBase, ReentrancyGuard {
                         if (OrderKey.unwrap(orderQueue.head) == OrderKey.unwrap(orderKey)) {
                             orderQueue.head = order.next;
                         } else {
-                            orders[previousOrderKey].next = order.next;
+                            orders[prevOrderKey].next = order.next;
                         }
                         if (OrderKey.unwrap(orderQueue.tail) == OrderKey.unwrap(orderKey)) {
-                            orderQueue.tail = previousOrderKey;
+                            orderQueue.tail = prevOrderKey;
                         }
-                        previousOrderKey = orderKey;
+                        prevOrderKey = orderKey;
                         orderKey = order.next;
                         delete orders[temp];
                     } else {
-                        previousOrderKey = orderKey;
+                        prevOrderKey = orderKey;
                         orderKey = order.next;
                     }
                 }
@@ -324,12 +323,12 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
 
-    function _getTradeInfo(Account taker, Action action, BuySell buySell, Token base, Token quote, Price price, Unixtime expiry, Tokens baseTokens) internal returns (TradeInfo memory tradeInfo) {
+    function _getTradeInfo(Account taker, Action action, BuySell buySell, Token base, Token quote, Price price, Unixtime expiry, Tokens tokens) internal returns (TradeInfo memory tradeInfo) {
         if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice(price, PRICE_MAX);
         }
-        if (Tokens.unwrap(baseTokens) > Tokens.unwrap(TOKENS_MAX)) {
-            revert InvalidTokens(baseTokens, TOKENS_MAX);
+        if (Tokens.unwrap(tokens) > Tokens.unwrap(TOKENS_MAX)) {
+            revert InvalidTokens(tokens, TOKENS_MAX);
         }
         PairKey pairKey = generatePairKey(base, quote);
         if (Token.unwrap(pairs[pairKey].base) == address(0)) {
@@ -348,7 +347,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
             pairKeys.push(pairKey);
             emit PairAdded(pairKey, base, quote, baseDecimals, quoteDecimals, multiplier, divisor);
         }
-        return TradeInfo(taker, action, buySell, inverseBuySell(buySell), pairKey, price, expiry, baseTokens);
+        return TradeInfo(taker, action, buySell, inverseBuySell(buySell), pairKey, price, expiry, tokens);
     }
     function _checkTakerAvailableTokens(Pair memory pair, TradeInfo memory tradeInfo) internal view {
         if (tradeInfo.buySell == BuySell.Buy) {
@@ -360,7 +359,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         } else {
             uint availableTokens = availableTokens(pair.base, Account.wrap(msg.sender));
             if (availableTokens < uint(Tokens.unwrap(tradeInfo.tokens))) {
-                revert InsufficientBaseTokenBalanceOrAllowance(pair.base, tradeInfo.tokens, Tokens.wrap(uint128(availableTokens)));
+                revert InsufficientTokenBalanceOrAllowance(pair.base, tradeInfo.tokens, Tokens.wrap(uint128(availableTokens)));
             }
         }
     }
@@ -498,13 +497,13 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
 
-    function getOrders(PairKey pairKey, BuySell buySell, uint count, Price price, OrderKey firstOrderKey) public view returns (Price[] memory prices, OrderKey[] memory orderKeys, OrderKey[] memory nextOrderKeys, Account[] memory makers, Unixtime[] memory expiries, Tokens[] memory baseTokenss, Tokens[] memory filleds) {
+    function getOrders(PairKey pairKey, BuySell buySell, uint count, Price price, OrderKey firstOrderKey) public view returns (Price[] memory prices, OrderKey[] memory orderKeys, OrderKey[] memory nextOrderKeys, Account[] memory makers, Unixtime[] memory expiries, Tokens[] memory tokenss, Tokens[] memory filleds) {
         prices = new Price[](count);
         orderKeys = new OrderKey[](count);
         nextOrderKeys = new OrderKey[](count);
         makers = new Account[](count);
         expiries = new Unixtime[](count);
-        baseTokenss = new Tokens[](count);
+        tokenss = new Tokens[](count);
         filleds = new Tokens[](count);
         uint i;
         if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(price)) {
@@ -531,7 +530,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 nextOrderKeys[i] = order.next;
                 makers[i] = order.maker;
                 expiries[i] = order.expiry;
-                baseTokenss[i] = order.tokens;
+                tokenss[i] = order.tokens;
                 filleds[i] = order.filled;
                 orderKey = order.next;
                 i = onePlus(i);
@@ -541,7 +540,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
     }
 
     /*
-    function increaseOrderBaseTokens(bytes32 key, uint baseTokens) public returns (uint _newBaseTokens, uint _filled) {
+    function increaseOrderBaseTokens(bytes32 key, uint tokens) public returns (uint _newBaseTokens, uint _filled) {
         Order storage order = orders[key];
         require(order.maker == msg.sender);
         order.baseTokens = order.baseTokens.add(baseTokens);
