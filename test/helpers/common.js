@@ -274,7 +274,7 @@ class Data {
               var minutes = (order[2] - new Date() / 1000) / 60;
               console.log("                Order key=" + orderKey.substring(0, 10) + " next=" + order[0].substring(0, 10) +
                 " maker=" + this.getShortAccountName(order[1]) +
-                " expiry=" + minutes.toFixed(2) + "s baseTokens=" + ethers.utils.formatUnits(order[3], pair.baseDecimals) + " baseTokensFilled=" + ethers.utils.formatUnits(order[4], pair.baseDecimals));
+                " expiry=" + minutes.toFixed(2) + "s tokens=" + ethers.utils.formatUnits(order[3], pair.baseDecimals) + " filled=" + ethers.utils.formatUnits(order[4], pair.baseDecimals));
               orderKey = order[0];
             }
             price = await this.dexz.getNextBestPrice(pair.pairKey, buySell, price);
