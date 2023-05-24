@@ -242,7 +242,7 @@ class Data {
               break;
             }
             // console.log("k: " + k);
-            console.log("              * " + k + " " + parseInt(results[0][k]));
+            console.log("              * " + k + " " + ethers.utils.formatUnits(results[0][k], 9) + " " + results[1][k].substring(0, 10));
           }
 
 
