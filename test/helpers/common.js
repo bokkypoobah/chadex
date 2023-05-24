@@ -236,7 +236,7 @@ class Data {
         const pair = pairInfos[j];
         console.log("          ----- Pair " + pair.pairKey + " " + this.getShortAccountName(pair.baseToken) + "/" + this.getShortAccountName(pair.quoteToken) + " " + pair.multiplier + " " + pair.divisor + " -----");
         for (let buySell = 0; buySell < 2; buySell++) {
-          console.log("              #   " + (buySell == 0 ? " BUY" : "SELL") +" Price OrderKey   Next       Maker         Expiry(s)   BaseTokens       Filled")
+          console.log("              #   " + (buySell == 0 ? " BUY" : "SELL") +" Price OrderKey   Next       Maker         Expiry(s)       Tokens       Filled")
           console.log("            --- ------------ ---------- ---------- ------------ ---------- ------------ ------------");
 
           let price = PRICE_EMPTY;
