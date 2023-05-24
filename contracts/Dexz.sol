@@ -265,11 +265,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
     function trade(Action action, BuySell buySell, Token baseToken, Token quoteToken, Price price, Unixtime expiry, Tokens baseTokens, OrderKey[] calldata orderKeys) public reentrancyGuard returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
         if (uint(action) <= uint(Action.FillAnyAndAddOrder)) {
             return _trade(_getTradeInfo(Account.wrap(msg.sender), action, buySell, baseToken, quoteToken, price, expiry, baseTokens));
-        // } else if (uint(action) == uint(Action.RemoveOrders)) {
-            // _removeOrders(buySell, baseToken, quoteToken, price, orderKeys);
         }
     }
 
+    error CannotRemoveSomeoneElsesOrder(Account maker);
     function removeOrders(PairKey[] calldata _pairKeys, BuySell[] calldata buySells, OrderKey[][] calldata orderKeyss) public {
         for (uint i = 0; i < _pairKeys.length; i = onePlus(i)) {
             PairKey pairKey = _pairKeys[i];
@@ -289,6 +288,9 @@ contract Dexz is DexzBase, ReentrancyGuard {
                     }
                     Order memory order = orders[orderKey];
                     if (deleteOrder) {
+                        if (Account.unwrap(order.maker) != msg.sender) {
+                            revert CannotRemoveSomeoneElsesOrder(order.maker);
+                        }
                         OrderKey temp = orderKey;
                         emit OrderRemoved(pairKey, orderKey, order.maker, buySell, price, order.baseTokens, order.baseTokensFilled);
                         if (OrderKey.unwrap(orderQueue.head) == OrderKey.unwrap(orderKey)) {
@@ -496,14 +498,14 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
 
-    function getOrders(PairKey pairKey, BuySell buySell, uint size, Price price, OrderKey firstOrderKey) public view returns (Price[] memory prices, OrderKey[] memory orderKeys, OrderKey[] memory nextOrderKeys, Account[] memory makers, Unixtime[] memory expiries, Tokens[] memory baseTokenss, Tokens[] memory baseTokensFilleds) {
-        prices = new Price[](size);
-        orderKeys = new OrderKey[](size);
-        nextOrderKeys = new OrderKey[](size);
-        makers = new Account[](size);
-        expiries = new Unixtime[](size);
-        baseTokenss = new Tokens[](size);
-        baseTokensFilleds = new Tokens[](size);
+    function getOrders(PairKey pairKey, BuySell buySell, uint count, Price price, OrderKey firstOrderKey) public view returns (Price[] memory prices, OrderKey[] memory orderKeys, OrderKey[] memory nextOrderKeys, Account[] memory makers, Unixtime[] memory expiries, Tokens[] memory baseTokenss, Tokens[] memory baseTokensFilleds) {
+        prices = new Price[](count);
+        orderKeys = new OrderKey[](count);
+        nextOrderKeys = new OrderKey[](count);
+        makers = new Account[](count);
+        expiries = new Unixtime[](count);
+        baseTokenss = new Tokens[](count);
+        baseTokensFilleds = new Tokens[](count);
         uint i;
         if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(price)) {
             price = getBestPrice(pairKey, buySell);
@@ -512,7 +514,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 price = getNextBestPrice(pairKey, buySell, price);
             }
         }
-        while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(price) && i < size) {
+        while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(price) && i < count) {
             OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
             OrderKey orderKey = orderQueue.head;
             if (isNotSentinel(firstOrderKey)) {
@@ -522,7 +524,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 }
                 firstOrderKey = ORDERKEY_SENTINEL;
             }
-            while (isNotSentinel(orderKey) && i < size) {
+            while (isNotSentinel(orderKey) && i < count) {
                 Order memory order = orders[orderKey];
                 prices[i] = price;
                 orderKeys[i] = orderKey;
