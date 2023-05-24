@@ -148,9 +148,12 @@ describe("Dexz", function () {
     console.log("      00. Test 00 - Happy Path - Specified Set");
 
     // Add Orders
-    const price1 = "0.69";
-    const price2 = "0.69012345";
-    const price3 = "0.6902";
+    const price1 = "0.6901";
+    const price2 = "0.6902";
+    const price3 = "0.6903";
+    const price5 = "0.6905";
+    const price6 = "0.6906";
+    const price7 = "0.6907";
     const expired = parseInt(new Date()/1000) - 60*60;
     const expiry = parseInt(new Date()/1000) + 60*60;
     const baseTokens1 = ethers.utils.parseUnits("1", data.decimals0);
@@ -187,11 +190,14 @@ describe("Dexz", function () {
     await data.printState("After Adding Orders");
 
     const actions = [
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 9).toString(), expiry: expiry, tokens: "-" + baseTokens3.toString(), orderKeys: [] },
+      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price5, 9).toString(), expiry: expiry, tokens: baseTokens1.toString(), orderKeys: [] },
+      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price6, 9).toString(), expiry: expiry, tokens: baseTokens1.toString(), orderKeys: [] },
+      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price7, 9).toString(), expiry: expiry, tokens: baseTokens1.toString(), orderKeys: [] },
     ];
     console.log("actions: " + JSON.stringify(actions, null, 2));
     const bulkTrade1Tx = await data.dexz.connect(data.user2Signer).bulkTrade(actions);
     await data.printEvents("user2->dexz.bulkTrade(actions)", await bulkTrade1Tx.wait());
+    await data.printState("After Bulk Trade");
 
     // // Execute against orders
     // const sellBaseTokens = ethers.utils.parseUnits("1", data.decimals0);
