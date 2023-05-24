@@ -220,6 +220,7 @@ class Data {
             console.log("              * --- End   " + l + ", price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
             l++
             results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
+            // console.log("results: " + JSON.stringify(results, null, 2));
           }
 
           price = PRICE_EMPTY;

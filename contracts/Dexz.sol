@@ -470,7 +470,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
             OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
             OrderKey orderKey = orderQueue.head;
             if (isNotSentinel(firstOrderKey)) {
-                while (isNotSentinel(orderKey) && OrderKey.unwrap(orderKey) != OrderKey.unwrap(firstOrderKey)) {
+                while (isNotSentinel(orderKey) && OrderKey.unwrap(orderKey) != OrderKey.unwrap(firstOrderKey) && false) {
                     Order memory order = orders[orderKey];
                     orderKey = order.next;
                 }
