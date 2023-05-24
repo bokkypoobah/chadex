@@ -235,7 +235,15 @@ class Data {
           console.log("            --- " + (buySell == 0 ? "Buy" : "Sell") + " Orders ---");
 
           const results = await this.dexz.getOrders(pair.pairKey, buySell, 10, 0, "0x0000000000000000000000000000000000000000000000000000000000000000");
-          console.log("results: " + JSON.stringify(results));
+          // console.log("results[0].length: " + results.length);
+          // console.log("results: " + JSON.stringify(results[0], null, 2));
+          for (let k = 0; k < results[0].length; k++) {
+            if (parseInt(results[0][k]) == 0) {
+              break;
+            }
+            // console.log("k: " + k);
+            console.log("              * " + k + " " + parseInt(results[0][k]));
+          }
 
 
           let price = 0;
