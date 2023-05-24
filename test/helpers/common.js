@@ -242,8 +242,9 @@ class Data {
           let l = 0;
           const ORDERSIZE = 10;
 
-          const results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, next);
-          while (parseInt(results[0][0]) != 0 && l++ < 2) {
+          let results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, next);
+          while (parseInt(results[0][0]) != 0 && l < 2) {
+            console.log("              * --- " + l + ", price: " + price + ", next: " + next + " ---")
             for (let k = 0; k < results[0].length; k++) {
               if (parseInt(results[0][k]) == 0) {
                 break;
@@ -258,8 +259,12 @@ class Data {
                 this.padLeft(minutes.toFixed(2), 10) + " " +
                 this.padLeft(ethers.utils.formatUnits(results[5][k], pair.baseDecimals), 12) + " " +
                 this.padLeft(ethers.utils.formatUnits(results[6][k], pair.baseDecimals), 12));
+              price = results[0][k];
+              next = results[2][k];
             }
             console.log("              * --- " + l + " ---")
+            l++
+            results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, next);
           }
 
           price = PRICE_EMPTY;
