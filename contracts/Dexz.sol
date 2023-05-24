@@ -39,8 +39,8 @@ type Unixtime is uint64;
 type Factor is uint8;
 
 enum BuySell { Buy, Sell }
-// TODO: AddOrder, UpdateOrderExpiry, IncreaseOrderBaseTokens, DecreasesOrderBaseTokens
-enum Action { FillAny, FillAllOrNothing, FillAnyAndAddOrder, AddOrder, RemoveOrders }
+// TODO: RemoveOrders, UpdateOrderExpiry, IncreaseOrderBaseTokens, DecreasesOrderBaseTokens
+enum Action { FillAny, FillAllOrNothing, FillAnyAndAddOrder }
 
 
 interface IERC20 {
@@ -255,16 +255,18 @@ contract Dexz is DexzBase, ReentrancyGuard {
     constructor() DexzBase() {
     }
 
-    function trade(Action action, BuySell buySell, address baseToken, address quoteToken, Price price, Unixtime expiry, Tokens baseTokens, OrderKey[] calldata orderKeys) public payable reentrancyGuard returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
+    function trade(Action action, BuySell buySell, address baseToken, address quoteToken, Price price, Unixtime expiry, Tokens baseTokens, OrderKey[] calldata orderKeys) public reentrancyGuard returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
         if (uint(action) <= uint(Action.FillAnyAndAddOrder)) {
             return _trade(_getTradeInfo(msg.sender, action, buySell, baseToken, quoteToken, price, expiry, baseTokens));
-        } else if (uint(action) == uint(Action.RemoveOrders)) {
-            _removeOrders(buySell, baseToken, quoteToken, price, orderKeys);
+        // } else if (uint(action) == uint(Action.RemoveOrders)) {
+            // _removeOrders(buySell, baseToken, quoteToken, price, orderKeys);
         }
     }
 
-    function _removeOrders(BuySell buySell, address baseToken, address quoteToken, Price price, OrderKey[] calldata orderKeys) internal {
-
+    function removeOrders(PairKey[] calldata _pairKeys, BuySell[] calldata buySells, OrderKey[][] calldata orderKeys) public {
+        for (uint i = 0; i < _pairKeys.length; i++) {
+            PairKey pairKey = _pairKeys[i];
+        }
     }
 
     function _getTradeInfo(address taker, Action action, BuySell buySell, address baseToken, address quoteToken, Price price, Unixtime expiry, Tokens baseTokens) internal returns (TradeInfo memory tradeInfo) {

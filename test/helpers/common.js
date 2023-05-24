@@ -181,24 +181,25 @@ class Data {
     for (let j = 0; j < pairsLength; j++) {
       const info = await this.dexz.pair(j);
       const [pairKey, baseToken, quoteToken, multiplier, divisor] = info;
+      const baseDecimals = this.decimals[baseToken];
+      const quoteDecimals = this.decimals[quoteToken];
+      const orders = {};
       for (let buySell = 0; buySell < 2; buySell++) {
         let price = PRICE_EMPTY;
         let firstOrderKey = ORDERKEY_SENTINEL;
         const ORDERSIZE = 4;
-        const baseDecimals = this.decimals[baseToken];
-        const quoteDecimals = this.decimals[quoteToken];
-        const orders = [];
+        orders[buySell] = [];
         let results = await this.dexz.getOrders(pairKey, buySell, ORDERSIZE, price, firstOrderKey);
         while (parseInt(results[0][0]) != 0) {
           for (let k = 0; k < results[0].length && parseInt(results[0][k]) != 0; k++) {
-            orders.push({ price: parseInt(results[0][k]), orderKey: results[1][k], nextOrderKey: results[2][k], maker: results[3][k], expiry: parseInt(results[4][k]), baseTokens: results[5][k].toString(), baseTokensFilled: results[6][k].toString() })
+            orders[buySell].push({ price: parseInt(results[0][k]), orderKey: results[1][k], nextOrderKey: results[2][k], maker: results[3][k], expiry: parseInt(results[4][k]), baseTokens: results[5][k].toString(), baseTokensFilled: results[6][k].toString() })
             price = results[0][k];
             firstOrderKey = results[2][k];
           }
           results = await this.dexz.getOrders(pairKey, buySell, ORDERSIZE, price, firstOrderKey);
         }
-        pairs[pairKey] = { baseToken, quoteToken, multiplier, divisor, baseDecimals, quoteDecimals, orders };
       }
+      pairs[pairKey] = { baseToken, quoteToken, multiplier, divisor, baseDecimals, quoteDecimals, orders };
     }
     return pairs;
   }
