@@ -163,32 +163,32 @@ contract DexzBase {
     // BK TODO function count(bytes32 pairKey, uint _orderType) public view returns (uint _count) {
     // BK TODO     _count = priceTrees[pairKey][_orderType].count();
     // BK TODO }
-    function first(PairKey pairKey, BuySell buySell) public view returns (Price key) {
-        key = priceTrees[pairKey][buySell].first();
+    function first(PairKey pairKey, BuySell buySell) public view returns (Price price) {
+        price = priceTrees[pairKey][buySell].first();
     }
-    function last(PairKey pairKey, BuySell buySell) public view returns (Price key) {
-        key = priceTrees[pairKey][buySell].last();
+    function last(PairKey pairKey, BuySell buySell) public view returns (Price price) {
+        price = priceTrees[pairKey][buySell].last();
     }
-    function next(PairKey pairKey, BuySell buySell, Price x) public view returns (Price y) {
-        y = priceTrees[pairKey][buySell].next(x);
+    function next(PairKey pairKey, BuySell buySell, Price price) public view returns (Price nextPrice) {
+        nextPrice = priceTrees[pairKey][buySell].next(price);
     }
-    function prev(PairKey pairKey, BuySell buySell, Price x) public view returns (Price y) {
-        y = priceTrees[pairKey][buySell].prev(x);
+    function prev(PairKey pairKey, BuySell buySell, Price price) public view returns (Price prevPrice) {
+        prevPrice = priceTrees[pairKey][buySell].prev(price);
     }
-    function exists(PairKey pairKey, BuySell buySell, Price key) public view returns (bool) {
-        return priceTrees[pairKey][buySell].exists(key);
+    function exists(PairKey pairKey, BuySell buySell, Price price) public view returns (bool) {
+        return priceTrees[pairKey][buySell].exists(price);
     }
-    function getNode(PairKey pairKey, BuySell buySell, Price key) public view returns (Price returnKey, Price parent, Price left, Price right, uint8 red) {
-        return priceTrees[pairKey][buySell].getNode(key);
+    function getNode(PairKey pairKey, BuySell buySell, Price price) public view returns (Price returnKey, Price parent, Price left, Price right, uint8 red) {
+        return priceTrees[pairKey][buySell].getNode(price);
     }
     // Don't need parent, grandparent, sibling, uncle
 
     // Orders navigating
-    function generatePairKey(Token _baseToken, Token _quoteToken) internal pure returns (PairKey) {
-        return PairKey.wrap(keccak256(abi.encodePacked(_baseToken, _quoteToken)));
+    function generatePairKey(Token base, Token quote) internal pure returns (PairKey) {
+        return PairKey.wrap(keccak256(abi.encodePacked(base, quote)));
     }
-    function generateOrderKey(BuySell buySell, Account _maker, Token _baseToken, Token _quoteToken, Price _price, Unixtime _expiry) internal pure returns (OrderKey) {
-        return OrderKey.wrap(keccak256(abi.encodePacked(buySell, _maker, _baseToken, _quoteToken, _price, _expiry)));
+    function generateOrderKey(BuySell buySell, Account maker, Token base, Token quote, Price price, Unixtime expiry) internal pure returns (OrderKey) {
+        return OrderKey.wrap(keccak256(abi.encodePacked(buySell, maker, base, quote, price, expiry)));
     }
     function exists(OrderKey key) internal view returns (bool) {
         return Unixtime.unwrap(orders[key].expiry) != 0;
@@ -197,14 +197,14 @@ contract DexzBase {
         inverse = (buySell == BuySell.Buy) ? BuySell.Sell : BuySell.Buy;
     }
 
-    function getBestPrice(PairKey pairKey, BuySell buySell) public view returns (Price key) {
-        key = (buySell == BuySell.Buy) ? priceTrees[pairKey][buySell].last() : priceTrees[pairKey][buySell].first();
+    function getBestPrice(PairKey pairKey, BuySell buySell) public view returns (Price price) {
+        price = (buySell == BuySell.Buy) ? priceTrees[pairKey][buySell].last() : priceTrees[pairKey][buySell].first();
     }
-    function getNextBestPrice(PairKey pairKey, BuySell buySell, Price x) public view returns (Price y) {
-        if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(x)) {
-            y = (buySell == BuySell.Buy) ? priceTrees[pairKey][buySell].last() : priceTrees[pairKey][buySell].first();
+    function getNextBestPrice(PairKey pairKey, BuySell buySell, Price price) public view returns (Price nextBestPrice) {
+        if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(price)) {
+            nextBestPrice = (buySell == BuySell.Buy) ? priceTrees[pairKey][buySell].last() : priceTrees[pairKey][buySell].first();
         } else {
-            y = (buySell == BuySell.Buy) ? priceTrees[pairKey][buySell].prev(x) : priceTrees[pairKey][buySell].next(x);
+            nextBestPrice = (buySell == BuySell.Buy) ? priceTrees[pairKey][buySell].prev(price) : priceTrees[pairKey][buySell].next(price);
         }
     }
 
