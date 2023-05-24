@@ -263,9 +263,48 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
 
-    function removeOrders(PairKey[] calldata _pairKeys, BuySell[] calldata buySells, OrderKey[][] calldata orderKeys) public {
+    event RemoveOrderKey(Price price, OrderKey orderKey);
+    event RemovePrice(Price price);
+    function removeOrders(PairKey[] calldata _pairKeys, BuySell[] calldata buySells, OrderKey[][] calldata orderKeyss) public {
         for (uint i = 0; i < _pairKeys.length; i++) {
             PairKey pairKey = _pairKeys[i];
+            BuySell buySell = buySells[i];
+            OrderKey[] memory orderKeys = orderKeyss[i];
+            Price price = getBestPrice(pairKey, buySell);
+            while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(price)) {
+                OrderQueue storage orderQueue = orderQueues[pairKey][buySell][price];
+                OrderKey orderKey = orderQueue.head;
+                while (isNotSentinel(orderKey)) {
+                    bool deleteOrder = false;
+                    for (uint j = 0; j< orderKeys.length && !deleteOrder; j++) {
+                        if (OrderKey.unwrap(orderKeys[j]) == OrderKey.unwrap(orderKey)) {
+                            emit RemoveOrderKey(price, orderKey);
+                            deleteOrder = true;
+                        }
+                    }
+                    OrderKey previousOrderKey;
+                    Order memory order = orders[orderKey];
+                    if (deleteOrder) {
+                        OrderKey temp = orderKey;
+                        if (OrderKey.unwrap(orderQueue.head) == OrderKey.unwrap(orderKey)) {
+                            orderQueue.head = order.next;
+                        } else {
+                            orders[previousOrderKey].next = order.next;
+                        }
+                        if (OrderKey.unwrap(orderQueue.tail) == OrderKey.unwrap(orderKey)) {
+                            orderQueue.tail = previousOrderKey;
+                        }
+                        previousOrderKey = orderKey;
+                        orderKey = order.next;
+                        delete orders[temp];
+                    } else {
+                        previousOrderKey = orderKey;
+                        orderKey = order.next;
+                    }
+                }
+                emit RemovePrice(price);
+                price = getNextBestPrice(pairKey, buySell, price);
+            }
         }
     }
 

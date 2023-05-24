@@ -194,26 +194,34 @@ describe("Dexz", function () {
 
     // Delete orders
     const dexzData = await data.getDexzData();
+    console.log();
     // console.log("          dexzData: " + JSON.stringify(dexzData, null, 2));
+
+    // function removeOrders(PairKey[] calldata _pairKeys, BuySell[] calldata buySells, OrderKey[][] calldata orderKeys) public {
+
+    const pairKeys = [];
+    const buySells = [];
+    const orders = [];
 
     for (const [pairKey, pair] of Object.entries(dexzData)) {
       console.log("          Pair " + pairKey + " " + data.getShortAccountName(pair.baseToken) + " " + data.getShortAccountName(pair.quoteToken) + " " + pair.multiplier + " " + pair.divisor + " " + pair.baseDecimals + " " + pair.quoteDecimals);
-
-      // "baseToken": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-      // "quoteToken": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
-      // "multiplier": 9,
-      // "divisor": 0,
-      // "baseDecimals": 18,
-      // "quoteDecimals": 18,
-
       for (let buySell = 0; buySell < 2; buySell++) {
-        for (const order of pair.orders[buySell]) {
-          // if (order.maker == data.user0) {
-            console.log((buySell == 0 ? " BUY" : "SELL") + " " + JSON.stringify(order));
-          // }
+        const myOrders = pair.orders[buySell].filter(e => e.maker == data.user2).map(e => e.orderKey);
+        if (myOrders.length > 0) {
+          pairKeys.push(pairKey);
+          buySells.push(buySell);
+          orders.push(myOrders);
         }
       }
     }
+
+    console.log("          pairKeys: " + JSON.stringify(pairKeys));
+    console.log("          buySells: " + JSON.stringify(buySells));
+    console.log("          orders: " + JSON.stringify(orders));
+
+    const removeOrders1Tx = await data.dexz.connect(data.user2Signer).removeOrders(pairKeys, buySells, orders);
+    await data.printEvents("user2->dexz.removeOrders(pairKeys, buySells, orders)", await removeOrders1Tx.wait());
+
 
     await data.printState("After Executing Against Order(s)");
   });

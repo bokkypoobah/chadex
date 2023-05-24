@@ -262,22 +262,23 @@ class Data {
             // console.log("            * --- End price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
             results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
           }
+          console.log();
 
-          // price = await this.dexz.getBestPrice(pair.pairKey, buySell);
-          // while (price != 0) {
-          //   var orderQueue = await this.dexz.getOrderQueue(pair.pairKey, buySell, price);
-          //   console.log("              price: " + ethers.utils.formatUnits(price, 9) + " head=" + orderQueue[0].substring(0, 10) + " tail=" + orderQueue[1].substring(0, 10));
-          //   let orderKey = orderQueue[0];
-          //   while (orderKey != 0) {
-          //     let order = await this.dexz.getOrder(orderKey);
-          //     var minutes = (order[2] - new Date() / 1000) / 60;
-          //     console.log("                Order key=" + orderKey.substring(0, 10) + " next=" + order[0].substring(0, 10) +
-          //       " maker=" + this.getShortAccountName(order[1]) +
-          //       " expiry=" + minutes.toFixed(2) + "s baseTokens=" + ethers.utils.formatUnits(order[3], pair.baseDecimals) + " baseTokensFilled=" + ethers.utils.formatUnits(order[4], pair.baseDecimals));
-          //     orderKey = order[0];
-          //   }
-          //   price = await this.dexz.getNextBestPrice(pair.pairKey, buySell, price);
-          // }
+          price = await this.dexz.getBestPrice(pair.pairKey, buySell);
+          while (price != 0) {
+            var orderQueue = await this.dexz.getOrderQueue(pair.pairKey, buySell, price);
+            console.log("              price: " + ethers.utils.formatUnits(price, 9) + " head=" + orderQueue[0].substring(0, 10) + " tail=" + orderQueue[1].substring(0, 10));
+            let orderKey = orderQueue[0];
+            while (orderKey != 0) {
+              let order = await this.dexz.getOrder(orderKey);
+              var minutes = (order[2] - new Date() / 1000) / 60;
+              console.log("                Order key=" + orderKey.substring(0, 10) + " next=" + order[0].substring(0, 10) +
+                " maker=" + this.getShortAccountName(order[1]) +
+                " expiry=" + minutes.toFixed(2) + "s baseTokens=" + ethers.utils.formatUnits(order[3], pair.baseDecimals) + " baseTokensFilled=" + ethers.utils.formatUnits(order[4], pair.baseDecimals));
+              orderKey = order[0];
+            }
+            price = await this.dexz.getNextBestPrice(pair.pairKey, buySell, price);
+          }
           console.log();
         }
       }
