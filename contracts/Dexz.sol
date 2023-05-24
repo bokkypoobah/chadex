@@ -457,9 +457,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
         // console.log("          * baseTokensFilled: %s, quoteTokensFilled: %s, baseTokensOnOrder: %s", baseTokensFilled, quoteTokensFilled, baseTokensOnOrder);
     }
 
-    function getOrders(PairKey pairKey, BuySell buySell, uint size, Price price, OrderKey orderKey) public view returns (Price[] memory prices, OrderKey[] memory orderKeys, address[] memory makers, Unixtime[] memory expiries, Tokens[] memory baseTokenss, Tokens[] memory baseTokensFilleds) {
+    function getOrders(PairKey pairKey, BuySell buySell, uint size, Price price, OrderKey orderKey) public view returns (Price[] memory prices, OrderKey[] memory orderKeys, OrderKey[] memory nextOrderKeys, address[] memory makers, Unixtime[] memory expiries, Tokens[] memory baseTokenss, Tokens[] memory baseTokensFilleds) {
         prices = new Price[](size);
         orderKeys = new OrderKey[](size);
+        nextOrderKeys = new OrderKey[](size);
         makers = new address[](size);
         expiries = new Unixtime[](size);
         baseTokenss = new Tokens[](size);
@@ -473,6 +474,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 Order memory order = orders[orderKey];
                 prices[i] = price;
                 orderKeys[i] = orderKey;
+                nextOrderKeys[i] = order.next;
                 makers[i] = order.maker;
                 expiries[i] = order.expiry;
                 baseTokenss[i] = order.baseTokens;

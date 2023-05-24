@@ -1,5 +1,6 @@
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const ORDERKEY_SENTINEL = "0x0000000000000000000000000000000000000000000000000000000000000000";
+const PRICE_EMPTY = 0;
 const BUYORSELL = { BUY: 0, SELL: 1 };
 const ANYORALL = { ANY: 0, ALL: 1 };
 const BUYORSELLSTRING = [ "Buy", "Sell" ];
@@ -242,14 +243,15 @@ class Data {
               break;
             }
             // console.log("k: " + k);
-            var minutes = (results[3][k] - now / 1000) / 60;
+            var minutes = (results[4][k] - now / 1000) / 60;
             console.log("              * " + k + " " +
               this.padLeft(ethers.utils.formatUnits(results[0][k], 9), 12) + " " +
               results[1][k].substring(0, 10) + " " +
-              this.getShortAccountName(results[2][k]) + " " +
+              results[2][k].substring(0, 10) + " " +
+              this.getShortAccountName(results[3][k]) + " " +
               this.padLeft(minutes.toFixed(2), 10) + " " +
-              this.padLeft(ethers.utils.formatUnits(results[4][k], pair.baseDecimals), 12) + " " +
-              this.padLeft(ethers.utils.formatUnits(results[5][k], pair.baseDecimals), 12));
+              this.padLeft(ethers.utils.formatUnits(results[5][k], pair.baseDecimals), 12) + " " +
+              this.padLeft(ethers.utils.formatUnits(results[6][k], pair.baseDecimals), 12));
           }
 
           let price = 0;
@@ -387,6 +389,7 @@ const generateRange = (start, stop, step) => Array.from({ length: (stop - start)
 module.exports = {
     ZERO_ADDRESS,
     ORDERKEY_SENTINEL,
+    PRICE_EMPTY,
     BUYORSELL,
     ANYORALL,
     BUYORSELLSTRING,
