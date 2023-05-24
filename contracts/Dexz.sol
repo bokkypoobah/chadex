@@ -332,22 +332,9 @@ contract Dexz is DexzBase, ReentrancyGuard {
                    ((tradeInfo.buySell == BuySell.Buy && Price.unwrap(bestMatchingPrice) <= Price.unwrap(tradeInfo.price)) ||
                     (tradeInfo.buySell == BuySell.Sell && Price.unwrap(bestMatchingPrice) >= Price.unwrap(tradeInfo.price))) &&
                    Tokens.unwrap(tradeInfo.baseTokens) > 0) {
-            // while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice)) {
-            //     if (tradeInfo.buySell == BuySell.Buy) {
-            //         if (Price.unwrap(bestMatchingPrice) > Price.unwrap(tradeInfo.price)) {
-            //             break;
-            //         }
-            //     } else if (tradeInfo.buySell == BuySell.Sell) {
-            //         if (Price.unwrap(bestMatchingPrice) < Price.unwrap(tradeInfo.price)) {
-            //             break;
-            //         }
-            //     }
-            //     if (Tokens.unwrap(tradeInfo.baseTokens) == 0) {
-            //         break;
-            //     }
                 OrderQueue storage orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
                 OrderKey bestMatchingOrderKey = orderQueue.head;
-                while (isNotSentinel(bestMatchingOrderKey) /*&& tradeInfo.baseTokens > 0*/) {
+                while (isNotSentinel(bestMatchingOrderKey)) {
                     Order storage order = orders[bestMatchingOrderKey];
                     bool deleteOrder = false;
                     if (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) >= block.timestamp) {
@@ -355,7 +342,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
                         uint baseTokensToTransfer;
                         uint quoteTokensToTransfer;
                         if (tradeInfo.buySell == BuySell.Buy) {
-                            // Taker Buy Base / Maker Sell Quote
                             uint availableBaseTokens = availableTokens(pair.baseToken, order.maker);
                             if (availableBaseTokens > 0) {
                                 if (makerBaseTokensToFill > availableBaseTokens) {
@@ -375,7 +361,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
                                 deleteOrder = true;
                             }
                         } else {
-                            // Taker Sell Base / Maker Buy Quote
                             uint availableQuoteTokens = availableTokens(pair.quoteToken, order.maker);
                             if (availableQuoteTokens > 0) {
                                 uint availableQuoteTokensInBaseTokens = pair.multiplier * availableQuoteTokens / uint(Price.unwrap(bestMatchingPrice)) / pair.divisor;
@@ -421,11 +406,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                         break;
                     }
                 }
-                // console.log("          * Checking Order Queue - head & tail");
-                // console.logBytes32(orderQueue.head);
-                // console.logBytes32(orderQueue.tail);
-                if (isSentinel(orderQueue.head) /*&& orderQueue.tail == ORDERKEY_SENTINEL*/) {
-                    // console.log("          * Deleting Order Queue");
+                if (isSentinel(orderQueue.head)) {
                     delete orderQueues[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
                     Price tempBestMatchingPrice = getMatchingNextBestPrice(tradeInfo, bestMatchingPrice);
                     BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[tradeInfo.pairKey][tradeInfo.inverseBuySell];
@@ -443,7 +424,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 }
             }
             if (Tokens.unwrap(tradeInfo.baseTokens) > 0 && (tradeInfo.action == Action.FillAnyAndAddOrder)) {
-                // TODO Skip and remove expired items
                 // TODO require(tradeInfo.expiry > block.timestamp);
                 orderKey = _addOrder(pair, tradeInfo);
                 baseTokensOnOrder = tradeInfo.baseTokens;
@@ -453,7 +433,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 emit TradeSummary(tradeInfo.buySell, msg.sender, baseTokensFilled, quoteTokensFilled, Price.wrap(uint64(price)), baseTokensOnOrder);
             }
         }
-        // console.log("          * baseTokensFilled: %s, quoteTokensFilled: %s, baseTokensOnOrder: %s", baseTokensFilled, quoteTokensFilled, baseTokensOnOrder);
     }
 
     function getOrders(PairKey pairKey, BuySell buySell, uint size, Price price, OrderKey firstOrderKey) public view returns (Price[] memory prices, OrderKey[] memory orderKeys, OrderKey[] memory nextOrderKeys, address[] memory makers, Unixtime[] memory expiries, Tokens[] memory baseTokenss, Tokens[] memory baseTokensFilleds) {
@@ -477,9 +456,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
             OrderKey orderKey = orderQueue.head;
             if (isNotSentinel(firstOrderKey)) {
                 while (isNotSentinel(orderKey) && OrderKey.unwrap(orderKey) != OrderKey.unwrap(firstOrderKey)) {
-                    // if (OrderKey.unwrap(orderKey) == OrderKey.unwrap(firstOrderKey)) {
-                    //     break;
-                    // }
                     Order memory order = orders[orderKey];
                     orderKey = order.next;
                 }
