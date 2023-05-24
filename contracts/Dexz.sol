@@ -32,11 +32,13 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 // import "hardhat/console.sol";
 
 
-type PairKey is bytes32;
+type Account is address;
+type Factor is uint8;
 type OrderKey is bytes32;
+type PairKey is bytes32;
+type Token is address;
 type Tokens is uint128;
 type Unixtime is uint64;
-type Factor is uint8;
 
 enum BuySell { Buy, Sell }
 // TODO: RemoveOrders, UpdateOrderExpiry, IncreaseOrderBaseTokens, DecreasesOrderBaseTokens
@@ -88,8 +90,8 @@ contract DexzBase {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
     struct Pair {
-        address baseToken;
-        address quoteToken;
+        Token baseToken;
+        Token quoteToken;
         Factor multiplier;
         Factor divisor;
     }
@@ -129,7 +131,7 @@ contract DexzBase {
     mapping(PairKey => mapping(BuySell => mapping(Price => OrderQueue))) orderQueues;
     mapping(OrderKey => Order) orders;
 
-    event PairAdded(PairKey indexed pairKey, address indexed baseToken, address indexed quoteToken, uint8 baseDecimals, uint8 quoteDecimals, Factor multiplier, Factor divisor);
+    event PairAdded(PairKey indexed pairKey, Token indexed baseToken, Token indexed quoteToken, uint8 baseDecimals, uint8 quoteDecimals, Factor multiplier, Factor divisor);
     event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, address indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens baseTokens);
     event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, address indexed maker, BuySell buySell, Price price, Tokens baseTokens, Tokens baseTokensFilled);
     event OrderUpdated(OrderKey indexed key, uint baseTokens, uint newBaseTokens);
@@ -140,15 +142,15 @@ contract DexzBase {
     error InvalidPrice(Price price, Price priceMax);
     error InvalidTokens(Tokens tokenAmount, Tokens tokenAmountMax);
     error TransferFromFailedApproval(address token, address from, address to, uint _tokens, uint _approved);
-    error TransferFromFailed(address token, address from, address to, uint _tokens);
-    error InsufficientBaseTokenBalanceOrAllowance(address baseToken, Tokens baseTokens, Tokens availableTokens);
-    error InsufficientQuoteTokenBalanceOrAllowance(address quoteToken, Tokens quoteTokens, Tokens availableTokens);
+    error TransferFromFailed(Token token, address from, address to, uint _tokens);
+    error InsufficientBaseTokenBalanceOrAllowance(Token baseToken, Tokens baseTokens, Tokens availableTokens);
+    error InsufficientQuoteTokenBalanceOrAllowance(Token quoteToken, Tokens quoteTokens, Tokens availableTokens);
     error UnableToFillOrder(Tokens baseTokensUnfilled);
 
     constructor() {
     }
 
-    function pair(uint i) public view returns (PairKey pairKey, address baseToken, address quoteToken, Factor multiplier, Factor divisor) {
+    function pair(uint i) public view returns (PairKey pairKey, Token baseToken, Token quoteToken, Factor multiplier, Factor divisor) {
         pairKey = pairKeys[i];
         Pair memory p = pairs[pairKey];
         return (pairKey, p.baseToken, p.quoteToken, p.multiplier, p.divisor);
@@ -182,10 +184,10 @@ contract DexzBase {
     // Don't need parent, grandparent, sibling, uncle
 
     // Orders navigating
-    function generatePairKey(address _baseToken, address _quoteToken) internal pure returns (PairKey) {
+    function generatePairKey(Token _baseToken, Token _quoteToken) internal pure returns (PairKey) {
         return PairKey.wrap(keccak256(abi.encodePacked(_baseToken, _quoteToken)));
     }
-    function generateOrderKey(BuySell buySell, address _maker, address _baseToken, address _quoteToken, Price _price, Unixtime _expiry) internal pure returns (OrderKey) {
+    function generateOrderKey(BuySell buySell, address _maker, Token _baseToken, Token _quoteToken, Price _price, Unixtime _expiry) internal pure returns (OrderKey) {
         return OrderKey.wrap(keccak256(abi.encodePacked(buySell, _maker, _baseToken, _quoteToken, _price, _expiry)));
     }
     function exists(OrderKey key) internal view returns (bool) {
@@ -233,14 +235,14 @@ contract DexzBase {
         }
     }
 
-    function availableTokens(address token, address wallet) internal view returns (uint tokens) {
-        uint allowance = IERC20(token).allowance(wallet, address(this));
-        uint balance = IERC20(token).balanceOf(wallet);
+    function availableTokens(Token token, address wallet) internal view returns (uint tokens) {
+        uint allowance = IERC20(Token.unwrap(token)).allowance(wallet, address(this));
+        uint balance = IERC20(Token.unwrap(token)).balanceOf(wallet);
         tokens = allowance < balance ? allowance : balance;
     }
-    function transferFrom(address token, address from, address to, uint tokens) internal {
+    function transferFrom(Token token, address from, address to, uint tokens) internal {
         // Handle ERC20 tokens that do not return true/false
-        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, tokens));
+        (bool success, bytes memory data) = Token.unwrap(token).call(abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, tokens));
         if (!success || (data.length != 0 && !abi.decode(data, (bool)))) {
             revert TransferFromFailed(token, from, to, tokens);
         }
@@ -260,7 +262,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
     constructor() DexzBase() {
     }
 
-    function trade(Action action, BuySell buySell, address baseToken, address quoteToken, Price price, Unixtime expiry, Tokens baseTokens, OrderKey[] calldata orderKeys) public reentrancyGuard returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
+    function trade(Action action, BuySell buySell, Token baseToken, Token quoteToken, Price price, Unixtime expiry, Tokens baseTokens, OrderKey[] calldata orderKeys) public reentrancyGuard returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
         if (uint(action) <= uint(Action.FillAnyAndAddOrder)) {
             return _trade(_getTradeInfo(msg.sender, action, buySell, baseToken, quoteToken, price, expiry, baseTokens));
         // } else if (uint(action) == uint(Action.RemoveOrders)) {
@@ -320,7 +322,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
 
-    function _getTradeInfo(address taker, Action action, BuySell buySell, address baseToken, address quoteToken, Price price, Unixtime expiry, Tokens baseTokens) internal returns (TradeInfo memory tradeInfo) {
+    function _getTradeInfo(address taker, Action action, BuySell buySell, Token baseToken, Token quoteToken, Price price, Unixtime expiry, Tokens baseTokens) internal returns (TradeInfo memory tradeInfo) {
         if (Price.unwrap(price) < Price.unwrap(PRICE_MIN) || Price.unwrap(price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice(price, PRICE_MAX);
         }
@@ -328,9 +330,9 @@ contract Dexz is DexzBase, ReentrancyGuard {
             revert InvalidTokens(baseTokens, TOKENS_MAX);
         }
         PairKey pairKey = generatePairKey(baseToken, quoteToken);
-        if (pairs[pairKey].baseToken == address(0)) {
-            uint8 baseDecimals = IERC20(baseToken).decimals();
-            uint8 quoteDecimals = IERC20(quoteToken).decimals();
+        if (Token.unwrap(pairs[pairKey].baseToken) == address(0)) {
+            uint8 baseDecimals = IERC20(Token.unwrap(baseToken)).decimals();
+            uint8 quoteDecimals = IERC20(Token.unwrap(quoteToken)).decimals();
             Factor multiplier;
             Factor divisor;
             if (baseDecimals >= quoteDecimals) {
