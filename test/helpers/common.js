@@ -237,24 +237,32 @@ class Data {
         for (let buySell = 0; buySell < 2; buySell++) {
           console.log("            --- " + (buySell == 0 ? "Buy" : "Sell") + " Orders ---");
 
-          const results = await this.dexz.getOrders(pair.pairKey, buySell, 10, 0, ORDERKEY_SENTINEL);
-          for (let k = 0; k < results[0].length; k++) {
-            if (parseInt(results[0][k]) == 0) {
-              break;
+          let price = PRICE_EMPTY;
+          let next = ORDERKEY_SENTINEL;
+          let l = 0;
+          const ORDERSIZE = 10;
+
+          const results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, next);
+          while (parseInt(results[0][0]) != 0 && l++ < 2) {
+            for (let k = 0; k < results[0].length; k++) {
+              if (parseInt(results[0][k]) == 0) {
+                break;
+              }
+              next = results[2][k];
+              var minutes = (results[4][k] - now / 1000) / 60;
+              console.log("              * " + k + " " +
+                this.padLeft(ethers.utils.formatUnits(results[0][k], 9), 12) + " " +
+                results[1][k].substring(0, 10) + " " +
+                results[2][k].substring(0, 10) + " " +
+                this.getShortAccountName(results[3][k]) + " " +
+                this.padLeft(minutes.toFixed(2), 10) + " " +
+                this.padLeft(ethers.utils.formatUnits(results[5][k], pair.baseDecimals), 12) + " " +
+                this.padLeft(ethers.utils.formatUnits(results[6][k], pair.baseDecimals), 12));
             }
-            // console.log("k: " + k);
-            var minutes = (results[4][k] - now / 1000) / 60;
-            console.log("              * " + k + " " +
-              this.padLeft(ethers.utils.formatUnits(results[0][k], 9), 12) + " " +
-              results[1][k].substring(0, 10) + " " +
-              results[2][k].substring(0, 10) + " " +
-              this.getShortAccountName(results[3][k]) + " " +
-              this.padLeft(minutes.toFixed(2), 10) + " " +
-              this.padLeft(ethers.utils.formatUnits(results[5][k], pair.baseDecimals), 12) + " " +
-              this.padLeft(ethers.utils.formatUnits(results[6][k], pair.baseDecimals), 12));
+            console.log("              * --- " + l + " ---")
           }
 
-          let price = 0;
+          price = PRICE_EMPTY;
           price = await this.dexz.getBestPrice(pair.pairKey, buySell);
           while (price != 0) {
             var orderQueue = await this.dexz.getOrderQueue(pair.pairKey, buySell, price);
