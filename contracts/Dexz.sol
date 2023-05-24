@@ -94,7 +94,7 @@ contract DexzBase {
     struct Order {
         OrderKey next;
         address maker;
-        BuySell buySell;
+        BuySell buySell; // TODO Delete
         Unixtime expiry;
         Tokens baseTokens;
         Tokens baseTokensFilled;
@@ -457,19 +457,26 @@ contract Dexz is DexzBase, ReentrancyGuard {
         // console.log("          * baseTokensFilled: %s, quoteTokensFilled: %s, baseTokensOnOrder: %s", baseTokensFilled, quoteTokensFilled, baseTokensOnOrder);
     }
 
-    function getOrders(PairKey pairKey, BuySell buySell, uint size, Price price, OrderKey orderKey) public view returns (Price[] memory prices, OrderKey[] memory orderKeys) {
+    function getOrders(PairKey pairKey, BuySell buySell, uint size, Price price, OrderKey orderKey) public view returns (Price[] memory prices, OrderKey[] memory orderKeys, address[] memory makers, Unixtime[] memory expiries, Tokens[] memory baseTokenss, Tokens[] memory baseTokensFilleds) {
         prices = new Price[](size);
         orderKeys = new OrderKey[](size);
+        makers = new address[](size);
+        expiries = new Unixtime[](size);
+        baseTokenss = new Tokens[](size);
+        baseTokensFilleds = new Tokens[](size);
         uint i;
         price = getNextBestPrice(pairKey, buySell, price);
         while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(price) && i < size) {
-
             OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
             orderKey = orderQueue.head;
             while (isNotSentinel(orderKey)) {
                 Order memory order = orders[orderKey];
                 prices[i] = price;
                 orderKeys[i] = orderKey;
+                makers[i] = order.maker;
+                expiries[i] = order.expiry;
+                baseTokenss[i] = order.baseTokens;
+                baseTokensFilleds[i] = order.baseTokensFilled;
                 orderKey = order.next;
                 i++;
             }

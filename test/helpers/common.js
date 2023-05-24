@@ -228,6 +228,7 @@ class Data {
         pairInfos.push({ pairKey: info[0], baseToken: info[1], quoteToken: info[2], multiplier: info[3], divisor: info[4] })
       }
 
+      let now = new Date();
       for (let j = 0; j < pairInfos.length; j++) {
         const pair = pairInfos[j];
         console.log("          ----- Pair " + pair.pairKey + " " + this.getShortAccountName(pair.baseToken) + "/" + this.getShortAccountName(pair.quoteToken) + " " + pair.multiplier + " " + pair.divisor + " -----");
@@ -242,7 +243,14 @@ class Data {
               break;
             }
             // console.log("k: " + k);
-            console.log("              * " + k + " " + ethers.utils.formatUnits(results[0][k], 9) + " " + results[1][k].substring(0, 10));
+            var minutes = (results[3][k] - now / 1000) / 60;
+            console.log("              * " + k + " " +
+              this.padLeft(ethers.utils.formatUnits(results[0][k], 9), 12) + " " +
+              results[1][k].substring(0, 10) + " " +
+              this.getShortAccountName(results[2][k]) + " " +
+              minutes.toFixed(2) + " " +
+              ethers.utils.formatUnits(results[4][k], pair.baseDecimals) + " " +
+              ethers.utils.formatUnits(results[5][k], pair.baseDecimals));
           }
 
 
