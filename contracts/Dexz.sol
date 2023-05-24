@@ -191,7 +191,7 @@ contract DexzBase {
         return OrderKey.wrap(keccak256(abi.encodePacked(buySell, maker, base, quote, price, expiry)));
     }
     function exists(OrderKey key) internal view returns (bool) {
-        return Unixtime.unwrap(orders[key].expiry) != 0;
+        return Account.unwrap(orders[key].maker) != address(0);
     }
     function inverseBuySell(BuySell buySell) internal pure returns (BuySell inverse) {
         inverse = (buySell == BuySell.Buy) ? BuySell.Sell : BuySell.Buy;
@@ -268,7 +268,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
     }
 
     function removeOrders(PairKey[] calldata _pairKeys, BuySell[] calldata buySells, OrderKey[][] calldata orderKeyss) public {
-        for (uint i = 0; i < _pairKeys.length; i = onePlus(i)) {
+        for (uint i; i < _pairKeys.length; i = onePlus(i)) {
             PairKey pairKey = _pairKeys[i];
             BuySell buySell = buySells[i];
             OrderKey[] memory orderKeys = orderKeyss[i];

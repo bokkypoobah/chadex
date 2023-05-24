@@ -110,7 +110,8 @@ class Data {
                 result = result + data.args[a.name].toString();
               }
             } else if (a.type == 'bytes32') {
-              result = result + data.args[a.name].substring(0, 6) + "..." + data.args[a.name].substring(62);
+              // result = result + data.args[a.name].substring(0, 6) + "..." + data.args[a.name].substring(62);
+              result = result + data.args[a.name].substring(0, 10);
             } else {
               result = result + data.args[a.name].toString();
             }
