@@ -193,17 +193,8 @@ describe("Dexz", function () {
     // await data.printEvents("user3->dexz.trade(FillAnyAndAddOrder, BUY, token0, WETH, " + price1 + ", expiry, sellBaseTokens, [])", await trade4Tx.wait());
 
     // Delete orders
-
-    const orders = await data.getOrders();
-
-    // const pairsLength = parseInt(await data.dexz.pairsLength());
-    // console.log("          Dexz: " + data.getShortAccountName(data.dexz.address));
-    // const pairInfos = [];
-    // for (let j = 0; j < pairsLength; j++) {
-    //   const info = await data.dexz.pair(j);
-    //   pairInfos.push({ pairKey: info[0], baseToken: info[1], quoteToken: info[2], multiplier: info[3], divisor: info[4] })
-    // }
-    console.log("          orders: " + JSON.stringify(orders, null, 2));
+    const dexzData = await data.getDexzData();
+    console.log("          dexzData: " + JSON.stringify(dexzData, null, 2));
 
 
     await data.printState("After Executing Against Order(s)");

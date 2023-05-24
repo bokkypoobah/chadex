@@ -173,7 +173,7 @@ class Data {
     this.addContract(dexz, "Dexz");
   }
 
-  async getOrders() {
+  async getDexzData() {
     const pairs = {};
     let now = new Date();
     let row = 0;
@@ -190,25 +190,14 @@ class Data {
         const orders = [];
         let results = await this.dexz.getOrders(pairKey, buySell, ORDERSIZE, price, firstOrderKey);
         while (parseInt(results[0][0]) != 0) {
-          for (let k = 0; k < results[0].length; k++) {
-            if (parseInt(results[0][k]) == 0) {
-              break;
-            }
+          for (let k = 0; k < results[0].length && parseInt(results[0][k]) != 0; k++) {
             orders.push({ price: parseInt(results[0][k]), orderKey: results[1][k], nextOrderKey: results[2][k], maker: results[3][k], expiry: parseInt(results[4][k]), baseTokens: results[5][k].toString(), baseTokensFilled: results[6][k].toString() })
             price = results[0][k];
             firstOrderKey = results[2][k];
           }
           results = await this.dexz.getOrders(pairKey, buySell, ORDERSIZE, price, firstOrderKey);
         }
-        pairs[pairKey] = {
-          baseToken,
-          quoteToken,
-          multiplier,
-          divisor,
-          baseDecimals,
-          quoteDecimals,
-          orders,
-        }
+        pairs[pairKey] = { baseToken, quoteToken, multiplier, divisor, baseDecimals, quoteDecimals, orders };
       }
     }
     return pairs;
@@ -256,10 +245,7 @@ class Data {
           let results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
           while (parseInt(results[0][0]) != 0) {
             // console.log("            * --- Start price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
-            for (let k = 0; k < results[0].length; k++) {
-              if (parseInt(results[0][k]) == 0) {
-                break;
-              }
+            for (let k = 0; k < results[0].length && parseInt(results[0][k]) != 0; k++) {
               var minutes = (results[4][k] - now / 1000) / 60;
               console.log("              " + (row++) + " " +
                 this.padLeft(ethers.utils.formatUnits(results[0][k], 9), 12) + " " +
