@@ -235,8 +235,7 @@ contract DexzBase {
     function transferFrom(address token, address from, address to, uint _tokens) internal {
         // Handle ERC20 tokens that do not return true/false
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, _tokens));
-        if (success && (data.length == 0 || abi.decode(data, (bool)))) {
-        } else {
+        if (!success || (data.length != 0 && !abi.decode(data, (bool)))) {
             revert TransferFromFailed(token, from, to, _tokens);
         }
     }
