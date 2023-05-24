@@ -469,7 +469,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(price) && i < size) {
             OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
             orderKey = orderQueue.head;
-            while (isNotSentinel(orderKey)) {
+            while (isNotSentinel(orderKey) && i < size) {
                 Order memory order = orders[orderKey];
                 prices[i] = price;
                 orderKeys[i] = orderKey;

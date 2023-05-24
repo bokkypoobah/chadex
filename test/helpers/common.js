@@ -240,16 +240,15 @@ class Data {
           let price = PRICE_EMPTY;
           let next = ORDERKEY_SENTINEL;
           let l = 0;
-          const ORDERSIZE = 10;
+          const ORDERSIZE = 4;
 
           let results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, next);
-          while (parseInt(results[0][0]) != 0 && l < 2) {
+          while (parseInt(results[0][0]) != 0 && l < 5) {
             console.log("              * --- " + l + ", price: " + price + ", next: " + next + " ---")
             for (let k = 0; k < results[0].length; k++) {
               if (parseInt(results[0][k]) == 0) {
                 break;
               }
-              next = results[2][k];
               var minutes = (results[4][k] - now / 1000) / 60;
               console.log("              * " + k + " " +
                 this.padLeft(ethers.utils.formatUnits(results[0][k], 9), 12) + " " +
@@ -260,7 +259,7 @@ class Data {
                 this.padLeft(ethers.utils.formatUnits(results[5][k], pair.baseDecimals), 12) + " " +
                 this.padLeft(ethers.utils.formatUnits(results[6][k], pair.baseDecimals), 12));
               price = results[0][k];
-              next = results[2][k];
+              next = results[1][k];
             }
             console.log("              * --- " + l + " ---")
             l++
