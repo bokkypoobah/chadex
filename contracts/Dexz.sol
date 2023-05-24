@@ -233,16 +233,16 @@ contract DexzBase {
         }
     }
 
-    function availableTokens(address token, address wallet) internal view returns (uint _tokens) {
-        uint _allowance = IERC20(token).allowance(wallet, address(this));
-        uint _balance = IERC20(token).balanceOf(wallet);
-        _tokens = _allowance < _balance ? _allowance : _balance;
+    function availableTokens(address token, address wallet) internal view returns (uint tokens) {
+        uint allowance = IERC20(token).allowance(wallet, address(this));
+        uint balance = IERC20(token).balanceOf(wallet);
+        tokens = allowance < balance ? allowance : balance;
     }
-    function transferFrom(address token, address from, address to, uint _tokens) internal {
+    function transferFrom(address token, address from, address to, uint tokens) internal {
         // Handle ERC20 tokens that do not return true/false
-        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, _tokens));
+        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, tokens));
         if (!success || (data.length != 0 && !abi.decode(data, (bool)))) {
-            revert TransferFromFailed(token, from, to, _tokens);
+            revert TransferFromFailed(token, from, to, tokens);
         }
     }
 }
