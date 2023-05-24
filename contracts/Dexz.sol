@@ -263,7 +263,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
 
-    event RemoveOrderKey(Price price, OrderKey orderKey);
+    event RemoveOrderKey(Price price, OrderKey previousOrderKey, OrderKey orderKey);
     event RemovePrice(Price price);
     function removeOrders(PairKey[] calldata _pairKeys, BuySell[] calldata buySells, OrderKey[][] calldata orderKeyss) public {
         for (uint i = 0; i < _pairKeys.length; i++) {
@@ -274,18 +274,18 @@ contract Dexz is DexzBase, ReentrancyGuard {
             while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(price)) {
                 OrderQueue storage orderQueue = orderQueues[pairKey][buySell][price];
                 OrderKey orderKey = orderQueue.head;
+                OrderKey previousOrderKey;
                 while (isNotSentinel(orderKey)) {
                     bool deleteOrder = false;
                     for (uint j = 0; j< orderKeys.length && !deleteOrder; j++) {
                         if (OrderKey.unwrap(orderKeys[j]) == OrderKey.unwrap(orderKey)) {
-                            emit RemoveOrderKey(price, orderKey);
                             deleteOrder = true;
                         }
                     }
-                    OrderKey previousOrderKey;
                     Order memory order = orders[orderKey];
                     if (deleteOrder) {
                         OrderKey temp = orderKey;
+                        emit RemoveOrderKey(price, previousOrderKey, orderKey);
                         if (OrderKey.unwrap(orderQueue.head) == OrderKey.unwrap(orderKey)) {
                             orderQueue.head = order.next;
                         } else {
@@ -302,8 +302,18 @@ contract Dexz is DexzBase, ReentrancyGuard {
                         orderKey = order.next;
                     }
                 }
-                emit RemovePrice(price);
-                price = getNextBestPrice(pairKey, buySell, price);
+                if (isSentinel(orderQueue.head)) {
+                    delete orderQueues[pairKey][buySell][price];
+                    Price tempPrice = getNextBestPrice(pairKey, buySell, price);
+                    BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][buySell];
+                    if (priceTree.exists(price)) {
+                        emit RemovePrice(price);
+                        priceTree.remove(price);
+                    }
+                    price = tempPrice;
+                } else {
+                    price = getNextBestPrice(pairKey, buySell, price);
+                }
             }
         }
     }
