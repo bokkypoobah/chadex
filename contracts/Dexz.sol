@@ -137,7 +137,6 @@ contract DexzBase {
     event OrderUpdated(OrderKey indexed key, uint tokens, uint newTokens);
     event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, Account indexed taker, Account maker, uint tokens, uint quoteTokens, Price price);
     event TradeSummary(BuySell buySell, Account indexed taker, Tokens filled, Tokens quoteTokensFilled, Price price, Tokens tokensOnOrder);
-    event LogInfo(string topic, uint number, bytes32 data, string note, address addr);
 
     error InvalidPrice(Price price, Price priceMax);
     error InvalidTokens(Tokens tokenAmount, Tokens tokenAmountMax);
@@ -146,6 +145,7 @@ contract DexzBase {
     error InsufficientTokenBalanceOrAllowance(Token base, Tokens tokens, Tokens availableTokens);
     error InsufficientQuoteTokenBalanceOrAllowance(Token quote, Tokens quoteTokens, Tokens availableTokens);
     error UnableToFillOrder(Tokens unfilled);
+    error CannotRemoveSomeoneElsesOrder(Account maker);
 
     constructor() {
     }
@@ -267,7 +267,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
 
-    error CannotRemoveSomeoneElsesOrder(Account maker);
     function removeOrders(PairKey[] calldata _pairKeys, BuySell[] calldata buySells, OrderKey[][] calldata orderKeyss) public {
         for (uint i = 0; i < _pairKeys.length; i = onePlus(i)) {
             PairKey pairKey = _pairKeys[i];
