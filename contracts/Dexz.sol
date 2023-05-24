@@ -103,8 +103,8 @@ contract DexzBase {
         OrderKey next;
         Account maker;
         Unixtime expiry;
-        Tokens baseTokens;
-        Tokens baseTokensFilled;
+        Tokens tokens;
+        Tokens filled;
     }
     struct TradeInfo {
         Account taker;
@@ -114,7 +114,7 @@ contract DexzBase {
         PairKey pairKey;
         Price price;
         Unixtime expiry;
-        Tokens baseTokens;
+        Tokens tokens;
     }
 
     uint constant public TENPOW18 = uint(10)**18;
@@ -132,11 +132,11 @@ contract DexzBase {
     mapping(OrderKey => Order) orders;
 
     event PairAdded(PairKey indexed pairKey, Token indexed base, Token indexed quote, uint8 baseDecimals, uint8 quoteDecimals, Factor multiplier, Factor divisor);
-    event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens baseTokens);
-    event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens baseTokens, Tokens baseTokensFilled);
+    event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens);
+    event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, Tokens filled);
     event OrderUpdated(OrderKey indexed key, uint baseTokens, uint newBaseTokens);
-    event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, Account indexed taker, Account maker, uint baseTokens, uint quoteTokens, Price price);
-    event TradeSummary(BuySell buySell, Account indexed taker, Tokens baseTokensFilled, Tokens quoteTokensFilled, Price price, Tokens baseTokensOnOrder);
+    event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, Account indexed taker, Account maker, uint tokens, uint quoteTokens, Price price);
+    event TradeSummary(BuySell buySell, Account indexed taker, Tokens filled, Tokens quoteTokensFilled, Price price, Tokens tokensOnOrder);
     event LogInfo(string topic, uint number, bytes32 data, string note, address addr);
 
     error InvalidPrice(Price price, Price priceMax);
@@ -219,9 +219,9 @@ contract DexzBase {
         OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
         return (orderQueue.head, orderQueue.tail);
     }
-    function getOrder(OrderKey orderKey) public view returns (OrderKey _next, Account maker, Unixtime expiry, Tokens baseTokens, Tokens baseTokensFilled) {
+    function getOrder(OrderKey orderKey) public view returns (OrderKey _next, Account maker, Unixtime expiry, Tokens baseTokens, Tokens filled) {
         Order memory order = orders[orderKey];
-        return (order.next, order.maker, order.expiry, order.baseTokens, order.baseTokensFilled);
+        return (order.next, order.maker, order.expiry, order.tokens, order.filled);
     }
 
     function getMatchingBestPrice(TradeInfo memory tradeInfo) public view returns (Price price) {
@@ -262,7 +262,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
     constructor() DexzBase() {
     }
 
-    function trade(Action action, BuySell buySell, Token base, Token quote, Price price, Unixtime expiry, Tokens baseTokens, OrderKey[] calldata orderKeys) public reentrancyGuard returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
+    function trade(Action action, BuySell buySell, Token base, Token quote, Price price, Unixtime expiry, Tokens baseTokens, OrderKey[] calldata orderKeys) public reentrancyGuard returns (Tokens filled, Tokens quoteTokensFilled, Tokens tokensOnOrder, OrderKey orderKey) {
         if (uint(action) <= uint(Action.FillAnyAndAddOrder)) {
             return _trade(_getTradeInfo(Account.wrap(msg.sender), action, buySell, base, quote, price, expiry, baseTokens));
         }
@@ -292,7 +292,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                             revert CannotRemoveSomeoneElsesOrder(order.maker);
                         }
                         OrderKey temp = orderKey;
-                        emit OrderRemoved(pairKey, orderKey, order.maker, buySell, price, order.baseTokens, order.baseTokensFilled);
+                        emit OrderRemoved(pairKey, orderKey, order.maker, buySell, price, order.tokens, order.filled);
                         if (OrderKey.unwrap(orderQueue.head) == OrderKey.unwrap(orderKey)) {
                             orderQueue.head = order.next;
                         } else {
@@ -353,14 +353,14 @@ contract Dexz is DexzBase, ReentrancyGuard {
     function _checkTakerAvailableTokens(Pair memory pair, TradeInfo memory tradeInfo) internal view {
         if (tradeInfo.buySell == BuySell.Buy) {
             uint availableTokens = availableTokens(pair.quote, Account.wrap(msg.sender));
-            uint quoteTokens = (10 ** Factor.unwrap(pair.divisor)) * uint(Tokens.unwrap(tradeInfo.baseTokens)) * Price.unwrap(tradeInfo.price) / (10 ** Factor.unwrap(pair.multiplier));
+            uint quoteTokens = (10 ** Factor.unwrap(pair.divisor)) * uint(Tokens.unwrap(tradeInfo.tokens)) * Price.unwrap(tradeInfo.price) / (10 ** Factor.unwrap(pair.multiplier));
             if (availableTokens < quoteTokens) {
                 revert InsufficientQuoteTokenBalanceOrAllowance(pair.quote, Tokens.wrap(uint128(quoteTokens)), Tokens.wrap(uint128(availableTokens)));
             }
         } else {
             uint availableTokens = availableTokens(pair.base, Account.wrap(msg.sender));
-            if (availableTokens < uint(Tokens.unwrap(tradeInfo.baseTokens))) {
-                revert InsufficientBaseTokenBalanceOrAllowance(pair.base, tradeInfo.baseTokens, Tokens.wrap(uint128(availableTokens)));
+            if (availableTokens < uint(Tokens.unwrap(tradeInfo.tokens))) {
+                revert InsufficientBaseTokenBalanceOrAllowance(pair.base, tradeInfo.tokens, Tokens.wrap(uint128(availableTokens)));
             }
         }
     }
@@ -379,15 +379,15 @@ contract Dexz is DexzBase, ReentrancyGuard {
         if (isSentinel(orderQueue.tail)) {
             orderQueue.head = orderKey;
             orderQueue.tail = orderKey;
-            orders[orderKey] = Order(ORDERKEY_SENTINEL, tradeInfo.taker, tradeInfo.expiry, tradeInfo.baseTokens, Tokens.wrap(0));
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, tradeInfo.taker, tradeInfo.expiry, tradeInfo.tokens, Tokens.wrap(0));
         } else {
             orders[orderQueue.tail].next = orderKey;
-            orders[orderKey] = Order(ORDERKEY_SENTINEL, tradeInfo.taker, tradeInfo.expiry, tradeInfo.baseTokens, Tokens.wrap(0));
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, tradeInfo.taker, tradeInfo.expiry, tradeInfo.tokens, Tokens.wrap(0));
             orderQueue.tail = orderKey;
         }
-        emit OrderAdded(tradeInfo.pairKey, orderKey, tradeInfo.taker, tradeInfo.buySell, tradeInfo.price, tradeInfo.expiry, tradeInfo.baseTokens);
+        emit OrderAdded(tradeInfo.pairKey, orderKey, tradeInfo.taker, tradeInfo.buySell, tradeInfo.price, tradeInfo.expiry, tradeInfo.tokens);
     }
-    function _trade(TradeInfo memory tradeInfo) internal returns (Tokens baseTokensFilled, Tokens quoteTokensFilled, Tokens baseTokensOnOrder, OrderKey orderKey) {
+    function _trade(TradeInfo memory tradeInfo) internal returns (Tokens filled, Tokens quoteTokensFilled, Tokens tokensOnOrder, OrderKey orderKey) {
         Pair memory pair = pairs[tradeInfo.pairKey];
         _checkTakerAvailableTokens(pair, tradeInfo);
 
@@ -395,32 +395,32 @@ contract Dexz is DexzBase, ReentrancyGuard {
         while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
                ((tradeInfo.buySell == BuySell.Buy && Price.unwrap(bestMatchingPrice) <= Price.unwrap(tradeInfo.price)) ||
                 (tradeInfo.buySell == BuySell.Sell && Price.unwrap(bestMatchingPrice) >= Price.unwrap(tradeInfo.price))) &&
-               Tokens.unwrap(tradeInfo.baseTokens) > 0) {
+               Tokens.unwrap(tradeInfo.tokens) > 0) {
             OrderQueue storage orderQueue = orderQueues[tradeInfo.pairKey][tradeInfo.inverseBuySell][bestMatchingPrice];
             OrderKey bestMatchingOrderKey = orderQueue.head;
             while (isNotSentinel(bestMatchingOrderKey)) {
                 Order storage order = orders[bestMatchingOrderKey];
                 bool deleteOrder = false;
                 if (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) >= block.timestamp) {
-                    uint makerBaseTokensToFill = Tokens.unwrap(order.baseTokens) - Tokens.unwrap(order.baseTokensFilled);
-                    uint baseTokensToTransfer;
+                    uint makerTokensToFill = Tokens.unwrap(order.tokens) - Tokens.unwrap(order.filled);
+                    uint tokensToTransfer;
                     uint quoteTokensToTransfer;
                     if (tradeInfo.buySell == BuySell.Buy) {
                         uint availableBaseTokens = availableTokens(pair.base, order.maker);
                         if (availableBaseTokens > 0) {
-                            if (makerBaseTokensToFill > availableBaseTokens) {
-                                makerBaseTokensToFill = availableBaseTokens;
+                            if (makerTokensToFill > availableBaseTokens) {
+                                makerTokensToFill = availableBaseTokens;
                             }
-                            if (Tokens.unwrap(tradeInfo.baseTokens) >= makerBaseTokensToFill) {
-                                baseTokensToTransfer = makerBaseTokensToFill;
+                            if (Tokens.unwrap(tradeInfo.tokens) >= makerTokensToFill) {
+                                tokensToTransfer = makerTokensToFill;
                                 deleteOrder = true;
                             } else {
-                                baseTokensToTransfer = uint(Tokens.unwrap(tradeInfo.baseTokens));
+                                tokensToTransfer = uint(Tokens.unwrap(tradeInfo.tokens));
                             }
-                            quoteTokensToTransfer = (10 ** Factor.unwrap(pair.divisor)) * baseTokensToTransfer * uint(Price.unwrap(bestMatchingPrice)) / (10 ** Factor.unwrap(pair.multiplier));
+                            quoteTokensToTransfer = (10 ** Factor.unwrap(pair.divisor)) * tokensToTransfer * uint(Price.unwrap(bestMatchingPrice)) / (10 ** Factor.unwrap(pair.multiplier));
                             transferFrom(pair.quote, Account.wrap(msg.sender), order.maker, quoteTokensToTransfer);
-                            transferFrom(pair.base, order.maker, Account.wrap(msg.sender), baseTokensToTransfer);
-                            emit Trade(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, Account.wrap(msg.sender), order.maker, baseTokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
+                            transferFrom(pair.base, order.maker, Account.wrap(msg.sender), tokensToTransfer);
+                            emit Trade(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, Account.wrap(msg.sender), order.maker, tokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
                         } else {
                             deleteOrder = true;
                         }
@@ -428,30 +428,30 @@ contract Dexz is DexzBase, ReentrancyGuard {
                         uint availableQuoteTokens = availableTokens(pair.quote, order.maker);
                         if (availableQuoteTokens > 0) {
                             uint availableQuoteTokensInBaseTokens = (10 ** Factor.unwrap(pair.multiplier)) * availableQuoteTokens / uint(Price.unwrap(bestMatchingPrice)) / (10 ** Factor.unwrap(pair.divisor));
-                            if (makerBaseTokensToFill > availableQuoteTokensInBaseTokens) {
-                                makerBaseTokensToFill = availableQuoteTokensInBaseTokens;
+                            if (makerTokensToFill > availableQuoteTokensInBaseTokens) {
+                                makerTokensToFill = availableQuoteTokensInBaseTokens;
                             } else {
-                                availableQuoteTokens = (10 ** Factor.unwrap(pair.divisor)) * makerBaseTokensToFill * Price.unwrap(bestMatchingPrice) / (10 ** Factor.unwrap(pair.multiplier));
+                                availableQuoteTokens = (10 ** Factor.unwrap(pair.divisor)) * makerTokensToFill * Price.unwrap(bestMatchingPrice) / (10 ** Factor.unwrap(pair.multiplier));
                             }
-                            if (Tokens.unwrap(tradeInfo.baseTokens) >= makerBaseTokensToFill) {
-                                baseTokensToTransfer = makerBaseTokensToFill;
+                            if (Tokens.unwrap(tradeInfo.tokens) >= makerTokensToFill) {
+                                tokensToTransfer = makerTokensToFill;
                                 quoteTokensToTransfer = availableQuoteTokens;
                                 deleteOrder = true;
                             } else {
-                                baseTokensToTransfer = uint(Tokens.unwrap(tradeInfo.baseTokens));
-                                quoteTokensToTransfer = (10 ** Factor.unwrap(pair.divisor)) * baseTokensToTransfer * uint(Price.unwrap(bestMatchingPrice)) / (10 ** Factor.unwrap(pair.multiplier));
+                                tokensToTransfer = uint(Tokens.unwrap(tradeInfo.tokens));
+                                quoteTokensToTransfer = (10 ** Factor.unwrap(pair.divisor)) * tokensToTransfer * uint(Price.unwrap(bestMatchingPrice)) / (10 ** Factor.unwrap(pair.multiplier));
                             }
-                            transferFrom(pair.base, Account.wrap(msg.sender), order.maker, baseTokensToTransfer);
+                            transferFrom(pair.base, Account.wrap(msg.sender), order.maker, tokensToTransfer);
                             transferFrom(pair.quote, order.maker, Account.wrap(msg.sender), quoteTokensToTransfer);
-                            emit Trade(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, Account.wrap(msg.sender), order.maker, baseTokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
+                            emit Trade(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, Account.wrap(msg.sender), order.maker, tokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
                         } else {
                             deleteOrder = true;
                         }
                     }
-                    order.baseTokensFilled = Tokens.wrap(Tokens.unwrap(order.baseTokensFilled) + uint128(baseTokensToTransfer));
-                    baseTokensFilled = Tokens.wrap(Tokens.unwrap(baseTokensFilled) + uint128(baseTokensToTransfer));
+                    order.filled = Tokens.wrap(Tokens.unwrap(order.filled) + uint128(tokensToTransfer));
+                    filled = Tokens.wrap(Tokens.unwrap(filled) + uint128(tokensToTransfer));
                     quoteTokensFilled = Tokens.wrap(Tokens.unwrap(quoteTokensFilled) + uint128(quoteTokensToTransfer));
-                    tradeInfo.baseTokens = Tokens.wrap(Tokens.unwrap(tradeInfo.baseTokens) - uint128(baseTokensToTransfer));
+                    tradeInfo.tokens = Tokens.wrap(Tokens.unwrap(tradeInfo.tokens) - uint128(tokensToTransfer));
                 } else {
                     deleteOrder = true;
                 }
@@ -466,7 +466,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 } else {
                     bestMatchingOrderKey = order.next;
                 }
-                if (Tokens.unwrap(tradeInfo.baseTokens) == 0) {
+                if (Tokens.unwrap(tradeInfo.tokens) == 0) {
                     break;
                 }
             }
@@ -483,29 +483,29 @@ contract Dexz is DexzBase, ReentrancyGuard {
             }
         }
         if (tradeInfo.action == Action.FillAllOrNothing) {
-            if (Tokens.unwrap(tradeInfo.baseTokens) > 0) {
-                revert UnableToFillOrder(tradeInfo.baseTokens);
+            if (Tokens.unwrap(tradeInfo.tokens) > 0) {
+                revert UnableToFillOrder(tradeInfo.tokens);
             }
         }
-        if (Tokens.unwrap(tradeInfo.baseTokens) > 0 && (tradeInfo.action == Action.FillAnyAndAddOrder)) {
+        if (Tokens.unwrap(tradeInfo.tokens) > 0 && (tradeInfo.action == Action.FillAnyAndAddOrder)) {
             // TODO require(tradeInfo.expiry > block.timestamp);
             orderKey = _addOrder(pair, tradeInfo);
-            baseTokensOnOrder = tradeInfo.baseTokens;
+            tokensOnOrder = tradeInfo.tokens;
         }
-        if (Tokens.unwrap(baseTokensFilled) > 0 || Tokens.unwrap(quoteTokensFilled) > 0) {
-            uint256 price = Tokens.unwrap(baseTokensFilled) > 0 ? (10 ** Factor.unwrap(pair.multiplier)) * uint(Tokens.unwrap(quoteTokensFilled)) / uint(Tokens.unwrap(baseTokensFilled)) / (10 ** Factor.unwrap(pair.divisor)) : 0;
-            emit TradeSummary(tradeInfo.buySell, Account.wrap(msg.sender), baseTokensFilled, quoteTokensFilled, Price.wrap(uint64(price)), baseTokensOnOrder);
+        if (Tokens.unwrap(filled) > 0 || Tokens.unwrap(quoteTokensFilled) > 0) {
+            uint256 price = Tokens.unwrap(filled) > 0 ? (10 ** Factor.unwrap(pair.multiplier)) * uint(Tokens.unwrap(quoteTokensFilled)) / uint(Tokens.unwrap(filled)) / (10 ** Factor.unwrap(pair.divisor)) : 0;
+            emit TradeSummary(tradeInfo.buySell, Account.wrap(msg.sender), filled, quoteTokensFilled, Price.wrap(uint64(price)), tokensOnOrder);
         }
     }
 
-    function getOrders(PairKey pairKey, BuySell buySell, uint count, Price price, OrderKey firstOrderKey) public view returns (Price[] memory prices, OrderKey[] memory orderKeys, OrderKey[] memory nextOrderKeys, Account[] memory makers, Unixtime[] memory expiries, Tokens[] memory baseTokenss, Tokens[] memory baseTokensFilleds) {
+    function getOrders(PairKey pairKey, BuySell buySell, uint count, Price price, OrderKey firstOrderKey) public view returns (Price[] memory prices, OrderKey[] memory orderKeys, OrderKey[] memory nextOrderKeys, Account[] memory makers, Unixtime[] memory expiries, Tokens[] memory baseTokenss, Tokens[] memory filleds) {
         prices = new Price[](count);
         orderKeys = new OrderKey[](count);
         nextOrderKeys = new OrderKey[](count);
         makers = new Account[](count);
         expiries = new Unixtime[](count);
         baseTokenss = new Tokens[](count);
-        baseTokensFilleds = new Tokens[](count);
+        filleds = new Tokens[](count);
         uint i;
         if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(price)) {
             price = getBestPrice(pairKey, buySell);
@@ -531,8 +531,8 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 nextOrderKeys[i] = order.next;
                 makers[i] = order.maker;
                 expiries[i] = order.expiry;
-                baseTokenss[i] = order.baseTokens;
-                baseTokensFilleds[i] = order.baseTokensFilled;
+                baseTokenss[i] = order.tokens;
+                filleds[i] = order.filled;
                 orderKey = order.next;
                 i = onePlus(i);
             }
@@ -541,22 +541,22 @@ contract Dexz is DexzBase, ReentrancyGuard {
     }
 
     /*
-    function increaseOrderBaseTokens(bytes32 key, uint baseTokens) public returns (uint _newBaseTokens, uint _baseTokensFilled) {
+    function increaseOrderBaseTokens(bytes32 key, uint baseTokens) public returns (uint _newBaseTokens, uint _filled) {
         Order storage order = orders[key];
         require(order.maker == msg.sender);
         order.baseTokens = order.baseTokens.add(baseTokens);
-        (_newBaseTokens, _baseTokensFilled) = (order.baseTokens, order.baseTokensFilled);
+        (_newBaseTokens, _filled) = (order.baseTokens, order.filled);
         emit OrderUpdated(key, baseTokens, _newBaseTokens);
     }
-    function decreaseOrderBaseTokens(bytes32 key, uint baseTokens) public returns (uint _newBaseTokens, uint _baseTokensFilled) {
+    function decreaseOrderBaseTokens(bytes32 key, uint baseTokens) public returns (uint _newBaseTokens, uint _filled) {
         Order storage order = orders[key];
         require(order.maker == msg.sender);
-        if (order.baseTokensFilled.add(baseTokens) < order.baseTokens) {
-            order.baseTokens = order.baseTokensFilled;
+        if (order.filled.add(baseTokens) < order.baseTokens) {
+            order.baseTokens = order.filled;
         } else {
             order.baseTokens = order.baseTokens.sub(baseTokens);
         }
-        (_newBaseTokens, _baseTokensFilled) = (order.baseTokens, order.baseTokensFilled);
+        (_newBaseTokens, _filled) = (order.baseTokens, order.filled);
         emit OrderUpdated(key, baseTokens, _newBaseTokens);
     }
     function updateOrderPrice(OrderType orderType, address baseToken, address quoteToken, uint oldPrice, uint newPrice, uint expiry) public returns (uint _newBaseTokens) {
@@ -567,14 +567,14 @@ contract Dexz is DexzBase, ReentrancyGuard {
         Order storage newOrder = orders[newKey];
         if (newOrder.maker != address(0)) {
             require(newOrder.maker == msg.sender);
-            newOrder.baseTokens = newOrder.baseTokens.add(oldOrder.baseTokens.sub(oldOrder.baseTokensFilled));
+            newOrder.baseTokens = newOrder.baseTokens.add(oldOrder.baseTokens.sub(oldOrder.filled));
             _newBaseTokens = newOrder.baseTokens;
         } else {
-            orders[newKey] = Order(orderType, msg.sender, baseToken, quoteToken, newPrice, expiry, oldOrder.baseTokens.sub(oldOrder.baseTokensFilled), 0);
+            orders[newKey] = Order(orderType, msg.sender, baseToken, quoteToken, newPrice, expiry, oldOrder.baseTokens.sub(oldOrder.filled), 0);
             userOrders[msg.sender].push(newKey);
             _newBaseTokens = oldOrder.baseTokens;
         }
-        oldOrder.baseTokens = oldOrder.baseTokensFilled;
+        oldOrder.baseTokens = oldOrder.filled;
         // BK TODO: Log changes
     }
     function updateOrderExpiry(OrderType orderType, address baseToken, address quoteToken, uint price, uint oldExpiry, uint newExpiry) public returns (uint _newBaseTokens) {
@@ -585,14 +585,14 @@ contract Dexz is DexzBase, ReentrancyGuard {
         Order storage newOrder = orders[newKey];
         if (newOrder.maker != address(0)) {
             require(newOrder.maker == msg.sender);
-            newOrder.baseTokens = newOrder.baseTokens.add(oldOrder.baseTokens.sub(oldOrder.baseTokensFilled));
+            newOrder.baseTokens = newOrder.baseTokens.add(oldOrder.baseTokens.sub(oldOrder.filled));
             _newBaseTokens = newOrder.baseTokens;
         } else {
-            orders[newKey] = Order(orderType, msg.sender, baseToken, quoteToken, price, newExpiry, oldOrder.baseTokens.sub(oldOrder.baseTokensFilled), 0);
+            orders[newKey] = Order(orderType, msg.sender, baseToken, quoteToken, price, newExpiry, oldOrder.baseTokens.sub(oldOrder.filled), 0);
             userOrders[msg.sender].push(newKey);
             _newBaseTokens = oldOrder.baseTokens;
         }
-        oldOrder.baseTokens = oldOrder.baseTokensFilled;
+        oldOrder.baseTokens = oldOrder.filled;
         // BK TODO: Log changes
     }
     function removeOrder(bytes32 key) public {
