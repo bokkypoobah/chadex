@@ -187,10 +187,10 @@ describe("Dexz", function () {
     await data.printState("After Adding Order(s)");
 
     // Execute against orders
-    // const sellBaseTokens = ethers.utils.parseUnits("1", data.decimals0);
-    //
-    // const trade4Tx = await data.dexz.connect(data.user3Signer).trade(Action.FillAnyAndAddOrder, BuySell.Buy, data.token0.address, data.weth.address, ethers.utils.parseUnits(price1, 9), expiry, sellBaseTokens, []);
-    // await data.printEvents("user3->dexz.trade(FillAnyAndAddOrder, BUY, token0, WETH, " + price1 + ", expiry, sellBaseTokens, [])", await trade4Tx.wait());
+    const sellBaseTokens = ethers.utils.parseUnits("0.69", data.decimals0);
+
+    const trade4Tx = await data.dexz.connect(data.user3Signer).trade(Action.FillAnyAndAddOrder, BuySell.Buy, data.token0.address, data.weth.address, ethers.utils.parseUnits(price1, 9), expiry, sellBaseTokens, []);
+    await data.printEvents("user3->dexz.trade(FillAnyAndAddOrder, BUY, token0, WETH, " + price1 + ", expiry, sellBaseTokens, [])", await trade4Tx.wait());
 
     // Delete orders
     const dexzData = await data.getDexzData();

@@ -60,6 +60,11 @@ interface IERC20 {
 }
 
 
+function onePlus(uint x) pure returns (uint) {
+    unchecked { return 1 + x; }
+}
+
+
 contract ReentrancyGuard {
     uint private _executing;
 
@@ -126,7 +131,7 @@ contract DexzBase {
 
     event PairAdded(PairKey indexed pairKey, address indexed baseToken, address indexed quoteToken, uint8 baseDecimals, uint8 quoteDecimals, Factor multiplier, Factor divisor);
     event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, address indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens baseTokens);
-    event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, address indexed maker, BuySell buySell, Price price);
+    event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, address indexed maker, BuySell buySell, Price price, Tokens baseTokens, Tokens baseTokensFilled);
     event OrderUpdated(OrderKey indexed key, uint baseTokens, uint newBaseTokens);
     event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, address indexed taker, address maker, uint baseTokens, uint quoteTokens, Price price);
     event TradeSummary(BuySell buySell, address indexed taker, Tokens baseTokensFilled, Tokens quoteTokensFilled, Price price, Tokens baseTokensOnOrder);
@@ -263,9 +268,8 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
 
-    // event RemovePrice(Price price);
     function removeOrders(PairKey[] calldata _pairKeys, BuySell[] calldata buySells, OrderKey[][] calldata orderKeyss) public {
-        for (uint i = 0; i < _pairKeys.length; i++) {
+        for (uint i = 0; i < _pairKeys.length; i = onePlus(i)) {
             PairKey pairKey = _pairKeys[i];
             BuySell buySell = buySells[i];
             OrderKey[] memory orderKeys = orderKeyss[i];
@@ -276,7 +280,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 OrderKey previousOrderKey;
                 while (isNotSentinel(orderKey)) {
                     bool deleteOrder = false;
-                    for (uint j = 0; j< orderKeys.length && !deleteOrder; j++) {
+                    for (uint j = 0; j< orderKeys.length && !deleteOrder; j = onePlus(j)) {
                         if (OrderKey.unwrap(orderKeys[j]) == OrderKey.unwrap(orderKey)) {
                             deleteOrder = true;
                         }
@@ -284,7 +288,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                     Order memory order = orders[orderKey];
                     if (deleteOrder) {
                         OrderKey temp = orderKey;
-                        emit OrderRemoved(pairKey, orderKey, order.maker, buySell, price);
+                        emit OrderRemoved(pairKey, orderKey, order.maker, buySell, price, order.baseTokens, order.baseTokensFilled);
                         if (OrderKey.unwrap(orderQueue.head) == OrderKey.unwrap(orderKey)) {
                             orderQueue.head = order.next;
                         } else {
@@ -306,7 +310,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
                     Price tempPrice = getNextBestPrice(pairKey, buySell, price);
                     BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][buySell];
                     if (priceTree.exists(price)) {
-                        // emit RemovePrice(price);
                         priceTree.remove(price);
                     }
                     price = tempPrice;
@@ -527,7 +530,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 baseTokenss[i] = order.baseTokens;
                 baseTokensFilleds[i] = order.baseTokensFilled;
                 orderKey = order.next;
-                i++;
+                i = onePlus(i);
             }
             price = getNextBestPrice(pairKey, buySell, price);
         }
