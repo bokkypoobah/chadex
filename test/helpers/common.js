@@ -198,29 +198,29 @@ class Data {
           let l = 0;
           const ORDERSIZE = 4;
 
-          // let results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
-          // while (parseInt(results[0][0]) != 0 && l < 5) {
-          //   console.log("              * --- " + l + ", price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
-          //   for (let k = 0; k < results[0].length; k++) {
-          //     if (parseInt(results[0][k]) == 0) {
-          //       break;
-          //     }
-          //     var minutes = (results[4][k] - now / 1000) / 60;
-          //     console.log("              * " + k + " " +
-          //       this.padLeft(ethers.utils.formatUnits(results[0][k], 9), 12) + " " +
-          //       results[1][k].substring(0, 10) + " " +
-          //       results[2][k].substring(0, 10) + " " +
-          //       this.getShortAccountName(results[3][k]) + " " +
-          //       this.padLeft(minutes.toFixed(2), 10) + " " +
-          //       this.padLeft(ethers.utils.formatUnits(results[5][k], pair.baseDecimals), 12) + " " +
-          //       this.padLeft(ethers.utils.formatUnits(results[6][k], pair.baseDecimals), 12));
-          //     price = results[0][k];
-          //     firstOrderKey = results[1][k];
-          //   }
-          //   console.log("              * --- " + l + " ---")
-          //   l++
-          //   results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
-          // }
+          let results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
+          while (parseInt(results[0][0]) != 0 && l < 5) {
+            console.log("              * --- Start " + l + ", price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
+            for (let k = 0; k < results[0].length; k++) {
+              if (parseInt(results[0][k]) == 0) {
+                break;
+              }
+              var minutes = (results[4][k] - now / 1000) / 60;
+              console.log("              * " + k + " " +
+                this.padLeft(ethers.utils.formatUnits(results[0][k], 9), 12) + " " +
+                results[1][k].substring(0, 10) + " " +
+                results[2][k].substring(0, 10) + " " +
+                this.getShortAccountName(results[3][k]) + " " +
+                this.padLeft(minutes.toFixed(2), 10) + " " +
+                this.padLeft(ethers.utils.formatUnits(results[5][k], pair.baseDecimals), 12) + " " +
+                this.padLeft(ethers.utils.formatUnits(results[6][k], pair.baseDecimals), 12));
+              price = results[0][k];
+              firstOrderKey = results[2][k];
+            }
+            console.log("              * --- End   " + l + ", price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
+            l++
+            results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
+          }
 
           price = PRICE_EMPTY;
           price = await this.dexz.getBestPrice(pair.pairKey, buySell);
