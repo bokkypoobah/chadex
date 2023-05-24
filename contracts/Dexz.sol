@@ -40,6 +40,7 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 // ----------------------------------------------------------------------------
 
 type Account is address;
+type Delta is int128;
 type Factor is uint8;
 type OrderKey is bytes32;
 type PairKey is bytes32;
@@ -278,9 +279,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
         Action action;
         BuySell buySell;
         Token base;
+        Token quote;
         Price price;
         Unixtime expiry;
-        Tokens tokens;
+        Delta tokens;
         OrderKey[] orderKeys;
     }
 
