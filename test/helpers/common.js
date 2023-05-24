@@ -194,13 +194,13 @@ class Data {
           console.log("            --- " + (buySell == 0 ? "Buy" : "Sell") + " Orders ---");
 
           let price = PRICE_EMPTY;
-          let next = ORDERKEY_SENTINEL;
+          let firstOrderKey = ORDERKEY_SENTINEL;
           let l = 0;
           const ORDERSIZE = 4;
 
-          let results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, next);
+          let results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
           while (parseInt(results[0][0]) != 0 && l < 5) {
-            console.log("              * --- " + l + ", price: " + price + ", next: " + next + " ---")
+            console.log("              * --- " + l + ", price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
             for (let k = 0; k < results[0].length; k++) {
               if (parseInt(results[0][k]) == 0) {
                 break;
@@ -215,11 +215,11 @@ class Data {
                 this.padLeft(ethers.utils.formatUnits(results[5][k], pair.baseDecimals), 12) + " " +
                 this.padLeft(ethers.utils.formatUnits(results[6][k], pair.baseDecimals), 12));
               price = results[0][k];
-              next = results[1][k];
+              firstOrderKey = results[1][k];
             }
             console.log("              * --- " + l + " ---")
             l++
-            results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, next);
+            results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
           }
 
           price = PRICE_EMPTY;

@@ -456,7 +456,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         // console.log("          * baseTokensFilled: %s, quoteTokensFilled: %s, baseTokensOnOrder: %s", baseTokensFilled, quoteTokensFilled, baseTokensOnOrder);
     }
 
-    function getOrders(PairKey pairKey, BuySell buySell, uint size, Price price, OrderKey orderKey) public view returns (Price[] memory prices, OrderKey[] memory orderKeys, OrderKey[] memory nextOrderKeys, address[] memory makers, Unixtime[] memory expiries, Tokens[] memory baseTokenss, Tokens[] memory baseTokensFilleds) {
+    function getOrders(PairKey pairKey, BuySell buySell, uint size, Price price, OrderKey firstOrderKey) public view returns (Price[] memory prices, OrderKey[] memory orderKeys, OrderKey[] memory nextOrderKeys, address[] memory makers, Unixtime[] memory expiries, Tokens[] memory baseTokenss, Tokens[] memory baseTokensFilleds) {
         prices = new Price[](size);
         orderKeys = new OrderKey[](size);
         nextOrderKeys = new OrderKey[](size);
@@ -466,9 +466,16 @@ contract Dexz is DexzBase, ReentrancyGuard {
         baseTokensFilleds = new Tokens[](size);
         uint i;
         price = getNextBestPrice(pairKey, buySell, price);
+        bool first = false;
         while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(price) && i < size) {
             OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
-            orderKey = orderQueue.head;
+            OrderKey orderKey = orderQueue.head;
+            if (!first) {
+                first = true;
+                if (isNotSentinel(firstOrderKey)) {
+
+                }
+            }
             while (isNotSentinel(orderKey) && i < size) {
                 Order memory order = orders[orderKey];
                 prices[i] = price;
