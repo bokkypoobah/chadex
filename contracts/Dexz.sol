@@ -1,5 +1,8 @@
 pragma solidity ^0.8.0;
 
+import "./BokkyPooBahsRedBlackTreeLibrary.sol";
+// import "hardhat/console.sol";
+
 // ----------------------------------------------------------------------------
 // Dexz🤖, pronounced dex-zee, the token exchanger bot
 //
@@ -15,8 +18,15 @@ pragma solidity ^0.8.0;
 //   price = multiplier * quoteTokens / baseTokens / divisor
 //
 // TODO:
-//   What happens when maker == taker?
-//
+//   * bulkTrade
+//   * updateExpiryAndTokens
+//   * What happens when maker == taker?
+//   * Check limits for Tokens(uint128) x Price(uint64)
+//   * Serverless UI
+//   * ?computeTrade
+//   * ?updatePriceExpiryAndTokens
+//   * ?oracle
+//   * ?Optional backend services
 //
 // https://github.com/bokkypoobah/Dexz
 //
@@ -24,13 +34,10 @@ pragma solidity ^0.8.0;
 //
 // If you earn fees using your deployment of this code, or derivatives of this
 // code, please send a proportionate amount to bokkypoobah.eth .
+// Don't be stingy!
 //
 // Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2023
 // ----------------------------------------------------------------------------
-
-import "./BokkyPooBahsRedBlackTreeLibrary.sol";
-// import "hardhat/console.sol";
-
 
 type Account is address;
 type Factor is uint8;
@@ -264,6 +271,24 @@ contract Dexz is DexzBase, ReentrancyGuard {
     function trade(Action action, BuySell buySell, Token base, Token quote, Price price, Unixtime expiry, Tokens tokens, OrderKey[] calldata orderKeys) public reentrancyGuard returns (Tokens filled, Tokens quoteTokensFilled, Tokens tokensOnOrder, OrderKey orderKey) {
         if (uint(action) <= uint(Action.FillAnyAndAddOrder)) {
             return _trade(_getTradeInfo(Account.wrap(msg.sender), action, buySell, base, quote, price, expiry, tokens));
+        }
+    }
+
+    struct Info {
+        Action action;
+        BuySell buySell;
+        Token base;
+        Price price;
+        Unixtime expiry;
+        Tokens tokens;
+        OrderKey[] orderKeys;
+    }
+
+    event LogInfo(Info info);
+    function bulkTrade(Info[] calldata infos) public {
+        for (uint i = 0; i < infos.length; i = onePlus(i)) {
+            Info memory info = infos[i];
+            emit LogInfo(info);
         }
     }
 
