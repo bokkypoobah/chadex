@@ -466,7 +466,11 @@ contract Dexz is DexzBase, ReentrancyGuard {
         baseTokensFilleds = new Tokens[](size);
         uint i;
         if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(price)) {
-            price = getNextBestPrice(pairKey, buySell, price);
+            price = getBestPrice(pairKey, buySell);
+        } else {
+            if (isSentinel(firstOrderKey)) {
+                price = getNextBestPrice(pairKey, buySell, price);
+            }
         }
         while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(price) && i < size) {
             OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];

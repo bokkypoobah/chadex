@@ -187,11 +187,13 @@ class Data {
       }
 
       let now = new Date();
+      let row = 0;
       for (let j = 0; j < pairInfos.length; j++) {
         const pair = pairInfos[j];
         console.log("          ----- Pair " + pair.pairKey + " " + this.getShortAccountName(pair.baseToken) + "/" + this.getShortAccountName(pair.quoteToken) + " " + pair.multiplier + " " + pair.divisor + " -----");
         for (let buySell = 0; buySell < 2; buySell++) {
-          console.log("            --- " + (buySell == 0 ? "Buy" : "Sell") + " Orders ---");
+          console.log("              #   " + (buySell == 0 ? " BUY" : "SELL") +" Price OrderKey   Next       Maker         Expiry(s)   BaseTokens       Filled")
+          console.log("            --- ------------ ---------- ---------- ------------ ---------- ------------ ------------");
 
           let price = PRICE_EMPTY;
           let firstOrderKey = ORDERKEY_SENTINEL;
@@ -200,13 +202,13 @@ class Data {
 
           let results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
           while (parseInt(results[0][0]) != 0 && l < 5) {
-            console.log("              * --- Start " + l + ", price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
+            // console.log("              * --- Start " + l + ", price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
             for (let k = 0; k < results[0].length; k++) {
               if (parseInt(results[0][k]) == 0) {
                 break;
               }
               var minutes = (results[4][k] - now / 1000) / 60;
-              console.log("              * " + k + " " +
+              console.log("              " + (row++) + " " +
                 this.padLeft(ethers.utils.formatUnits(results[0][k], 9), 12) + " " +
                 results[1][k].substring(0, 10) + " " +
                 results[2][k].substring(0, 10) + " " +
@@ -217,7 +219,7 @@ class Data {
               price = results[0][k];
               firstOrderKey = results[2][k];
             }
-            console.log("              * --- End   " + l + ", price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
+            // console.log("              * --- End   " + l + ", price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
             l++
             results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
             // console.log("results: " + JSON.stringify(results, null, 2));
