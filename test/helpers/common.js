@@ -24,6 +24,7 @@ class Data {
     this.decimals0 = null;
     this.decimals1 = null;
     this.decimalsWeth = null;
+    this.decimals = {};
 
     this.dexz = null;
 
@@ -92,7 +93,16 @@ class Data {
             if (a.type == 'address') {
               result = result + this.getShortAccountName(data.args[a.name].toString());
             } else if (a.type == 'uint256' || a.type == 'uint128' || a.type == 'uint64') {
-              if (a.name == 'tokens' || a.name.substring(0, 10) == 'baseTokens' || a.name.substring(0, 11) == 'quoteTokens' || a.name == 'feeBaseTokens' || a.name == 'feeQuoteTokens' || a.name == 'wad' || a.name == 'amount' || a.name == 'balance' || a.name == 'value' || a.name == 'integratorTip' || a.name == 'remainingTip') {
+              if (a.name == 'tokens') {
+                const decimals = this.decimals[log.address] || 18;
+                result = result + ethers.utils.formatUnits(data.args[a.name], decimals);
+              } else if (a.name.substring(0, 10) == 'baseTokens') {
+                const decimals = this.decimals[this.token0.address] || 18;
+                result = result + ethers.utils.formatUnits(data.args[a.name], decimals);
+              } else if (a.name.substring(0, 11) == 'quoteTokens') {
+                const decimals = this.decimals[this.weth.address] || 18;
+                result = result + ethers.utils.formatUnits(data.args[a.name], decimals);
+              } else if (a.name == 'wad' || a.name == 'amount' || a.name == 'balance' || a.name == 'value') {
                 result = result + ethers.utils.formatUnits(data.args[a.name], 18);
               } else if (a.name == 'price') {
                 result = result + ethers.utils.formatUnits(data.args[a.name], 9);
@@ -143,16 +153,19 @@ class Data {
   async setToken0(token) {
     this.token0 = token;
     this.decimals0 = await this.token0.decimals();
+    this.decimals[token.address] = this.decimals0;
     this.addContract(token, "Token0");
   }
   async setToken1(token) {
     this.token1 = token;
     this.decimals1 = await this.token1.decimals();
+    this.decimals[token.address] = this.decimals1;
     this.addContract(token, "Token1");
   }
   async setWeth(weth) {
     this.weth = weth;
     this.decimalsWeth = await this.weth.decimals();
+    this.decimals[weth.address] = this.decimalsWeth;
     this.addContract(weth, "WETH");
   }
   async setDexz(dexz) {
@@ -198,7 +211,7 @@ class Data {
           let price = PRICE_EMPTY;
           let firstOrderKey = ORDERKEY_SENTINEL;
           const ORDERSIZE = 4;
-
+          const baseDecimals = this.decimals[pair.baseToken];
           let results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
           while (parseInt(results[0][0]) != 0) {
             // console.log("            * --- Start price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
@@ -213,8 +226,8 @@ class Data {
                 results[2][k].substring(0, 10) + " " +
                 this.getShortAccountName(results[3][k]) + " " +
                 this.padLeft(minutes.toFixed(2), 10) + " " +
-                this.padLeft(ethers.utils.formatUnits(results[5][k], pair.baseDecimals), 12) + " " +
-                this.padLeft(ethers.utils.formatUnits(results[6][k], pair.baseDecimals), 12));
+                this.padLeft(ethers.utils.formatUnits(results[5][k], baseDecimals), 12) + " " +
+                this.padLeft(ethers.utils.formatUnits(results[6][k], baseDecimals), 12));
               price = results[0][k];
               firstOrderKey = results[2][k];
             }
