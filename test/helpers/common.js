@@ -236,8 +236,6 @@ class Data {
           console.log("            --- " + (buySell == 0 ? "Buy" : "Sell") + " Orders ---");
 
           const results = await this.dexz.getOrders(pair.pairKey, buySell, 10, 0, "0x0000000000000000000000000000000000000000000000000000000000000000");
-          // console.log("results[0].length: " + results.length);
-          // console.log("results: " + JSON.stringify(results[0], null, 2));
           for (let k = 0; k < results[0].length; k++) {
             if (parseInt(results[0][k]) == 0) {
               break;
@@ -252,7 +250,6 @@ class Data {
               ethers.utils.formatUnits(results[4][k], pair.baseDecimals) + " " +
               ethers.utils.formatUnits(results[5][k], pair.baseDecimals));
           }
-
 
           let price = 0;
           price = await this.dexz.getBestPrice(pair.pairKey, buySell);
