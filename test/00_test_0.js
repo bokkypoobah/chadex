@@ -200,7 +200,7 @@ describe("Dexz", function () {
     // await data.printState("After Executing Against Orders");
 
     const newExpiry = parseInt(new Date()/1000) + 24*60*60;
-    const baseTokensD = ethers.utils.parseUnits("-0.35", data.decimals0);
+    const baseTokensD = ethers.utils.parseUnits("1.23", data.decimals0);
     const actionsD = [
       { action: Action.UpdateExpiryAndTokens, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), expiry: newExpiry, tokens: baseTokensD.toString() },
     ];

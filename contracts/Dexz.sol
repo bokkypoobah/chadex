@@ -158,6 +158,10 @@ contract DexzBase {
     error InsufficientTokenBalanceOrAllowance(Token base, Delta tokens, Tokens availableTokens);
     error InsufficientQuoteTokenBalanceOrAllowance(Token quote, Tokens quoteTokens, Tokens availableTokens);
     error UnableToFillOrder(Tokens unfilled);
+    error OrderNotFoundForUpdate(OrderKey orderKey);
+    error OnlyPositiveTokensAccepted(Delta tokens);
+    error UnknownAction(uint action);
+
 
     constructor() {
     }
@@ -265,9 +269,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
     constructor() DexzBase() {
     }
 
-    error OnlyPositiveTokensAccepted(Delta tokens);
-    error UnknownAction(uint action);
-
     event Executing(Info info);
     function execute(Info[] calldata infos) public {
         // TODO: Check BuySell
@@ -289,34 +290,29 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
 
-    event DebugOrderKey(OrderKey orderKey);
-
-    error OrderNotFoundForUpdate(OrderKey orderKey);
-
     function _updateExpiryAndTokens(Info memory info, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
         if (Delta.unwrap(info.tokens) > int128(Tokens.unwrap(TOKENS_MAX))) {
             revert InvalidTokens(info.tokens, TOKENS_MAX);
         }
-        // TODO: Check allowance - need to take into account the delta
-        // Pair memory pair = pairs[moreInfo.pairKey];
-        // _checkTakerAvailableTokens(info, pair);
         orderKey = generateOrderKey(info.buySell, moreInfo.taker, info.base, info.quote, info.price);
-        emit DebugOrderKey(orderKey);
         Order storage order = orders[orderKey];
         if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
             revert OrderNotFoundForUpdate(orderKey);
         }
-        order.expiry = info.expiry;
         if (Delta.unwrap(info.tokens) < 0) {
             uint128 negativeTokens = uint128(-1 * Delta.unwrap(info.tokens));
             if (negativeTokens > (Tokens.unwrap(order.tokens) - Tokens.unwrap(order.filled))) {
-                order.tokens = order.filled;
+                info.tokens = Delta.wrap(int128(Tokens.unwrap(order.filled)));
             } else {
-                order.tokens = Tokens.wrap(Tokens.unwrap(order.tokens) - uint128(-1 * Delta.unwrap(info.tokens)));
+                info.tokens = Delta.wrap(int128(Tokens.unwrap(order.tokens) - uint128(-1 * Delta.unwrap(info.tokens))));
             }
         } else {
-            order.tokens = Tokens.wrap(Tokens.unwrap(order.tokens) + uint128(Delta.unwrap(info.tokens)));
+            info.tokens = Delta.wrap(int128(Tokens.unwrap(order.tokens) + uint128(Delta.unwrap(info.tokens))));
         }
+        Pair memory pair = pairs[moreInfo.pairKey];
+        _checkTakerAvailableTokens(info, pair);
+        order.tokens = Tokens.wrap(uint128(Delta.unwrap(info.tokens)));
+        order.expiry = info.expiry;
         emit OrderUpdated(moreInfo.pairKey, orderKey, moreInfo.taker, info.buySell, info.price, info.expiry, order.tokens);
     }
 
