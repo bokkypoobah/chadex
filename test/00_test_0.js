@@ -12,8 +12,9 @@ const BuySell = {
 const Action = {
   FillAny: 0,
   FillAllOrNothing: 1,
-  FillAnyAndAddOrder:2,
-  RemoveOrder:3
+  FillAnyAndAddOrder: 2,
+  RemoveOrder: 3,
+  UpdateExpiryAndTokens: 4,
 }
 
 let data;
@@ -189,13 +190,22 @@ describe("Dexz", function () {
     // await data.printEvents("user2->dexz.execute(actions)", await execute1Tx.wait());
     // await data.printState("After Executing Against Orders");
 
-    const baseTokensC = ethers.utils.parseUnits("-1", data.decimals0);
-    const actionsC = [
-      { action: Action.RemoveOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), expiry: expiry, tokens: baseTokensC.toString() },
+    // const baseTokensC = ethers.utils.parseUnits("-1", data.decimals0);
+    // const actionsC = [
+    //   { action: Action.RemoveOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), expiry: expiry, tokens: baseTokensC.toString() },
+    // ];
+    // console.log("        Executing: " + JSON.stringify(actionsC));
+    // const executeCTx = await data.dexz.connect(data.user0Signer).execute(actionsC);
+    // await data.printEvents("user0->dexz.execute(actions)", await executeCTx.wait());
+    // await data.printState("After Executing Against Orders");
+
+    const baseTokensD = ethers.utils.parseUnits("-1", data.decimals0);
+    const actionsD = [
+      { action: Action.UpdateExpiryAndTokens, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), expiry: 9999999, tokens: baseTokens5.toString() },
     ];
-    console.log("        Executing: " + JSON.stringify(actionsC));
-    const executeCTx = await data.dexz.connect(data.user0Signer).execute(actionsC);
-    await data.printEvents("user0->dexz.execute(actions)", await executeCTx.wait());
+    console.log("        Executing: " + JSON.stringify(actionsD));
+    const executeDTx = await data.dexz.connect(data.user0Signer).execute(actionsD);
+    await data.printEvents("user0->dexz.execute(actions)", await executeDTx.wait());
     await data.printState("After Executing Against Orders");
 
 

@@ -25,6 +25,7 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 //   * Check cost of taking vs making expired or dummy orders
 //   * Check remainder from divisions
 //   * Serverless UI
+//   * Move updated orders to the end of the queue?
 //   * ?computeTrade
 //   * ?updatePriceExpiryAndTokens
 //   * ?oracle
@@ -51,8 +52,7 @@ type Tokens is uint128;
 type Unixtime is uint64;
 
 enum BuySell { Buy, Sell }
-// TODO: RemoveOrders, UpdateOrderExpiry, IncreaseOrderBaseTokens, DecreasesOrderBaseTokens
-enum Action { FillAny, FillAllOrNothing, FillAnyAndAddOrder, RemoveOrder }
+enum Action { FillAny, FillAllOrNothing, FillAnyAndAddOrder, RemoveOrder, UpdateExpiryAndTokens }
 
 
 interface IERC20 {
@@ -266,9 +266,11 @@ contract Dexz is DexzBase, ReentrancyGuard {
     }
 
     error OnlyPositiveTokensAccepted(Delta tokens);
+    error UnknownAction(uint action);
 
     event Executing(Info info);
     function execute(Info[] calldata infos) public {
+        // TODO: Check BuySell
         for (uint i = 0; i < infos.length; i = onePlus(i)) {
             Info memory info = infos[i];
             if (uint(info.action) <= uint(Action.FillAnyAndAddOrder)) {
@@ -277,10 +279,17 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 }
                 _trade(info, _getMoreInfo(info, Account.wrap(msg.sender)));
             } else if (info.action == Action.RemoveOrder) {
-                // emit Executing(info);
                 _removeOrder(info, _getMoreInfo(info, Account.wrap(msg.sender)));
+            } else if (info.action == Action.UpdateExpiryAndTokens) {
+                emit Executing(info);
+                _updateExpiryAndTokens(info, _getMoreInfo(info, Account.wrap(msg.sender)));
+            } else {
+                revert UnknownAction(uint(info.action));
             }
         }
+    }
+
+    function _updateExpiryAndTokens(Info memory info, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
     }
 
     function _removeOrder(Info memory info, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
