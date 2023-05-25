@@ -286,11 +286,11 @@ contract Dexz is DexzBase, ReentrancyGuard {
 
     error OnlyPositiveTokensAccepted(Delta tokens);
 
-    event Executing(Info info);
+    // event Executing(Info info);
     function execute(Info[] calldata infos) public {
         for (uint i = 0; i < infos.length; i = onePlus(i)) {
             Info memory info = infos[i];
-            emit Executing(info);
+            // emit Executing(info);
             if (uint(info.action) <= uint(Action.FillAnyAndAddOrder)) {
                 if (Delta.unwrap(info.tokens) < 0) {
                     revert OnlyPositiveTokensAccepted(info.tokens);
