@@ -477,6 +477,21 @@
               <template #cell(include)="data">
                 <b-form-checkbox size="sm" :checked="data.item.include ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'include')" v-b-popover.hover="'Include in NFTs view?'"></b-form-checkbox>
               </template>
+              <template #cell(getSome)="data">
+                <div v-if="tokenInfo[data.item.address] && !tokenInfo[data.item.address].faucet">
+                  Exchange
+                </div>
+                <div v-else-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weenus'">
+                  Weenus
+                </div>
+                <div v-else-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weth'">
+                  WETH
+                </div>
+                <div v-else>
+                  Get Some
+                </div>
+                <!-- <b-form-checkbox size="sm" :checked="data.item.include ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'include')" v-b-popover.hover="'Include in NFTs view?'"></b-form-checkbox> -->
+              </template>
               <template #cell(delete)="data">
                 <b-button size="sm" @click="deleteCoin(data.item.address)" variant="link" v-b-popover.hover="'Delete account'"><b-icon-trash style="color: #ff0000;" shift-v="+1" font-scale="1.0"></b-icon-trash></b-button>
               </template>
@@ -717,6 +732,33 @@
           tokens: [],
           selectedCollections: {},
           selectedMainTable: {},
+
+          tokenInfo: {
+            "0x03563574B3839e2CdD6281D8741497Ba82FD6739": {
+                "faucet": null,
+                "symbol": "BOKKY",
+            },
+            "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9": {
+                "faucet": "weenus",
+                "symbol": "WEENUS",
+            },
+            "0x07391dbE03e7a0DEa0fce6699500da081537B6c3": {
+                "faucet": "weth",
+                "symbol": "WETH",
+            },
+            "0xc21d97673B9E0B3AA53a06439F71fDc1facE393B": {
+              "faucet": "weenus",
+                "symbol": "XEENUS",
+            },
+            "0x93fCA4c6E2525C09c95269055B46f16b1459BF9d": {
+                "faucet": "weenus",
+                "symbol": "YEENUS",
+            },
+            "0xe9EF74A6568E9f0e42a587C9363C9BcC582dcC6c": {
+                "faucet": "weenus",
+                "symbol": "ZEENUS",
+            }
+          },
           accountsSortOptions: [
             { value: 'groupnameasc', text: '▲ Group, ▲ Name' },
             { value: 'groupnamedsc', text: '▼ Group, ▲ Name' },
@@ -744,13 +786,14 @@
           ],
           coinsFields: [
             { key: 'address', label: '#', sortable: false, thStyle: 'width: 30%;', tdClass: 'text-truncate' },
-            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
             // { key: 'sync', label: 'Sync', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
             // { key: 'include', label: 'Include', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
-            { key: 'delete', label: 'Delete', sortable: false, thStyle: 'width: 6%;', tdClass: 'text-truncate' },
+            { key: 'getSome', label: 'Get Some', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+            { key: 'delete', label: 'Delete', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
           ],
           accountsFields: [
             { key: 'address', label: '#', sortable: false, thStyle: 'width: 30%;', tdClass: 'text-truncate' },
