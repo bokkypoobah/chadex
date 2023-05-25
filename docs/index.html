@@ -63,9 +63,9 @@
           <b-alert v-if="false" size="sm" dismissible variant="warning" show class="m-1 my-0">
             Warning: This is experimental unaudited software. Revoke permissions when not required, at this early stage.
           </b-alert>
-          <b-card class="m-2 p-1" header-class="warningheader" header="Welcome" v-if="!coinbase">
+          <b-card class="m-2 p-1" header-class="warningheader" header="Welcome" v-if="!coinbase || chainId != '11155111'">
             <b-card-text>
-              Please install the MetaMask extension, connect to the Ethereum mainnet and refresh this page. Then click the [Connect] button on the top right.
+              Please install the MetaMask extension, connect to the Ethereum Sepolia testnet and refresh this page. Then click the [Connect] button on the top right.
             </b-card-text>
           </b-card>
 
@@ -596,6 +596,7 @@
         // --- DATA ---
         data: {
           coinbase: null,
+          chainId: null,
           settings: {
             tabIndex: 0,
             showAdditionalFilters: false,
@@ -629,7 +630,7 @@
               pageSize: 10,
               sortOption: 'lastsaledsc',
             },
-            version: 3,
+            version: 0,
           },
           newCoinAddress: null,
           newAddress: null,
@@ -753,7 +754,7 @@
             34: "U3Collect",
           },
           db: {
-            name: "memecoindata089g",
+            name: "dexzdata089g",
             version: 1,
             schemaDefinition: {
               cache: '&objectName',
@@ -1393,7 +1394,7 @@
             this.saveSettings();
           },
           saveSettings() {
-            localStorage.memeCoinDataSettings = JSON.stringify(this.settings);
+            localStorage.dexzSettings = JSON.stringify(this.settings);
             // console.log("saveSettings: " + JSON.stringify(this.settings));
           },
           filterChanged(dataType, option) {
@@ -2844,8 +2845,11 @@
               const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
               const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider);
               this.coinbase = await signer.getAddress();
-              localStorage.coinbase = this.coinbase;
+              localStorage.dexzCoinbase = this.coinbase;
               const network = await provider.getNetwork();
+              console.log("network: " + JSON.stringify(network));
+              localStorage.dexzChainId = network.chainId;
+              this.chainId = network.chainId;
               const block = await provider.getBlock("latest");
               const blockNumber = block.number;
               const timestamp = block.timestamp;
@@ -3077,8 +3081,11 @@
 
         // --- MOUNTED ---
         mounted() {
-          if ('coinbase' in localStorage) {
-            this.coinbase = localStorage.coinbase;
+          if ('dexzCoinbase' in localStorage) {
+            this.coinbase = localStorage.dexzCoinbase;
+          }
+          if ('dexzChainId' in localStorage) {
+            this.chainId = localStorage.dexzChainId;
           }
           // if ('selectedCollections' in localStorage) {
           //   this.selectedCollections = JSON.parse(localStorage.selectedCollections);
@@ -3087,8 +3094,8 @@
           // if ('selectedMainTable' in localStorage) {
           //   this.selectedMainTable = JSON.parse(localStorage.selectedMainTable);
           // }
-          if ('memeCoinDataSettings' in localStorage) {
-            const tempSettings = JSON.parse(localStorage.memeCoinDataSettings);
+          if ('dexzSettings' in localStorage) {
+            const tempSettings = JSON.parse(localStorage.dexzSettings);
             if ('version' in tempSettings && tempSettings.version == this.settings.version) {
               this.settings = tempSettings;
               if (this.settings.tokensTable.currentPage > 1) {
