@@ -51,9 +51,9 @@
             <em v-b-popover.hover.bottom="'gm gm gm'">Dexz</em>
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
-            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings()" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'View/sync Coin Data'">Coin Data</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings()" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'View/edit ERC-20 coins'">Coins</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View/edit my accounts'">Accounts</b-nav-item> -->
+            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings()" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'View/sync Dexz Data'">Dexz</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings()" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'View/edit ERC-20 coins'">Tokens</b-nav-item>
+            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View/edit my accounts'">Accounts</b-nav-item> -->
             <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="processIt('connect')" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
@@ -438,7 +438,7 @@
                 ERC-20 Coin Address <b-button v-b-modal.new-coin-modal-prevent-closing variant="link" v-b-popover.hover.top="'Add new coin'"><b-icon-plus-square shift-v="+1" font-scale="0.8"></b-icon-plus-square></b-button>
                 <b-modal id="new-coin-modal-prevent-closing" ref="modal" title="New ERC-20 Coin Address" @show="newCoinAddressResetModal" @hidden="newCoinAddressResetModal" @ok="newCoinAddressHandleOk">
                   <form ref="coinForm" @submit.stop.prevent="newCoinAddressHandleSubmit">
-                    <b-form-group label="Address" label-for="name-input" :state="newCoinAddressState" description="Pre-filled with TURBO for initial testing" invalid-feedback="Please enter a valid Ethereum ERC-20 address">
+                    <b-form-group label="Address" label-for="name-input" :state="newCoinAddressState" description="Pre-filled with WEENUS for initial testing" invalid-feedback="Please enter a valid Ethereum ERC-20 address">
                       <b-form-input id="name-input" v-model="newCoinAddress" :state="newCoinAddressState" required placeholder="0x1234..."></b-form-input>
                     </b-form-group>
                   </form>
@@ -602,7 +602,53 @@
             showAdditionalFilters: false,
             filters: {},
             editCoins: false,
-            coins: {},
+            coins: {
+              "0x07391dbE03e7a0DEa0fce6699500da081537B6c3": {
+                  "sync": true,
+                  "include": true,
+                  "latestBlockNumber": null,
+                  "symbol": "WETH",
+                  "name": "Wrapped Ether",
+                  "totalSupply": "0",
+                  "decimals": 18
+              },
+              "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9": {
+                  "sync": true,
+                  "include": true,
+                  "latestBlockNumber": null,
+                  "symbol": "WEENUS",
+                  "name": "Weenus 💪",
+                  "decimals": 18,
+                  "totalSupply": "1008000000000000000000000"
+              },
+              "0xc21d97673B9E0B3AA53a06439F71fDc1facE393B": {
+                  "sync": true,
+                  "include": true,
+                  "latestBlockNumber": null,
+                  "symbol": "XEENUS",
+                  "name": "Xeenus 💪",
+                  "decimals": 18,
+                  "totalSupply": "1023000000000000000000000"
+              },
+              "0x93fCA4c6E2525C09c95269055B46f16b1459BF9d": {
+                  "sync": true,
+                  "include": true,
+                  "latestBlockNumber": null,
+                  "symbol": "YEENUS",
+                  "name": "Yeenus 💪",
+                  "decimals": 8,
+                  "totalSupply": "100200000000000"
+              },
+              "0xe9EF74A6568E9f0e42a587C9363C9BcC582dcC6c": {
+                  "sync": true,
+                  "include": true,
+                  "latestBlockNumber": null,
+                  "symbol": "ZEENUS",
+                  "name": "Zeenus 💪",
+                  "decimals": 0,
+                  "totalSupply": "1000000"
+              }
+            },
             coinsTable: {
               filter: null,
               currentPage: 1,
@@ -1290,7 +1336,7 @@
           },
           newCoinAddressResetModal() {
             // TODO this.newCoinAddress = null;
-            this.newCoinAddress = "0xA35923162C49cF95e6BF26623385eb431ad920D3";
+            this.newCoinAddress = "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9";
           },
           newCoinAddressHandleOk(bvModalEvent) {
             // Prevent modal from closing
@@ -1306,39 +1352,66 @@
             if (!(this.newCoinAddress in this.settings.coins)) {
               console.log("Adding: " + this.newCoinAddress);
               const provider = new ethers.providers.Web3Provider(window.ethereum);
-              const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider);
+
               const coinInfo = {
                 sync: true,
                 include: true,
                 latestBlockNumber: null,
               };
+              const erc20 = new ethers.Contract(this.newCoinAddress, ERC20ABI, provider);
+              console.log("Hello");
               try {
-                const tokenInfos = await erc721Helper.tokenInfo([this.newCoinAddress], { gasLimit: 1000000 });
-                console.log("tokenInfos: " + JSON.stringify(tokenInfos, null, 2));
-                for (let i = 0; i < tokenInfos[0].length; i++) {
-                  coinInfo.mask = tokenInfos[0][i].toNumber();
-                  coinInfo.symbol = tokenInfos[1][i];
-                  coinInfo.name = tokenInfos[2][i];
-                  coinInfo.totalSupply = ethers.BigNumber.from(tokenInfos[3][i]).toString();
-                }
+                coinInfo.symbol = await erc20.symbol();
               } catch (e) {
-                console.log("newCoinAddressHandleSubmit ERROR - account: " + this.newCoinAddress + ", message: " + e.message);
-                coinInfo.mask = 0;
-                coinInfo.symbol = null;
-                coinInfo.name = null;
+                console.log("newCoinAddressHandleSubmit ERROR - symbol - account: " + this.newCoinAddress + ", message: " + e.message);
               }
-              coinInfo.decimals = null;
-              if ((coinInfo.mask & MASK_ISERC20) == MASK_ISERC20) {
-                const erc20 = new ethers.Contract(this.newCoinAddress, ERC20ABI, provider);
-                try {
-                  coinInfo.decimals = parseInt(ethers.BigNumber.from(await erc20.decimals()).toString());
-                } catch (e) {
-                  console.log("newCoinAddressHandleSubmit ERROR - decimals - account: " + this.newCoinAddress + ", message: " + e.message);
-                }
-                Vue.set(this.settings.coins, this.newCoinAddress, { ...coinInfo, mask: undefined });
-              } else {
-                console.log("Not ERC-20: " + this.newCoinAddress);
+              try {
+                coinInfo.name = await erc20.name();
+              } catch (e) {
+                console.log("newCoinAddressHandleSubmit ERROR - name - account: " + this.newCoinAddress + ", message: " + e.message);
               }
+              try {
+                coinInfo.decimals = parseInt(ethers.BigNumber.from(await erc20.decimals()).toString());
+              } catch (e) {
+                console.log("newCoinAddressHandleSubmit ERROR - decimals - account: " + this.newCoinAddress + ", message: " + e.message);
+              }
+              try {
+                coinInfo.totalSupply = ethers.BigNumber.from(await erc20.totalSupply()).toString();
+              } catch (e) {
+                console.log("newCoinAddressHandleSubmit ERROR - totalSupply - account: " + this.newCoinAddress + ", message: " + e.message);
+              }
+              Vue.set(this.settings.coins, this.newCoinAddress, coinInfo);
+
+
+
+              // const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS_SEPOLIA, ERC721HELPERABI, provider);
+              // try {
+              //   const tokenInfos = await erc721Helper.tokenInfo([this.newCoinAddress], { gasLimit: 1000000 });
+              //   console.log("tokenInfos: " + JSON.stringify(tokenInfos, null, 2));
+              //   for (let i = 0; i < tokenInfos[0].length; i++) {
+              //     coinInfo.mask = tokenInfos[0][i].toNumber();
+              //     coinInfo.symbol = tokenInfos[1][i];
+              //     coinInfo.name = tokenInfos[2][i];
+              //     coinInfo.totalSupply = ethers.BigNumber.from(tokenInfos[3][i]).toString();
+              //   }
+              // } catch (e) {
+              //   console.log("newCoinAddressHandleSubmit ERROR - account: " + this.newCoinAddress + ", message: " + e.message);
+              //   coinInfo.mask = 0;
+              //   coinInfo.symbol = null;
+              //   coinInfo.name = null;
+              // }
+              // coinInfo.decimals = null;
+              // if ((coinInfo.mask & MASK_ISERC20) == MASK_ISERC20) {
+              //   const erc20 = new ethers.Contract(this.newCoinAddress, ERC20ABI, provider);
+              //   try {
+              //     coinInfo.decimals = parseInt(ethers.BigNumber.from(await erc20.decimals()).toString());
+              //   } catch (e) {
+              //     console.log("newCoinAddressHandleSubmit ERROR - decimals - account: " + this.newCoinAddress + ", message: " + e.message);
+              //   }
+              //   Vue.set(this.settings.coins, this.newCoinAddress, { ...coinInfo, mask: undefined });
+              // } else {
+              //   console.log("Not ERC-20: " + this.newCoinAddress);
+              // }
             } else {
               console.log("Discarding duplicate: " + this.newCoinAddress);
             }
@@ -2843,7 +2916,7 @@
               const provider = new ethers.providers.Web3Provider(window.ethereum);
               const signer = provider.getSigner();
               const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-              const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider);
+              const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS_SEPOLIA, ERC721HELPERABI, provider);
               this.coinbase = await signer.getAddress();
               localStorage.dexzCoinbase = this.coinbase;
               const network = await provider.getNetwork();
