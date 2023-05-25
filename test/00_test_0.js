@@ -180,8 +180,9 @@ describe("Dexz", function () {
 
     await data.printState("After Adding Orders");
 
+    const baseTokensB = ethers.utils.parseUnits("1", data.decimals0);
     const actionsb = [
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 9).toString(), expiry: expiry, tokens: baseTokens5.toString() },
+      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 9).toString(), expiry: expiry, tokens: baseTokensB.toString() },
     ];
     console.log("actionsb: " + JSON.stringify(actionsb));
     const execute1Tx = await data.dexz.connect(data.user2Signer).execute(actionsb);
