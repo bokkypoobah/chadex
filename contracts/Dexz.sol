@@ -18,8 +18,6 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 //   price = multiplier * quoteTokens / baseTokens / divisor
 //
 // TODO:
-//   * bulkTrade
-//   * updateExpiryAndTokens
 //   * Check limits for Tokens(uint128) x Price(uint64)
 //   * Review Delta and Token conversions
 //   * Check cost of taking vs making expired or dummy orders
@@ -578,64 +576,4 @@ contract Dexz is DexzBase, ReentrancyGuard {
             price = getNextBestPrice(pairKey, buySell, price);
         }
     }
-
-    /*
-    function increaseOrderBaseTokens(bytes32 key, uint tokens) public returns (uint _newBaseTokens, uint _filled) {
-        Order storage order = orders[key];
-        require(order.maker == msg.sender);
-        order.baseTokens = order.baseTokens.add(baseTokens);
-        (_newBaseTokens, _filled) = (order.baseTokens, order.filled);
-        emit OrderUpdated(key, baseTokens, _newBaseTokens);
-    }
-    function decreaseOrderBaseTokens(bytes32 key, uint baseTokens) public returns (uint _newBaseTokens, uint _filled) {
-        Order storage order = orders[key];
-        require(order.maker == msg.sender);
-        if (order.filled.add(baseTokens) < order.baseTokens) {
-            order.baseTokens = order.filled;
-        } else {
-            order.baseTokens = order.baseTokens.sub(baseTokens);
-        }
-        (_newBaseTokens, _filled) = (order.baseTokens, order.filled);
-        emit OrderUpdated(key, baseTokens, _newBaseTokens);
-    }
-    function updateOrderPrice(OrderType orderType, address baseToken, address quoteToken, uint oldPrice, uint newPrice, uint expiry) public returns (uint _newBaseTokens) {
-        bytes32 oldKey = Orders.generateOrderKey(OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, oldPrice, expiry);
-        Order storage oldOrder = orders[oldKey];
-        require(oldOrder.maker == msg.sender);
-        bytes32 newKey = Orders.generateOrderKey(OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, newPrice, expiry);
-        Order storage newOrder = orders[newKey];
-        if (newOrder.maker != address(0)) {
-            require(newOrder.maker == msg.sender);
-            newOrder.baseTokens = newOrder.baseTokens.add(oldOrder.baseTokens.sub(oldOrder.filled));
-            _newBaseTokens = newOrder.baseTokens;
-        } else {
-            orders[newKey] = Order(orderType, msg.sender, baseToken, quoteToken, newPrice, expiry, oldOrder.baseTokens.sub(oldOrder.filled), 0);
-            userOrders[msg.sender].push(newKey);
-            _newBaseTokens = oldOrder.baseTokens;
-        }
-        oldOrder.baseTokens = oldOrder.filled;
-        // BK TODO: Log changes
-    }
-    function updateOrderExpiry(OrderType orderType, address baseToken, address quoteToken, uint price, uint oldExpiry, uint newExpiry) public returns (uint _newBaseTokens) {
-        bytes32 oldKey = Orders.generateOrderKey(OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, price, oldExpiry);
-        Order storage oldOrder = orders[oldKey];
-        require(oldOrder.maker == msg.sender);
-        bytes32 newKey = Orders.generateOrderKey(OrderType(uint(orderType)), msg.sender, baseToken, quoteToken, price, newExpiry);
-        Order storage newOrder = orders[newKey];
-        if (newOrder.maker != address(0)) {
-            require(newOrder.maker == msg.sender);
-            newOrder.baseTokens = newOrder.baseTokens.add(oldOrder.baseTokens.sub(oldOrder.filled));
-            _newBaseTokens = newOrder.baseTokens;
-        } else {
-            orders[newKey] = Order(orderType, msg.sender, baseToken, quoteToken, price, newExpiry, oldOrder.baseTokens.sub(oldOrder.filled), 0);
-            userOrders[msg.sender].push(newKey);
-            _newBaseTokens = oldOrder.baseTokens;
-        }
-        oldOrder.baseTokens = oldOrder.filled;
-        // BK TODO: Log changes
-    }
-    function removeOrder(bytes32 key) public {
-        _removeOrder(key, msg.sender);
-    }
-    */
 }
