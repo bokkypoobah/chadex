@@ -17,7 +17,7 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 //   price = multiplier * quoteTokens / baseTokens / divisor
 //
 // TODO:
-//   * Work around stack overflow
+//   * Work around stack too deep requiring IR that is not easy to source validate
 //   * Deploy to Sepolia
 //   * Decide on checks for taker's balances
 //   * Check limits for Tokens(uint128) x Price(uint64)
@@ -302,6 +302,26 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
 
+    struct StackTooDeepWorkaround {
+        // uint availableTokens;
+        bool deleteOrder;
+        uint makerTokensToFill;
+        uint tokensToTransfer;
+        uint quoteTokensToTransfer;
+    }
+
+    event Trade(TradeInfo tradeInfo);
+    struct TradeInfo {
+        PairKey pairKey;
+        OrderKey orderKey;
+        BuySell buySell;
+        Account taker;
+        Account maker;
+        uint tokens;
+        uint quoteTokens;
+        Price price;
+    }
+
     function _trade(Info memory info, MoreInfo memory moreInfo) internal returns (Tokens filled, Tokens quoteTokensFilled, Tokens tokensOnOrder, OrderKey orderKey) {
         if (Price.unwrap(info.price) < Price.unwrap(PRICE_MIN) || Price.unwrap(info.price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice(info.price, PRICE_MAX);
@@ -320,66 +340,68 @@ contract Dexz is DexzBase, ReentrancyGuard {
             OrderKey bestMatchingOrderKey = orderQueue.head;
             while (isNotSentinel(bestMatchingOrderKey)) {
                 Order storage order = orders[bestMatchingOrderKey];
-                bool deleteOrder = false;
+                StackTooDeepWorkaround memory stdw;
+                stdw.deleteOrder = false;
                 if (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) >= block.timestamp) {
-                    uint makerTokensToFill = Tokens.unwrap(order.tokens) - Tokens.unwrap(order.filled);
-                    uint tokensToTransfer;
-                    uint quoteTokensToTransfer;
+                    stdw.makerTokensToFill = Tokens.unwrap(order.tokens) - Tokens.unwrap(order.filled);
+                    stdw.tokensToTransfer = 0;
+                    stdw.quoteTokensToTransfer = 0;
                     if (info.buySell == BuySell.Buy) {
                         uint _availableTokens = availableTokens(info.base, order.maker);
                         if (_availableTokens > 0) {
-                            if (makerTokensToFill > _availableTokens) {
-                                makerTokensToFill = _availableTokens;
+                            if (stdw.makerTokensToFill > _availableTokens) {
+                                stdw.makerTokensToFill = _availableTokens;
                             }
-                            if (uint128(Delta.unwrap(info.tokens)) >= makerTokensToFill) {
-                                tokensToTransfer = makerTokensToFill;
-                                deleteOrder = true;
+                            if (uint128(Delta.unwrap(info.tokens)) >= stdw.makerTokensToFill) {
+                                stdw.tokensToTransfer = stdw.makerTokensToFill;
+                                stdw.deleteOrder = true;
                             } else {
-                                tokensToTransfer = uint(uint128(Delta.unwrap(info.tokens)));
+                                stdw.tokensToTransfer = uint(uint128(Delta.unwrap(info.tokens)));
                             }
-                            quoteTokensToTransfer = baseToQuote(moreInfo, tokensToTransfer, bestMatchingPrice);
+                            stdw.quoteTokensToTransfer = baseToQuote(moreInfo, stdw.tokensToTransfer, bestMatchingPrice);
                             if (Account.unwrap(order.maker) != msg.sender) {
-                                transferFrom(info.quote, Account.wrap(msg.sender), order.maker, quoteTokensToTransfer);
-                                transferFrom(info.base, order.maker, Account.wrap(msg.sender), tokensToTransfer);
+                                transferFrom(info.quote, Account.wrap(msg.sender), order.maker, stdw.quoteTokensToTransfer);
+                                transferFrom(info.base, order.maker, Account.wrap(msg.sender), stdw.tokensToTransfer);
                             }
-                            emit Trade(moreInfo.pairKey, bestMatchingOrderKey, info.buySell, moreInfo.taker, order.maker, tokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
+                            // emit Trade(moreInfo.pairKey, bestMatchingOrderKey, info.buySell, moreInfo.taker, order.maker, stdw.tokensToTransfer, stdw.quoteTokensToTransfer, bestMatchingPrice);
+                            emit Trade(TradeInfo(moreInfo.pairKey, bestMatchingOrderKey, info.buySell, moreInfo.taker, order.maker, stdw.tokensToTransfer, stdw.quoteTokensToTransfer, bestMatchingPrice));
                         } else {
-                            deleteOrder = true;
+                            stdw.deleteOrder = true;
                         }
                     } else {
                         uint availableQuoteTokens = availableTokens(info.quote, order.maker);
                         if (availableQuoteTokens > 0) {
                             uint availableQuoteTokensInBaseTokens = quoteToBase(moreInfo, availableQuoteTokens, bestMatchingPrice);
-                            if (makerTokensToFill > availableQuoteTokensInBaseTokens) {
-                                makerTokensToFill = availableQuoteTokensInBaseTokens;
+                            if (stdw.makerTokensToFill > availableQuoteTokensInBaseTokens) {
+                                stdw.makerTokensToFill = availableQuoteTokensInBaseTokens;
                             } else {
-                                availableQuoteTokens = baseToQuote(moreInfo, makerTokensToFill, bestMatchingPrice);
+                                availableQuoteTokens = baseToQuote(moreInfo, stdw.makerTokensToFill, bestMatchingPrice);
                             }
-                            if (uint128(Delta.unwrap(info.tokens)) >= makerTokensToFill) {
-                                tokensToTransfer = makerTokensToFill;
-                                quoteTokensToTransfer = availableQuoteTokens;
-                                deleteOrder = true;
+                            if (uint128(Delta.unwrap(info.tokens)) >= stdw.makerTokensToFill) {
+                                stdw.tokensToTransfer = stdw.makerTokensToFill;
+                                stdw.quoteTokensToTransfer = availableQuoteTokens;
+                                stdw.deleteOrder = true;
                             } else {
-                                tokensToTransfer = uint(uint128(Delta.unwrap(info.tokens)));
-                                quoteTokensToTransfer = baseToQuote(moreInfo, tokensToTransfer, bestMatchingPrice);
+                                stdw.tokensToTransfer = uint(uint128(Delta.unwrap(info.tokens)));
+                                stdw.quoteTokensToTransfer = baseToQuote(moreInfo, stdw.tokensToTransfer, bestMatchingPrice);
                             }
                             if (Account.unwrap(order.maker) != msg.sender) {
-                                transferFrom(info.base, Account.wrap(msg.sender), order.maker, tokensToTransfer);
-                                transferFrom(info.quote, order.maker, Account.wrap(msg.sender), quoteTokensToTransfer);
+                                transferFrom(info.base, Account.wrap(msg.sender), order.maker, stdw.tokensToTransfer);
+                                transferFrom(info.quote, order.maker, Account.wrap(msg.sender), stdw.quoteTokensToTransfer);
                             }
-                            emit Trade(moreInfo.pairKey, bestMatchingOrderKey, info.buySell, moreInfo.taker, order.maker, tokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
+                            emit Trade(TradeInfo(moreInfo.pairKey, bestMatchingOrderKey, info.buySell, moreInfo.taker, order.maker, stdw.tokensToTransfer, stdw.quoteTokensToTransfer, bestMatchingPrice));
                         } else {
-                            deleteOrder = true;
+                            stdw.deleteOrder = true;
                         }
                     }
-                    order.filled = Tokens.wrap(Tokens.unwrap(order.filled) + uint128(tokensToTransfer));
-                    filled = Tokens.wrap(Tokens.unwrap(filled) + uint128(tokensToTransfer));
-                    quoteTokensFilled = Tokens.wrap(Tokens.unwrap(quoteTokensFilled) + uint128(quoteTokensToTransfer));
-                    info.tokens = Delta.wrap(int128(uint128(Delta.unwrap(info.tokens)) - uint128(tokensToTransfer)));
+                    order.filled = Tokens.wrap(Tokens.unwrap(order.filled) + uint128(stdw.tokensToTransfer));
+                    filled = Tokens.wrap(Tokens.unwrap(filled) + uint128(stdw.tokensToTransfer));
+                    quoteTokensFilled = Tokens.wrap(Tokens.unwrap(quoteTokensFilled) + uint128(stdw.quoteTokensToTransfer));
+                    info.tokens = Delta.wrap(int128(uint128(Delta.unwrap(info.tokens)) - uint128(stdw.tokensToTransfer)));
                 } else {
-                    deleteOrder = true;
+                    stdw.deleteOrder = true;
                 }
-                if (deleteOrder) {
+                if (stdw.deleteOrder) {
                     OrderKey temp = bestMatchingOrderKey;
                     bestMatchingOrderKey = order.next;
                     orderQueue.head = order.next;
