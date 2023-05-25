@@ -17,6 +17,9 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 //   price = multiplier * quoteTokens / baseTokens / divisor
 //
 // TODO:
+//   * Work around stack overflow
+//   * Deploy to Sepolia
+//   * Decide on checks for taker's balances
 //   * Check limits for Tokens(uint128) x Price(uint64)
 //   * Review Delta and Token conversions
 //   * Check cost of taking vs making expired or dummy orders
@@ -160,10 +163,6 @@ contract DexzBase {
     error OrderNotFoundForUpdate(OrderKey orderKey);
     error OnlyPositiveTokensAccepted(Delta tokens);
 
-
-    constructor() {
-    }
-
     function pair(uint i) public view returns (PairKey pairKey, Token base, Token quote, Factor multiplier, Factor divisor) {
         pairKey = pairKeys[i];
         Pair memory p = pairs[pairKey];
@@ -172,43 +171,14 @@ contract DexzBase {
     function pairsLength() public view returns (uint) {
         return pairKeys.length;
     }
-
-    // Price tree navigating
-    // BK TODO function count(bytes32 pairKey, uint _orderType) public view returns (uint _count) {
-    // BK TODO     _count = priceTrees[pairKey][_orderType].count();
-    // BK TODO }
-    function first(PairKey pairKey, BuySell buySell) public view returns (Price price) {
-        price = priceTrees[pairKey][buySell].first();
+    function getOrderQueue(PairKey pairKey, BuySell buySell, Price price) public view returns (OrderKey head, OrderKey tail) {
+        OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
+        return (orderQueue.head, orderQueue.tail);
     }
-    function last(PairKey pairKey, BuySell buySell) public view returns (Price price) {
-        price = priceTrees[pairKey][buySell].last();
+    function getOrder(OrderKey orderKey) public view returns (OrderKey _next, Account maker, Unixtime expiry, Tokens tokens, Tokens filled) {
+        Order memory order = orders[orderKey];
+        return (order.next, order.maker, order.expiry, order.tokens, order.filled);
     }
-    function next(PairKey pairKey, BuySell buySell, Price price) public view returns (Price nextPrice) {
-        nextPrice = priceTrees[pairKey][buySell].next(price);
-    }
-    function prev(PairKey pairKey, BuySell buySell, Price price) public view returns (Price prevPrice) {
-        prevPrice = priceTrees[pairKey][buySell].prev(price);
-    }
-    function exists(PairKey pairKey, BuySell buySell, Price price) public view returns (bool) {
-        return priceTrees[pairKey][buySell].exists(price);
-    }
-    function getNode(PairKey pairKey, BuySell buySell, Price price) public view returns (Price returnKey, Price parent, Price left, Price right, uint8 red) {
-        return priceTrees[pairKey][buySell].getNode(price);
-    }
-
-    function generatePairKey(Info memory info) internal pure returns (PairKey) {
-        return PairKey.wrap(keccak256(abi.encodePacked(info.base, info.quote)));
-    }
-    function generateOrderKey(BuySell buySell, Account maker, Token base, Token quote, Price price) internal pure returns (OrderKey) {
-        return OrderKey.wrap(keccak256(abi.encodePacked(buySell, maker, base, quote, price)));
-    }
-    function exists(OrderKey key) internal view returns (bool) {
-        return Account.unwrap(orders[key].maker) != address(0);
-    }
-    function inverseBuySell(BuySell buySell) internal pure returns (BuySell inverse) {
-        inverse = (buySell == BuySell.Buy) ? BuySell.Sell : BuySell.Buy;
-    }
-
     function getBestPrice(PairKey pairKey, BuySell buySell) public view returns (Price price) {
         price = (buySell == BuySell.Buy) ? priceTrees[pairKey][buySell].last() : priceTrees[pairKey][buySell].first();
     }
@@ -219,27 +189,10 @@ contract DexzBase {
             nextBestPrice = (buySell == BuySell.Buy) ? priceTrees[pairKey][buySell].prev(price) : priceTrees[pairKey][buySell].next(price);
         }
     }
-
-    function isSentinel(OrderKey orderKey) internal pure returns (bool) {
-        return OrderKey.unwrap(orderKey) == OrderKey.unwrap(ORDERKEY_SENTINEL);
-    }
-    function isNotSentinel(OrderKey orderKey) internal pure returns (bool) {
-        return OrderKey.unwrap(orderKey) != OrderKey.unwrap(ORDERKEY_SENTINEL);
-    }
-
-    function getOrderQueue(PairKey pairKey, BuySell buySell, Price price) public view returns (OrderKey head, OrderKey tail) {
-        OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
-        return (orderQueue.head, orderQueue.tail);
-    }
-    function getOrder(OrderKey orderKey) public view returns (OrderKey _next, Account maker, Unixtime expiry, Tokens tokens, Tokens filled) {
-        Order memory order = orders[orderKey];
-        return (order.next, order.maker, order.expiry, order.tokens, order.filled);
-    }
-
-    function getMatchingBestPrice(MoreInfo memory moreInfo) public view returns (Price price) {
+    function getMatchingBestPrice(MoreInfo memory moreInfo) internal view returns (Price price) {
         price = (moreInfo.inverseBuySell == BuySell.Buy) ? priceTrees[moreInfo.pairKey][moreInfo.inverseBuySell].last() : priceTrees[moreInfo.pairKey][moreInfo.inverseBuySell].first();
     }
-    function getMatchingNextBestPrice(MoreInfo memory moreInfo, Price x) public view returns (Price y) {
+    function getMatchingNextBestPrice(MoreInfo memory moreInfo, Price x) internal view returns (Price y) {
         if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(x)) {
             y = (moreInfo.inverseBuySell == BuySell.Buy) ? priceTrees[moreInfo.pairKey][moreInfo.inverseBuySell].last() : priceTrees[moreInfo.pairKey][moreInfo.inverseBuySell].first();
         } else {
@@ -247,11 +200,39 @@ contract DexzBase {
         }
     }
 
+    function isSentinel(OrderKey orderKey) internal pure returns (bool) {
+        return OrderKey.unwrap(orderKey) == OrderKey.unwrap(ORDERKEY_SENTINEL);
+    }
+    function isNotSentinel(OrderKey orderKey) internal pure returns (bool) {
+        return OrderKey.unwrap(orderKey) != OrderKey.unwrap(ORDERKEY_SENTINEL);
+    }
+    function exists(OrderKey key) internal view returns (bool) {
+        return Account.unwrap(orders[key].maker) != address(0);
+    }
+    function inverseBuySell(BuySell buySell) internal pure returns (BuySell inverse) {
+        inverse = (buySell == BuySell.Buy) ? BuySell.Sell : BuySell.Buy;
+    }
+    function generatePairKey(Info memory info) internal pure returns (PairKey) {
+        return PairKey.wrap(keccak256(abi.encodePacked(info.base, info.quote)));
+    }
+    function generateOrderKey(BuySell buySell, Account maker, Token base, Token quote, Price price) internal pure returns (OrderKey) {
+        return OrderKey.wrap(keccak256(abi.encodePacked(buySell, maker, base, quote, price)));
+    }
+    function baseToQuote(MoreInfo memory moreInfo, uint tokens, Price price) pure internal returns (uint quoteTokens) {
+        quoteTokens = uint128((10 ** Factor.unwrap(moreInfo.divisor)) * tokens * uint(Price.unwrap(price)) / (10 ** Factor.unwrap(moreInfo.multiplier)));
+    }
+    function quoteToBase(MoreInfo memory moreInfo, uint quoteTokens, Price price) pure internal returns (uint tokens) {
+        tokens = (10 ** Factor.unwrap(moreInfo.multiplier)) * quoteTokens / uint(Price.unwrap(price)) / (10 ** Factor.unwrap(moreInfo.divisor));
+    }
+    function baseAndQuoteToPrice(MoreInfo memory moreInfo, uint tokens, uint quoteTokens) pure internal returns (Price price) {
+        price = Price.wrap(uint64((10 ** Factor.unwrap(moreInfo.multiplier)) * quoteTokens / tokens / (10 ** Factor.unwrap(moreInfo.divisor))));
+    }
     function availableTokens(Token token, Account wallet) internal view returns (uint tokens) {
         uint allowance = IERC20(Token.unwrap(token)).allowance(Account.unwrap(wallet), address(this));
         uint balance = IERC20(Token.unwrap(token)).balanceOf(Account.unwrap(wallet));
         tokens = allowance < balance ? allowance : balance;
     }
+
     function transferFrom(Token token, Account from, Account to, uint tokens) internal {
         (bool success, bytes memory data) = Token.unwrap(token).call(abi.encodeWithSelector(IERC20.transferFrom.selector, Account.unwrap(from), Account.unwrap(to), tokens));
         if (!success || (data.length != 0 && !abi.decode(data, (bool)))) {
@@ -263,9 +244,6 @@ contract DexzBase {
 
 contract Dexz is DexzBase, ReentrancyGuard {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
-
-    constructor() DexzBase() {
-    }
 
     function execute(Info[] calldata infos) public {
         for (uint i = 0; i < infos.length; i = onePlus(i)) {
@@ -280,71 +258,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
             } else if (info.action == Action.UpdateExpiryAndTokens) {
                 _updateExpiryAndTokens(info, _getMoreInfo(info, Account.wrap(msg.sender)));
             }
-        }
-    }
-
-    function _updateExpiryAndTokens(Info memory info, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
-        if (Delta.unwrap(info.tokens) > int128(Tokens.unwrap(TOKENS_MAX))) {
-            revert InvalidTokens(info.tokens, TOKENS_MAX);
-        }
-        orderKey = generateOrderKey(info.buySell, moreInfo.taker, info.base, info.quote, info.price);
-        Order storage order = orders[orderKey];
-        if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
-            revert OrderNotFoundForUpdate(orderKey);
-        }
-        if (Delta.unwrap(info.tokens) < 0) {
-            uint128 negativeTokens = uint128(-1 * Delta.unwrap(info.tokens));
-            if (negativeTokens > (Tokens.unwrap(order.tokens) - Tokens.unwrap(order.filled))) {
-                info.tokens = Delta.wrap(int128(Tokens.unwrap(order.filled)));
-            } else {
-                info.tokens = Delta.wrap(int128(Tokens.unwrap(order.tokens) - uint128(-1 * Delta.unwrap(info.tokens))));
-            }
-        } else {
-            info.tokens = Delta.wrap(int128(Tokens.unwrap(order.tokens) + uint128(Delta.unwrap(info.tokens))));
-        }
-        _checkTakerAvailableTokens(info, moreInfo);
-        order.tokens = Tokens.wrap(uint128(Delta.unwrap(info.tokens)));
-        order.expiry = info.expiry;
-        emit OrderUpdated(moreInfo.pairKey, orderKey, moreInfo.taker, info.buySell, info.price, info.expiry, order.tokens);
-    }
-
-    function _removeOrder(Info memory info, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
-        OrderQueue storage orderQueue = orderQueues[moreInfo.pairKey][info.buySell][info.price];
-        orderKey = orderQueue.head;
-        OrderKey prevOrderKey;
-        bool found;
-        while (isNotSentinel(orderKey) && !found) {
-            Order memory order = orders[orderKey];
-            if (Account.unwrap(order.maker) == Account.unwrap(moreInfo.taker)) {
-                OrderKey temp = orderKey;
-                emit OrderRemoved(moreInfo.pairKey, orderKey, order.maker, info.buySell, info.price, order.tokens, order.filled);
-                if (OrderKey.unwrap(orderQueue.head) == OrderKey.unwrap(orderKey)) {
-                    orderQueue.head = order.next;
-                } else {
-                    orders[prevOrderKey].next = order.next;
-                }
-                if (OrderKey.unwrap(orderQueue.tail) == OrderKey.unwrap(orderKey)) {
-                    orderQueue.tail = prevOrderKey;
-                }
-                prevOrderKey = orderKey;
-                orderKey = order.next;
-                delete orders[temp];
-                found = true;
-            } else {
-                prevOrderKey = orderKey;
-                orderKey = order.next;
-            }
-        }
-        if (found) {
-            if (isSentinel(orderQueue.head)) {
-                delete orderQueues[moreInfo.pairKey][info.buySell][info.price];
-                BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[moreInfo.pairKey][info.buySell];
-                if (priceTree.exists(info.price)) {
-                    priceTree.remove(info.price);
-                }
-            }
-        } else {
-            revert CannotRemoveMissingOrder();
         }
     }
 
@@ -372,6 +285,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
         return MoreInfo(taker, inverseBuySell(info.buySell), pairKey, multiplier, divisor);
     }
+
     function _checkTakerAvailableTokens(Info memory info, MoreInfo memory moreInfo) internal view {
         // TODO: Check somewhere that tokens > 0
         if (info.buySell == BuySell.Buy) {
@@ -387,41 +301,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
             }
         }
     }
-    function _addOrder(Info memory info, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
-        orderKey = generateOrderKey(info.buySell, moreInfo.taker, info.base, info.quote, info.price);
-        if (Account.unwrap(orders[orderKey].maker) != address(0)) {
-            revert CannotInsertDuplicateOrder(orderKey);
-        }
-        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[moreInfo.pairKey][info.buySell];
-        if (!priceTree.exists(info.price)) {
-            priceTree.insert(info.price);
-        }
-        OrderQueue storage orderQueue = orderQueues[moreInfo.pairKey][info.buySell][info.price];
-        if (isSentinel(orderQueue.head)) {
-            orderQueues[moreInfo.pairKey][info.buySell][info.price] = OrderQueue(ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
-            orderQueue = orderQueues[moreInfo.pairKey][info.buySell][info.price];
-        }
-        if (isSentinel(orderQueue.tail)) {
-            orderQueue.head = orderKey;
-            orderQueue.tail = orderKey;
-            orders[orderKey] = Order(ORDERKEY_SENTINEL, moreInfo.taker, info.expiry, Tokens.wrap(uint128(Delta.unwrap(info.tokens))), Tokens.wrap(0));
-        } else {
-            orders[orderQueue.tail].next = orderKey;
-            orders[orderKey] = Order(ORDERKEY_SENTINEL, moreInfo.taker, info.expiry, Tokens.wrap(uint128(Delta.unwrap(info.tokens))), Tokens.wrap(0));
-            orderQueue.tail = orderKey;
-        }
-        emit OrderAdded(moreInfo.pairKey, orderKey, moreInfo.taker, info.buySell, info.price, info.expiry, Tokens.wrap(uint128(Delta.unwrap(info.tokens))));
-    }
-
-    function baseToQuote(MoreInfo memory moreInfo, uint tokens, Price price) pure internal returns (uint quoteTokens) {
-        quoteTokens = uint128((10 ** Factor.unwrap(moreInfo.divisor)) * tokens * uint(Price.unwrap(price)) / (10 ** Factor.unwrap(moreInfo.multiplier)));
-    }
-    function quoteToBase(MoreInfo memory moreInfo, uint quoteTokens, Price price) pure internal returns (uint tokens) {
-        tokens = (10 ** Factor.unwrap(moreInfo.multiplier)) * quoteTokens / uint(Price.unwrap(price)) / (10 ** Factor.unwrap(moreInfo.divisor));
-    }
-    function baseAndQuoteToPrice(MoreInfo memory moreInfo, uint tokens, uint quoteTokens) pure internal returns (Price price) {
-        price = Price.wrap(uint64((10 ** Factor.unwrap(moreInfo.multiplier)) * quoteTokens / tokens / (10 ** Factor.unwrap(moreInfo.divisor))));
-    }
 
     function _trade(Info memory info, MoreInfo memory moreInfo) internal returns (Tokens filled, Tokens quoteTokensFilled, Tokens tokensOnOrder, OrderKey orderKey) {
         if (Price.unwrap(info.price) < Price.unwrap(PRICE_MIN) || Price.unwrap(info.price) > Price.unwrap(PRICE_MAX)) {
@@ -430,7 +309,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         if (Delta.unwrap(info.tokens) > int128(Tokens.unwrap(TOKENS_MAX))) {
             revert InvalidTokens(info.tokens, TOKENS_MAX);
         }
-        // TODO Testing _checkTakerAvailableTokens(info, moreInfo);
+        // TODO - Decide whether to have this check _checkTakerAvailableTokens(info, moreInfo);
 
         Price bestMatchingPrice = getMatchingBestPrice(moreInfo);
         while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
@@ -541,6 +420,97 @@ contract Dexz is DexzBase, ReentrancyGuard {
             Price price = Tokens.unwrap(filled) > 0 ? baseAndQuoteToPrice(moreInfo, uint(Tokens.unwrap(filled)), uint(Tokens.unwrap(quoteTokensFilled))) : Price.wrap(0);
             emit TradeSummary(info.buySell, moreInfo.taker, filled, quoteTokensFilled, price, tokensOnOrder);
         }
+    }
+
+    function _addOrder(Info memory info, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
+        orderKey = generateOrderKey(info.buySell, moreInfo.taker, info.base, info.quote, info.price);
+        if (Account.unwrap(orders[orderKey].maker) != address(0)) {
+            revert CannotInsertDuplicateOrder(orderKey);
+        }
+        BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[moreInfo.pairKey][info.buySell];
+        if (!priceTree.exists(info.price)) {
+            priceTree.insert(info.price);
+        }
+        OrderQueue storage orderQueue = orderQueues[moreInfo.pairKey][info.buySell][info.price];
+        if (isSentinel(orderQueue.head)) {
+            orderQueues[moreInfo.pairKey][info.buySell][info.price] = OrderQueue(ORDERKEY_SENTINEL, ORDERKEY_SENTINEL);
+            orderQueue = orderQueues[moreInfo.pairKey][info.buySell][info.price];
+        }
+        if (isSentinel(orderQueue.tail)) {
+            orderQueue.head = orderKey;
+            orderQueue.tail = orderKey;
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, moreInfo.taker, info.expiry, Tokens.wrap(uint128(Delta.unwrap(info.tokens))), Tokens.wrap(0));
+        } else {
+            orders[orderQueue.tail].next = orderKey;
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, moreInfo.taker, info.expiry, Tokens.wrap(uint128(Delta.unwrap(info.tokens))), Tokens.wrap(0));
+            orderQueue.tail = orderKey;
+        }
+        emit OrderAdded(moreInfo.pairKey, orderKey, moreInfo.taker, info.buySell, info.price, info.expiry, Tokens.wrap(uint128(Delta.unwrap(info.tokens))));
+    }
+
+    function _removeOrder(Info memory info, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
+        OrderQueue storage orderQueue = orderQueues[moreInfo.pairKey][info.buySell][info.price];
+        orderKey = orderQueue.head;
+        OrderKey prevOrderKey;
+        bool found;
+        while (isNotSentinel(orderKey) && !found) {
+            Order memory order = orders[orderKey];
+            if (Account.unwrap(order.maker) == Account.unwrap(moreInfo.taker)) {
+                OrderKey temp = orderKey;
+                emit OrderRemoved(moreInfo.pairKey, orderKey, order.maker, info.buySell, info.price, order.tokens, order.filled);
+                if (OrderKey.unwrap(orderQueue.head) == OrderKey.unwrap(orderKey)) {
+                    orderQueue.head = order.next;
+                } else {
+                    orders[prevOrderKey].next = order.next;
+                }
+                if (OrderKey.unwrap(orderQueue.tail) == OrderKey.unwrap(orderKey)) {
+                    orderQueue.tail = prevOrderKey;
+                }
+                prevOrderKey = orderKey;
+                orderKey = order.next;
+                delete orders[temp];
+                found = true;
+            } else {
+                prevOrderKey = orderKey;
+                orderKey = order.next;
+            }
+        }
+        if (found) {
+            if (isSentinel(orderQueue.head)) {
+                delete orderQueues[moreInfo.pairKey][info.buySell][info.price];
+                BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[moreInfo.pairKey][info.buySell];
+                if (priceTree.exists(info.price)) {
+                    priceTree.remove(info.price);
+                }
+            }
+        } else {
+            revert CannotRemoveMissingOrder();
+        }
+    }
+
+    function _updateExpiryAndTokens(Info memory info, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
+        if (Delta.unwrap(info.tokens) > int128(Tokens.unwrap(TOKENS_MAX))) {
+            revert InvalidTokens(info.tokens, TOKENS_MAX);
+        }
+        orderKey = generateOrderKey(info.buySell, moreInfo.taker, info.base, info.quote, info.price);
+        Order storage order = orders[orderKey];
+        if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
+            revert OrderNotFoundForUpdate(orderKey);
+        }
+        if (Delta.unwrap(info.tokens) < 0) {
+            uint128 negativeTokens = uint128(-1 * Delta.unwrap(info.tokens));
+            if (negativeTokens > (Tokens.unwrap(order.tokens) - Tokens.unwrap(order.filled))) {
+                info.tokens = Delta.wrap(int128(Tokens.unwrap(order.filled)));
+            } else {
+                info.tokens = Delta.wrap(int128(Tokens.unwrap(order.tokens) - uint128(-1 * Delta.unwrap(info.tokens))));
+            }
+        } else {
+            info.tokens = Delta.wrap(int128(Tokens.unwrap(order.tokens) + uint128(Delta.unwrap(info.tokens))));
+        }
+        // TODO - Decide whether to have this check _checkTakerAvailableTokens(info, moreInfo);
+        order.tokens = Tokens.wrap(uint128(Delta.unwrap(info.tokens)));
+        order.expiry = info.expiry;
+        emit OrderUpdated(moreInfo.pairKey, orderKey, moreInfo.taker, info.buySell, info.price, info.expiry, order.tokens);
     }
 
     function getOrders(PairKey pairKey, BuySell buySell, uint count, Price price, OrderKey firstOrderKey) public view returns (Price[] memory prices, OrderKey[] memory orderKeys, OrderKey[] memory nextOrderKeys, Account[] memory makers, Unixtime[] memory expiries, Tokens[] memory tokenss, Tokens[] memory filleds) {
