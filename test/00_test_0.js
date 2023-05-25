@@ -163,21 +163,21 @@ describe("Dexz", function () {
     const baseTokens4 = ethers.utils.parseUnits("6.9", data.decimals0);
     const baseTokens5 = ethers.utils.parseUnits("69", data.decimals0);
 
-    const actionsa = [
+    const actionsA = [
       { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), expiry: expiry, tokens: baseTokens1.toString() },
       { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 9).toString(), expiry: expiry, tokens: baseTokens2.toString() },
       { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 9).toString(), expiry: expiry, tokens: baseTokens3.toString() },
     ];
-    console.log("        Executing: " + JSON.stringify(actionsa));
+    console.log("        Executing: " + JSON.stringify(actionsA, null, 2));
 
-    const execute0aTx = await data.dexz.connect(data.user0Signer).execute(actionsa);
-    await data.printEvents("user0->dexz.execute(actionsa)", await execute0aTx.wait());
+    const execute0aTx = await data.dexz.connect(data.user0Signer).execute(actionsA);
+    await data.printEvents("user0->dexz.execute(actionsA)", await execute0aTx.wait());
 
-    const execute1aTx = await data.dexz.connect(data.user1Signer).execute(actionsa);
-    await data.printEvents("user1->dexz.execute(actionsa)", await execute1aTx.wait());
+    const execute1aTx = await data.dexz.connect(data.user1Signer).execute(actionsA);
+    await data.printEvents("user1->dexz.execute(actionsA)", await execute1aTx.wait());
 
-    const execute1bTx = await data.dexz.connect(data.user2Signer).execute(actionsa);
-    await data.printEvents("user2->dexz.execute(actionsa)", await execute1bTx.wait());
+    const execute1bTx = await data.dexz.connect(data.user2Signer).execute(actionsA);
+    await data.printEvents("user2->dexz.execute(actionsA)", await execute1bTx.wait());
 
     await data.printState("After Adding Orders");
 
@@ -185,26 +185,26 @@ describe("Dexz", function () {
     const actionsB = [
       { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 9).toString(), expiry: expiry, tokens: baseTokensB.toString() },
     ];
-    console.log("actionsB: " + JSON.stringify(actionsB));
+    console.log("        Executing: " + JSON.stringify(actionsB, null, 2));
     const execute1Tx = await data.dexz.connect(data.user2Signer).execute(actionsB);
     await data.printEvents("user2->dexz.execute(actions)", await execute1Tx.wait());
     await data.printState("After Executing Against Orders");
 
-    // const baseTokensC = ethers.utils.parseUnits("-1", data.decimals0);
-    // const actionsC = [
-    //   { action: Action.RemoveOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), expiry: expiry, tokens: baseTokensC.toString() },
-    // ];
-    // console.log("        Executing: " + JSON.stringify(actionsC));
-    // const executeCTx = await data.dexz.connect(data.user0Signer).execute(actionsC);
-    // await data.printEvents("user0->dexz.execute(actions)", await executeCTx.wait());
-    // await data.printState("After Executing Against Orders");
+    const baseTokensC = ethers.utils.parseUnits("-1", data.decimals0);
+    const actionsC = [
+      { action: Action.RemoveOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 9).toString(), expiry: expiry, tokens: baseTokensC.toString() },
+    ];
+    console.log("        Executing: " + JSON.stringify(actionsC, null, 2));
+    const executeCTx = await data.dexz.connect(data.user2Signer).execute(actionsC);
+    await data.printEvents("user2->dexz.execute(actions)", await executeCTx.wait());
+    await data.printState("After Executing Against Orders");
 
     const newExpiry = parseInt(new Date()/1000) + 24*60*60;
     const baseTokensD = ethers.utils.parseUnits("1.23", data.decimals0);
     const actionsD = [
       { action: Action.UpdateExpiryAndTokens, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), expiry: newExpiry, tokens: baseTokensD.toString() },
     ];
-    console.log("        Executing: " + JSON.stringify(actionsD));
+    console.log("        Executing: " + JSON.stringify(actionsD, null, 2));
     const executeDTx = await data.dexz.connect(data.user2Signer).execute(actionsD);
     await data.printEvents("user2->dexz.execute(actions)", await executeDTx.wait());
     await data.printState("After Executing Against Orders");
