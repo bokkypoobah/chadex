@@ -149,6 +149,7 @@ contract DexzBase {
 
     error InvalidPrice(Price price, Price priceMax);
     error InvalidTokens(Tokens tokenAmount, Tokens tokenAmountMax);
+    error CannotInsertDuplicateOrder(OrderKey orderKey);
     error TransferFromFailedApproval(Token token, Account from, Account to, uint _tokens, uint _approved);
     error TransferFromFailed(Token token, Account from, Account to, uint _tokens);
     error InsufficientTokenBalanceOrAllowance(Token base, Tokens tokens, Tokens availableTokens);
@@ -190,14 +191,12 @@ contract DexzBase {
     function getNode(PairKey pairKey, BuySell buySell, Price price) public view returns (Price returnKey, Price parent, Price left, Price right, uint8 red) {
         return priceTrees[pairKey][buySell].getNode(price);
     }
-    // Don't need parent, grandparent, sibling, uncle
 
-    // Orders navigating
     function generatePairKey(Token base, Token quote) internal pure returns (PairKey) {
         return PairKey.wrap(keccak256(abi.encodePacked(base, quote)));
     }
-    function generateOrderKey(BuySell buySell, Account maker, Token base, Token quote, Price price, Unixtime expiry) internal pure returns (OrderKey) {
-        return OrderKey.wrap(keccak256(abi.encodePacked(buySell, maker, base, quote, price, expiry)));
+    function generateOrderKey(BuySell buySell, Account maker, Token base, Token quote, Price price) internal pure returns (OrderKey) {
+        return OrderKey.wrap(keccak256(abi.encodePacked(buySell, maker, base, quote, price)));
     }
     function exists(OrderKey key) internal view returns (bool) {
         return Account.unwrap(orders[key].maker) != address(0);
@@ -298,7 +297,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 if (Delta.unwrap(info.tokens) < 0) {
                     revert OnlyPositiveTokensAccepted(info.tokens);
                 }
-                // Require info.tokens > 0
                 _trade(_getTradeInfo(Account.wrap(msg.sender), info.action, info.buySell, info.base, info.quote, info.price, info.expiry, Tokens.wrap(uint128(Delta.unwrap(info.tokens)))));
             }
         }
@@ -400,8 +398,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
     function _addOrder(Pair memory pair, TradeInfo memory tradeInfo) internal returns (OrderKey orderKey) {
-        orderKey = generateOrderKey(tradeInfo.buySell, tradeInfo.taker, pair.base, pair.quote, tradeInfo.price, tradeInfo.expiry);
-        require(Account.unwrap(orders[orderKey].maker) == address(0));
+        orderKey = generateOrderKey(tradeInfo.buySell, tradeInfo.taker, pair.base, pair.quote, tradeInfo.price);
+        if (Account.unwrap(orders[orderKey].maker) != address(0)) {
+            revert CannotInsertDuplicateOrder(orderKey);
+        }
         BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[tradeInfo.pairKey][tradeInfo.buySell];
         if (!priceTree.exists(tradeInfo.price)) {
             priceTree.insert(tradeInfo.price);
@@ -441,10 +441,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
                     uint tokensToTransfer;
                     uint quoteTokensToTransfer;
                     if (tradeInfo.buySell == BuySell.Buy) {
-                        uint availableBaseTokens = availableTokens(pair.base, order.maker);
-                        if (availableBaseTokens > 0) {
-                            if (makerTokensToFill > availableBaseTokens) {
-                                makerTokensToFill = availableBaseTokens;
+                        uint _availableTokens = availableTokens(pair.base, order.maker);
+                        if (_availableTokens > 0) {
+                            if (makerTokensToFill > _availableTokens) {
+                                makerTokensToFill = _availableTokens;
                             }
                             if (Tokens.unwrap(tradeInfo.tokens) >= makerTokensToFill) {
                                 tokensToTransfer = makerTokensToFill;
