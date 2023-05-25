@@ -145,7 +145,7 @@ contract DexzBase {
     event PairAdded(PairKey indexed pairKey, Token indexed base, Token indexed quote, uint8 baseDecimals, uint8 quoteDecimals, Factor multiplier, Factor divisor);
     event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens);
     event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, Tokens filled);
-    event OrderUpdated(OrderKey indexed key, uint tokens, uint newTokens);
+    event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens);
     event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, Account indexed taker, Account maker, uint tokens, uint quoteTokens, Price price);
     event TradeSummary(BuySell buySell, Account indexed taker, Tokens filled, Tokens quoteTokensFilled, Price price, Tokens tokensOnOrder);
 
@@ -289,7 +289,35 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
 
+    event DebugOrderKey(OrderKey orderKey);
+
+    error OrderNotFoundForUpdate(OrderKey orderKey);
+
     function _updateExpiryAndTokens(Info memory info, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
+        if (Delta.unwrap(info.tokens) > int128(Tokens.unwrap(TOKENS_MAX))) {
+            revert InvalidTokens(info.tokens, TOKENS_MAX);
+        }
+        // TODO: Check allowance - need to take into account the delta
+        // Pair memory pair = pairs[moreInfo.pairKey];
+        // _checkTakerAvailableTokens(info, pair);
+        orderKey = generateOrderKey(info.buySell, moreInfo.taker, info.base, info.quote, info.price);
+        emit DebugOrderKey(orderKey);
+        Order storage order = orders[orderKey];
+        if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
+            revert OrderNotFoundForUpdate(orderKey);
+        }
+        order.expiry = info.expiry;
+        if (Delta.unwrap(info.tokens) < 0) {
+            uint128 negativeTokens = uint128(-1 * Delta.unwrap(info.tokens));
+            if (negativeTokens > (Tokens.unwrap(order.tokens) - Tokens.unwrap(order.filled))) {
+                order.tokens = order.filled;
+            } else {
+                order.tokens = Tokens.wrap(Tokens.unwrap(order.tokens) - uint128(-1 * Delta.unwrap(info.tokens)));
+            }
+        } else {
+            order.tokens = Tokens.wrap(Tokens.unwrap(order.tokens) + uint128(Delta.unwrap(info.tokens)));
+        }
+        emit OrderUpdated(moreInfo.pairKey, orderKey, moreInfo.taker, info.buySell, info.price, info.expiry, order.tokens);
     }
 
     function _removeOrder(Info memory info, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
@@ -299,7 +327,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         bool found;
         while (isNotSentinel(orderKey) && !found) {
             Order memory order = orders[orderKey];
-            if (Account.unwrap(order.maker) == msg.sender) {
+            if (Account.unwrap(order.maker) == Account.unwrap(moreInfo.taker)) {
                 OrderKey temp = orderKey;
                 emit OrderRemoved(moreInfo.pairKey, orderKey, order.maker, info.buySell, info.price, order.tokens, order.filled);
                 if (OrderKey.unwrap(orderQueue.head) == OrderKey.unwrap(orderKey)) {
