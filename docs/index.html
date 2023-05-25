@@ -51,9 +51,9 @@
             <em v-b-popover.hover.bottom="'gm gm gm'">Dexz</em>
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
-            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings()" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'View/sync Coin Data'">Coin Data</b-nav-item>
+            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings()" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'View/sync Coin Data'">Coin Data</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings()" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'View/edit ERC-20 coins'">Coins</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View/edit my accounts'">Accounts</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View/edit my accounts'">Accounts</b-nav-item> -->
             <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="processIt('connect')" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
@@ -140,13 +140,13 @@
 
           <b-card v-if="coinbase && settings.tabIndex == 0" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <div class="d-flex flex-wrap m-0 p-0">
-              <div class="mt-0 pr-1">
+              <div v-if="false" class="mt-0 pr-1">
                 <b-form-input type="text" size="sm" v-model.trim="settings.tokensTable.tokenFilter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Token id and name filter'" placeholder="🔍 token id/name regex" style="min-width: 8.0rem;"></b-form-input>
               </div>
-              <div class="mt-0 pr-1">
+              <div v-if="false" class="mt-0 pr-1">
                 <b-form-input type="text" size="sm" v-model.trim="settings.tokensTable.collectionfilter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Collection name filter'" placeholder="🔍 collection name" style="min-width: 8.0rem;"></b-form-input>
               </div>
-              <div class="mt-0 pr-1">
+              <div v-if="false" class="mt-0 pr-1">
                 <b-button size="sm" :pressed.sync="settings.showAdditionalFilters" @click="saveSettings" variant="link" v-b-popover.hover.top="'Additional filters'"><span v-if="settings.showAdditionalFilters"><b-icon-funnel-fill shift-v="+1" font-scale="1.0"></b-icon-funnel-fill></span><span v-else><b-icon-funnel shift-v="+1" font-scale="1.0"></b-icon-funnel></span></b-button>
               </div>
               <div v-if="Object.keys(settings.filters).length > 0" class="mt-0 pr-1">
@@ -162,7 +162,7 @@
               <div class="mt-0 flex-grow-1">
               </div>
               <div v-if="!sync.section" class="mt-0 pr-1">
-                <b-button size="sm" @click="syncCoins()" variant="primary" v-b-popover.hover.top="'Select NFT collections to for accounts'">Sync</b-button>
+                <b-button size="sm" @click="syncAll()" variant="primary" v-b-popover.hover.top="'Select NFT collections to for accounts'">Sync</b-button>
               </div>
               <div class="mt-1" style="width: 250px;">
                 <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
@@ -246,7 +246,7 @@
             </div>
 
             <!-- <b-table small fixed striped responsive hover selectable select-mode="single" @row-selected="showModalDetails" :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Add your coins in the [Coins] menu, then click [Sync] above" head-variant="light" class="mx-0 my-1"> -->
-            <b-table small fixed striped responsive hover :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Add your coins in the [Coins] menu, then click [Sync] above" head-variant="light" class="mx-0 my-1">
+            <b-table small fixed striped responsive hover :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Please click [Sync] above" head-variant="light" class="mx-0 my-1">
               <template #cell(number)="data">
                 <!--
                 <b-form-checkbox size="sm" :checked="selectedCollections[data.item.contract] ? 1 : 0" value="1" @change="toggleSelectedCollections([data.item])">
@@ -1516,8 +1516,8 @@
             }
             this.saveSettings();
           },
-          async syncCoins() {
-            console.log("syncCoins");
+          async syncAll() {
+            console.log("syncAll");
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const block = await provider.getBlock();
             const CONFIRMATIONS = 10;
@@ -1527,12 +1527,12 @@
             for (const [address, coinInfo] of Object.entries(this.settings.coins)) {
               if (coinInfo.sync && !this.sync.halt) {
                 const context = { provider, confirmedBlockNumber, db, address, symbol: coinInfo.symbol };
-                await this.syncCoinTransfers(context);
-                await this.syncUniswapV2Pools(context);
-                await this.syncUniswapV3Pools(context);
-                await this.syncUniswapV2Trades(context);
-                await this.syncUniswapV3Trades(context);
-                await this.syncUniswapAltTokenTransfers(context);
+                // await this.syncCoinTransfers(context);
+                // await this.syncUniswapV2Pools(context);
+                // await this.syncUniswapV3Pools(context);
+                // await this.syncUniswapV2Trades(context);
+                // await this.syncUniswapV3Trades(context);
+                // await this.syncUniswapAltTokenTransfers(context);
                 // // await this.syncAllENSNames(context);
                 // // await this.testSyncENSNames(context);
               }
