@@ -158,7 +158,6 @@ contract DexzBase {
     error UnableToFillOrder(Tokens unfilled);
     error OrderNotFoundForUpdate(OrderKey orderKey);
     error OnlyPositiveTokensAccepted(Delta tokens);
-    error UnknownAction(uint action);
 
 
     constructor() {
@@ -267,9 +266,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
     constructor() DexzBase() {
     }
 
-    event Executing(Info info);
     function execute(Info[] calldata infos) public {
-        // TODO: Check BuySell
         for (uint i = 0; i < infos.length; i = onePlus(i)) {
             Info memory info = infos[i];
             if (uint(info.action) <= uint(Action.FillAnyAndAddOrder)) {
@@ -280,10 +277,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
             } else if (info.action == Action.RemoveOrder) {
                 _removeOrder(info, _getMoreInfo(info, Account.wrap(msg.sender)));
             } else if (info.action == Action.UpdateExpiryAndTokens) {
-                emit Executing(info);
                 _updateExpiryAndTokens(info, _getMoreInfo(info, Account.wrap(msg.sender)));
-            } else {
-                revert UnknownAction(uint(info.action));
             }
         }
     }
