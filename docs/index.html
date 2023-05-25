@@ -417,6 +417,11 @@
               -->
               <div class="mt-0 flex-grow-1">
               </div>
+              <div v-if="!sync.section" class="mt-0 pr-1">
+                <b-button size="sm" @click="syncTokens()" variant="primary" v-b-popover.hover.top="'Select token balances and total supply'">Sync</b-button>
+              </div>
+              <div class="mt-0 flex-grow-1">
+              </div>
               <!--
               <div class="mt-0 pl-1">
                 <b-form-select size="sm" v-model="settings.coinsTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
@@ -468,6 +473,9 @@
                 </b-dropdown>
                 -->
               </template>
+              <template #cell(balance)="data">
+                {{ formatERC20(data.item.balance, data.item.decimals) }}
+              </template>
               <template #cell(totalSupply)="data">
                 {{ formatERC20(data.item.totalSupply, data.item.decimals) }}
               </template>
@@ -479,10 +487,10 @@
               </template>
               <template #cell(getSome)="data">
                 <div v-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weenus'">
-                  <b-link @click="mintWeenus(data.item.address);">Mint 1,000</b-link>
+                  <b-link @click="mintWeenus(data.item.address);" v-b-popover.hover.top="'Faucet drips 1,000 tokens each tx'">Mint</b-link>
                 </div>
                 <div v-else-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weth'">
-                  <b-button v-b-modal.weth-modal-prevent-closing variant="link" v-b-popover.hover.top="'Wrap/Unwrap ETH'">Convert</b-button>
+                  <b-link v-b-modal.weth-modal-prevent-closing variant="link" v-b-popover.hover.top="'Wrap/Unwrap ETH'">Convert</b-link>
                   <b-modal id="weth-modal-prevent-closing" ref="modal" title="ETH To WETH Convertor" @show="wethFormResetModal" @hidden="wethFormResetModal" @ok="wethFormHandleOk">
                     <form ref="wethForm" @submit.stop.prevent="wethFormHandleSubmit">
                       <b-form-group label="">
@@ -1005,6 +1013,7 @@
                   symbol: item.symbol,
                   name: item.name,
                   decimals: item.decimals,
+                  balance: item.balance,
                   totalSupply: item.totalSupply,
                   sync: item.sync,
                   include: item.include,
@@ -1454,14 +1463,12 @@
             if (!(this.newCoinAddress in this.settings.coins)) {
               console.log("Adding: " + this.newCoinAddress);
               const provider = new ethers.providers.Web3Provider(window.ethereum);
-
               const coinInfo = {
                 sync: true,
                 include: true,
                 latestBlockNumber: null,
               };
               const erc20 = new ethers.Contract(this.newCoinAddress, ERC20ABI, provider);
-              console.log("Hello");
               try {
                 coinInfo.symbol = await erc20.symbol();
               } catch (e) {
@@ -1521,6 +1528,29 @@
             this.$nextTick(() => {
               this.$bvModal.hide('new-coin-modal-prevent-closing');
             })
+            this.saveSettings();
+          },
+          async syncTokens() {
+            console.log("syncTokens");
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const addresses = Object.keys(this.settings.coins);
+            for (const address of addresses) {
+              const erc20 = new ethers.Contract(address, ERC20ABI, provider);
+              let balance = null, totalSupply = null;
+              try {
+                balance = ethers.BigNumber.from(await erc20.balanceOf(this.coinbase)).toString();
+              } catch (e) {
+                console.log("syncTokens ERROR - balanceOf - token: " + address + ", message: " + e.message);
+              }
+              try {
+                totalSupply = ethers.BigNumber.from(await erc20.totalSupply()).toString();
+              } catch (e) {
+                console.log("syncTokens ERROR - totalSupply - token: " + address + ", message: " + e.message);
+              }
+              console.log(balance + " " + totalSupply);
+              Vue.set(this.settings.coins[address], 'balance', balance);
+              Vue.set(this.settings.coins[address], 'totalSupply', totalSupply);
+            }
             this.saveSettings();
           },
           newAccountResetModal() {
