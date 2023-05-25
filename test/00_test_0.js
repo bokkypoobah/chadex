@@ -195,8 +195,8 @@ describe("Dexz", function () {
       // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 9).toString(), expiry: expiry, tokens: baseTokens1.toString(), orderKeys: [] },
     ];
     console.log("actions: " + JSON.stringify(actions, null, 2));
-    const bulkTrade1Tx = await data.dexz.connect(data.user2Signer).bulkTrade(actions);
-    await data.printEvents("user2->dexz.bulkTrade(actions)", await bulkTrade1Tx.wait());
+    const execute1Tx = await data.dexz.connect(data.user2Signer).execute(actions);
+    await data.printEvents("user2->dexz.execute(actions)", await execute1Tx.wait());
     await data.printState("After Bulk Trade");
 
     // // Execute against orders
