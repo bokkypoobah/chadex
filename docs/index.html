@@ -632,8 +632,9 @@
                   "latestBlockNumber": null,
                   "symbol": "BOKKY",
                   "name": "BokkyPooBah wuz here!",
+                  "decimals": 18,
+                  "balance": null,
                   "totalSupply": "1000000000000000000000000",
-                  "decimals": 18
               },
               "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9": {
                   "sync": true,
@@ -642,7 +643,8 @@
                   "symbol": "WEENUS",
                   "name": "Weenus 💪",
                   "decimals": 18,
-                  "totalSupply": "1008000000000000000000000"
+                  "balance": null,
+                  "totalSupply": "1008000000000000000000000",
               },
               "0x07391dbE03e7a0DEa0fce6699500da081537B6c3": {
                   "sync": true,
@@ -650,8 +652,9 @@
                   "latestBlockNumber": null,
                   "symbol": "WETH",
                   "name": "Wrapped Ether",
+                  "decimals": 18,
+                  "balance": null,
                   "totalSupply": "0",
-                  "decimals": 18
               },
               "0xc21d97673B9E0B3AA53a06439F71fDc1facE393B": {
                   "sync": true,
@@ -660,7 +663,8 @@
                   "symbol": "XEENUS",
                   "name": "Xeenus 💪",
                   "decimals": 18,
-                  "totalSupply": "1023000000000000000000000"
+                  "balance": null,
+                  "totalSupply": "1023000000000000000000000",
               },
               "0x93fCA4c6E2525C09c95269055B46f16b1459BF9d": {
                   "sync": true,
@@ -669,7 +673,8 @@
                   "symbol": "YEENUS",
                   "name": "Yeenus 💪",
                   "decimals": 8,
-                  "totalSupply": "100200000000000"
+                  "balance": null,
+                  "totalSupply": "100200000000000",
               },
               "0xe9EF74A6568E9f0e42a587C9363C9BcC582dcC6c": {
                   "sync": true,
@@ -678,7 +683,8 @@
                   "symbol": "ZEENUS",
                   "name": "Zeenus 💪",
                   "decimals": 0,
-                  "totalSupply": "1000000"
+                  "balance": null,
+                  "totalSupply": "1000000",
               }
             },
             coinsTable: {
@@ -708,7 +714,7 @@
               pageSize: 10,
               sortOption: 'lastsaledsc',
             },
-            version: 1,
+            version: 2,
           },
           newCoinAddress: null,
           newAddress: null,
@@ -798,10 +804,11 @@
             { value: 10000, text: '10k' },
           ],
           coinsFields: [
-            { key: 'address', label: '#', sortable: false, thStyle: 'width: 30%;', tdClass: 'text-truncate' },
+            { key: 'address', label: '#', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
             { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
             // { key: 'sync', label: 'Sync', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
             // { key: 'include', label: 'Include', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
