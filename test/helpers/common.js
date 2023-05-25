@@ -237,8 +237,8 @@ class Data {
         const pair = pairInfos[j];
         console.log("          ----- Pair " + pair.pairKey + " " + this.getShortAccountName(pair.baseToken) + "/" + this.getShortAccountName(pair.quoteToken) + " " + pair.multiplier + " " + pair.divisor + " -----");
         for (let buySell = 0; buySell < 2; buySell++) {
-          console.log("              #   " + (buySell == 0 ? " BUY" : "SELL") +" Price OrderKey   Next       Maker         Expiry(s)       Tokens       Filled")
-          console.log("            --- ------------ ---------- ---------- ------------ ---------- ------------ ------------");
+          console.log("              #   " + (buySell == 0 ? " BUY" : "SELL") +" Price OrderKey   Next       Maker         Expiry(s)                Tokens                Filled")
+          console.log("            --- ------------ ---------- ---------- ------------ ---------- --------------------- ---------------------");
 
           let price = PRICE_EMPTY;
           let firstOrderKey = ORDERKEY_SENTINEL;
@@ -255,8 +255,8 @@ class Data {
                 results[2][k].substring(0, 10) + " " +
                 this.getShortAccountName(results[3][k]) + " " +
                 this.padLeft(minutes.toFixed(2), 10) + " " +
-                this.padLeft(ethers.utils.formatUnits(results[5][k], baseDecimals), 12) + " " +
-                this.padLeft(ethers.utils.formatUnits(results[6][k], baseDecimals), 12));
+                this.padLeft(ethers.utils.formatUnits(results[5][k], baseDecimals), 21) + " " +
+                this.padLeft(ethers.utils.formatUnits(results[6][k], baseDecimals), 21));
               price = results[0][k];
               firstOrderKey = results[2][k];
             }
