@@ -190,13 +190,13 @@ describe("Dexz", function () {
     await data.printState("After Adding Orders");
 
     const actions = [
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), expiry: expiry, tokens: baseTokens1.toString(), orderKeys: [] },
+      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), expiry: expiry, tokens: baseTokens1.toString(), orderKeys: [] },
       // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 9).toString(), expiry: expiry, tokens: baseTokens1.toString(), orderKeys: [] },
       // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 9).toString(), expiry: expiry, tokens: baseTokens1.toString(), orderKeys: [] },
     ];
     console.log("actions: " + JSON.stringify(actions, null, 2));
-    const bulkTrade1Tx = await data.dexz.connect(data.user0Signer).bulkTrade(actions);
-    await data.printEvents("user0->dexz.bulkTrade(actions)", await bulkTrade1Tx.wait());
+    const bulkTrade1Tx = await data.dexz.connect(data.user2Signer).bulkTrade(actions);
+    await data.printEvents("user2->dexz.bulkTrade(actions)", await bulkTrade1Tx.wait());
     await data.printState("After Bulk Trade");
 
     // // Execute against orders

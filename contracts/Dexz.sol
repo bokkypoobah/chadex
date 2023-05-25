@@ -20,8 +20,6 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 // TODO:
 //   * bulkTrade
 //   * updateExpiryAndTokens
-//   * handle duplicate orders gracefully
-//   * What happens when maker == taker?
 //   * Check limits for Tokens(uint128) x Price(uint64)
 //   * Serverless UI
 //   * ?computeTrade
@@ -453,8 +451,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
                                 tokensToTransfer = uint(Tokens.unwrap(tradeInfo.tokens));
                             }
                             quoteTokensToTransfer = (10 ** Factor.unwrap(pair.divisor)) * tokensToTransfer * uint(Price.unwrap(bestMatchingPrice)) / (10 ** Factor.unwrap(pair.multiplier));
-                            transferFrom(pair.quote, Account.wrap(msg.sender), order.maker, quoteTokensToTransfer);
-                            transferFrom(pair.base, order.maker, Account.wrap(msg.sender), tokensToTransfer);
+                            if (Account.unwrap(order.maker) != msg.sender) {
+                                transferFrom(pair.quote, Account.wrap(msg.sender), order.maker, quoteTokensToTransfer);
+                                transferFrom(pair.base, order.maker, Account.wrap(msg.sender), tokensToTransfer);
+                            }
                             emit Trade(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, Account.wrap(msg.sender), order.maker, tokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
                         } else {
                             deleteOrder = true;
@@ -476,8 +476,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
                                 tokensToTransfer = uint(Tokens.unwrap(tradeInfo.tokens));
                                 quoteTokensToTransfer = (10 ** Factor.unwrap(pair.divisor)) * tokensToTransfer * uint(Price.unwrap(bestMatchingPrice)) / (10 ** Factor.unwrap(pair.multiplier));
                             }
-                            transferFrom(pair.base, Account.wrap(msg.sender), order.maker, tokensToTransfer);
-                            transferFrom(pair.quote, order.maker, Account.wrap(msg.sender), quoteTokensToTransfer);
+                            if (Account.unwrap(order.maker) != msg.sender) {
+                                transferFrom(pair.base, Account.wrap(msg.sender), order.maker, tokensToTransfer);
+                                transferFrom(pair.quote, order.maker, Account.wrap(msg.sender), quoteTokensToTransfer);
+                            }
                             emit Trade(tradeInfo.pairKey, bestMatchingOrderKey, tradeInfo.buySell, Account.wrap(msg.sender), order.maker, tokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
                         } else {
                             deleteOrder = true;
