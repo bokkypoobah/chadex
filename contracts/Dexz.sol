@@ -52,7 +52,7 @@ type Unixtime is uint64;
 
 enum BuySell { Buy, Sell }
 // TODO: RemoveOrders, UpdateOrderExpiry, IncreaseOrderBaseTokens, DecreasesOrderBaseTokens
-enum Action { FillAny, FillAllOrNothing, FillAnyAndAddOrder }
+enum Action { FillAny, FillAllOrNothing, FillAnyAndAddOrder, RemoveOrder }
 
 
 interface IERC20 {
@@ -93,9 +93,6 @@ contract ReentrancyGuard {
 }
 
 
-// ----------------------------------------------------------------------------
-// DexzBase
-// ----------------------------------------------------------------------------
 contract DexzBase {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
@@ -152,6 +149,7 @@ contract DexzBase {
     event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, Account indexed taker, Account maker, uint tokens, uint quoteTokens, Price price);
     event TradeSummary(BuySell buySell, Account indexed taker, Tokens filled, Tokens quoteTokensFilled, Price price, Tokens tokensOnOrder);
 
+    error CannotRemoveMissingOrder();
     error InvalidPrice(Price price, Price priceMax);
     error InvalidTokens(Delta tokens, Tokens tokensMax);
     error CannotInsertDuplicateOrder(OrderKey orderKey);
@@ -160,7 +158,6 @@ contract DexzBase {
     error InsufficientTokenBalanceOrAllowance(Token base, Delta tokens, Tokens availableTokens);
     error InsufficientQuoteTokenBalanceOrAllowance(Token quote, Tokens quoteTokens, Tokens availableTokens);
     error UnableToFillOrder(Tokens unfilled);
-    error CannotRemoveSomeoneElsesOrder(Account maker);
 
     constructor() {
     }
@@ -260,14 +257,8 @@ contract DexzBase {
         }
     }
 }
-// ----------------------------------------------------------------------------
-// End - DexzBase
-// ----------------------------------------------------------------------------
 
 
-// ----------------------------------------------------------------------------
-// Dexz contract
-// ----------------------------------------------------------------------------
 contract Dexz is DexzBase, ReentrancyGuard {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
@@ -276,82 +267,63 @@ contract Dexz is DexzBase, ReentrancyGuard {
 
     error OnlyPositiveTokensAccepted(Delta tokens);
 
-    // event Executing(Info info);
+    event Executing(Info info);
     function execute(Info[] calldata infos) public {
         for (uint i = 0; i < infos.length; i = onePlus(i)) {
             Info memory info = infos[i];
-            // emit Executing(info);
             if (uint(info.action) <= uint(Action.FillAnyAndAddOrder)) {
                 if (Delta.unwrap(info.tokens) < 0) {
                     revert OnlyPositiveTokensAccepted(info.tokens);
                 }
                 _trade(info, _getMoreInfo(info, Account.wrap(msg.sender)));
+            } else if (info.action == Action.RemoveOrder) {
+                // emit Executing(info);
+                _removeOrder(info, _getMoreInfo(info, Account.wrap(msg.sender)));
             }
         }
     }
 
-    function removeOrders(PairKey[] calldata _pairKeys, BuySell[] calldata buySells, OrderKey[][] calldata orderKeyss) public {
-        for (uint i; i < _pairKeys.length; i = onePlus(i)) {
-            PairKey pairKey = _pairKeys[i];
-            BuySell buySell = buySells[i];
-            OrderKey[] memory orderKeys = orderKeyss[i];
-            Price price = getBestPrice(pairKey, buySell);
-            while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(price)) {
-                OrderQueue storage orderQueue = orderQueues[pairKey][buySell][price];
-                OrderKey orderKey = orderQueue.head;
-                OrderKey prevOrderKey;
-                while (isNotSentinel(orderKey)) {
-                    bool deleteOrder = false;
-                    for (uint j = 0; j< orderKeys.length && !deleteOrder; j = onePlus(j)) {
-                        if (OrderKey.unwrap(orderKeys[j]) == OrderKey.unwrap(orderKey)) {
-                            deleteOrder = true;
-                        }
-                    }
-                    Order memory order = orders[orderKey];
-                    if (deleteOrder) {
-                        if (Account.unwrap(order.maker) != msg.sender) {
-                            revert CannotRemoveSomeoneElsesOrder(order.maker);
-                        }
-                        OrderKey temp = orderKey;
-                        emit OrderRemoved(pairKey, orderKey, order.maker, buySell, price, order.tokens, order.filled);
-                        if (OrderKey.unwrap(orderQueue.head) == OrderKey.unwrap(orderKey)) {
-                            orderQueue.head = order.next;
-                        } else {
-                            orders[prevOrderKey].next = order.next;
-                        }
-                        if (OrderKey.unwrap(orderQueue.tail) == OrderKey.unwrap(orderKey)) {
-                            orderQueue.tail = prevOrderKey;
-                        }
-                        prevOrderKey = orderKey;
-                        orderKey = order.next;
-                        delete orders[temp];
-                    } else {
-                        prevOrderKey = orderKey;
-                        orderKey = order.next;
-                    }
-                }
-                if (isSentinel(orderQueue.head)) {
-                    delete orderQueues[pairKey][buySell][price];
-                    Price tempPrice = getNextBestPrice(pairKey, buySell, price);
-                    BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[pairKey][buySell];
-                    if (priceTree.exists(price)) {
-                        priceTree.remove(price);
-                    }
-                    price = tempPrice;
+    function _removeOrder(Info memory info, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
+        OrderQueue storage orderQueue = orderQueues[moreInfo.pairKey][info.buySell][info.price];
+        orderKey = orderQueue.head;
+        OrderKey prevOrderKey;
+        bool found;
+        while (isNotSentinel(orderKey) && !found) {
+            Order memory order = orders[orderKey];
+            if (Account.unwrap(order.maker) == msg.sender) {
+                OrderKey temp = orderKey;
+                emit OrderRemoved(moreInfo.pairKey, orderKey, order.maker, info.buySell, info.price, order.tokens, order.filled);
+                if (OrderKey.unwrap(orderQueue.head) == OrderKey.unwrap(orderKey)) {
+                    orderQueue.head = order.next;
                 } else {
-                    price = getNextBestPrice(pairKey, buySell, price);
+                    orders[prevOrderKey].next = order.next;
+                }
+                if (OrderKey.unwrap(orderQueue.tail) == OrderKey.unwrap(orderKey)) {
+                    orderQueue.tail = prevOrderKey;
+                }
+                prevOrderKey = orderKey;
+                orderKey = order.next;
+                delete orders[temp];
+                found = true;
+            } else {
+                prevOrderKey = orderKey;
+                orderKey = order.next;
+            }
+        }
+        if (found) {
+            if (isSentinel(orderQueue.head)) {
+                delete orderQueues[moreInfo.pairKey][info.buySell][info.price];
+                BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[moreInfo.pairKey][info.buySell];
+                if (priceTree.exists(info.price)) {
+                    priceTree.remove(info.price);
                 }
             }
+        } else {
+            revert CannotRemoveMissingOrder();
         }
     }
 
     function _getMoreInfo(Info memory info, Account taker) internal returns (MoreInfo memory moreInfo) {
-        if (Price.unwrap(info.price) < Price.unwrap(PRICE_MIN) || Price.unwrap(info.price) > Price.unwrap(PRICE_MAX)) {
-            revert InvalidPrice(info.price, PRICE_MAX);
-        }
-        if (Delta.unwrap(info.tokens) > int128(Tokens.unwrap(TOKENS_MAX))) {
-            revert InvalidTokens(info.tokens, TOKENS_MAX);
-        }
         PairKey pairKey = generatePairKey(info);
         if (Token.unwrap(pairs[pairKey].base) == address(0)) {
             uint8 baseDecimals = IERC20(Token.unwrap(info.base)).decimals();
@@ -412,6 +384,12 @@ contract Dexz is DexzBase, ReentrancyGuard {
         emit OrderAdded(moreInfo.pairKey, orderKey, moreInfo.taker, info.buySell, info.price, info.expiry, Tokens.wrap(uint128(Delta.unwrap(info.tokens))));
     }
     function _trade(Info memory info, MoreInfo memory moreInfo) internal returns (Tokens filled, Tokens quoteTokensFilled, Tokens tokensOnOrder, OrderKey orderKey) {
+        if (Price.unwrap(info.price) < Price.unwrap(PRICE_MIN) || Price.unwrap(info.price) > Price.unwrap(PRICE_MAX)) {
+            revert InvalidPrice(info.price, PRICE_MAX);
+        }
+        if (Delta.unwrap(info.tokens) > int128(Tokens.unwrap(TOKENS_MAX))) {
+            revert InvalidTokens(info.tokens, TOKENS_MAX);
+        }
         Pair memory pair = pairs[moreInfo.pairKey];
         _checkTakerAvailableTokens(info, pair);
 
