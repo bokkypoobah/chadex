@@ -1,7 +1,6 @@
 pragma solidity ^0.8.0;
 
 import "./BokkyPooBahsRedBlackTreeLibrary.sol";
-// import "hardhat/console.sol";
 
 // ----------------------------------------------------------------------------
 // Dexz🤖, pronounced dex-zee, the token exchanger bot
@@ -124,6 +123,8 @@ contract DexzBase {
         Account taker;
         BuySell inverseBuySell;
         PairKey pairKey;
+        Factor multiplier;
+        Factor divisor;
     }
 
     uint constant public TENPOW18 = uint(10)**18;
@@ -301,8 +302,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         } else {
             info.tokens = Delta.wrap(int128(Tokens.unwrap(order.tokens) + uint128(Delta.unwrap(info.tokens))));
         }
-        Pair memory pair = pairs[moreInfo.pairKey];
-        _checkTakerAvailableTokens(info, pair);
+        _checkTakerAvailableTokens(info, moreInfo);
         order.tokens = Tokens.wrap(uint128(Delta.unwrap(info.tokens)));
         order.expiry = info.expiry;
         emit OrderUpdated(moreInfo.pairKey, orderKey, moreInfo.taker, info.buySell, info.price, info.expiry, order.tokens);
@@ -350,11 +350,12 @@ contract Dexz is DexzBase, ReentrancyGuard {
 
     function _getMoreInfo(Info memory info, Account taker) internal returns (MoreInfo memory moreInfo) {
         PairKey pairKey = generatePairKey(info);
-        if (Token.unwrap(pairs[pairKey].base) == address(0)) {
+        Factor multiplier;
+        Factor divisor;
+        Pair memory pair = pairs[pairKey];
+        if (Token.unwrap(pair.base) == address(0)) {
             uint8 baseDecimals = IERC20(Token.unwrap(info.base)).decimals();
             uint8 quoteDecimals = IERC20(Token.unwrap(info.quote)).decimals();
-            Factor multiplier;
-            Factor divisor;
             if (baseDecimals >= quoteDecimals) {
                 multiplier = Factor.wrap(baseDecimals - quoteDecimals + 9);
                 divisor = Factor.wrap(0);
@@ -365,21 +366,24 @@ contract Dexz is DexzBase, ReentrancyGuard {
             pairs[pairKey] = Pair(info.base, info.quote, multiplier, divisor);
             pairKeys.push(pairKey);
             emit PairAdded(pairKey, info.base, info.quote, baseDecimals, quoteDecimals, multiplier, divisor);
+        } else {
+            multiplier = pair.multiplier;
+            divisor = pair.divisor;
         }
-        return MoreInfo(taker, inverseBuySell(info.buySell), pairKey);
+        return MoreInfo(taker, inverseBuySell(info.buySell), pairKey, multiplier, divisor);
     }
-    function _checkTakerAvailableTokens(Info memory info, Pair memory pair) internal view {
+    function _checkTakerAvailableTokens(Info memory info, MoreInfo memory moreInfo) internal view {
         // TODO: Check somewhere that tokens > 0
         if (info.buySell == BuySell.Buy) {
-            uint availableTokens = availableTokens(pair.quote, Account.wrap(msg.sender));
-            uint quoteTokens = (10 ** Factor.unwrap(pair.divisor)) * uint(uint128(Delta.unwrap(info.tokens))) * Price.unwrap(info.price) / (10 ** Factor.unwrap(pair.multiplier));
+            uint availableTokens = availableTokens(info.quote, Account.wrap(msg.sender));
+            uint quoteTokens = baseToQuote(moreInfo, uint(uint128(Delta.unwrap(info.tokens))), info.price);
             if (availableTokens < quoteTokens) {
-                revert InsufficientQuoteTokenBalanceOrAllowance(pair.quote, Tokens.wrap(uint128(quoteTokens)), Tokens.wrap(uint128(availableTokens)));
+                revert InsufficientQuoteTokenBalanceOrAllowance(info.quote, Tokens.wrap(uint128(quoteTokens)), Tokens.wrap(uint128(availableTokens)));
             }
         } else {
-            uint availableTokens = availableTokens(pair.base, Account.wrap(msg.sender));
+            uint availableTokens = availableTokens(info.base, Account.wrap(msg.sender));
             if (availableTokens < uint(uint128(Delta.unwrap(info.tokens)))) {
-                revert InsufficientTokenBalanceOrAllowance(pair.base, info.tokens, Tokens.wrap(uint128(availableTokens)));
+                revert InsufficientTokenBalanceOrAllowance(info.base, info.tokens, Tokens.wrap(uint128(availableTokens)));
             }
         }
     }
@@ -408,6 +412,17 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
         emit OrderAdded(moreInfo.pairKey, orderKey, moreInfo.taker, info.buySell, info.price, info.expiry, Tokens.wrap(uint128(Delta.unwrap(info.tokens))));
     }
+
+    function baseToQuote(MoreInfo memory moreInfo, uint tokens, Price price) pure internal returns (uint quoteTokens) {
+        quoteTokens = uint128((10 ** Factor.unwrap(moreInfo.divisor)) * tokens * uint(Price.unwrap(price)) / (10 ** Factor.unwrap(moreInfo.multiplier)));
+    }
+    function quoteToBase(MoreInfo memory moreInfo, uint quoteTokens, Price price) pure internal returns (uint tokens) {
+        tokens = (10 ** Factor.unwrap(moreInfo.multiplier)) * quoteTokens / uint(Price.unwrap(price)) / (10 ** Factor.unwrap(moreInfo.divisor));
+    }
+    function baseAndQuoteToPrice(MoreInfo memory moreInfo, uint tokens, uint quoteTokens) pure internal returns (Price price) {
+        price = Price.wrap(uint64((10 ** Factor.unwrap(moreInfo.multiplier)) * quoteTokens / tokens / (10 ** Factor.unwrap(moreInfo.divisor))));
+    }
+
     function _trade(Info memory info, MoreInfo memory moreInfo) internal returns (Tokens filled, Tokens quoteTokensFilled, Tokens tokensOnOrder, OrderKey orderKey) {
         if (Price.unwrap(info.price) < Price.unwrap(PRICE_MIN) || Price.unwrap(info.price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice(info.price, PRICE_MAX);
@@ -415,8 +430,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         if (Delta.unwrap(info.tokens) > int128(Tokens.unwrap(TOKENS_MAX))) {
             revert InvalidTokens(info.tokens, TOKENS_MAX);
         }
-        Pair memory pair = pairs[moreInfo.pairKey];
-        _checkTakerAvailableTokens(info, pair);
+        _checkTakerAvailableTokens(info, moreInfo);
 
         Price bestMatchingPrice = getMatchingBestPrice(moreInfo);
         while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
@@ -433,7 +447,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                     uint tokensToTransfer;
                     uint quoteTokensToTransfer;
                     if (info.buySell == BuySell.Buy) {
-                        uint _availableTokens = availableTokens(pair.base, order.maker);
+                        uint _availableTokens = availableTokens(info.base, order.maker);
                         if (_availableTokens > 0) {
                             if (makerTokensToFill > _availableTokens) {
                                 makerTokensToFill = _availableTokens;
@@ -444,23 +458,23 @@ contract Dexz is DexzBase, ReentrancyGuard {
                             } else {
                                 tokensToTransfer = uint(uint128(Delta.unwrap(info.tokens)));
                             }
-                            quoteTokensToTransfer = (10 ** Factor.unwrap(pair.divisor)) * tokensToTransfer * uint(Price.unwrap(bestMatchingPrice)) / (10 ** Factor.unwrap(pair.multiplier));
+                            quoteTokensToTransfer = baseToQuote(moreInfo, tokensToTransfer, bestMatchingPrice);
                             if (Account.unwrap(order.maker) != msg.sender) {
-                                transferFrom(pair.quote, Account.wrap(msg.sender), order.maker, quoteTokensToTransfer);
-                                transferFrom(pair.base, order.maker, Account.wrap(msg.sender), tokensToTransfer);
+                                transferFrom(info.quote, Account.wrap(msg.sender), order.maker, quoteTokensToTransfer);
+                                transferFrom(info.base, order.maker, Account.wrap(msg.sender), tokensToTransfer);
                             }
                             emit Trade(moreInfo.pairKey, bestMatchingOrderKey, info.buySell, moreInfo.taker, order.maker, tokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
                         } else {
                             deleteOrder = true;
                         }
                     } else {
-                        uint availableQuoteTokens = availableTokens(pair.quote, order.maker);
+                        uint availableQuoteTokens = availableTokens(info.quote, order.maker);
                         if (availableQuoteTokens > 0) {
-                            uint availableQuoteTokensInBaseTokens = (10 ** Factor.unwrap(pair.multiplier)) * availableQuoteTokens / uint(Price.unwrap(bestMatchingPrice)) / (10 ** Factor.unwrap(pair.divisor));
+                            uint availableQuoteTokensInBaseTokens = quoteToBase(moreInfo, availableQuoteTokens, bestMatchingPrice);
                             if (makerTokensToFill > availableQuoteTokensInBaseTokens) {
                                 makerTokensToFill = availableQuoteTokensInBaseTokens;
                             } else {
-                                availableQuoteTokens = (10 ** Factor.unwrap(pair.divisor)) * makerTokensToFill * Price.unwrap(bestMatchingPrice) / (10 ** Factor.unwrap(pair.multiplier));
+                                availableQuoteTokens = baseToQuote(moreInfo, makerTokensToFill, bestMatchingPrice);
                             }
                             if (uint128(Delta.unwrap(info.tokens)) >= makerTokensToFill) {
                                 tokensToTransfer = makerTokensToFill;
@@ -468,11 +482,11 @@ contract Dexz is DexzBase, ReentrancyGuard {
                                 deleteOrder = true;
                             } else {
                                 tokensToTransfer = uint(uint128(Delta.unwrap(info.tokens)));
-                                quoteTokensToTransfer = (10 ** Factor.unwrap(pair.divisor)) * tokensToTransfer * uint(Price.unwrap(bestMatchingPrice)) / (10 ** Factor.unwrap(pair.multiplier));
+                                quoteTokensToTransfer = baseToQuote(moreInfo, tokensToTransfer, bestMatchingPrice);
                             }
                             if (Account.unwrap(order.maker) != msg.sender) {
-                                transferFrom(pair.base, Account.wrap(msg.sender), order.maker, tokensToTransfer);
-                                transferFrom(pair.quote, order.maker, Account.wrap(msg.sender), quoteTokensToTransfer);
+                                transferFrom(info.base, Account.wrap(msg.sender), order.maker, tokensToTransfer);
+                                transferFrom(info.quote, order.maker, Account.wrap(msg.sender), quoteTokensToTransfer);
                             }
                             emit Trade(moreInfo.pairKey, bestMatchingOrderKey, info.buySell, moreInfo.taker, order.maker, tokensToTransfer, quoteTokensToTransfer, bestMatchingPrice);
                         } else {
@@ -524,8 +538,8 @@ contract Dexz is DexzBase, ReentrancyGuard {
             tokensOnOrder = Tokens.wrap(uint128(Delta.unwrap(info.tokens)));
         }
         if (Tokens.unwrap(filled) > 0 || Tokens.unwrap(quoteTokensFilled) > 0) {
-            uint256 price = Tokens.unwrap(filled) > 0 ? (10 ** Factor.unwrap(pair.multiplier)) * uint(Tokens.unwrap(quoteTokensFilled)) / uint(Tokens.unwrap(filled)) / (10 ** Factor.unwrap(pair.divisor)) : 0;
-            emit TradeSummary(info.buySell, moreInfo.taker, filled, quoteTokensFilled, Price.wrap(uint64(price)), tokensOnOrder);
+            Price price = Tokens.unwrap(filled) > 0 ? baseAndQuoteToPrice(moreInfo, uint(Tokens.unwrap(filled)), uint(Tokens.unwrap(quoteTokensFilled))) : Price.wrap(0);
+            emit TradeSummary(info.buySell, moreInfo.taker, filled, quoteTokensFilled, price, tokensOnOrder);
         }
     }
 
