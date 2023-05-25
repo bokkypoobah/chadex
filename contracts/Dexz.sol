@@ -302,7 +302,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         } else {
             info.tokens = Delta.wrap(int128(Tokens.unwrap(order.tokens) + uint128(Delta.unwrap(info.tokens))));
         }
-        // TODO _checkTakerAvailableTokens(info, moreInfo);
+        _checkTakerAvailableTokens(info, moreInfo);
         order.tokens = Tokens.wrap(uint128(Delta.unwrap(info.tokens)));
         order.expiry = info.expiry;
         emit OrderUpdated(moreInfo.pairKey, orderKey, moreInfo.taker, info.buySell, info.price, info.expiry, order.tokens);
@@ -423,25 +423,14 @@ contract Dexz is DexzBase, ReentrancyGuard {
         price = Price.wrap(uint64((10 ** Factor.unwrap(moreInfo.multiplier)) * quoteTokens / tokens / (10 ** Factor.unwrap(moreInfo.divisor))));
     }
 
-    struct Results {
-        Tokens filled;
-        Tokens quoteTokensFilled;
-        Tokens tokensOnOrder;
-        OrderKey orderKey;
-    }
-
-    function remaining(Order memory order) pure internal returns (uint) {
-        return Tokens.unwrap(order.tokens) - Tokens.unwrap(order.filled);
-    }
-
-    function _trade(Info memory info, MoreInfo memory moreInfo) internal returns (Results memory results) {
+    function _trade(Info memory info, MoreInfo memory moreInfo) internal returns (Tokens filled, Tokens quoteTokensFilled, Tokens tokensOnOrder, OrderKey orderKey) {
         if (Price.unwrap(info.price) < Price.unwrap(PRICE_MIN) || Price.unwrap(info.price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice(info.price, PRICE_MAX);
         }
         if (Delta.unwrap(info.tokens) > int128(Tokens.unwrap(TOKENS_MAX))) {
             revert InvalidTokens(info.tokens, TOKENS_MAX);
         }
-        // TODO _checkTakerAvailableTokens(info, moreInfo);
+        // TODO Testing _checkTakerAvailableTokens(info, moreInfo);
 
         Price bestMatchingPrice = getMatchingBestPrice(moreInfo);
         while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
@@ -454,16 +443,17 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 Order storage order = orders[bestMatchingOrderKey];
                 bool deleteOrder = false;
                 if (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) >= block.timestamp) {
+                    uint makerTokensToFill = Tokens.unwrap(order.tokens) - Tokens.unwrap(order.filled);
                     uint tokensToTransfer;
                     uint quoteTokensToTransfer;
                     if (info.buySell == BuySell.Buy) {
                         uint _availableTokens = availableTokens(info.base, order.maker);
-                        if (_availableTokens > remaining(order)) {
-                            _availableTokens = remaining(order);
-                        }
                         if (_availableTokens > 0) {
-                            if (uint128(Delta.unwrap(info.tokens)) >= _availableTokens) {
-                                tokensToTransfer = _availableTokens;
+                            if (makerTokensToFill > _availableTokens) {
+                                makerTokensToFill = _availableTokens;
+                            }
+                            if (uint128(Delta.unwrap(info.tokens)) >= makerTokensToFill) {
+                                tokensToTransfer = makerTokensToFill;
                                 deleteOrder = true;
                             } else {
                                 tokensToTransfer = uint(uint128(Delta.unwrap(info.tokens)));
@@ -478,7 +468,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
                             deleteOrder = true;
                         }
                     } else {
-                        uint makerTokensToFill = remaining(order);
                         uint availableQuoteTokens = availableTokens(info.quote, order.maker);
                         if (availableQuoteTokens > 0) {
                             uint availableQuoteTokensInBaseTokens = quoteToBase(moreInfo, availableQuoteTokens, bestMatchingPrice);
@@ -505,8 +494,8 @@ contract Dexz is DexzBase, ReentrancyGuard {
                         }
                     }
                     order.filled = Tokens.wrap(Tokens.unwrap(order.filled) + uint128(tokensToTransfer));
-                    results.filled = Tokens.wrap(Tokens.unwrap(results.filled) + uint128(tokensToTransfer));
-                    results.quoteTokensFilled = Tokens.wrap(Tokens.unwrap(results.quoteTokensFilled) + uint128(quoteTokensToTransfer));
+                    filled = Tokens.wrap(Tokens.unwrap(filled) + uint128(tokensToTransfer));
+                    quoteTokensFilled = Tokens.wrap(Tokens.unwrap(quoteTokensFilled) + uint128(quoteTokensToTransfer));
                     info.tokens = Delta.wrap(int128(uint128(Delta.unwrap(info.tokens)) - uint128(tokensToTransfer)));
                 } else {
                     deleteOrder = true;
@@ -545,12 +534,12 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
         if (Delta.unwrap(info.tokens) > 0 && (info.action == Action.FillAnyAndAddOrder)) {
             // TODO require(moreInfo.expiry > block.timestamp);
-            results.orderKey = _addOrder(info, moreInfo);
-            results.tokensOnOrder = Tokens.wrap(uint128(Delta.unwrap(info.tokens)));
+            orderKey = _addOrder(info, moreInfo);
+            tokensOnOrder = Tokens.wrap(uint128(Delta.unwrap(info.tokens)));
         }
-        if (Tokens.unwrap(results.filled) > 0 || Tokens.unwrap(results.quoteTokensFilled) > 0) {
-            Price price = Tokens.unwrap(results.filled) > 0 ? baseAndQuoteToPrice(moreInfo, uint(Tokens.unwrap(results.filled)), uint(Tokens.unwrap(results.quoteTokensFilled))) : Price.wrap(0);
-            emit TradeSummary(info.buySell, moreInfo.taker, results.filled, results.quoteTokensFilled, price, results.tokensOnOrder);
+        if (Tokens.unwrap(filled) > 0 || Tokens.unwrap(quoteTokensFilled) > 0) {
+            Price price = Tokens.unwrap(filled) > 0 ? baseAndQuoteToPrice(moreInfo, uint(Tokens.unwrap(filled)), uint(Tokens.unwrap(quoteTokensFilled))) : Price.wrap(0);
+            emit TradeSummary(info.buySell, moreInfo.taker, filled, quoteTokensFilled, price, tokensOnOrder);
         }
     }
 

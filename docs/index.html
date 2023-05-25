@@ -1,0 +1,3130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Meme Coin Data</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="Meme Coin Data (c) Bok Consulting Pty Ltd 2023" />
+    <meta name="author" content="BokkyPooBah" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@BokkyPooBah" />
+    <meta name="twitter:creator" content="@BokkyPooBah" />
+    <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="css/bootstrap-vue.min.css"/>
+    <link type="text/css" rel="stylesheet" href="css/bootstrap-vue-icons.min.css"/>
+    <link type="text/css" rel="stylesheet" href="css/app.css" />
+    <script src="js/vue.js"></script>
+    <script src="js/bootstrap-vue.min.js"></script>
+    <script src="js/bootstrap-vue-icons.min.js"></script>
+    <script src="js/ethers-5.6.umd.min.js" type="application/javascript"></script>
+    <script src="js/moment.min.js"></script>
+    <script src="js/dexie.js"></script>
+    <script src="globals.js"></script>
+    <script src="deploymentData.js"></script>
+    <script src="txparser.js"></script>
+
+    <link rel="apple-touch-icon" sizes="57x57" href="images/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="images/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="images/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="images/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="images/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="images/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="images/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="manifest" href="images/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="images/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+  </head>
+  <body>
+    <div id="app">
+      <b-container fluid class="m-0 p-0">
+        <b-navbar toggleable="sm" variant="light" class="mx-1 my-0 p-0">
+          <b-navbar-brand to="/" variant="primary">
+            <b-avatar rounded variant="light" size="3.0rem" src="images/ZombieBaby_001_gp2_3871_8601_10786.gif" v-b-popover.hover.bottom="'gm'" class="ml-0"></b-avatar>
+            <em v-b-popover.hover.bottom="'gm gm gm'">Meme Coin Data</em>
+          </b-navbar-brand>
+          <b-navbar-nav class="ml-auto">
+            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings()" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'View/sync Coin Data'">Coin Data</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings()" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'View/edit ERC-20 coins'">Coins</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View/edit my accounts'">Accounts</b-nav-item>
+            <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
+            <b-button size="sm" variant="outline-primary" class="ml-1" @click="processIt('connect')" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
+          </b-navbar-nav>
+        </b-navbar>
+
+        <b-card no-body class="p-0 mt-0" style="min-height: 666px;">
+          <b-alert v-if="false" size="sm" dismissible variant="warning" show class="m-1 my-0">
+            Warning: This is experimental unaudited software. Revoke permissions when not required, at this early stage.
+          </b-alert>
+          <b-card class="m-2 p-1" header-class="warningheader" header="Welcome" v-if="!coinbase">
+            <b-card-text>
+              Please install the MetaMask extension, connect to the Ethereum mainnet and refresh this page. Then click the [Connect] button on the top right.
+            </b-card-text>
+          </b-card>
+
+          <b-modal id="modal-details" hide-footer size="lg">
+            <template #modal-title>
+              <font size="-1">Tx {{ modalDetails.txHash }}</font>
+              <!--
+              <b-button size="sm" @click="copyToClipboard(modalTx.hash);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+              <b-button size="sm" :href="'https://etherscan.io/tx/' + modalTx.hash" target="_blank" variant="link" class="m-0 p-0" v-b-popover.hover.top="'View in etherscan.io'">
+                <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
+              </b-button>
+              -->
+            </template>
+            <b-form-group label="Restore:" label-for="restore-from-backup-browse" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Select backup .tsv file from your local computer to restore'" class="mx-0 my-1 p-0">
+              <b-form-file size="sm" id="restore-from-backup-browse" v-model="restoreFile" @change="backupFilesChange($event.target.name, $event.target.files)" accept=".tsv" class="w-75"></b-form-file>
+            </b-form-group>
+            <div>
+              <pre>
+                {{ modalDetails }}
+              </pre>
+            </div>
+            <!--
+            <div class="d-flex flex-row">
+              <div>
+                <b-avatar v-if="modalDetails.token" rounded variant="light" size="8.0rem" :src="modalDetails.token.image">
+                </b-avatar>
+              </div>
+              <div class="ml-2">
+                {{ modalDetails.token && modalDetails.token.name }}
+                <br />
+                {{ modalDetails.token && modalDetails.token.collectionName }}
+                <br />
+                {{ modalDetails.token && modalDetails.token.tokenId }}
+                <b-button v-if="modalDetails.token" size="sm" :href="'https://opensea.io/assets/ethereum/' + modalDetails.token.contract + '/' + modalDetails.token.tokenId" target="_blank" variant="link" v-b-popover.hover.top="'View token in opensea.io'">
+                  <b-avatar rounded variant="light" size="0.9rem" src="images/opensea.svg">
+                  </b-avatar>
+                </b-button>
+                <b-button v-if="modalDetails.token" size="sm" :href="'https://etherscan.io/token/' + modalDetails.token.contract + ((modalDetails.token.kind == 'erc721' || modalDetails.token.kind== 'erc1155') ? ('?a=' + modalDetails.token.tokenId) : '')" target="_blank" variant="link" v-b-popover.hover.top="'View token in etherscan.io'">
+                  <b-avatar rounded variant="light" size="0.9rem" src="images/etherscan-logo-circle.svg">
+                  </b-avatar>
+                </b-button>
+                <br />
+                {{ modalDetails.token && modalDetails.token.ownerName }}
+                <b-button v-if="modalDetails.token" size="sm" :href="'https://opensea.io/' + modalDetails.token.owner" target="_blank" variant="link" v-b-popover.hover.top="'View owner account in opensea.io'">
+                  <b-avatar rounded variant="light" size="0.9rem" src="images/opensea.svg">
+                  </b-avatar>
+                </b-button>
+                <br />
+                <b-button size="sm" @click="requestReservoirAPITokenMetadataRefresh(modalDetails.token)" variant="link" v-b-popover.hover.top="'Request a metadata refresh on the Reservoir API. Re-sync after a few minutes'"><b-icon-arrow-clockwise shift-v="+1" font-scale="1.2"></b-icon-arrow-clockwise></b-button>
+              </div>
+            </div>
+            -->
+          </b-modal>
+
+          <b-modal id="modal-accounts-import" hide-footer size="lg">
+            <template #modal-title>
+              Import Accounts
+            </template>
+            <b-form-group label="Restore:" label-for="restore-from-backup-browse" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Select backup .tsv file from your local computer to restore'" class="mx-0 my-1 p-0">
+              <b-form-file size="sm" id="restore-from-backup-browse" v-model="restoreFile" @change="backupFilesChange($event.target.name, $event.target.files)" accept=".tsv" class="w-75"></b-form-file>
+            </b-form-group>
+            <b-form-group v-if="restoreAddresses" label="Loaded data:" label-for="restore-from-backup-data" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Only valid unique addresses will be imported'" class="mx-0 my-1 p-0">
+              <font v-if="restoreAddresses" size="-2">
+                <b-table small id="restore-from-backup-data" fixed striped sticky-header="200px" :fields="accountsImportAddressesFields" :items="restoreAddresses" head-variant="light">
+                </b-table>
+              </font>
+            </b-form-group>
+            <b-form-group label="" label-for="restore-from-backup" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Restore from backup file. Adjust Sync and Include settings and re-synced'" class="mx-0 my-1 p-0">
+              <b-button size="sm" id="restore-from-backup" :disabled="!restoreAddresses || restoreAddresses.length == 0" @click="restoreFromBackup()" variant="primary">Restore</b-button>
+            </b-form-group>
+          </b-modal>
+
+          <b-card v-if="coinbase && settings.tabIndex == 0" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
+            <div class="d-flex flex-wrap m-0 p-0">
+              <div class="mt-0 pr-1">
+                <b-form-input type="text" size="sm" v-model.trim="settings.tokensTable.tokenFilter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Token id and name filter'" placeholder="🔍 token id/name regex" style="min-width: 8.0rem;"></b-form-input>
+              </div>
+              <div class="mt-0 pr-1">
+                <b-form-input type="text" size="sm" v-model.trim="settings.tokensTable.collectionfilter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Collection name filter'" placeholder="🔍 collection name" style="min-width: 8.0rem;"></b-form-input>
+              </div>
+              <div class="mt-0 pr-1">
+                <b-button size="sm" :pressed.sync="settings.showAdditionalFilters" @click="saveSettings" variant="link" v-b-popover.hover.top="'Additional filters'"><span v-if="settings.showAdditionalFilters"><b-icon-funnel-fill shift-v="+1" font-scale="1.0"></b-icon-funnel-fill></span><span v-else><b-icon-funnel shift-v="+1" font-scale="1.0"></b-icon-funnel></span></b-button>
+              </div>
+              <div v-if="Object.keys(settings.filters).length > 0" class="mt-0 pr-1">
+                <b-button size="sm" @click="resetAdditionalFilters();" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Reset additional filters'">
+                  <b-iconstack shift-v="-1" font-scale="1">
+                    <b-icon stacked icon="funnel-fill" variant="info" scale="1"></b-icon>
+                    <b-icon stacked icon="x" variant="danger" scale="1.3"></b-icon>
+                  </b-iconstack>
+                </b-button>
+              </div>
+              <div class="mt-0 flex-grow-1">
+              </div>
+              <div class="mt-0 flex-grow-1">
+              </div>
+              <div v-if="!sync.section" class="mt-0 pr-1">
+                <b-button size="sm" @click="syncCoins()" variant="primary" v-b-popover.hover.top="'Select NFT collections to for accounts'">Sync</b-button>
+              </div>
+              <div class="mt-1" style="width: 250px;">
+                <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
+                  <b-progress-bar :value="sync.completed">
+                    {{ sync.total == null || sync.total == 0 ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
+                  </b-progress-bar>
+                </b-progress>
+              </div>
+              <div class="ml-0 mt-1">
+                <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.top="'Click to stop. It may take a few minutes to clean up. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
+              </div>
+              <div class="mt-0 flex-grow-1">
+              </div>
+              <div class="mt-0 pl-1">
+                <b-form-select size="sm" v-model="settings.transfersTable.sortOption" @change="saveSettings" :options="transfersSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
+              </div>
+              <div class="mt-0 pl-1">
+                <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedTransfers.length + '/' + tokens.length }}</font>
+              </div>
+              <div class="mt-0 pl-1">
+                <b-pagination size="sm" v-model="settings.transfersTable.currentPage" @input="saveSettings" :total-rows="filteredSortedTransfers.length" :per-page="settings.transfersTable.pageSize" style="height: 0;"></b-pagination>
+              </div>
+              <div class="mt-0 pl-1">
+                <b-form-select size="sm" v-model="settings.transfersTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Tokens page size'"></b-form-select>
+              </div>
+            </div>
+
+            <!-- ADDITIONAL FILTERS -->
+            <div v-if="settings.showAdditionalFilters" class="d-flex flex-wrap m-0 p-0">
+              <div class="mt-0 pr-1" style="width: 13.0rem;">
+                <b-card no-header no-body class="m-0 mt-1 p-0 border-1">
+                  <b-card-body class="m-0 p-0">
+                    <font size="-2">
+                      <b-table small fixed striped sticky-header="200px" :fields="groupsFilterFields" :items="getAllGroups" head-variant="light">
+                        <template #cell(select)="data">
+                          <b-form-checkbox size="sm" :checked="(settings.filters['groups'] && settings.filters['groups'][data.item.group]) ? 1 : 0" value="1" @change="filterChanged('groups', data.item.group)"></b-form-checkbox>
+                        </template>
+                        <template #cell(group)="data">
+                          {{ data.item.group }}
+                        </template>
+                      </b-table>
+                    </font>
+                  </b-card-body>
+                </b-card>
+              </div>
+
+              <div class="mt-0 pr-1" style="width: 13.0rem;">
+                <b-card no-header no-body class="m-0 mt-1 p-0 border-1">
+                  <b-card-body class="m-0 p-0">
+                    <font size="-2">
+                      <b-table small fixed striped sticky-header="200px" :fields="accountsFilterFields" :items="getAllAccounts" head-variant="light">
+                        <template #cell(select)="data">
+                          <b-form-checkbox size="sm" :checked="(settings.filters['accounts'] && settings.filters['accounts'][data.item.account]) ? 1 : 0" value="1" @change="filterChanged('accounts', data.item.account)"></b-form-checkbox>
+                        </template>
+                        <template #cell(account)="data">
+                          {{ data.item.accountName }}
+                        </template>
+                      </b-table>
+                    </font>
+                  </b-card-body>
+                </b-card>
+              </div>
+
+              <div class="mt-0 pr-1" style="width: 13.0rem;">
+                <b-card no-header no-body class="m-0 mt-1 p-0 border-1">
+                  <b-card-body class="m-0 p-0">
+                    <font size="-2">
+                      <b-table small fixed striped sticky-header="200px" :fields="collectionsFilterFields" :items="getAllPools" head-variant="light">
+                        <template #cell(select)="data">
+                          <b-form-checkbox size="sm" :checked="(settings.filters['collections'] && settings.filters['collections'][data.item.collection]) ? 1 : 0" value="1" @change="filterChanged('collections', data.item.collection)"></b-form-checkbox>
+                        </template>
+                        <template #cell(account)="data">
+                          {{ data.item.collectionName }}
+                        </template>
+                      </b-table>
+                    </font>
+                  </b-card-body>
+                </b-card>
+              </div>
+
+            </div>
+
+            <!-- <b-table small fixed striped responsive hover selectable select-mode="single" @row-selected="showModalDetails" :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Add your coins in the [Coins] menu, then click [Sync] above" head-variant="light" class="mx-0 my-1"> -->
+            <b-table small fixed striped responsive hover :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Add your coins in the [Coins] menu, then click [Sync] above" head-variant="light" class="mx-0 my-1">
+              <template #cell(number)="data">
+                <!--
+                <b-form-checkbox size="sm" :checked="selectedCollections[data.item.contract] ? 1 : 0" value="1" @change="toggleSelectedCollections([data.item])">
+                  {{ parseInt(data.index) + ((settings.collections.currentPage - 1) * settings.collections.pageSize) + 1 }}
+                </b-form-checkbox>
+                -->
+                {{ parseInt(data.index) + ((settings.transfersTable.currentPage - 1) * settings.transfersTable.pageSize) + 1 }}
+              </template>
+              <template #cell(timestamp)="data">
+                <font size="-1">
+                  <b-link :href="'https://etherscan.io/tx/' + data.item[0]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                    {{ formatTimestamp(data.item[2]) }}
+                  </b-link>
+                  <font size="-2">
+                    <b-link @click="showModalDetails(data.item);">🔍</b-link>
+                  </font>
+                </font>
+                <br />
+                <font size="-2">
+                  {{ data.item[1] + ':' + data.item[3] + ':' + data.item[0] }}
+                </font>
+              </template>
+              <template #cell(info)="data">
+                <div v-if="data.item[4]">
+                  <div v-for="action of data.item[4]">
+                    <font size="-1"><pre>{{ transactionTypes[action[1]] || '(Unknown)' }}</pre></font>
+                    <br />
+                  </div>
+                </div>
+                <!--
+                <div v-if="data.item.info">
+                  <div v-if="data.item.info.type == 'tx'">
+                    Transfer
+                  </div>
+                  <div v-else-if="data.item.info.type == 'addLiquidity'">
+                    Add Liquidity
+                  </div>
+                  <div v-else-if="data.item.info.type == 'dex'">
+                    DEX: <font size="-2"><pre>{{ data.item }}</pre></font>
+                  </div>
+                  <div v-else>
+                    Unknown
+                  </div>
+                </div>
+                <div v-else>
+                  <font size="-2"><pre>{{ data.item }}</pre></font>
+                </div>
+                -->
+                <font size="-2"><pre>{{ data.item }}</pre></font>
+              </template>
+              <template #cell(from)="data">
+                <div v-if="data.item[4]">
+                  <div v-for="action of data.item[4]">
+                    <font size="-1">
+                      <b-link v-if="action" :href="'https://etherscan.io/address/' + indexToAddress[action[2]]" v-b-popover.hover.bottom="'View account in etherscan.io'" target="_blank">
+                        {{ ensOrAddress(indexToAddress[action[2]]) }}
+                      </b-link>
+                    </font>
+                    <br />
+                  </div>
+                </div>
+                <!--
+                <font size="-2">
+                  <b-link v-if="data.item.info" :href="'https://etherscan.io/address/' + data.item.info.from" v-b-popover.hover.bottom="'View account in etherscan.io'" target="_blank">
+                    {{ ensOrAddress(data.item.info.from) }}
+                  </b-link>
+                </font>
+                -->
+              </template>
+              <template #cell(to)="data">
+                <div v-if="data.item[4]">
+                  <div v-for="action of data.item[4]">
+                    <font size="-1">
+                      <b-link v-if="action" :href="'https://etherscan.io/address/' + indexToAddress[action[3]]" v-b-popover.hover.bottom="'View account in etherscan.io'" target="_blank">
+                        {{ ensOrAddress(indexToAddress[action[3]]) }}
+                      </b-link>
+                    </font>
+                    <br />
+                  </div>
+                </div>
+                <!--
+                <font size="-2">
+                  <b-link v-if="data.item.info" :href="'https://etherscan.io/address/' + data.item.info.to" v-b-popover.hover.bottom="'View account in etherscan.io'" target="_blank">
+                    {{ ensOrAddress(data.item.info.to) }}
+                  </b-link>
+                </font>
+                -->
+              </template>
+              <template #cell(tokens)="data">
+                <div v-if="data.item[4]">
+                  <div v-for="action of data.item[4]">
+                    <font size="-1">
+                      {{ formatERC20(action[4], indexToDecimals[action[5]]) }}
+                    </font>
+                    <div v-if="action.length > 6">
+                      <font size="-1">
+                        {{ formatERC20(action[6], indexToDecimals[action[7]]) }}
+                      </font>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <template #cell(token)="data">
+                <div v-if="data.item[4]">
+                  <div v-for="action of data.item[4]">
+                    <font size="-1">
+                      {{ indexToSymbols[action[5]] }}
+                    </font>
+                    <div v-if="action.length > 6">
+                      <font size="-1">
+                        {{ indexToSymbols[action[7]] || ("Unknown: " + action[7]) }}
+                      </font>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <template #cell(rate)="data">
+                <div v-if="data.item.actions">
+                  <div v-for="action of data.item.actions">
+                    <div v-if="action.length > 8">
+                      <font size="-1">
+                        {{ formatRate(action[12], 18, 10) }}
+                      </font>
+                    </div>
+                    <br />
+                  </div>
+                </div>
+              </template>
+              <template #cell(token1)="data">
+                <div class="d-flex flex-row">
+                  <div>
+                    <b-avatar rounded variant="light" size="8.0rem" :src="data.item.image">
+                    </b-avatar>
+                  </div>
+                  <div class="ml-2">
+                    <b-link @click="showModalDetails(data.item);">{{ data.item.name }}</b-link>
+                    <br />
+                    {{ data.item.collectionName }}
+                    <br />
+                    {{ data.item.tokenId }}
+                    <br />
+                    {{ data.item.ownerName }}
+                    <br />
+                    <b-button size="sm" @click="requestReservoirAPITokenMetadataRefresh(data.item)" variant="link" v-b-popover.hover.top="'Request a metadata refresh on the Reservoir API. Re-sync after a few minutes'"><b-icon-arrow-clockwise shift-v="+1" font-scale="1.2"></b-icon-arrow-clockwise></b-button>
+                    <!-- Volume: 1d {{ commify(data.item.volume["1day"]) + 'e' }}; 7d {{ commify(data.item.volume["7day"]) + 'e' }}; 30d {{ commify(data.item.volume["30day"]) + 'e' }}; allTime {{ commify(data.item.volume["allTime"]) + 'e' }}; tokens {{ data.item.tokenCount }}; onSale {{ data.item.onSaleCount }} -->
+                  </div>
+                </div>
+              </template>
+              <template #cell(lastSaleAmount)="data">
+                <div v-if="data.item.lastSale">
+                  {{ data.item.lastSale.amount }} {{ data.item.lastSale.currency }} <font size="-2">{{ data.item.lastSale.amountInUSD }} USD</font>
+                </div>
+              </template>
+              <template #cell(lastSaleTime)="data">
+                <div v-if="data.item.lastSale">
+                  {{ formatTimestamp(data.item.lastSale.timestamp) }}
+              </div>
+              </template>
+            </b-table>
+          </b-card>
+
+          <b-card v-if="coinbase && settings.tabIndex == 1" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
+            <div class="d-flex flex-wrap m-0 p-0">
+              <!--
+              <div class="mt-0 pr-1">
+                <b-form-input type="text" size="sm" v-model.trim="settings.coinsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Account address/name filter'" placeholder="🔍 add/name regex" style="min-width: 8.0rem;"></b-form-input>
+              </div>
+              -->
+              <div class="mt-0 flex-grow-1">
+              </div>
+              <!--
+              <div class="mt-0 pl-1">
+                <b-form-select size="sm" v-model="settings.coinsTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
+              </div>
+              -->
+              <div class="mt-0 pl-1">
+                <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedCoins.length + '/' + Object.keys(settings.coins).length }}</font>
+              </div>
+              <div class="mt-0 pl-1">
+                <b-pagination size="sm" v-model="settings.coinsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.coinsTable.pageSize" style="height: 0;"></b-pagination>
+              </div>
+              <div class="mt-0 pl-1">
+                <b-form-select size="sm" v-model="settings.coinsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Coins page size'"></b-form-select>
+              </div>
+            </div>
+
+            <b-table small fixed striped responsive hover :fields="coinsFields" :items="pagedFilteredSortedCoins" show-empty empty-html="Click [+] above to add a new ERC-20 token contract. Currently only TURBO supported" head-variant="light" class="mx-0 my-1">
+              <template #head(address)="data">
+                ERC-20 Coin Address <b-button v-b-modal.new-coin-modal-prevent-closing variant="link" v-b-popover.hover.top="'Add new coin'"><b-icon-plus-square shift-v="+1" font-scale="0.8"></b-icon-plus-square></b-button>
+                <b-modal id="new-coin-modal-prevent-closing" ref="modal" title="New ERC-20 Coin Address" @show="newCoinAddressResetModal" @hidden="newCoinAddressResetModal" @ok="newCoinAddressHandleOk">
+                  <form ref="coinForm" @submit.stop.prevent="newCoinAddressHandleSubmit">
+                    <b-form-group label="Address" label-for="name-input" :state="newCoinAddressState" description="Pre-filled with TURBO for initial testing" invalid-feedback="Please enter a valid Ethereum ERC-20 address">
+                      <b-form-input id="name-input" v-model="newCoinAddress" :state="newCoinAddressState" required placeholder="0x1234..."></b-form-input>
+                    </b-form-group>
+                  </form>
+                </b-modal>
+              </template>
+              <template #head(sync)="data">
+                Sync
+                <!--
+                <b-dropdown size="sm" variant="link" v-b-popover.hover="'Toggle selection'">
+                  <template #button-content>
+                    <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
+                  </template>
+                  <b-dropdown-item href="#" @click="toggleSyncAccounts(pagedFilteredSortedAccounts)">Toggle sync for all accounts on this page</b-dropdown-item>
+                  <b-dropdown-item href="#" @click="toggleSyncAccounts(filteredSortedAccounts)">Toggle sync for all accounts on all pages</b-dropdown-item>
+                </b-dropdown>
+                -->
+              </template>
+              <template #head(include)="data">
+                Include
+                <!--
+                <b-dropdown size="sm" variant="link" v-b-popover.hover="'Toggle selection'">
+                  <template #button-content>
+                    <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
+                  </template>
+                  <b-dropdown-item href="#" @click="toggleIncludeAccounts(pagedFilteredSortedAccounts)">Toggle include for all accounts on this page</b-dropdown-item>
+                  <b-dropdown-item href="#" @click="toggleIncludeAccounts(filteredSortedAccounts)">Toggle include for all accounts on all pages</b-dropdown-item>
+                </b-dropdown>
+                -->
+              </template>
+              <template #cell(totalSupply)="data">
+                {{ formatERC20(data.item.totalSupply, data.item.decimals) }}
+              </template>
+              <template #cell(sync)="data">
+                <b-form-checkbox size="sm" :checked="data.item.sync ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'sync')" v-b-popover.hover="'Include in sync process?'"></b-form-checkbox>
+              </template>
+              <template #cell(include)="data">
+                <b-form-checkbox size="sm" :checked="data.item.include ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'include')" v-b-popover.hover="'Include in NFTs view?'"></b-form-checkbox>
+              </template>
+              <template #cell(delete)="data">
+                <b-button size="sm" @click="deleteCoin(data.item.address)" variant="link" v-b-popover.hover="'Delete account'"><b-icon-trash style="color: #ff0000;" shift-v="+1" font-scale="1.0"></b-icon-trash></b-button>
+              </template>
+            </b-table>
+
+          </b-card>
+
+          <b-card v-if="coinbase && settings.tabIndex == 2" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
+            <div class="d-flex flex-wrap m-0 p-0">
+              <!--
+              <div class="mt-0 pr-1">
+                <b-form-input type="text" size="sm" v-model.trim="settings.accountsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Account address/name filter'" placeholder="🔍 add/name regex" style="min-width: 8.0rem;"></b-form-input>
+              </div>
+              -->
+              <div class="mt-0 flex-grow-1">
+              </div>
+              <!--
+              <div v-if="!sync.section" class="mt-0 pr-1">
+                <b-button size="sm" :pressed.sync="settings.editAccounts" @click="saveSettings" :variant="settings.editAccounts ? 'danger' : 'link'" v-b-popover.hover.top="settings.editAccounts ? 'End adding/editing accounts. Click Sync to apply changes' : 'Add/Edit accounts'"><b-icon-pencil shift-v="+1" font-scale="1.0"></b-icon-pencil></b-button>
+              </div>
+              <div class="mt-0 flex-grow-1">
+              </div>
+              -->
+              <!--
+              <div class="mt-0 pr-1">
+                <b-dropdown size="sm" variant="link" v-b-popover.hover.top="'Export/Import accounts'">
+                  <template #button-content>
+                    <b-icon-file-earmark-spreadsheet shift-v="+1" font-scale="1.2"></b-icon-file-earmark-spreadsheet>
+                  </template>
+                  <b-dropdown-item @click="exportAccounts" >Export</b-dropdown-item>
+                  <b-dropdown-item @click="showModalAccountsImport();">Import</b-dropdown-item>
+                </b-dropdown>
+              </div>
+              -->
+              <div class="mt-0 flex-grow-1">
+              </div>
+              <div class="mt-0 pl-1">
+                <b-form-select size="sm" v-model="settings.accountsTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
+              </div>
+              <div class="mt-0 pl-1">
+                <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedAccounts.length + '/' + Object.keys(settings.accounts).length }}</font>
+              </div>
+              <div class="mt-0 pl-1">
+                <b-pagination size="sm" v-model="settings.accountsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.accountsTable.pageSize" style="height: 0;"></b-pagination>
+              </div>
+              <div class="mt-0 pl-1">
+                <b-form-select size="sm" v-model="settings.accountsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Accounts page size'"></b-form-select>
+              </div>
+            </div>
+
+            <b-table small fixed striped responsive hover :fields="accountsFields" :items="pagedFilteredSortedAccounts" show-empty empty-html="Click [+] above to add your account" head-variant="light" class="mx-0 my-1">
+              <template #head(address)="data">
+                Account <b-button v-b-modal.new-account-modal-prevent-closing variant="link" v-b-popover.hover.top="'Add new account'"><b-icon-plus-square shift-v="+1" font-scale="0.8"></b-icon-plus-square></b-button>
+                <b-modal id="new-account-modal-prevent-closing" ref="modal" title="New Account" @show="newAccountResetModal" @hidden="newAccountResetModal" @ok="newAccountHandleOk">
+                  <form ref="accountForm" @submit.stop.prevent="newAccountHandleSubmit">
+                    <b-form-group label="Address" label-for="name-input" :state="newAddressState" invalid-feedback="Please enter a valid Ethereum address">
+                      <b-form-input id="name-input" v-model="newAddress" :state="newAddressState" required placeholder="0x1234..."></b-form-input>
+                    </b-form-group>
+                  </form>
+                </b-modal>
+              </template>
+              <!--
+              <template #head(sync)="data">
+                Sync
+                <b-dropdown size="sm" variant="link" v-b-popover.hover="'Toggle selection'">
+                  <template #button-content>
+                    <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
+                  </template>
+                  <b-dropdown-item href="#" @click="toggleSyncAccounts(pagedFilteredSortedAccounts)">Toggle sync for all accounts on this page</b-dropdown-item>
+                  <b-dropdown-item href="#" @click="toggleSyncAccounts(filteredSortedAccounts)">Toggle sync for all accounts on all pages</b-dropdown-item>
+                </b-dropdown>
+              </template>
+              -->
+              <!--
+              <template #head(include)="data">
+                Include
+                <b-dropdown size="sm" variant="link" v-b-popover.hover="'Toggle selection'">
+                  <template #button-content>
+                    <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
+                  </template>
+                  <b-dropdown-item href="#" @click="toggleIncludeAccounts(pagedFilteredSortedAccounts)">Toggle include for all accounts on this page</b-dropdown-item>
+                  <b-dropdown-item href="#" @click="toggleIncludeAccounts(filteredSortedAccounts)">Toggle include for all accounts on all pages</b-dropdown-item>
+                </b-dropdown>
+              </template>
+              -->
+              <template #cell(group)="data">
+                <b-form-input type="text" size="sm" v-model.trim="data.item.group" @change="setAccountField(data.item.address, 'group', $event)" placeholder="group"></b-form-input>
+              </template>
+              <template #cell(name)="data">
+                <b-form-input type="text" size="sm" v-model.trim="data.item.name" @change="setAccountField(data.item.address, 'name', $event)" placeholder="name"></b-form-input>
+              </template>
+              <!--
+              <template #cell(sync)="data">
+                <b-form-checkbox size="sm" :checked="data.item.sync ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'sync')" v-b-popover.hover="'Include in sync process?'"></b-form-checkbox>
+              </template>
+              <template #cell(include)="data">
+                <b-form-checkbox size="sm" :checked="data.item.include ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'include')" v-b-popover.hover="'Include in NFTs view?'"></b-form-checkbox>
+              </template>
+              -->
+              <template #cell(delete)="data">
+                <b-button size="sm" @click="deleteAccount(data.item.address)" variant="link" v-b-popover.hover="'Delete account'"><b-icon-trash style="color: #ff0000;" shift-v="+1" font-scale="1.0"></b-icon-trash></b-button>
+              </template>
+            </b-table>
+          </b-card>
+        </b-card>
+        <b-card no-header body-class="m-0 p-0" class="m-0 p-0 border-0">
+          <b-card-text class="text-right">
+            gm, and enjoy! <i>Meme Coin Data</i> &copy; Bok Consulting Pty Ltd 2023.
+          </b-card-text>
+        </b-card no-header>
+      </b-container>
+    </div>
+
+    <script>
+      window.app = new Vue({
+        el: '#app',
+        // --- DATA ---
+        data: {
+          coinbase: null,
+          settings: {
+            tabIndex: 0,
+            showAdditionalFilters: false,
+            filters: {},
+            editCoins: false,
+            coins: {},
+            coinsTable: {
+              filter: null,
+              currentPage: 1,
+              pageSize: 10,
+              sortOption: 'lastsaledsc',
+            },
+            editAccounts: false,
+            accounts: {},
+            accountsTable: {
+              filter: null,
+              currentPage: 1,
+              pageSize: 10,
+              sortOption: 'groupnameasc',
+            },
+            transfersTable: {
+              filter: null,
+              currentPage: 1,
+              pageSize: 10,
+              sortOption: 'blocknumberdsc',
+            },
+            tokensTable: {
+              tokenFilter: null,
+              collectionFilter: null,
+              currentPage: 1,
+              pageSize: 10,
+              sortOption: 'lastsaledsc',
+            },
+            version: 3,
+          },
+          newCoinAddress: null,
+          newAddress: null,
+          restoreFile: null,
+          restoreAddresses: null,
+          sync: {
+            section: null,
+            total: null,
+            completed: null,
+            halt: false,
+          },
+          modalDetails: {
+            data: null,
+            token: null,
+            collection: null,
+          },
+
+          addressToIndex: {},
+          indexToAddress: [],
+          indexToName: {},
+          indexToSymbols: {},
+          indexToDecimals: {},
+
+          transfers: {},
+          pools: {},
+          trades: {},
+          blockTimestamps: {},
+          collections: {},
+          tokens: [],
+          selectedCollections: {},
+          selectedMainTable: {},
+          accountsSortOptions: [
+            { value: 'groupnameasc', text: '▲ Group, ▲ Name' },
+            { value: 'groupnamedsc', text: '▼ Group, ▲ Name' },
+            { value: 'nameasc', text: '▲ Name' },
+            { value: 'namedsc', text: '▼ Name' },
+          ],
+          transfersSortOptions: [
+            { value: 'blocknumberasc', text: '▲ Block Number' },
+            { value: 'blocknumberdsc', text: '▼ Block Number' },
+          ],
+          tokensSortOptions: [
+            { value: 'lastsaleasc', text: '▲ Last Sale' },
+            { value: 'lastsaledsc', text: '▼ Last Sale' },
+          ],
+          pageSizes: [
+            { value: 5, text: '5' },
+            { value: 10, text: '10' },
+            { value: 25, text: '25' },
+            { value: 50, text: '50' },
+            { value: 100, text: '100' },
+            { value: 500, text: '500' },
+            { value: 1000, text: '1k' },
+            { value: 2500, text: '2.5k' },
+            { value: 10000, text: '10k' },
+          ],
+          coinsFields: [
+            { key: 'address', label: '#', sortable: false, thStyle: 'width: 30%;', tdClass: 'text-truncate' },
+            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'sync', label: 'Sync', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
+            { key: 'include', label: 'Include', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
+            { key: 'delete', label: 'Delete', sortable: false, thStyle: 'width: 6%;', tdClass: 'text-truncate' },
+          ],
+          accountsFields: [
+            { key: 'address', label: '#', sortable: false, thStyle: 'width: 30%;', tdClass: 'text-truncate' },
+            { key: 'group', label: 'Group', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
+            { key: 'delete', label: 'Delete', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+          ],
+          transfersFields: [
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            // { key: 'blockNumber', label: 'Block Number', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            { key: 'info', label: 'Info', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            // { key: 'coin', label: 'Coin', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+            { key: 'from', label: 'From', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            { key: 'to', label: 'To', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'token', label: 'Token', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'rate', label: 'Rate', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+          ],
+          tokensFields: [
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'token', label: 'Token', sortable: false, thStyle: 'width: 55%;', tdClass: 'text-truncate' },
+            { key: 'lastSaleAmount', label: 'Last Sale Amount', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+            { key: 'lastSaleTime', label: 'Last Sale', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+          ],
+          groupsFilterFields: [
+            { key: 'select', label: '', thStyle: 'width: 15%;' },
+            { key: 'group', label: 'Group', sortable: true, tdClass: 'text-truncate' },
+            { key: 'count', label: '#', sortable: true, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
+          ],
+          accountsFilterFields: [
+            { key: 'select', label: '', thStyle: 'width: 15%;' },
+            { key: 'account', label: 'Account', sortable: true, tdClass: 'text-truncate' },
+            { key: 'count', label: '#', sortable: true, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
+          ],
+          collectionsFilterFields: [
+            { key: 'select', label: '', thStyle: 'width: 15%;' },
+            { key: 'collectionName', label: 'Collection', sortable: true, tdClass: 'text-truncate' },
+            { key: 'count', label: '#', sortable: true, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
+          ],
+          accountsImportAddressesFields: [
+            { key: 'address', label: 'Address', sortable: true, thStyle: 'width: 60%;', tdClass: 'text-truncate' },
+            { key: 'name', label: 'Name', sortable: true, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+            { key: 'group', label: 'Group', sortable: true, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+            // { key: 'sync', label: 'Sync', sortable: true, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+            // { key: 'include', label: 'Include', sortable: true, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+          ],
+          transactionTypes: {
+            1: "Transfer",
+            21: "U2Mint",
+            22: "U2Swap",
+            23: "U2Burn",
+            31: "U3Mint",
+            32: "U3Swap",
+            33: "U3Burn",
+            34: "U3Collect",
+          },
+          db: {
+            name: "memecoindata089g",
+            version: 1,
+            schemaDefinition: {
+              cache: '&objectName',
+            },
+            updated: null,
+          },
+        },
+
+        // --- COMPUTED ---
+        computed: {
+          getAllGroups() {
+            const groupsMap = {};
+            for (const token of this.filteredTransfers) {
+              const accountInfo = this.settings.accounts[token.owner] || {};
+              const group = accountInfo.group || "(blank)";
+              if (!(group in groupsMap)) {
+                groupsMap[group] = 0;
+              }
+              groupsMap[group]++;
+            }
+            const results = [];
+            for (const [group, count] of Object.entries(groupsMap)) {
+              results.push({ group, count });
+            }
+            results.sort((a, b) => {
+              if (('' + a.group).localeCompare(b.group) == 0) {
+                results.sort((a, b) => a.count - b.count);
+              } else {
+                return ('' + a.group).localeCompare(b.group);
+              }
+            });
+            return results;
+          },
+          getAllAccounts() {
+            const accountsMap = {};
+            for (const token of this.filteredTransfers) {
+              if (!(token.owner in accountsMap)) {
+                accountsMap[token.owner] = 0;
+              }
+              accountsMap[token.owner]++;
+            }
+            const results = [];
+            for (const [account, count] of Object.entries(accountsMap)) {
+              const accountInfo = this.settings.accounts[account] || {};
+              const accountName = accountInfo.name && (accountInfo.name + ' ' + account.substring(0, 8)) || account.substring(0, 16);
+              results.push({ account, accountName, count });
+            }
+            results.sort((a, b) => {
+              if (('' + a.accountName).localeCompare(b.accountName) == 0) {
+                results.sort((a, b) => a.count - b.count);
+              } else {
+                return ('' + a.accountName).localeCompare(b.accountName);
+              }
+            });
+            return results;
+          },
+          getAllPools() {
+            const collectionsMap = {};
+            for (const token of this.filteredTransfers) {
+              if (!(token.contract in collectionsMap)) {
+                collectionsMap[token.contract] = 0;
+              }
+              collectionsMap[token.contract]++;
+            }
+            const results = [];
+            for (const [contract, count] of Object.entries(collectionsMap)) {
+              const collectionInfo = this.collections[contract] || {};
+              results.push({ collection: contract, collectionName: collectionInfo.name, count });
+            }
+            results.sort((a, b) => {
+              if (('' + a.collectionName).localeCompare(b.collectionName) == 0) {
+                results.sort((a, b) => a.count - b.count);
+              } else {
+                return ('' + a.collectionName).localeCompare(b.collectionName);
+              }
+            });
+            return results;
+          },
+          newCoinAddressState() {
+            if (this.newCoinAddress) {
+              try {
+                const a = ethers.utils.getAddress(this.newCoinAddress);
+                return a && a.length > 0;
+              } catch (e) {
+                return false;
+              }
+            }
+            return null;
+          },
+          newAddressState() {
+            if (this.newAddress) {
+              try {
+                const a = ethers.utils.getAddress(this.newAddress);
+                return a && a.length > 0;
+              } catch (e) {
+                return false;
+              }
+            }
+            return null;
+          },
+          filteredCoins() {
+            const results = [];
+            const filterRegex = this.settings.coinsTable.filter && this.settings.coinsTable.filter.length > 0 ? new RegExp(this.settings.coinsTable.filter, 'i') : null;
+            for (const [address, item] of Object.entries(this.settings.coins)) {
+              let include = true;
+              if (filterRegex) {
+                if (!filterRegex.test(item.name) && !filterRegex.test(item.group) && !filterRegex.test(address)) {
+                  include = false;
+                }
+              }
+              if (include) {
+                results.push({
+                  address,
+                  symbol: item.symbol,
+                  name: item.name,
+                  decimals: item.decimals,
+                  totalSupply: item.totalSupply,
+                  sync: item.sync,
+                  include: item.include,
+                  latestBlockNumber: item.latestBlockNumber,
+                });
+              }
+            }
+            return results;
+          },
+          filteredSortedCoins() {
+            let results = this.filteredCoins;
+            return results;
+          },
+          pagedFilteredSortedCoins() {
+            return this.filteredSortedCoins.slice((this.settings.coinsTable.currentPage - 1) * this.settings.coinsTable.pageSize, this.settings.coinsTable.currentPage * this.settings.coinsTable.pageSize);
+          },
+          filteredAccounts() {
+            const results = [];
+            const filterRegex = this.settings.accountsTable.filter && this.settings.accountsTable.filter.length > 0 ? new RegExp(this.settings.accountsTable.filter, 'i') : null;
+            for (const [address, item] of Object.entries(this.settings.accounts)) {
+              let include = true;
+              if (filterRegex) {
+                if (!filterRegex.test(item.name) && !filterRegex.test(item.group) && !filterRegex.test(address)) {
+                  include = false;
+                }
+              }
+              if (include) {
+                results.push({
+                  address,
+                  name: item.name,
+                  group: item.group,
+                });
+              }
+            }
+            return results;
+          },
+          filteredSortedAccounts() {
+            let results = this.filteredAccounts;
+            if (this.settings.accountsTable.sortOption == 'groupnameasc') {
+              results.sort((a, b) => {
+                if (('' + a.group).localeCompare(b.group) == 0) {
+                  if (('' + a.name).localeCompare(b.name) == 0) {
+                    return ('' + a.account).localeCompare(b.account);
+                  } else {
+                    return ('' + a.name).localeCompare(b.name);
+                  }
+                } else {
+                  return ('' + a.group).localeCompare(b.group);
+                }
+              });
+            } else if (this.settings.accountsTable.sortOption == 'groupnamedsc') {
+              results.sort((a, b) => {
+                if (('' + a.group).localeCompare(b.group) == 0) {
+                  if (('' + a.name).localeCompare(b.name) == 0) {
+                    return ('' + a.account).localeCompare(b.account);
+                  } else {
+                    return ('' + a.name).localeCompare(b.name);
+                  }
+                } else {
+                  return ('' + b.group).localeCompare(a.group);
+                }
+              });
+            } else if (this.settings.accountsTable.sortOption == 'nameasc') {
+              results.sort((a, b) => {
+                if (('' + a.name).localeCompare(b.name) == 0) {
+                  return ('' + a.account).localeCompare(b.account);
+                } else {
+                  return ('' + a.name).localeCompare(b.name);
+                }
+              });
+            } else if (this.settings.accountsTable.sortOption == 'namedsc') {
+              results.sort((a, b) => {
+                if (('' + a.name).localeCompare(b.name) == 0) {
+                  return ('' + a.account).localeCompare(b.account);
+                } else {
+                  return ('' + b.name).localeCompare(a.name);
+                }
+              });
+            } else {
+              results.sort((a, b) => {
+                if (('' + a.group).localeCompare(b.group) == 0) {
+                  if (('' + a.name).localeCompare(b.name) == 0) {
+                    return ('' + a.account).localeCompare(b.account);
+                  } else {
+                    return ('' + a.name).localeCompare(b.name);
+                  }
+                } else {
+                  return ('' + a.group).localeCompare(b.group);
+                }
+              });
+            }
+            return results;
+          },
+          pagedFilteredSortedAccounts() {
+            return this.filteredSortedAccounts.slice((this.settings.accountsTable.currentPage - 1) * this.settings.accountsTable.pageSize, this.settings.accountsTable.currentPage * this.settings.accountsTable.pageSize);
+          },
+          filteredTransfers() {
+            console.log(moment().format("HH:mm:ss") + " filteredTransfers");
+            // console.log("pools: " + JSON.stringify(this.pools. null, 2));
+            // console.log("trades: " + JSON.stringify(this.trades, null, 2));
+            // const tokenFilterRegex = this.settings.tokensTable.tokenFilter && this.settings.tokensTable.tokenFilter.length > 0 ? new RegExp(this.settings.tokensTable.tokenFilter, 'i') : null;
+            // const searchCollectionLower = this.settings.tokensTable.collectionfilter && this.settings.tokensTable.collectionfilter.toLowerCase() || null;
+            // let groupFilter = null;
+            // if (this.settings.filters.groups && Object.keys(this.settings.filters.groups).length > 0) {
+            //   groupFilter = this.settings.filters.groups;
+            // }
+            // let accountFilter = null;
+            // if (this.settings.filters.accounts && Object.keys(this.settings.filters.accounts).length > 0) {
+            //   accountFilter = this.settings.filters.accounts;
+            // }
+            // let collectionFilter = null;
+            // if (this.settings.filters.collections && Object.keys(this.settings.filters.collections).length > 0) {
+            //   collectionFilter = this.settings.filters.collections;
+            // }
+            const results = [];
+            // console.log("this.trades: " + JSON.stringify(this.trades, null, 2));
+            // multi for (const [txHash, txInfo] of Object.entries(this.trades).slice(900, 950)) {
+            for (const [txHash, txInfo] of Object.entries(this.trades)) {
+              // const timestamp = this.blockTimestamps[txInfo.blockNumber] || null;
+
+              // console.log(txHash + " => " + JSON.stringify(txInfo, null, 2));
+              const [blockNumber, timestamp, txIndex, isDex, logs] = txInfo;
+
+              let actions = null;
+              // const sortedLogs = [];
+
+              // console.log("txInfo.logs: " + JSON.stringify(txInfo.logs, null, 2));
+              // for (const [logIndex, logInfo] of Object.entries(txInfo.logs)) {
+              //   const [type, tokenIndex, fromIndex, toIndex, tokens ] = logInfo;
+              //   sortedLogs.push({ logIndex, type, tokenIndex, fromIndex, toIndex, tokens });
+              // }
+
+              // for (const row of txInfo[4]) {
+              //   sortedLogs.push(row);
+              // }
+              if (logs.length > 1) {
+                logs.sort((a, b) => {
+                  return a[0] - b[0];
+                });
+              }
+              // console.log("logs: " + JSON.stringify(logs, null, 2));
+
+              // const txLogs = logs.filter(e => e[1] == "tx");
+              // console.log("txLogs: " + JSON.stringify(txLogs));
+
+              // const altTxLogs = sortedLogs.filter(e => e.type == "alttx");
+              // const uLogs = sortedLogs.filter(e => e[1] == "swap" || e[1] == "mint" || e[1] == "burn" || e[1] == "collect");
+              // console.log("uLogs: " + JSON.stringify(uLogs));
+
+              // const u2Logs = sortedLogs.filter(e => e.source == "u2");
+              // const u3Logs = sortedLogs.filter(e => e.source == "u3");
+              // console.log("sortedLogs: " + JSON.stringify(sortedLogs, null, 2));
+              // console.log("altTxLogs: " + JSON.stringify(altTxLogs, null, 2));
+              // console.log("u2Logs: " + JSON.stringify(u2Logs, null, 2));
+              // console.log("u3Logs: " + JSON.stringify(u3Logs, null, 2));
+
+              if (!isDex) {
+                actions = logs;
+                // actions = [];
+                // for (const log of logs) {
+                //   // const tokenIndex = log[5];
+                //   // const tokenAddress = this.indexToAddress[tokenIndex];
+                //   // const tokenSymbol = this.settings.coins[tokenAddress] && this.settings.coins[tokenAddress].symbol || null;
+                //   // const decimals = this.settings.coins[tokenAddress] && this.settings.coins[tokenAddress].decimals || 18;
+                //   // actions.push([ log[0], log[1], tokenAddress, tokenSymbol, decimals, this.indexToAddress[log[3]], this.indexToAddress[log[4]], log[5] ]);
+                //   actions.push([ ...log, /*tokenSymbol, decimals*/ ]);
+                // }
+              } else if (isDex) {
+                actions = logs;
+              } else if (uLogs.length > 0 && false) {
+                // console.log("uLogs: " + JSON.stringify(uLogs));
+                actions = [];
+                for (const log of uLogs) {
+                  // console.log("log: " + JSON.stringify(log));
+                  if (log[1] == "mint") {
+                    const pool = this.pools[this.indexToAddress[log[log.length - 1]]] || null;
+                    // console.log("pool: " + JSON.stringify(pool, null, 2));
+                    const token0 = {
+                      token: pool.token0.symbol,
+                      decimals: pool.token0.decimals,
+                      tokens: ethers.BigNumber.from(log[3]).mul(-1).toString(),
+                    };
+                    const token1 = {
+                      token: pool.token1.symbol,
+                      decimals: pool.token1.decimals,
+                      tokens: ethers.BigNumber.from(log[4]).mul(-1).toString(),
+                    };
+                    // console.log("token0: " + JSON.stringify(token0));
+                    // console.log("token1: " + JSON.stringify(token1));
+                    const TENMINUS18 = ethers.BigNumber.from(10).pow(18).mul(-1);
+                    let rate;
+                    if (pool.coin == pool.token0.address) {
+                      if (!ethers.BigNumber.from(token0.tokens).eq(0)) {
+                        rate = ethers.BigNumber.from(token1.tokens).mul(TENMINUS18).div(ethers.BigNumber.from(token0.tokens)).toString();
+                      }
+                    } else {
+                      if (!ethers.BigNumber.from(token1.tokens).eq(0)) {
+                        rate = ethers.BigNumber.from(token0.tokens).mul(TENMINUS18).div(ethers.BigNumber.from(token1.tokens)).toString();
+                      }
+                    }
+                    actions.push([ log[0], log[1], log[2], log[6],
+                      log[3], this.addressToIndex[pool.token0.address], pool.token0.symbol, pool.token0.decimals,
+                      log[4], this.addressToIndex[pool.token1.address], pool.token1.symbol, pool.token1.decimals,
+                      rate ]);
+
+                  } else if (log[1] == "swap") {
+                    const pool = this.pools[this.indexToAddress[log[7]]] || null;
+                    const token0 = {
+                      token: pool.token0.symbol,
+                      decimals: pool.token0.decimals,
+                      tokens: ethers.BigNumber.from(log[4]).mul(-1).toString(),
+                    };
+                    const token1 = {
+                      token: pool.token1.symbol,
+                      decimals: pool.token1.decimals,
+                      tokens: ethers.BigNumber.from(log[5]).mul(-1).toString(),
+                    };
+                    let tradeType;
+                    let rate = null;
+                    const TENMINUS18 = ethers.BigNumber.from(10).pow(18).mul(-1);
+                    if (pool.coin == pool.token0.address) {
+                      if (ethers.BigNumber.from(token0.tokens).gt(0)) {
+                        tradeType = "Buy " + pool.token0.symbol;
+                      } else {
+                        tradeType = "Sell " + pool.token0.symbol;
+                      }
+                      if (!ethers.BigNumber.from(token0.tokens).eq(0)) {
+                        rate = ethers.BigNumber.from(token1.tokens).mul(TENMINUS18).div(ethers.BigNumber.from(token0.tokens)).toString();
+                      }
+                    } else {
+                      if (ethers.BigNumber.from(token1.tokens).gt(0)) {
+                        tradeType = "Buy " + pool.token1.symbol;
+                      } else {
+                        tradeType = "Sell " + pool.token1.symbol;
+                      }
+                      if (!ethers.BigNumber.from(token1.tokens).eq(0)) {
+                        rate = ethers.BigNumber.from(token0.tokens).mul(TENMINUS18).div(ethers.BigNumber.from(token1.tokens)).toString();
+                      }
+                    }
+                    actions.push([ log[0], log[1], log[3], log[7],
+                      log[4], this.addressToIndex[pool.token0.address], pool.token0.symbol, pool.token0.decimals,
+                      log[5], this.addressToIndex[pool.token1.address], pool.token1.symbol, pool.token1.decimals,
+                      rate, log[6] ]);
+                  } else if (log[3] == "burn") {
+                    // console.log("logData: " + JSON.stringify(logData, null, 2));
+                    actions.push({
+                      type: "Burn",
+                      logData,
+                      // tradeType,
+                      // token0,
+                      // token1,
+                      // from: logData.recipient,
+                      // to: logData.poolAddress,
+                    });
+                  } else if (log[3] == "collect") {
+                    const token0 = {
+                      token: pool.token0.symbol,
+                      decimals: pool.token0.decimals,
+                      tokens: ethers.BigNumber.from(logData.amount0).mul(-1).toString(),
+                    };
+                    const token1 = {
+                      token: pool.token1.symbol,
+                      decimals: pool.token1.decimals,
+                      tokens: ethers.BigNumber.from(logData.amount1).mul(-1).toString(),
+                    };
+                    const TENMINUS18 = ethers.BigNumber.from(10).pow(18).mul(-1);
+                    let rate;
+                    if (pool.coin == pool.token0.address) {
+                      if (!ethers.BigNumber.from(token0.tokens).eq(0)) {
+                        rate = ethers.BigNumber.from(token1.tokens).mul(TENMINUS18).div(ethers.BigNumber.from(token0.tokens)).toString();
+                      }
+                    } else {
+                      if (!ethers.BigNumber.from(token1.tokens).eq(0)) {
+                        rate = ethers.BigNumber.from(token0.tokens).mul(TENMINUS18).div(ethers.BigNumber.from(token1.tokens)).toString();
+                      }
+                    }
+                    actions.push({
+                      type: "Collect",
+                      token0,
+                      token1,
+                      from: logData.poolAddress,
+                      to: logData.recipient,
+                      rate,
+                    });
+                  }
+                }
+              }
+              // if (actions && actions.type == "trade") {
+              // if (uLogs.length == 1 && txHash == "0x9f22ce032b8ff79fccd20f3465d0a09efc293afac3936035de5d7496276cb1eb") {
+              // if (uLogs.length == 0 && txLogs.length > 1) {
+              // if (txHash == "0x222c541878cf98dacd004e833bfa63a661521679c9c90a970ed47b1cd0d1e3b0") {
+                results.push([
+                  txHash,
+                  blockNumber,
+                  timestamp,
+                  txIndex,
+                  // txInfo.token,
+                  // logs: txInfo.logs,
+                  actions,
+                ]);
+                // console.log("results: " + JSON.stringify(results, null, 2));
+              // }
+            }
+            // console.log("results[0]: " + JSON.stringify(results && results[0] || {}));
+            // for (const [blockNumber, txIndexes] of Object.entries(this.transfers)) {
+            //   const timestamp = this.blockTimestamps[blockNumber] || null;
+            //   for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
+            //     for (const [txHash, logIndexes] of Object.entries(txHashes)) {
+            //       for (const [logIndex, txData] of Object.entries(logIndexes)) {
+            //         results.push({ blockNumber, timestamp, txIndex, txHash, logIndex, coin: txData.address, from: txData.from, to: txData.to, tokens: txData.tokens });
+            //       }
+            //     }
+            //   }
+            // //   let include = true;
+            // //   const collectionName = this.collections[token.contract] && this.collections[token.contract].name || null;
+            // //   if (tokenFilterRegex) {
+            // //     if (!tokenFilterRegex.test(token.name) && !tokenFilterRegex.test(token.tokenId.toString())) {
+            // //       include = false;
+            // //     }
+            // //   }
+            // //   if (include && searchCollectionLower) {
+            // //     if (!(collectionName && collectionName.toLowerCase().includes(searchCollectionLower))) {
+            // //       include = false;
+            // //     }
+            // //   }
+            // //   if (include && groupFilter) {
+            // //     const accountInfo = this.settings.accounts[token.owner] || {};
+            // //     const group = accountInfo.group || "(blank)";
+            // //     if (!(group in groupFilter)) {
+            // //       include = false;
+            // //     }
+            // //   }
+            // //   if (include && accountFilter) {
+            // //     if (!(token.owner in accountFilter)) {
+            // //       include = false;
+            // //     }
+            // //   }
+            // //   if (include && collectionFilter) {
+            // //     if (!(token.contract in collectionFilter)) {
+            // //       include = false;
+            // //     }
+            // //   }
+            // //   if (include) {
+            // //     const ownerInfo = this.settings.accounts[token.owner] || {};
+            // //     const ownerName = ownerInfo.name && (ownerInfo.name + ' ' + token.owner.substring(0, 8)) || token.owner.substring(0, 16);
+            // //     results.push({
+            // //       ...token,
+            // //       ownerName,
+            // //       collectionName,
+            // //       lastSale: {
+            // //         timestamp: token.lastSale && token.lastSale.timestamp || null,
+            // //         amount: token.lastSale && token.lastSale.price && token.lastSale.price.amount && token.lastSale.price.amount.native || null,
+            // //         currency: token.lastSale && token.lastSale.price && token.lastSale.price.currency && token.lastSale.price.currency.symbol || null,
+            // //         amountInUSD: token.lastSale && token.lastSale.price && token.lastSale.price.amount && token.lastSale.price.amount.usd || null,
+            // //       },
+            // //     });
+            // //   }
+            // }
+            console.log(moment().format("HH:mm:ss") + " filteredTransfers END");
+            return results;
+          },
+          filteredSortedTransfers() {
+            let results = this.filteredTransfers;
+            if (this.settings.transfersTable.sortOption == 'blocknumberasc') {
+              results.sort((a, b) => {
+                if (a[1] == b[1]) {
+                  return a[3] - b[3];
+                } else {
+                  return a[1] - b[1];
+                }
+              });
+            } else if (this.settings.transfersTable.sortOption == 'blocknumberdsc') {
+              results.sort((a, b) => {
+                if (a[1] == b[1]) {
+                  return b[3] - a[3];
+                } else {
+                  return b[1] - a[1];
+                }
+              });
+            }
+            return results;
+          },
+          pagedFilteredSortedTransfers() {
+            return this.filteredSortedTransfers.slice((this.settings.transfersTable.currentPage - 1) * this.settings.transfersTable.pageSize, this.settings.transfersTable.currentPage * this.settings.transfersTable.pageSize);
+          },
+        },
+
+        // --- METHODS ---
+        methods: {
+          checkCoinFormValidity() {
+            const valid = this.$refs.coinForm.checkValidity()
+            if (this.newCoinAddress && this.newCoinAddress.length > 0) {
+              try {
+                const a = ethers.utils.getAddress(this.newCoinAddress);
+                status = a && a.length > 0;
+                return status;
+              } catch (e) {
+                return false;
+              }
+            } else {
+              return valid;
+            }
+          },
+          checkAccountFormValidity() {
+            const valid = this.$refs.accountForm.checkValidity()
+            if (this.newAddress && this.newAddress.length > 0) {
+              try {
+                const a = ethers.utils.getAddress(this.newAddress);
+                status = a && a.length > 0;
+                return status;
+              } catch (e) {
+                return false;
+              }
+            } else {
+              return valid;
+            }
+          },
+          newCoinAddressResetModal() {
+            // TODO this.newCoinAddress = null;
+            this.newCoinAddress = "0xA35923162C49cF95e6BF26623385eb431ad920D3";
+          },
+          newCoinAddressHandleOk(bvModalEvent) {
+            // Prevent modal from closing
+            bvModalEvent.preventDefault();
+            // Trigger submit handler
+            this.newCoinAddressHandleSubmit();
+          },
+          async newCoinAddressHandleSubmit() {
+            // Exit when the form isn't valid
+            if (!this.checkCoinFormValidity()) {
+              return;
+            }
+            if (!(this.newCoinAddress in this.settings.coins)) {
+              console.log("Adding: " + this.newCoinAddress);
+              const provider = new ethers.providers.Web3Provider(window.ethereum);
+              const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider);
+              const coinInfo = {
+                sync: true,
+                include: true,
+                latestBlockNumber: null,
+              };
+              try {
+                const tokenInfos = await erc721Helper.tokenInfo([this.newCoinAddress], { gasLimit: 1000000 });
+                console.log("tokenInfos: " + JSON.stringify(tokenInfos, null, 2));
+                for (let i = 0; i < tokenInfos[0].length; i++) {
+                  coinInfo.mask = tokenInfos[0][i].toNumber();
+                  coinInfo.symbol = tokenInfos[1][i];
+                  coinInfo.name = tokenInfos[2][i];
+                  coinInfo.totalSupply = ethers.BigNumber.from(tokenInfos[3][i]).toString();
+                }
+              } catch (e) {
+                console.log("newCoinAddressHandleSubmit ERROR - account: " + this.newCoinAddress + ", message: " + e.message);
+                coinInfo.mask = 0;
+                coinInfo.symbol = null;
+                coinInfo.name = null;
+              }
+              coinInfo.decimals = null;
+              if ((coinInfo.mask & MASK_ISERC20) == MASK_ISERC20) {
+                const erc20 = new ethers.Contract(this.newCoinAddress, ERC20ABI, provider);
+                try {
+                  coinInfo.decimals = parseInt(ethers.BigNumber.from(await erc20.decimals()).toString());
+                } catch (e) {
+                  console.log("newCoinAddressHandleSubmit ERROR - decimals - account: " + this.newCoinAddress + ", message: " + e.message);
+                }
+                Vue.set(this.settings.coins, this.newCoinAddress, { ...coinInfo, mask: undefined });
+              } else {
+                console.log("Not ERC-20: " + this.newCoinAddress);
+              }
+            } else {
+              console.log("Discarding duplicate: " + this.newCoinAddress);
+            }
+            // Hide the modal manually
+            this.$nextTick(() => {
+              this.$bvModal.hide('new-coin-modal-prevent-closing');
+            })
+            this.saveSettings();
+          },
+          newAccountResetModal() {
+            this.newAddress = null;
+          },
+          newAccountHandleOk(bvModalEvent) {
+            // Prevent modal from closing
+            bvModalEvent.preventDefault();
+            // Trigger submit handler
+            this.newAccountHandleSubmit();
+          },
+          newAccountHandleSubmit() {
+            // Exit when the form isn't valid
+            if (!this.checkAccountFormValidity()) {
+              return;
+            }
+            if (!(this.newAddress in this.settings.accounts)) {
+              console.log("Adding: " + this.newAddress);
+              Vue.set(this.settings.accounts, this.newAddress, {
+                name: null,
+                group: null,
+              });
+            } else {
+              console.log("Discarding duplicate: " + this.newAddress);
+            }
+            // Hide the modal manually
+            this.$nextTick(() => {
+              this.$bvModal.hide('new-account-modal-prevent-closing');
+            })
+            this.saveSettings();
+          },
+          toggleAccountField(account, field) {
+            Vue.set(this.settings.accounts[account], field, !this.settings.accounts[account][field]);
+            this.saveSettings();
+          },
+          setAccountField(account, field, value) {
+            Vue.set(this.settings.accounts[account], field, value);
+            this.saveSettings();
+          },
+          deleteCoin(coin) {
+            Vue.delete(this.settings.coins, coin);
+            this.saveSettings();
+          },
+          deleteAccount(account) {
+            Vue.delete(this.settings.accounts, account);
+            this.saveSettings();
+          },
+          saveSettings() {
+            localStorage.memeCoinDataSettings = JSON.stringify(this.settings);
+            // console.log("saveSettings: " + JSON.stringify(this.settings));
+          },
+          filterChanged(dataType, option) {
+            console.log("filterChanged - dataType: " + dataType + ", option: " + JSON.stringify(option));
+            if (!this.settings.filters[dataType]) {
+              Vue.set(this.settings.filters, dataType, {});
+            }
+            if (this.settings.filters[dataType][option]) {
+              Vue.delete(this.settings.filters[dataType], option);
+              if (Object.keys(this.settings.filters[dataType]) == 0) {
+                Vue.delete(this.settings.filters, dataType);
+              }
+            } else {
+              Vue.set(this.settings.filters[dataType], option, true);
+            }
+            this.saveSettings();
+          },
+          resetAdditionalFilters() {
+            Vue.set(this.settings, 'filters', {});
+            this.saveSettings();
+          },
+          async showModalAccountsImport(item) {
+            // console.log("showModalAccountsImport: " + JSON.stringify(item));
+            // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
+            // console.log(url);
+            // const data = await fetch(url).then(response => response.json());
+            // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
+            this.modalDetails = {
+              item,
+              txHash: item[0],
+            //   token: item,
+            //   collection,
+            };
+            console.log(JSON.stringify(this.modalDetails, null, 2));
+            this.$bvModal.show('modal-accounts-import');
+          },
+          async showModalDetails(item) {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+            // console.log("showModalDetails: " + JSON.stringify(item));
+            // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
+            // console.log(url);
+            // const data = await fetch(url).then(response => response.json());
+            // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
+            this.$bvModal.show('modal-details');
+            const txHash = item[0];
+            this.modalDetails = {
+              item,
+              txHash,
+            };
+            const tx = await provider.getTransaction(txHash);
+            Vue.set(this.modalDetails, 'tx', {
+              hash: tx.hash,
+              type: tx.type,
+              blockHash: tx.blockHash,
+              blockNumber: tx.blockNumber,
+              transactionIndex: tx.transactionIndex,
+              from: tx.from,
+              gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
+              gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
+              to: tx.to,
+              value: ethers.BigNumber.from(tx.value).toString(),
+              nonce: tx.nonce,
+              data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
+              // r: tx.r,
+              // s: tx.s,
+              // v: tx.v,
+              chainId: tx.chainId,
+            });
+            const txReceipt = await provider.getTransactionReceipt(txHash);
+            Vue.set(this.modalDetails, 'txReceipt', {
+              to: txReceipt.to,
+              from: txReceipt.from,
+              contractAddress: txReceipt.contractAddress,
+              transactionIndex: txReceipt.transactionIndex,
+              gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
+              blockHash: txReceipt.blockHash,
+              // transactionHash: txReceipt.transactionHash,
+              logs: txReceipt.logs,
+              blockNumber: txReceipt.blockNumber,
+              // confirmations: txReceipt.confirmations,
+              cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
+              effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
+              status: txReceipt.status,
+              type: txReceipt.type,
+              // byzantium: txReceipt.byzantium,
+            });
+            console.log("tx: " + JSON.stringify(tx, null, 2));
+            console.log("txReceipt: " + JSON.stringify(txReceipt, null, 2));
+            console.log(JSON.stringify(this.modalDetails, null, 2));
+          },
+          toggleSyncAccounts(items) {
+            let someFalse = false;
+            let someTrue = false;
+            for (const item of items) {
+              if (item.sync) {
+                someTrue = true;
+              } else {
+                someFalse = true;
+              }
+            }
+            for (const item of items) {
+              Vue.set(this.settings.accounts[item.address], 'sync', !(someTrue && !someFalse));
+            }
+            this.saveSettings();
+          },
+          toggleIncludeAccounts(items) {
+            let someFalse = false;
+            let someTrue = false;
+            for (const item of items) {
+              if (item.include) {
+                someTrue = true;
+              } else {
+                someFalse = true;
+              }
+            }
+            for (const item of items) {
+              Vue.set(this.settings.accounts[item.address], 'include', !(someTrue && !someFalse));
+            }
+            this.saveSettings();
+          },
+          async syncCoins() {
+            console.log("syncCoins");
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const block = await provider.getBlock();
+            const CONFIRMATIONS = 10;
+            const confirmedBlockNumber = block && block.number && (block.number - CONFIRMATIONS) || null;
+            const db = new Dexie(this.db.name);
+            db.version(this.db.version).stores(this.db.schemaDefinition);
+            for (const [address, coinInfo] of Object.entries(this.settings.coins)) {
+              if (coinInfo.sync && !this.sync.halt) {
+                const context = { provider, confirmedBlockNumber, db, address, symbol: coinInfo.symbol };
+                await this.syncCoinTransfers(context);
+                await this.syncUniswapV2Pools(context);
+                await this.syncUniswapV3Pools(context);
+                await this.syncUniswapV2Trades(context);
+                await this.syncUniswapV3Trades(context);
+                await this.syncUniswapAltTokenTransfers(context);
+                // // await this.syncAllENSNames(context);
+                // // await this.testSyncENSNames(context);
+              }
+            }
+            this.sync.section = null;
+            this.sync.halt = false;
+            db.close();
+            await this.loadCurrentData();
+          },
+          async syncBlockTimestamps(context, newBlocks) {
+            this.sync.completed = 0;
+            this.sync.total = newBlocks.length;
+            this.sync.section = context.symbol + ' Timestamps';
+            const BATCHSIZE = 1000;
+            for (let i = 0; i < newBlocks.length; i += BATCHSIZE) {
+              const batch = newBlocks.slice(i, parseInt(i) + BATCHSIZE);
+              const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                  query: BLOCKTIMESTAMPINQUERY,
+                  variables: { blockNumbers: batch.map(e => parseInt(e)) },
+                })
+              }).then(response => response.json())
+                .catch(function(e) {
+                  console.log("error: " + e);
+                });
+              const timestamps = data.data && data.data.blocks || [];
+              for (const timestampItem of timestamps) {
+                Vue.set(this.blockTimestamps, parseInt(timestampItem.number), parseInt(timestampItem.timestamp));
+              }
+              this.sync.completed += timestamps.length;
+              console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps " + this.sync.completed + " of " + timestamps.length);
+            }
+            await context.db.cache.put({ objectName: "blockTimestamps", object: this.blockTimestamps }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+          },
+          // async testSyncENSNames(context) {
+          //   await this.syncENSNames(context, this.indexToAddress);
+          // },
+          // async syncAllENSNames(context) {
+          //   console.log("syncAllENSNames");
+          //   const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, context.provider);
+          //   console.log("this.indexToAddress: " + JSON.stringify(this.indexToAddress));
+          //   const addresses = this.indexToAddress;
+          //   // addresses.sort();
+          //
+          //   const MAXBATCHSIZE = 1000;
+          //   let batchSize = MAXBATCHSIZE;
+          //   let completed = 0;
+          //   let done = false;
+          //   let start = completed;
+          //   do {
+          //     let end = parseInt(start) + batchSize - 1;
+          //     if (end > addresses.length) {
+          //       end = addresses.length;
+          //     }
+          //     try {
+          //       const batch = addresses.slice(start, end + 1);
+          //       const allnames = await ensReverseRecordsContract.getNames(batch);
+          //       console.log(start + " - " + end + " " + batch.length);
+          //       start = parseInt(end) + 1;
+          //     } catch (e) {
+          //       if (batchSize > 1) {
+          //         batchSize = parseInt(batchSize / 2);
+          //       } else {
+          //         console.log("Skipping #" + start + " " + addresses[start]);
+          //         start = parseInt(start) + 1;
+          //         batchSize = MAXBATCHSIZE;
+          //       }
+          //     }
+          //     done = start > this.indexToAddress.length;
+          //   } while (!done);
+          //
+          // },
+          async syncENSNames(context, newAccounts) {
+            this.sync.completed = 0;
+            this.sync.total = newAccounts.length;
+            this.sync.section = context.symbol + ' ENS';
+            const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, context.provider);
+
+            const MAXBATCHSIZE = 1000;
+            let batchSize = MAXBATCHSIZE;
+            let completed = 0;
+            let start = completed;
+            do {
+              let end = parseInt(start) + batchSize - 1;
+              if (end > newAccounts.length) {
+                end = newAccounts.length;
+              }
+              try {
+                const batch = newAccounts.slice(start, end + 1);
+                const allnames = await ensReverseRecordsContract.getNames(batch);
+                for (let j = 0; j < batch.length; j++) {
+                  const account = batch[j];
+                  const name = allnames[j];
+                  // const normalized = normalize(account);
+                  if (name.length > 0) {
+                    // console.log(account + " => " + name);
+                    Vue.set(this.indexToName, this.addressToIndex[account], name);
+                  }
+                }
+                this.sync.completed += batch.length;
+                console.log(moment().format("HH:mm:ss") + " syncENSNames " + this.sync.completed + " of " + newAccounts.length);
+                start = parseInt(end) + 1;
+              } catch (e) {
+                if (batchSize > 1) {
+                  batchSize = parseInt(batchSize / 2);
+                } else {
+                  console.log("Skipping #" + start + " " + newAccounts[start]);
+                  start = parseInt(start) + 1;
+                  batchSize = MAXBATCHSIZE;
+                }
+              }
+            } while (start <= newAccounts.length);
+
+
+            //
+            //
+            // const BATCHSIZE = 5;
+            // for (let i = 0; i < newAccounts.length; i += BATCHSIZE) {
+            //   const batch = newAccounts.slice(i, parseInt(i) + BATCHSIZE);
+            //   console.log("batch: " + batch);
+            //   try {
+            //     const allnames = await ensReverseRecordsContract.getNames(batch);
+            //     console.log("allnames: " + allnames);
+            //     for (let j = 0; j < batch.length; j++) {
+            //       const account = batch[j];
+            //       const name = allnames[j];
+            //       // const normalized = normalize(account);
+            //       // console.log(account + " => " + name);
+            //       Vue.set(this.indexToName, account, name);
+            //     }
+            //     this.sync.completed += batch.length;
+            //   } catch (e) {
+            //     console.log("ENS getNames: " + e);
+            //   }
+            // }
+            await context.db.cache.put({ objectName: "indexToName", object: this.indexToName }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+          },
+          async syncCoinTransfers(context) {
+            this.sync.completed = 0;
+            this.sync.total = null;
+            this.sync.section = context.symbol + ' Txs';
+            const dataObject = await context.db.cache.where("objectName").equals(context.address + "_transfers").toArray();
+            const transfers = dataObject.length == 1 ? dataObject[0].object : {};
+            const blockNumbers = Object.keys(transfers).sort((a, b) => { return b - a });
+            const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: 0;
+            let batchSize = 100000000;
+            const BATCHREDUCTIONFACTOR = 0.50;
+            let done = false;
+            let fromBlock = startBlock;
+            let count = 0;
+            let newTransfers = 0;
+            const newBlocks = {};
+            const newAccounts = {};
+
+            const tempAddressToIndex = this.addressToIndex;
+            const tempIndexToAddress = this.indexToAddress;
+            for (const address of [context.address, this.coinbase]) {
+              if (!(address in tempAddressToIndex)) {
+                const index = tempIndexToAddress.length;
+                tempAddressToIndex[address] = index;
+                tempIndexToAddress.push(address);
+              }
+            }
+            const tokenIndex = tempAddressToIndex[context.address];
+            const coinbaseIndex = tempAddressToIndex[this.coinbase];
+
+            do {
+              if (batchSize > 1000 && parseInt(fromBlock) + batchSize > context.confirmedBlockNumber) {
+                batchSize = parseInt((context.confirmedBlockNumber - fromBlock) * 0.75);
+              }
+              batchSize = (batchSize > 10) ? batchSize: 10; // avoid divide by 0
+              let toBlock = (parseInt(fromBlock) + batchSize < context.confirmedBlockNumber) ? (parseInt(fromBlock) + batchSize) : context.confirmedBlockNumber;
+              const transferTopics = [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', null, null ];
+              try {
+                const logs = await context.provider.getLogs({ address: context.address, fromBlock, toBlock, topics: transferTopics });
+                for (const event of logs) {
+                  if (!event.removed) {
+                    const [eventBlockNumber, eventTransactionIndex, eventLogIndex] = [parseInt(event.blockNumber), parseInt(event.transactionIndex), parseInt(event.logIndex)];
+                    let from, to, tokens;
+                    if (event.topics.length == 4) {
+                      from = ethers.utils.getAddress('0x' + event.topics[1].substring(26));
+                      to = ethers.utils.getAddress('0x' + event.topics[2].substring(26));
+                      tokens = ethers.BigNumber.from(event.topics[3]).toString();
+                    } else if (event.topics.length == 3) {
+                      from = ethers.utils.getAddress('0x' + event.topics[1].substring(26));
+                      to = ethers.utils.getAddress('0x' + event.topics[2].substring(26));
+                      tokens = ethers.BigNumber.from(event.data).toString();
+                    } else if (event.topics.length == 1) {
+                      from = ethers.utils.getAddress('0x' + event.data.substring(26, 66));
+                      to = ethers.utils.getAddress('0x' + event.data.substring(90, 130));
+                      tokens = ethers.BigNumber.from('0x' + event.data.substring(130, 193)).toString();
+                    }
+                    if (!(eventBlockNumber in this.blockTimestamps) && !(eventBlockNumber in newBlocks)) {
+                      newBlocks[eventBlockNumber] = null;
+                    }
+                    if (!(from in this.indexToName) && !(from in newAccounts)) {
+                      newAccounts[from] = null;
+                    }
+                    if (!(to in this.indexToName) && !(to in newAccounts)) {
+                      newAccounts[to] = null;
+                    }
+
+                    for (const address of [from, to]) {
+                      if (!(address in tempAddressToIndex)) {
+                        const index = tempIndexToAddress.length;
+                        tempAddressToIndex[address] = index;
+                        tempIndexToAddress.push(address);
+                      }
+                    }
+                    const fromIndex = tempAddressToIndex[from];
+                    const toIndex = tempAddressToIndex[to];
+
+                    if (!(eventBlockNumber in transfers)) {
+                      transfers[eventBlockNumber] = {};
+                    }
+                    if (!(event.transactionIndex in transfers[eventBlockNumber])) {
+                      transfers[eventBlockNumber][eventTransactionIndex] = {};
+                    }
+                    if (!(event.transactionHash in transfers[eventBlockNumber][eventTransactionIndex])) {
+                      transfers[eventBlockNumber][eventTransactionIndex][event.transactionHash] = {};
+                    }
+                    if (!(event.logIndex in transfers[eventBlockNumber][eventTransactionIndex][event.transactionHash])) {
+                      transfers[eventBlockNumber][eventTransactionIndex][event.transactionHash][eventLogIndex] = [ fromIndex, toIndex, tokens ];
+                      newTransfers++;
+                    }
+                  }
+                  count++;
+                }
+                this.sync.completed = count;
+                console.log(moment().format("HH:mm:ss") + " syncCoinTransfers " + context.address.substring(0, 10) + " " + context.symbol + " #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newTransfers: " + newTransfers);
+                fromBlock = toBlock;
+              } catch (e) {
+                console.log(e);
+                batchSize = parseInt(batchSize * BATCHREDUCTIONFACTOR);
+              }
+              done = fromBlock >= context.confirmedBlockNumber;
+              // done = true; // TODO
+            } while (!done && !this.sync.halt);
+
+            Vue.set(this, "addressToIndex", tempAddressToIndex);
+            Vue.set(this, "indexToAddress", tempIndexToAddress);
+            await context.db.cache.put({ objectName: "indexToAddress", object: tempIndexToAddress }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            await context.db.cache.put({ objectName: "addressToIndex", object: tempAddressToIndex }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            await context.db.cache.put({ objectName: context.address + "_transfers", object: transfers }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+
+            newAccounts[this.coinbase] = null;
+            await this.syncENSNames(context, Object.keys(newAccounts));
+            await this.syncBlockTimestamps(context, Object.keys(newBlocks));
+          },
+          async getERC20TokenDetails(context, address) {
+            const results = { address, addressIndex: this.addressToIndex[address] };
+            const erc20 = new ethers.Contract(address, ERC20ABI, context.provider);
+            try {
+              results.symbol = await erc20.symbol();
+            } catch (e) {
+              console.log("getERC20TokenDetails ERROR - symbol - account: " + address + ", message: " + e.message);
+            }
+            try {
+              results.name = await erc20.name();
+            } catch (e) {
+              console.log("getERC20TokenDetails ERROR - name - account: " + address + ", message: " + e.message);
+            }
+            try {
+              results.decimals = parseInt(ethers.BigNumber.from(await erc20.decimals()).toString());
+            } catch (e) {
+              console.log("getERC20TokenDetails ERROR - decimals - account: " + address + ", message: " + e.message);
+            }
+            try {
+              results.totalSupply = ethers.BigNumber.from(await erc20.totalSupply()).toString();
+            } catch (e) {
+              console.log("getERC20TokenDetails ERROR - totalSupply - account: " + address + ", message: " + e.message);
+            }
+            return results;
+          },
+          async syncUniswapV2Pools(context) {
+            this.sync.completed = 0;
+            this.sync.total = null;
+            this.sync.section = context.symbol + " UniswapV2Pools";
+            const dataObject = await context.db.cache.where("objectName").equals(context.address + '_uniswapv2pools').toArray();
+            const pools = dataObject.length == 1 ? dataObject[0].object : {};
+            const blockNumbers = Object.keys(pools).sort((a, b) => { return b - a });
+            const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: 0;
+            let count = 0;
+            let newPools = 0;
+            const coinAddressAs32Bytes = '0x000000000000000000000000' + context.address.substring(2, 42).toLowerCase();
+            // PairCreated (index_topic_1 address token0, index_topic_2 address token1, address pair, uint256)
+            const topicsList = [
+              [ '0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9', null, coinAddressAs32Bytes ],
+              [ '0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9', coinAddressAs32Bytes, null ],
+            ];
+            const newBlocks = {};
+            const tempAddressToIndex = this.addressToIndex;
+            const tempIndexToAddress = this.indexToAddress;
+            for (const [topicsIndex, topics] of topicsList.entries()) {
+              let done = false;
+              let fromBlock = startBlock;
+              const toBlock = context.confirmedBlockNumber;
+              try {
+                const logs = await context.provider.getLogs({ address: UNISWAPV2FACTORY, fromBlock, toBlock, topics });
+                for (const event of logs) {
+                  if (!event.removed) {
+                    const [eventBlockNumber, eventTransactionIndex, eventLogIndex] = [parseInt(event.blockNumber), parseInt(event.transactionIndex), parseInt(event.logIndex)];
+                    if (!(eventBlockNumber in this.blockTimestamps) && !(eventBlockNumber in newBlocks)) {
+                      newBlocks[eventBlockNumber] = null;
+                    }
+                    if (!(eventBlockNumber in pools)) {
+                      pools[eventBlockNumber] = {};
+                    }
+                    const poolAddress = ethers.utils.getAddress('0x' + event.data.substring(26, 66));
+                    if (!(poolAddress in pools[eventBlockNumber])) {
+                      const token0Address = ethers.utils.getAddress('0x' + event.topics[1].substring(26));
+                      const token1Address = ethers.utils.getAddress('0x' + event.topics[2].substring(26));
+                      for (const address of [poolAddress, token0Address, token1Address]) {
+                        if (!(address in tempAddressToIndex)) {
+                          const index = tempIndexToAddress.length;
+                          tempAddressToIndex[address] = index;
+                          tempIndexToAddress.push(address);
+                        }
+                      }
+                      const poolIndex = tempAddressToIndex[poolAddress];
+                      const token0 = await this.getERC20TokenDetails(context, token0Address);
+                      const token1 = await this.getERC20TokenDetails(context, token1Address);
+                      pools[eventBlockNumber][poolAddress] = {
+                        poolIndex,
+                        name: "U2 " + token0.symbol + "/" + token1.symbol,
+                        coin: context.address,
+                        token0,
+                        token1,
+                        factory: event.address,
+                        transactionHash: event.transactionHash,
+                        transactionIndex: eventTransactionIndex,
+                        logIndex: eventLogIndex,
+                      };
+                      newPools++;
+                    }
+                  }
+                  count++;
+                }
+                this.sync.completed = count;
+                console.log(moment().format("HH:mm:ss") + " syncUniswapV2Pools " + (topicsIndex == 0 ? ("*/" + context.symbol) : (context.symbol + "/*")) + " #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "] newPools: " + newPools);
+                fromBlock = toBlock;
+              } catch (e) {
+                console.log(e);
+              }
+            }
+            Vue.set(this, "addressToIndex", tempAddressToIndex);
+            Vue.set(this, "indexToAddress", tempIndexToAddress);
+            await context.db.cache.put({ objectName: "indexToAddress", object: tempIndexToAddress }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            await context.db.cache.put({ objectName: "addressToIndex", object: tempAddressToIndex }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            await context.db.cache.put({ objectName: context.address + '_uniswapv2pools', object: pools }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            await this.syncBlockTimestamps(context, Object.keys(newBlocks));
+          },
+          async syncUniswapV3Pools(context) {
+            this.sync.completed = 0;
+            this.sync.total = null;
+            this.sync.section = context.symbol + " UniswapV3Pools";
+            const dataObject = await context.db.cache.where("objectName").equals(context.address + '_uniswapv3pools').toArray();
+            const pools = dataObject.length == 1 ? dataObject[0].object : {};
+            const blockNumbers = Object.keys(pools).sort((a, b) => { return b - a });
+            const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: 0;
+            let count = 0;
+            let newPools = 0;
+            const coinAddressAs32Bytes = '0x000000000000000000000000' + context.address.substring(2, 42).toLowerCase();
+            // PoolCreated (index_topic_1 address token0, index_topic_2 address token1, index_topic_3 uint24 fee, int24 tickSpacing, address pool)
+            const topicsList = [
+              [ '0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118', null, coinAddressAs32Bytes ],
+              [ '0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118', coinAddressAs32Bytes, null ],
+            ];
+            const newBlocks = {};
+            const tempAddressToIndex = this.addressToIndex;
+            const tempIndexToAddress = this.indexToAddress;
+            for (const [topicsIndex, topics] of topicsList.entries()) {
+              let done = false;
+              let fromBlock = startBlock;
+              const toBlock = context.confirmedBlockNumber;
+              try {
+                const logs = await context.provider.getLogs({ address: UNISWAPV3FACTORY, fromBlock, toBlock, topics });
+                for (const event of logs) {
+                  if (!event.removed) {
+                    const [eventBlockNumber, eventTransactionIndex, eventLogIndex] = [parseInt(event.blockNumber), parseInt(event.transactionIndex), parseInt(event.logIndex)];
+                    // console.log("event: " + JSON.stringify(event, null, 2));
+                    if (!(eventBlockNumber in this.blockTimestamps) && !(eventBlockNumber in newBlocks)) {
+                      newBlocks[eventBlockNumber] = null;
+                    }
+                    if (!(eventBlockNumber in pools)) {
+                      pools[eventBlockNumber] = {};
+                    }
+                    const poolAddress = ethers.utils.getAddress('0x' + event.data.substring(90, 130));
+                    if (!(poolAddress in pools[eventBlockNumber])) {
+                      const token0Address = ethers.utils.getAddress('0x' + event.topics[1].substring(26));
+                      const token1Address = ethers.utils.getAddress('0x' + event.topics[2].substring(26));
+                      for (const address of [poolAddress, token0Address, token1Address]) {
+                        if (!(address in tempAddressToIndex)) {
+                          const index = tempIndexToAddress.length;
+                          tempAddressToIndex[address] = index;
+                          tempIndexToAddress.push(address);
+                        }
+                      }
+                      const poolIndex = tempAddressToIndex[poolAddress];
+                      const token0 = await this.getERC20TokenDetails(context, token0Address);
+                      const token1 = await this.getERC20TokenDetails(context, token1Address);
+                      pools[eventBlockNumber][poolAddress] = {
+                        poolIndex,
+                        name: "U3 " + token0.symbol + "/" + token1.symbol + " " + ethers.utils.formatUnits(event.topics[3], 4) + "%",
+                        coin: context.address,
+                        token0,
+                        token1,
+                        fee: ethers.BigNumber.from(event.topics[3]).toString(),
+                        tickSpacing: ethers.BigNumber.from('0x' + event.data.substring(2, 66)).toString(),
+                        factory: event.address,
+                        transactionHash: event.transactionHash,
+                        transactionIndex: eventTransactionIndex,
+                        logIndex: eventLogIndex,
+                      };
+                      newPools++;
+                    }
+                  }
+                  count++;
+                }
+                this.sync.completed = count;
+                console.log(moment().format("HH:mm:ss") + " syncUniswapV3Pools " + (topicsIndex == 0 ? ("*/" + context.symbol) : (context.symbol + "/*")) + " #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "] newPools: " + newPools);
+                fromBlock = toBlock;
+              } catch (e) {
+                console.log(e);
+              }
+            }
+            Vue.set(this, "addressToIndex", tempAddressToIndex);
+            Vue.set(this, "indexToAddress", tempIndexToAddress);
+            await context.db.cache.put({ objectName: "indexToAddress", object: tempIndexToAddress }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            await context.db.cache.put({ objectName: "addressToIndex", object: tempAddressToIndex }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            await context.db.cache.put({ objectName: context.address + '_uniswapv3pools', object: pools }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            await this.syncBlockTimestamps(context, Object.keys(newBlocks));
+          },
+          async syncUniswapV2Trades(context) {
+            this.sync.completed = 0;
+            this.sync.total = null;
+            this.sync.section = context.symbol + " UniswapV2Trades";
+            const interface = new ethers.utils.Interface(UNISWAPV2POOLABI);
+            const poolsDataObject = await context.db.cache.where("objectName").equals(context.address + '_uniswapv2pools').toArray();
+            const poolsData = poolsDataObject.length == 1 ? poolsDataObject[0].object : {};
+            const pools = {};
+            for (const [blockNumber, poolsCreatedInBlock] of Object.entries(poolsData)) {
+              for (const [poolAddress, poolInfo] of Object.entries(poolsCreatedInBlock)) {
+                pools[poolAddress] = { token0: poolInfo.token0, token1: poolInfo.token1, blockNumber };
+              }
+            }
+            // Swap (index_topic_1 address sender, uint256 amount0In, uint256 amount1In, uint256 amount0Out, uint256 amount1Out, index_topic_2 address to)
+            // const topics = [ '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822', null, null ];
+            const topics = [ null, null, null ];
+            const newBlocks = {};
+
+            const tempAddressToIndex = this.addressToIndex;
+            const tempIndexToAddress = this.indexToAddress;
+
+            for (const [poolAddress, poolInfo] of Object.entries(pools)) {
+              const tradesDataObject = await context.db.cache.where("objectName").equals(poolAddress + '_uniswapv2trades').toArray();
+              const trades = tradesDataObject.length == 1 ? tradesDataObject[0].object : {};
+              const blockNumbers = Object.keys(trades).sort((a, b) => { return b - a });
+              const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: parseInt(poolInfo.blockNumber);
+              let batchSize = 100000000;
+              const BATCHREDUCTIONFACTOR = 0.50;
+              let done = false;
+              let fromBlock = startBlock;
+              let count = 0;
+              let newTrades = 0;
+
+              if (!(poolAddress in tempAddressToIndex)) {
+                const index = tempIndexToAddress.length;
+                tempAddressToIndex[poolAddress] = index;
+                tempIndexToAddress.push(poolAddress);
+              }
+              const poolIndex = tempAddressToIndex[poolAddress];
+
+              do {
+                if (batchSize > 1000 && parseInt(fromBlock) + batchSize > context.confirmedBlockNumber) {
+                  batchSize = parseInt((context.confirmedBlockNumber - fromBlock) * 0.75);
+                }
+                batchSize = (batchSize > 10) ? batchSize: 10; // avoid divide by 0
+                let toBlock = (parseInt(fromBlock) + batchSize < context.confirmedBlockNumber) ? (parseInt(fromBlock) + batchSize) : context.confirmedBlockNumber;
+                try {
+                  const logs = await context.provider.getLogs({ address: poolAddress, fromBlock, toBlock, topics });
+                  for (const event of logs) {
+                    if (!event.removed) {
+                      const [eventBlockNumber, eventTransactionIndex, eventLogIndex] = [parseInt(event.blockNumber), parseInt(event.transactionIndex), parseInt(event.logIndex)];
+                      const log = interface.parseLog(event);
+                      let record = null;
+
+                      if (log.name == "Mint") {
+                        // event Mint(address indexed sender, uint amount0, uint amount1);
+                        const [sender, amount0, amount1] = log.args;
+                        if (!(sender in tempAddressToIndex)) {
+                          const index = tempIndexToAddress.length;
+                          tempAddressToIndex[sender] = index;
+                          tempIndexToAddress.push(sender);
+                        }
+                        const senderIndex = tempAddressToIndex[sender];
+                        record = [ UNISWAPV2MINT, senderIndex, poolIndex, "-" + amount0.toString(), "-" + amount1.toString(), "u2" ];
+
+                      } else if (log.name == "Swap") {
+                        // event Swap(address indexed sender, uint amount0In, uint amount1In, uint amount0Out, uint amount1Out, address indexed to);
+                        const [sender, amount0In, amount1In, amount0Out, amount1Out, recipient] = log.args;
+                        for (const address of [sender, recipient]) {
+                          if (!(address in tempAddressToIndex)) {
+                            const index = tempIndexToAddress.length;
+                            tempAddressToIndex[address] = index;
+                            tempIndexToAddress.push(address);
+                          }
+                        }
+                        const senderIndex = tempAddressToIndex[sender];
+                        const recipientIndex = tempAddressToIndex[recipient];
+                        record = [ UNISWAPV2SWAP, senderIndex, poolIndex, amount0In.gt(0) ? "-" + amount0In.toString() : amount0Out.toString(), amount1In.gt(0) ? "-" + amount1In.toString() : amount1Out.toString() ];
+
+                      } else if (log.name == "Burn") {
+                        // event Burn(address indexed sender, uint amount0, uint amount1, address indexed to);
+                        const [sender, amount0, amount1, to] = log.args;
+                        for (const address of [sender, to]) {
+                          if (!(address in tempAddressToIndex)) {
+                            const index = tempIndexToAddress.length;
+                            tempAddressToIndex[address] = index;
+                            tempIndexToAddress.push(address);
+                          }
+                        }
+                        const senderIndex = tempAddressToIndex[sender];
+                        const toIndex = tempAddressToIndex[to];
+                        record = [ UNISWAPV2BURN, senderIndex, poolIndex, amount0.toString(), amount1.toString()];
+                      }
+                      if (record) {
+                        if (!(eventBlockNumber in this.blockTimestamps) && !(eventBlockNumber in newBlocks)) {
+                          newBlocks[eventBlockNumber] = null;
+                        }
+                        if (!(eventBlockNumber in trades)) {
+                          trades[eventBlockNumber] = {};
+                        }
+                        if (!(eventTransactionIndex in trades[eventBlockNumber])) {
+                          trades[eventBlockNumber][eventTransactionIndex] = {};
+                        }
+                        if (!(event.transactionHash in trades[eventBlockNumber][eventTransactionIndex])) {
+                          trades[eventBlockNumber][eventTransactionIndex][event.transactionHash] = {};
+                        }
+                        if (!(eventLogIndex in trades[eventBlockNumber][eventTransactionIndex][event.transactionHash])) {
+                          newTrades++;
+                          trades[eventBlockNumber][eventTransactionIndex][event.transactionHash][eventLogIndex] = record;
+                        }
+                      }
+                    }
+                    count++;
+                  }
+                  this.sync.completed = count;
+                  console.log(moment().format("HH:mm:ss") + " syncUniswapV2Trades #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newTrades: " + newTrades);
+                  fromBlock = toBlock;
+                } catch (e) {
+                  console.log(e);
+                  batchSize = parseInt(batchSize * BATCHREDUCTIONFACTOR);
+                }
+                done = fromBlock >= context.confirmedBlockNumber;
+              } while (!done && !this.sync.halt);
+
+              Vue.set(this, "addressToIndex", tempAddressToIndex);
+              Vue.set(this, "indexToAddress", tempIndexToAddress);
+              await context.db.cache.put({ objectName: "indexToAddress", object: tempIndexToAddress }).then (function() {
+              }).catch(function(error) {
+                console.log("error: " + error);
+              });
+              await context.db.cache.put({ objectName: "addressToIndex", object: tempAddressToIndex }).then (function() {
+              }).catch(function(error) {
+                console.log("error: " + error);
+              });
+
+              // console.log("trades: " + JSON.stringify(trades, null, 2));
+              await this.syncBlockTimestamps(context, Object.keys(newBlocks));
+              await context.db.cache.put({ objectName: poolAddress + '_uniswapv2trades', object: trades }).then (function() {
+              }).catch(function(error) {
+                console.log("error: " + error);
+              });
+            }
+          },
+          async syncUniswapV3Trades(context) {
+            this.sync.completed = 0;
+            this.sync.total = null;
+            this.sync.section = context.symbol + " UniswapV3Trades";
+            const interface = new ethers.utils.Interface(UNISWAPV3POOLABI);
+            const poolsDataObject = await context.db.cache.where("objectName").equals(context.address + '_uniswapv3pools').toArray();
+            const poolsData = poolsDataObject.length == 1 ? poolsDataObject[0].object : {};
+            const pools = {};
+            for (const [blockNumber, poolsCreatedInBlock] of Object.entries(poolsData)) {
+              for (const [poolAddress, poolInfo] of Object.entries(poolsCreatedInBlock)) {
+                pools[poolAddress] = { token0: poolInfo.token0, token1: poolInfo.token1, blockNumber };
+              }
+            }
+            // Swap (index_topic_1 address sender, index_topic_2 address recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)
+            // const topics = [ '0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67', null, null ];
+            const topics = [ null, null, null ];
+            const newBlocks = {};
+
+            const tempAddressToIndex = this.addressToIndex;
+            const tempIndexToAddress = this.indexToAddress;
+
+            for (const [poolAddress, poolInfo] of Object.entries(pools)) {
+              const tradesDataObject = await context.db.cache.where("objectName").equals(poolAddress + '_uniswapv3trades').toArray();
+              const trades = tradesDataObject.length == 1 ? tradesDataObject[0].object : {};
+              const blockNumbers = Object.keys(trades).sort((a, b) => { return b - a });
+              const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: parseInt(poolInfo.blockNumber);
+              let batchSize = 100000000;
+              const BATCHREDUCTIONFACTOR = 0.50;
+              let done = false;
+              let fromBlock = startBlock;
+              let count = 0;
+              let newTrades = 0;
+
+              if (!(poolAddress in tempAddressToIndex)) {
+                const index = tempIndexToAddress.length;
+                tempAddressToIndex[poolAddress] = index;
+                tempIndexToAddress.push(poolAddress);
+              }
+              const poolIndex = tempAddressToIndex[poolAddress];
+
+              do {
+                if (batchSize > 1000 && parseInt(fromBlock) + batchSize > context.confirmedBlockNumber) {
+                  batchSize = parseInt((context.confirmedBlockNumber - fromBlock) * 0.75);
+                }
+                batchSize = (batchSize > 10) ? batchSize: 10; // avoid divide by 0
+                let toBlock = (parseInt(fromBlock) + batchSize < context.confirmedBlockNumber) ? (parseInt(fromBlock) + batchSize) : context.confirmedBlockNumber;
+                try {
+                  const logs = await context.provider.getLogs({ address: poolAddress, fromBlock, toBlock, topics });
+                  for (const event of logs) {
+                    if (!event.removed) {
+                      const [eventBlockNumber, eventTransactionIndex, eventLogIndex] = [parseInt(event.blockNumber), parseInt(event.transactionIndex), parseInt(event.logIndex)];
+                      const log = interface.parseLog(event);
+                      let record = null;
+
+                      if (log.name == "Mint") {
+                        // event Mint(address sender, address indexed owner, int24 indexed tickLower, int24 indexed tickUpper, uint128 amount, uint256 amount0, uint256 amount1);
+                        const [sender, owner, tickLower, tickUpper, amount, amount0, amount1] = log.args;
+                        for (const address of [sender, owner]) {
+                          if (!(address in tempAddressToIndex)) {
+                            const index = tempIndexToAddress.length;
+                            tempAddressToIndex[address] = index;
+                            tempIndexToAddress.push(address);
+                          }
+                        }
+                        const senderIndex = tempAddressToIndex[sender];
+                        const ownerIndex = tempAddressToIndex[owner];
+                        record = [ UNISWAPV3MINT, senderIndex, poolIndex, ethers.BigNumber.from(amount0).mul(-1).toString(), ethers.BigNumber.from(amount1).mul(-1).toString(), "u3", ownerIndex, amount.toString() ];
+
+                      } else if (log.name == "Swap") {
+                        const [sender, recipient, amount0, amount1, sqrtPriceX96, liquidity, tick] = log.args;
+                        for (const address of [sender, recipient]) {
+                          if (!(address in tempAddressToIndex)) {
+                            const index = tempIndexToAddress.length;
+                            tempAddressToIndex[address] = index;
+                            tempIndexToAddress.push(address);
+                          }
+                        }
+                        const senderIndex = tempAddressToIndex[sender];
+                        const recipientIndex = tempAddressToIndex[recipient];
+                        record = [ UNISWAPV3SWAP, senderIndex, poolIndex, ethers.BigNumber.from(amount0).mul(-1).toString(), ethers.BigNumber.from(amount1).mul(-1).toString() ];
+
+                      } else if (log.name == "Burn") {
+                        // event Burn(address indexed owner, int24 indexed tickLower, int24 indexed tickUpper, uint128 amount, uint256 amount0, uint256 amount1);
+                        const [owner, tickLower, tickUpper, amount, amount0, amount1] = log.args;
+                        if (!(owner in tempAddressToIndex)) {
+                          const index = tempIndexToAddress.length;
+                          tempAddressToIndex[owner] = index;
+                          tempIndexToAddress.push(owner);
+                        }
+                        const ownerIndex = tempAddressToIndex[owner];
+                        record = [ UNISWAPV3BURN, ownerIndex, poolIndex, amount0.toString(), amount1.toString(), amount.toString() ];
+
+                      } else if (log.name == "Collect") {
+                        // event Collect(address indexed owner, address recipient, int24 indexed tickLower, int24 indexed tickUpper, uint128 amount0, uint128 amount1);
+                        const [owner, recipient, tickLower, tickUpper, amount0, amount1] = log.args;
+                        for (const address of [owner, recipient]) {
+                          if (!(address in tempAddressToIndex)) {
+                            const index = tempIndexToAddress.length;
+                            tempAddressToIndex[address] = index;
+                            tempIndexToAddress.push(address);
+                          }
+                        }
+                        const ownerIndex = tempAddressToIndex[owner];
+                        const recipientIndex = tempAddressToIndex[recipient];
+                        record = [ UNISWAPV3COLLECT, ownerIndex, poolIndex, amount0.toString(), amount1.toString() ];
+                      }
+                      if (record) {
+                        if (!(eventBlockNumber in this.blockTimestamps) && !(eventBlockNumber in newBlocks)) {
+                          newBlocks[eventBlockNumber] = null;
+                        }
+                        if (!(eventBlockNumber in trades)) {
+                          trades[eventBlockNumber] = {};
+                        }
+                        if (!(eventTransactionIndex in trades[eventBlockNumber])) {
+                          trades[eventBlockNumber][eventTransactionIndex] = {};
+                        }
+                        if (!(event.transactionHash in trades[eventBlockNumber][eventTransactionIndex])) {
+                          trades[eventBlockNumber][eventTransactionIndex][event.transactionHash] = {};
+                        }
+                        if (!(eventLogIndex in trades[eventBlockNumber][eventTransactionIndex][event.transactionHash])) {
+                          newTrades++;
+                          trades[eventBlockNumber][eventTransactionIndex][event.transactionHash][eventLogIndex] = record;
+                        }
+                      }
+                    }
+                    count++;
+                  }
+                  this.sync.completed = count;
+                  console.log(moment().format("HH:mm:ss") + " syncUniswapV3Trades #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newTrades: " + newTrades);
+                  fromBlock = toBlock;
+                } catch (e) {
+                  console.log(e);
+                  batchSize = parseInt(batchSize * BATCHREDUCTIONFACTOR);
+                }
+                done = fromBlock >= context.confirmedBlockNumber;
+              } while (!done && !this.sync.halt);
+
+              Vue.set(this, "addressToIndex", tempAddressToIndex);
+              Vue.set(this, "indexToAddress", tempIndexToAddress);
+              await context.db.cache.put({ objectName: "indexToAddress", object: tempIndexToAddress }).then (function() {
+              }).catch(function(error) {
+                console.log("error: " + error);
+              });
+              await context.db.cache.put({ objectName: "addressToIndex", object: tempAddressToIndex }).then (function() {
+              }).catch(function(error) {
+                console.log("error: " + error);
+              });
+
+              // console.log("trades: " + JSON.stringify(trades, null, 2));
+              await this.syncBlockTimestamps(context, Object.keys(newBlocks));
+              await context.db.cache.put({ objectName: poolAddress + '_uniswapv3trades', object: trades }).then (function() {
+              }).catch(function(error) {
+                console.log("error: " + error);
+              });
+            }
+          },
+          async syncUniswapAltTokenTransfers(context) {
+            this.sync.completed = 0;
+            this.sync.total = null;
+            const poolsToProcess = [];
+            for (const [coinAddress, coinInfo] of Object.entries(this.settings.coins)) {
+              if (coinInfo.include) {
+                const uniswapV2PoolsDataObject = await context.db.cache.where("objectName").equals(coinAddress + "_uniswapv2pools").toArray();
+                if (uniswapV2PoolsDataObject.length == 1) {
+                  for (const [blockNumber, poolsCreatedInBlock] of Object.entries(uniswapV2PoolsDataObject[0].object)) {
+                    for (const [poolAddress, poolInfo] of Object.entries(poolsCreatedInBlock)) {
+                      const altToken = poolInfo.token0.address == coinAddress ? poolInfo.token1 : poolInfo.token0;
+                      poolsToProcess.push({ coinAddress, poolAddress, type: "us2", altToken, blockNumber });
+                    }
+                  }
+                }
+                const uniswapV3PoolsDataObject = await context.db.cache.where("objectName").equals(coinAddress + "_uniswapv3pools").toArray();
+                if (uniswapV3PoolsDataObject.length == 1) {
+                  for (const [blockNumber, poolsCreatedInBlock] of Object.entries(uniswapV3PoolsDataObject[0].object)) {
+                    for (const [poolAddress, poolInfo] of Object.entries(poolsCreatedInBlock)) {
+                      const altToken = poolInfo.token0.address == coinAddress ? poolInfo.token1 : poolInfo.token0;
+                      poolsToProcess.push({ coinAddress, poolAddress, type: "us3", altToken, blockNumber });
+                    }
+                  }
+                }
+              }
+            }
+
+            const tempAddressToIndex = this.addressToIndex;
+            const tempIndexToAddress = this.indexToAddress;
+
+            let part = 0;
+            for (const poolInfo of poolsToProcess) {
+              const poolAddressAs32Bytes = '0x000000000000000000000000' + poolInfo.poolAddress.substring(2, 42).toLowerCase();
+              const topicsList = [
+                [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', null, poolAddressAs32Bytes ],
+                [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', poolAddressAs32Bytes, null ],
+              ];
+              const dataObject = await context.db.cache.where("objectName").equals(poolInfo.poolAddress + "_" + poolInfo.altToken.address + "_transfers").toArray();
+              const transfers = dataObject.length == 1 ? dataObject[0].object : {};
+              const blockNumbers = Object.keys(transfers).sort((a, b) => { return b - a });
+
+              for (const address of [poolInfo.poolAddress, poolInfo.altToken.address]) {
+                if (!(address in tempAddressToIndex)) {
+                  const index = tempIndexToAddress.length;
+                  tempAddressToIndex[address] = index;
+                  tempIndexToAddress.push(address);
+                }
+              }
+
+              for (const [topicsIndex, topics] of topicsList.entries()) {
+                this.sync.section = context.symbol + ' AltTkn ' + (part++);
+                let count = 0;
+                const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: parseInt(poolInfo.blockNumber);
+                let batchSize = 100000000;
+                const BATCHREDUCTIONFACTOR = 0.50;
+                let done = false;
+                let newTransfers = 0;
+                let fromBlock = startBlock;
+                do {
+                  if (batchSize > 1000 && parseInt(fromBlock) + batchSize > context.confirmedBlockNumber) {
+                    batchSize = parseInt((context.confirmedBlockNumber - fromBlock) * 0.75);
+                  }
+                  batchSize = (batchSize > 10) ? batchSize: 10; // avoid divide by 0
+                  let toBlock = (parseInt(fromBlock) + batchSize < context.confirmedBlockNumber) ? (parseInt(fromBlock) + batchSize) : context.confirmedBlockNumber;
+                  try {
+                    const logs = await context.provider.getLogs({ address: poolInfo.altToken.address, fromBlock, toBlock, topics });
+                    for (const event of logs) {
+                      if (!event.removed) {
+                        const [eventBlockNumber, eventTransactionIndex, eventLogIndex] = [parseInt(event.blockNumber), parseInt(event.transactionIndex), parseInt(event.logIndex)];
+                        let from, to, tokens;
+                        if (event.topics.length == 4) {
+                          from = ethers.utils.getAddress('0x' + event.topics[1].substring(26));
+                          to = ethers.utils.getAddress('0x' + event.topics[2].substring(26));
+                          tokens = ethers.BigNumber.from(event.topics[3]).toString();
+                        } else if (event.topics.length == 3) {
+                          from = ethers.utils.getAddress('0x' + event.topics[1].substring(26));
+                          to = ethers.utils.getAddress('0x' + event.topics[2].substring(26));
+                          tokens = ethers.BigNumber.from(event.data).toString();
+                        } else if (event.topics.length == 1) {
+                          from = ethers.utils.getAddress('0x' + event.data.substring(26, 66));
+                          to = ethers.utils.getAddress('0x' + event.data.substring(90, 130));
+                          tokens = ethers.BigNumber.from('0x' + event.data.substring(130, 193)).toString();
+                        }
+
+                        for (const address of [from, to]) {
+                          if (!(address in tempAddressToIndex)) {
+                            const index = tempIndexToAddress.length;
+                            tempAddressToIndex[address] = index;
+                            tempIndexToAddress.push(address);
+                          }
+                        }
+                        const fromIndex = tempAddressToIndex[from];
+                        const toIndex = tempAddressToIndex[to];
+
+                        if (!(eventBlockNumber in transfers)) {
+                          transfers[eventBlockNumber] = {};
+                        }
+                        if (!(event.transactionIndex in transfers[eventBlockNumber])) {
+                          transfers[eventBlockNumber][eventTransactionIndex] = {};
+                        }
+                        if (!(event.transactionHash in transfers[eventBlockNumber][eventTransactionIndex])) {
+                          transfers[eventBlockNumber][eventTransactionIndex][event.transactionHash] = {};
+                        }
+                        if (!(eventLogIndex in transfers[eventBlockNumber][eventTransactionIndex][event.transactionHash])) {
+                          transfers[eventBlockNumber][eventTransactionIndex][event.transactionHash][eventLogIndex] = [ fromIndex, toIndex, tokens ];
+                          newTransfers++;
+                        }
+                      }
+                      count++;
+                    }
+                    this.sync.completed = count;
+                    console.log(moment().format("HH:mm:ss") + " syncUniswapAltTokenTransfers " + context.address.substring(0, 10) + " " + context.symbol + "<->" + poolInfo.altToken.symbol + " #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newTransfers: " + newTransfers);
+                    fromBlock = toBlock;
+                  } catch (e) {
+                    console.log(e);
+                    batchSize = parseInt(batchSize * BATCHREDUCTIONFACTOR);
+                  }
+                  done = fromBlock >= context.confirmedBlockNumber;
+                } while (!done && !this.sync.halt);
+              }
+              await context.db.cache.put({ objectName: poolInfo.poolAddress + "_" + poolInfo.altToken.address + "_transfers", object: transfers }).then (function() {
+              }).catch(function(error) {
+                console.log("error: " + error);
+              });
+            }
+
+            Vue.set(this, "addressToIndex", tempAddressToIndex);
+            Vue.set(this, "indexToAddress", tempIndexToAddress);
+            await context.db.cache.put({ objectName: "indexToAddress", object: tempIndexToAddress }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            await context.db.cache.put({ objectName: "addressToIndex", object: tempAddressToIndex }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+
+          },
+          async loadCurrentData() {
+
+            // [
+            //   "0xa3f23edc79ae0aa3052a0b5a5fb81f9e13729adb338592d970ffe4a8f5ee3766",
+            //   17149228,
+            //   1682740691,
+            //   57,
+            //   [
+            //     [
+            //       134,
+            //       1,
+            //       2,
+            //       3,
+            //       "69000000000000000000000000000",
+            //       0
+            //     ]
+            //   ]
+            // ]
+            // [txHash, blockNumber, timestamp, txIndex, [[logIndex, type[1=tx,2[subtype]=u2,3[subtype]=u3], fromIndex, toIndex, amount0, token0Index]]]
+
+            // [txHash, blockNumber, timestamp, txIndex, [[logIndex, type[1=tx,2[subtype]=u2,3[subtype]=u3], fromIndex, toIndex, amount0, token0Index, amount1, token1Index, pairIndex]]]
+            // subtype 1 mint, 2 swap, 3 collect, 4 burn
+
+            const db = new Dexie(this.db.name);
+            db.version(this.db.version).stores(this.db.schemaDefinition);
+            const indexToSymbols = this.indexToSymbols;
+            const indexToDecimals = this.indexToDecimals;
+            const trades = {};
+            const transfers = {};
+            const pools = {};
+            let count = 0;
+            for (const [coinAddress, coinInfo] of Object.entries(this.settings.coins)) {
+              if (coinInfo.include) {
+                console.log(moment().format("HH:mm:ss") + " loadCurrentData: " + coinAddress + " " + coinInfo.symbol + " " + coinInfo.name);
+                const tokenIndex = this.addressToIndex[coinAddress];
+                if (!(tokenIndex in indexToSymbols)) {
+                  indexToSymbols[tokenIndex] = coinInfo.symbol;
+                }
+                if (!(tokenIndex in indexToDecimals)) {
+                  indexToDecimals[tokenIndex] = coinInfo.decimals;
+                }
+
+                const uniswapV2PoolsDataObject = await db.cache.where("objectName").equals(coinAddress + "_uniswapv2pools").toArray();
+                if (uniswapV2PoolsDataObject.length == 1) {
+                  for (const [blockNumber, poolsInfo] of Object.entries(uniswapV2PoolsDataObject[0].object)) {
+                    for (const [poolAddress, poolInfo] of Object.entries(poolsInfo)) {
+                      // console.log("poolInfo: " + JSON.stringify(poolInfo, null, 2));
+                      const poolIndex = this.addressToIndex[poolAddress];
+                      const altToken = poolInfo.token0.address == coinAddress ? poolInfo.token1 : poolInfo.token0;
+                      if (!(altToken.addressIndex in indexToSymbols)) {
+                        indexToSymbols[altToken.addressIndex] = altToken.symbol;
+                      }
+                      if (!(altToken.addressIndex in indexToDecimals)) {
+                        indexToDecimals[altToken.addressIndex] = altToken.decimals;
+                      }
+                      const tradesDataObject = await db.cache.where("objectName").equals(poolAddress + '_uniswapv2trades').toArray();
+                      const tradesData = tradesDataObject.length == 1 ? tradesDataObject[0].object : {};
+                      pools[poolAddress] = {
+                        poolIndex,
+                        name: poolInfo.name,
+                        coin: poolInfo.coin,
+                        token0: poolInfo.token0,
+                        token1: poolInfo.token1,
+                        transactionHash: poolInfo.transactionHash,
+                        txIndex: poolInfo.txIndex,
+                        logIndex: poolInfo.logIndex,
+                        blockNumber,
+                        type: "UniswapV2Pool"
+                      };
+                      Vue.set(this.indexToName, poolIndex, poolInfo.name);
+                      for (const [blockNumber, txIndexes] of Object.entries(tradesData)) {
+                        for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
+                          for (const [txHash, logIndexes] of Object.entries(txHashes)) {
+                            if (!trades[txHash]) {
+                              const timestamp = this.blockTimestamps[blockNumber] || null;
+                              // trades[txHash] = { blockNumber, timestamp, txIndex, dexTrade: true, logs: [] };
+                              trades[txHash] = [ parseInt(blockNumber), timestamp, parseInt(txIndex), true, [] ];
+                            }
+                            for (const [logIndex, txData] of Object.entries(logIndexes)) {
+                              // console.log("txData: " + JSON.stringify(txData));
+                              // trades[txHash].logs.push([ logIndex, ...txData, poolIndex ]);
+                              trades[txHash][4].push([ parseInt(logIndex), txData[0], txData[1], txData[2], txData[3], poolInfo.token0.addressIndex, txData[4], poolInfo.token1.addressIndex, poolIndex ]); // , poolInfo.token0.addressIndex, txData[4], poolInfo.token1.addressIndex, pooIndex ]);
+                            }
+                          }
+                        }
+                      }
+                      const altTokenIndex = this.addressToIndex[altToken.address];
+                      const altTradesDataObject = await db.cache.where("objectName").equals(poolAddress + "_" + altToken.address + "_transfers").toArray();
+                      const altTradesData = altTradesDataObject.length == 1 ? altTradesDataObject[0].object : {};
+                      for (const [blockNumber, txIndexes] of Object.entries(altTradesData)) {
+                        for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
+                          for (const [txHash, logIndexes] of Object.entries(txHashes)) {
+                            // if (!trades[txHash]) {
+                            //   trades[txHash] = { blockNumber, txIndex, logs: [] };
+                            // }
+                            if (trades[txHash]) {
+                              for (const [logIndex, txData] of Object.entries(logIndexes)) {
+                                // trades[txHash].logs.push([ logIndex, "alttx", ...txData, altTokenIndex ]);
+                                trades[txHash][4].push([ parseInt(logIndex), TRANSFER, ...txData, altTokenIndex ]);
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+
+                const uniswapV3PoolsDataObject = await db.cache.where("objectName").equals(coinAddress + "_uniswapv3pools").toArray();
+                if (uniswapV3PoolsDataObject.length == 1) {
+                  for (const [blockNumber, poolsInfo] of Object.entries(uniswapV3PoolsDataObject[0].object)) {
+                    for (const [poolAddress, poolInfo] of Object.entries(poolsInfo)) {
+                      // console.log("poolInfo: " + JSON.stringify(poolInfo, null, 2));
+                      const poolIndex = this.addressToIndex[poolAddress];
+                      const altToken = poolInfo.token0.address == coinAddress ? poolInfo.token1 : poolInfo.token0;
+                      if (!(altToken.addressIndex in indexToSymbols)) {
+                        indexToSymbols[altToken.addressIndex] = altToken.symbol;
+                      }
+                      if (!(altToken.addressIndex in indexToDecimals)) {
+                        indexToDecimals[altToken.addressIndex] = altToken.decimals;
+                      }
+                      const tradesDataObject = await db.cache.where("objectName").equals(poolAddress + '_uniswapv3trades').toArray();
+                      const tradesData = tradesDataObject.length == 1 ? tradesDataObject[0].object : {};
+                      pools[poolAddress] = {
+                        poolIndex,
+                        name: poolInfo.name,
+                        coin: poolInfo.coin,
+                        token0: poolInfo.token0,
+                        token1: poolInfo.token1,
+                        fee: poolInfo.fee,
+                        tickSpacing: poolInfo.tickSpacing,
+                        transactionHash: poolInfo.transactionHash,
+                        txIndex: poolInfo.txIndex,
+                        logIndex: poolInfo.logIndex,
+                        blockNumber,
+                        type: "UniswapV3Pool",
+                      };
+                      Vue.set(this.indexToName, poolIndex, poolInfo.name);
+                      for (const [blockNumber, txIndexes] of Object.entries(tradesData)) {
+                        for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
+                          for (const [txHash, logIndexes] of Object.entries(txHashes)) {
+                            if (!trades[txHash]) {
+                              const timestamp = this.blockTimestamps[blockNumber] || null;
+                              trades[txHash] = [ parseInt(blockNumber), timestamp, parseInt(txIndex), true, [] ];
+                            }
+                            for (const [logIndex, txData] of Object.entries(logIndexes)) {
+                              // trades[txHash].logs.push([ logIndex, ...txData, poolIndex ]);
+                              trades[txHash][4].push([ parseInt(logIndex), txData[0], txData[1], txData[2], txData[3], poolInfo.token0.addressIndex, txData[4], poolInfo.token1.addressIndex, poolIndex ]);
+                            }
+                          }
+                        }
+                      }
+                      const altTokenIndex = this.addressToIndex[altToken.address];
+                      const altTradesDataObject = await db.cache.where("objectName").equals(poolAddress + "_" + altToken.address + "_transfers").toArray();
+                      const altTradesData = altTradesDataObject.length == 1 ? altTradesDataObject[0].object : {};
+                      for (const [blockNumber, txIndexes] of Object.entries(altTradesData)) {
+                        for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
+                          for (const [txHash, logIndexes] of Object.entries(txHashes)) {
+                            // if (!trades[txHash]) {
+                            //   trades[txHash] = { blockNumber, txIndex, logs: [] };
+                            // }
+                            if (trades[txHash]) {
+                              for (const [logIndex, txData] of Object.entries(logIndexes)) {
+                                // trades[txHash].logs.push([ logIndex, "alttx", ...txData, altTokenIndex ]);
+                                trades[txHash][4].push([ parseInt(logIndex), TRANSFER, ...txData, altTokenIndex ]);
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+
+                const transfersDataObject = await db.cache.where("objectName").equals(coinAddress + "_transfers").toArray();
+                if (transfersDataObject.length == 1) {
+                  // console.log("transfersDataObject[0].object: " + JSON.stringify(transfersDataObject[0].object, null, 2));
+                  for (const [blockNumber, txIndexes] of Object.entries(transfersDataObject[0].object)) {
+                    for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
+                      for (const [txHash, logIndexes] of Object.entries(txHashes)) {
+                        if (!trades[txHash]) {
+                          const timestamp = this.blockTimestamps[blockNumber] || null;
+                          trades[txHash] = [ parseInt(blockNumber), timestamp, parseInt(txIndex), false, [] ];
+                        }
+                        // if (!trades[txHash][3]) {
+                          for (const [logIndex, txData] of Object.entries(logIndexes)) {
+                            trades[txHash][4].push([ parseInt(logIndex), TRANSFER, ...txData, tokenIndex ]);
+                          }
+                        // }
+                      }
+                    }
+                  }
+                }
+
+              }
+            }
+            db.close();
+            console.log(moment().format("HH:mm:ss") + " loadCurrentData END");
+            // console.log(moment().format("HH:mm:ss") + " loadCurrentData - indexToSymbols: " + JSON.stringify(indexToSymbols));
+            // console.log(moment().format("HH:mm:ss") + " loadCurrentData - indexToDecimals: " + JSON.stringify(indexToDecimals));
+            // console.log(moment().format("HH:mm:ss") + " loadCurrentData - trades: " + JSON.stringify(trades, null, 2));
+            // console.log("Loaded " + count + " events");
+            // console.log("Loaded " + Object.keys(pools).length + " Uniswap V2 & V3 pools");
+            // console.log("loadCurrentData - pools: " + JSON.stringify(pools, null, 2));
+            // console.log("loadCurrentData - trades['0x055cde7dfb6866abf5e6986dcce438061b945a17d72ad61a2ffeb3f6029765c5']: " + JSON.stringify(trades["0x055cde7dfb6866abf5e6986dcce438061b945a17d72ad61a2ffeb3f6029765c5"], null, 2));
+            // console.log("pools: " + JSON.stringify(pools, null, 2));
+            this.indexToSymbols = indexToSymbols;
+            this.indexToDecimals = indexToDecimals;
+            this.trades = trades;
+            this.transfers = transfers;
+            this.pools = pools;
+          },
+          async requestReservoirAPITokenMetadataRefresh(token) {
+            console.log("requestReservoirAPITokenMetadataRefresh - token: " + JSON.stringify(token));
+            const options = {
+              method: 'POST',
+              // mode: 'no-cors', // cors, no-cors, *cors, same-origin
+              headers: {accept: '*/*', 'content-type': 'application/json', 'x-api-key': 'demo-api-key'},
+              body: JSON.stringify({
+                overrideCoolDown: false,
+                token: token.contract + ':' + token.tokenId,
+              })
+            };
+            // console.log("options: " + JSON.stringify(options, null, 2));
+            const results = await fetch('https://api.reservoir.tools/tokens/refresh/v1', options)
+              .then(response => response.json())
+              .then(response => console.log(response))
+              .catch(err => console.error(err));
+            console.log("results: " + JSON.stringify(results));
+
+            this.$bvToast.toast("Please Sync after a few minutes", {
+              title: 'Metadata refresh ' + token.contract.substring(0, 12) + '...:' + token.tokenId.substring(0, 12),
+              autoHideDelay: 5000,
+              appendToast: true,
+            });
+            // setTimeout(function() {
+            //   store.dispatch('data/refreshTokenMetadata', token);
+            // }, 5000);
+            // alert("Request sent and will data will be auto-refreshed in 5 seconds. Manually refresh the locally cached token metadata if required")
+          },
+
+          async halt() {
+            this.sync.halt = true;
+            console.log("this.sync.halt: " + this.sync.halt);
+          },
+          commify(n) {
+            if (n != null) {
+              return ethers.utils.commify(n);
+            }
+            return null;
+          },
+          formatTimestamp(ts) {
+            if (ts != null) {
+              return moment.unix(ts).format("YYYY-MM-DD HH:mm:ss");
+            }
+            return null;
+          },
+          formatETH(e) {
+            try {
+              return e ? parseFloat(ethers.utils.formatEther(e)).toFixed(9) : null;
+            } catch (err) {
+            }
+            return e.toFixed(9);
+          },
+          formatERC20(e, decimals = 18) {
+            try {
+              return e ? ethers.utils.formatUnits(e, decimals) : null;
+            } catch (err) {
+            }
+            return e.toString();
+          },
+          formatRate(e, decimals = 18, fixed = 10) {
+            try {
+              return e ? parseFloat(ethers.utils.formatUnits(e, decimals)).toFixed(fixed) : null;
+            } catch (err) {
+            }
+            return e.toString();
+          },
+          ensOrAddress(addressOrAddressIndex, length = 0) {
+            let result = null;
+            if (new RegExp('^[0-9,]+$').test(addressOrAddressIndex)) {
+              result = this.indexToName[addressOrAddressIndex];
+            } else {
+              result = this.indexToName[this.addressToIndex[addressOrAddressIndex]] || addressOrAddressIndex;
+            }
+            if (result && length > 0) {
+              result = result.substring(0, length);
+            }
+            return result;
+          },
+          exportTxHashes() {
+            console.log("exportTxHashes");
+            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.txHashes));
+            var link = document.createElement("a");
+            link.setAttribute("href", dataStr);
+            link.setAttribute("download", "txhashes.json");
+            document.body.appendChild(link); // Required for FF
+            link.click();
+          },
+          exportAccounts() {
+            console.log("exportAccounts");
+            const rows = [
+                ["No", "Address", "Name", "ENSName", "Group", "Sync", "Include"],
+            ];
+            let i = 1;
+            for (const result of this.filteredSortedAccounts) {
+              rows.push([
+                i,
+                result.address,
+                result.name,
+                result.ensName,
+                result.group,
+                result.sync ? "y" : "n",
+                result.include ? "y" : "n",
+              ]);
+              i++;
+            }
+            let tsvContent = "data:text/tsv;charset=utf-8," + rows.map(e => e.join("\t")).join("\n");
+            var encodedUri = encodeURI(tsvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "mynfts_account_export-" + moment().format("YYYY-MM-DD-HH-mm-ss") + ".tsv");
+            document.body.appendChild(link); // Required for FF
+            link.click(); // This will download the data with the specified file name
+          },
+          async backupFilesChange(fileName, fileList) {
+            const reader = new FileReader();
+            this.restoreAddresses = [];
+            const t = this;
+            reader.onload = function (event) {
+              const data = event.target.result;
+              const lines = data.split("\n");
+              for (const line of lines) {
+                const fields = line.split("\t");
+                // console.log(JSON.stringify(fields));
+                if (fields[0] != "No") {
+                  const [number, address, name, ensName, group, sync, include]  = fields;
+                  t.restoreAddresses.push({ address, name, ensName, group, sync, include });
+                }
+              }
+            };
+            await reader.readAsText(fileList[0]);
+          },
+          restoreFromBackup() {
+            if (this.restoreAddresses) {
+              for (const addressData of this.restoreAddresses) {
+                if (!(addressData.address in this.settings.accounts)) {
+                  console.log("Adding: " + JSON.stringify(addressData));
+                  Vue.set(this.settings.accounts, addressData.address, {
+                    name: addressData.name,
+                    ensName: null,
+                    group: addressData.group,
+                    sync: true,
+                    include: true,
+                  });
+                } else {
+                  console.log("Discarding duplicate: " + JSON.stringify(addressData));
+                }
+              }
+              this.saveSettings();
+            }
+          },
+          copyToClipboard(str) {
+            // https://github.com/30-seconds/30-seconds-of-code/blob/master/snippets/copyToClipboard.md
+            const el = document.createElement('textarea');
+            el.value = str;
+            el.setAttribute('readonly', '');
+            el.style.position = 'absolute';
+            el.style.left = '-9999px';
+            document.body.appendChild(el);
+            const selected =
+              document.getSelection().rangeCount > 0
+                ? document.getSelection().getRangeAt(0)
+                : false;
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            if (selected) {
+              document.getSelection().removeAllRanges();
+              document.getSelection().addRange(selected);
+            }
+          },
+          async processIt(action, parameters = null) {
+            console.log("processIt - action: " + action + ", parameters: " + parameters);
+            let connected = true;
+            if (!window.ethereum) {
+              connected = false;
+            } else {
+              try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                connected = window.ethereum.isConnected();
+              } catch (e) {
+                console.log("window.ethereum.request error: " + e.message);
+                connected = false;
+              }
+            }
+            if (!connected) {
+              alert("Please use the https://metamask.io addon with Firefox, Chromium, Opera or Chrome, or any other other web3 browser, for web3 data retrieval. And refresh!");
+            } else {
+              const provider = new ethers.providers.Web3Provider(window.ethereum);
+              const signer = provider.getSigner();
+              const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
+              const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider);
+              this.coinbase = await signer.getAddress();
+              localStorage.coinbase = this.coinbase;
+              const network = await provider.getNetwork();
+              const block = await provider.getBlock("latest");
+              const blockNumber = block.number;
+              const timestamp = block.timestamp;
+              const ENSOWNERBATCHSIZE = 100; // 500 fails occassionally
+
+              const db = new Dexie(this.db.name);
+              db.version(this.db.version).stores(this.db.schemaDefinition);
+
+              if (action == "retrieveMainCollection") {
+                console.log("retrieveMainCollection");
+                let continuation = null;
+                this.sync.completed = 0;
+                this.sync.total = null;
+                this.sync.section = "Main collection";
+                const mainTokens = {};
+                this.mainToken.collection.name = null;
+                do {
+                  let url = "https://api.reservoir.tools/tokens/v5?contract=" + this.settings.mainCollection + "&limit=100" +
+                    (continuation != null ? "&continuation=" + continuation : '');
+                  console.log("url: " + url);
+                  const data = await fetch(url)
+                    .then(handleErrors)
+                    .then(response => response.json())
+                    .catch(function(error) {
+                       console.log("ERROR - updateCollection: " + error);
+                       // state.sync.error = true;
+                       return [];
+                    });
+                  continuation = data.continuation;
+                  if (data && data.tokens) {
+                    for (const tokenData of data.tokens) {
+                      const token = tokenData.token;
+                      mainTokens[token.tokenId] = {
+                        owner: token.owner,
+                        image: token.image,
+                      };
+                      if (this.mainToken.collection.name == null) {
+                        this.mainToken.collection.name = token.collection.name;
+                        this.mainToken.collection.image = token.collection.image;
+                        this.mainToken.collection.slug = token.collection.slug;
+                      }
+                    }
+                  }
+                  this.sync.completed = Object.keys(mainTokens).length;
+                  await delay(1500); // TODO: Adjust to avoid error 429 Too Many Requests. Fails at 200ms
+                } while (continuation != null /*&& !this.sync.halt && !state.sync.error */);
+
+                const mainOwners = {};
+                for (const [tokenId, data] of Object.entries(mainTokens)) {
+                  if (!(data.owner in mainOwners)) {
+                    mainOwners[data.owner] = [];
+                  }
+                  mainOwners[data.owner].push(tokenId);
+                }
+
+                this.sync.completed = 0;
+                const addresses = Object.keys(mainOwners);
+                this.sync.total = addresses.length;
+                this.sync.section = "ENS Names";
+                const indexToName = {};
+                for (let i = 0; i < addresses.length & !this.sync.halt; i += ENSOWNERBATCHSIZE) {
+                  const batch = addresses.slice(i, parseInt(i) + ENSOWNERBATCHSIZE);
+                  const allnames = await ensReverseRecordsContract.getNames(batch);
+                  for (let j = 0; j < batch.length; j++) {
+                    const address = batch[j];
+                    const name = allnames[j];
+                    indexToName[address] = name != null && name.length > 0 ? name : address;
+                    // const normalized = normalize(address);
+                  }
+                  this.sync.completed = parseInt(this.sync.completed) + batch.length;
+                }
+                this.indexToName = indexToName;
+                await db.cache.put({ objectName: 'indexToName', object: indexToName }).then (function() {
+                }).catch(function(error) {
+                  console.log("error: " + error);
+                });
+                this.mainToken.tokens = mainTokens;
+                this.mainToken.owners = mainOwners;
+                await db.cache.put({ objectName: 'mainToken', object: this.mainToken }).then (function() {
+                }).catch(function(error) {
+                  console.log("error: " + error);
+                });
+                this.secondaryData = {};
+                await db.cache.put({ objectName: 'secondaryData', object: this.secondaryData }).then (function() {
+                }).catch(function(error) {
+                  console.log("error: " + error);
+                });
+                this.sync.section = null;
+              }
+
+              if (action == "syncCollections") {
+                console.log("syncCollections");
+                let contracts = [];
+                if (Object.keys(this.selectedCollections).length > 0) {
+                  contracts = Object.keys(this.selectedCollections);
+                } else {
+                  for (const record of this.filteredSortedCollections) {
+                    if (!(record.contract in this.secondaryData)) {
+                      contracts.push(record.contract);
+                    }
+                  }
+                }
+                console.log("contracts: " + JSON.stringify(contracts));
+                for (let contract of contracts) {
+                  console.log("Processing: " + contract + " " + JSON.stringify(this.collections[contract]));
+
+                  let continuation = null;
+                  this.sync.completed = 0;
+                  this.sync.total = null;
+                  this.sync.section = this.collections[contract].name.substring(0, 24);
+                  const tokens = {};
+                  do {
+                    let url = "https://api.reservoir.tools/tokens/v5?contract=" + contract + "&includeAttributes=false&limit=100" +
+                      (continuation != null ? "&continuation=" + continuation : '');
+                    console.log("url: " + url);
+                    const data = await fetch(url)
+                      .then(handleErrors)
+                      .then(response => response.json())
+                      .catch(function(error) {
+                         console.log("ERROR - updateCollection: " + error);
+                         // state.sync.error = true;
+                         return [];
+                      });
+                    continuation = data.continuation;
+                    if (data && data.tokens) {
+                      for (const tokenData of data.tokens) {
+                        const token = tokenData.token;
+                        tokens[token.tokenId] = {
+                          owner: token.owner,
+                          image: token.image,
+                        };
+                      }
+                    }
+                    this.sync.completed = Object.keys(tokens).length;
+                    await delay(1500); // TODO: Adjust to avoid error 429 Too Many Requests. Fails at 200ms
+                  } while (continuation != null /*&& !this.sync.halt && !state.sync.error */);
+                  Vue.set(this.collections[contract], 'tokens', tokens);
+                  const owners = {};
+                  for (const [tokenId, data] of Object.entries(tokens)) {
+                    if (!(data.owner in owners)) {
+                      owners[data.owner] = [];
+                    }
+                    owners[data.owner].push(tokenId);
+                  }
+                  Vue.set(this.collections[contract], 'owners', owners);
+                  Vue.set(this.collections[contract], 'updated', timestamp);
+                  Vue.set(this.collections[contract], 'blockNumber', blockNumber);
+                }
+                await db.cache.put({ objectName: 'collections', object: this.collections }).then (function() {
+                }).catch(function(error) {
+                  console.log("error: " + error);
+                });
+              }
+
+              if (action == "retrieveSecondaryCollection") {
+                console.log("retrieveSecondaryCollection");
+                let owners = [];
+                if (Object.keys(this.selectedMainTable).length > 0) {
+                  owners = Object.keys(this.selectedMainTable);
+                } else {
+                  for (const record of this.filteredSortedMainTable) {
+                    if (!(record.owner in this.secondaryData)) {
+                      owners.push(record.owner);
+                    }
+                  }
+                }
+                console.log("owners: " + JSON.stringify(owners));
+
+                this.sync.completed = 0;
+                this.sync.total = owners.count;
+                this.sync.section = "Secondary collection";
+                for (let owner of owners) {
+                  console.log("Processing: " + owner);
+                  Vue.set(this.secondaryData, owner, {});
+                  let stop = false;
+                  const LIMIT = 100;
+                  const MAXLIMIT = 10000;
+                  for (let offset = 0; offset < MAXLIMIT && !stop; offset = parseInt(offset) + LIMIT) {
+                    let url = "https://api.reservoir.tools/users/" + owner + "/tokens/v5?sortBy=acquiredAt&sortDirection=desc&offset=" + offset + "&limit=" + LIMIT + "&includeTopBid=false";
+                    console.log("url: " + url);
+                    const data = await fetch(url)
+                      .then(handleErrors)
+                      .then(response => response.json())
+                      .catch(function(error) {
+                         console.log("ERROR - updateCollection: " + error);
+                         // state.sync.error = true;
+                         return [];
+                      });
+                    if (data && data.tokens && data.tokens.length > 0) {
+                      for (const tokenData of data.tokens) {
+                        const contract = tokenData.token.contract;
+                        const tokenId = tokenData.token.tokenId;
+                        const name = tokenData.token.name;
+                        const image = tokenData.token.image;
+                        const collectionName = tokenData.token.collection.name;
+                        const collectionImage = tokenData.token.collection.imageUrl;
+                        if (!(contract in this.secondaryData[owner])) {
+                          Vue.set(this.secondaryData[owner], contract, {
+                            collectionName,
+                            collectionImage,
+                            tokens: {},
+                          });
+                        }
+                        Vue.set(this.secondaryData[owner][contract].tokens, tokenId, { tokenId, name, image });
+                      }
+                    } else {
+                      stop = true;
+                    }
+                    await delay(1500); // TODO: Adjust to avoid error 429 Too Many Requests. Fails at 200ms
+                  }
+                  await delay(1000); // TODO: Adjust to avoid error 429 Too Many Requests. Fails at 200ms
+                  this.sync.completed = parseInt(this.sync.completed) + 1;
+                  if (this.sync.halt) {
+                    break;
+                  }
+                }
+                await db.cache.put({ objectName: 'secondaryData', object: this.secondaryData }).then (function() {
+                }).catch(function(error) {
+                  console.log("error: " + error);
+                });
+              }
+
+              db.close();
+              this.sync.section = null;
+              this.sync.halt = false;
+            }
+          },
+        },
+
+        // --- MOUNTED ---
+        mounted() {
+          if ('coinbase' in localStorage) {
+            this.coinbase = localStorage.coinbase;
+          }
+          // if ('selectedCollections' in localStorage) {
+          //   this.selectedCollections = JSON.parse(localStorage.selectedCollections);
+          //   console.log("mounted - selectedCollections: " + JSON.stringify(this.selectedCollections, null, 2));
+          // }
+          // if ('selectedMainTable' in localStorage) {
+          //   this.selectedMainTable = JSON.parse(localStorage.selectedMainTable);
+          // }
+          if ('memeCoinDataSettings' in localStorage) {
+            const tempSettings = JSON.parse(localStorage.memeCoinDataSettings);
+            if ('version' in tempSettings && tempSettings.version == this.settings.version) {
+              this.settings = tempSettings;
+              if (this.settings.tokensTable.currentPage > 1) {
+                this.settings.tokensTable.currentPage = 1;
+              }
+            }
+          }
+          (async() => {
+            const db0 = new Dexie(this.db.name);
+            db0.version(this.db.version).stores(this.db.schemaDefinition);
+            const blockTimestampsDataItems = await db0.cache.where("objectName").equals('blockTimestamps').toArray();
+            if (blockTimestampsDataItems.length == 1) {
+              this.blockTimestamps = blockTimestampsDataItems[0].object;
+            }
+            const indexToNameDataItems = await db0.cache.where("objectName").equals('indexToName').toArray();
+            if (indexToNameDataItems.length == 1) {
+              this.indexToName = indexToNameDataItems[0].object;
+            }
+            const indexToAddressDataItems = await db0.cache.where("objectName").equals('indexToAddress').toArray();
+            // console.log("indexToAddressDataItems.length: " + indexToAddressDataItems.length);
+            if (indexToAddressDataItems.length == 1) {
+              this.indexToAddress = indexToAddressDataItems[0].object;
+              // console.log("indexToAddress: " + JSON.stringify(this.indexToAddress));
+            }
+            const addressToIndexDataItems = await db0.cache.where("objectName").equals('addressToIndex').toArray();
+            // console.log("addressToIndexDataItems.length: " + addressToIndexDataItems.length);
+            if (addressToIndexDataItems.length == 1) {
+              this.addressToIndex = addressToIndexDataItems[0].object;
+              // console.log("addressToIndex: " + JSON.stringify(this.addressToIndex));
+            }
+
+            db0.close();
+            await this.loadCurrentData();
+          })();
+        },
+      })
+    </script>
+  </body>
+</html>
