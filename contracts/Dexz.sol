@@ -267,12 +267,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
     constructor() DexzBase() {
     }
 
-    function trade(Action action, BuySell buySell, Token base, Token quote, Price price, Unixtime expiry, Tokens tokens, OrderKey[] calldata orderKeys) public reentrancyGuard returns (Tokens filled, Tokens quoteTokensFilled, Tokens tokensOnOrder, OrderKey orderKey) {
-        if (uint(action) <= uint(Action.FillAnyAndAddOrder)) {
-            return _trade(_getTradeInfo(Account.wrap(msg.sender), action, buySell, base, quote, price, expiry, tokens));
-        }
-    }
-
     struct Info {
         Action action;
         BuySell buySell;
@@ -281,7 +275,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
         Price price;
         Unixtime expiry;
         Delta tokens;
-        OrderKey[] orderKeys;
     }
 
     error OnlyPositiveTokensAccepted(Delta tokens);
