@@ -478,17 +478,25 @@
                 <b-form-checkbox size="sm" :checked="data.item.include ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'include')" v-b-popover.hover="'Include in NFTs view?'"></b-form-checkbox>
               </template>
               <template #cell(getSome)="data">
-                <div v-if="tokenInfo[data.item.address] && !tokenInfo[data.item.address].faucet">
-                  Exchange
-                </div>
-                <div v-else-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weenus'">
-                  Weenus
+                <div v-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weenus'">
+                  <b-link @click="mintWeenus(data.item.address);">Mint 1,000</b-link>
                 </div>
                 <div v-else-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weth'">
-                  WETH
+                  <b-button v-b-modal.weth-modal-prevent-closing variant="link" v-b-popover.hover.top="'Wrap/Unwrap ETH'">Convert</b-button>
+                  <b-modal id="weth-modal-prevent-closing" ref="modal" title="ETH To WETH Convertor" @show="wethFormResetModal" @hidden="wethFormResetModal" @ok="wethFormHandleOk">
+                    <form ref="wethForm" @submit.stop.prevent="wethFormHandleSubmit">
+                      <b-form-group label="">
+                        <b-form-radio v-model="wethFormData.direction" value="ew">Wrap ETH</b-form-radio>
+                        <b-form-radio v-model="wethFormData.direction" value="we">Unwrap WETH</b-form-radio>
+                      </b-form-group>
+                      <b-form-group label="Amount" label-for="weth-amount" :state="wethAmountState" invalid-feedback="Please enter a valid amount">
+                        <b-form-input id="weth-amount" v-model="wethFormData.amount" :state="wethAmountState" required placeholder="0.12345"></b-form-input>
+                      </b-form-group>
+                    </form>
+                  </b-modal>
                 </div>
                 <div v-else>
-                  Get Some
+                  On Exchange
                 </div>
                 <!-- <b-form-checkbox size="sm" :checked="data.item.include ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'include')" v-b-popover.hover="'Include in NFTs view?'"></b-form-checkbox> -->
               </template>
@@ -599,7 +607,7 @@
         </b-card>
         <b-card no-header body-class="m-0 p-0" class="m-0 p-0 border-0">
           <b-card-text class="text-right">
-            gm, and enjoy! <i>Meme Coin Data</i> &copy; Bok Consulting Pty Ltd 2023.
+            gm, and enjoy! <i>Dexz</i> &copy; Bok Consulting Pty Ltd 2023.
           </b-card-text>
         </b-card no-header>
       </b-container>
@@ -704,6 +712,11 @@
           },
           newCoinAddress: null,
           newAddress: null,
+          wethFormData: {
+            direction: "ew",
+            amount: null,
+          },
+
           restoreFile: null,
           restoreAddresses: null,
           sync: {
@@ -948,6 +961,22 @@
                 const a = ethers.utils.getAddress(this.newAddress);
                 return a && a.length > 0;
               } catch (e) {
+                return false;
+              }
+            }
+            return null;
+          },
+          wethAmountState() {
+            if (this.wethFormData.amount) {
+              if (/^[+-]?\d+(\.\d+)?$/.test(this.wethFormData.amount)) {
+                try {
+                  const a = !isNaN(parseFloat(this.wethFormData.amount));
+                  console.log("wethAmountState: " + a);
+                  return a;
+                } catch (e) {
+                  return false;
+                }
+              } else {
                 return false;
               }
             }
@@ -1372,6 +1401,20 @@
               return valid;
             }
           },
+          checkWethFormValidity() {
+            const valid = this.$refs.wethForm.checkValidity()
+            // if (this.wethFormData.amount && this.wethFormData.amount.length > 0) {
+            //   try {
+            //     const a = ethers.utils.getAddress(this.newCoinAddress);
+            //     status = a && a.length > 0;
+            //     return status;
+            //   } catch (e) {
+            //     return false;
+            //   }
+            // } else {
+              return valid;
+            // }
+          },
           checkAccountFormValidity() {
             const valid = this.$refs.accountForm.checkValidity()
             if (this.newAddress && this.newAddress.length > 0) {
@@ -1502,6 +1545,48 @@
             })
             this.saveSettings();
           },
+
+          wethFormResetModal() {
+            this.wethFormData.direction = "ew";
+            this.wethFormData.amount = null;
+          },
+          wethFormHandleOk(bvModalEvent) {
+            // Prevent modal from closing
+            bvModalEvent.preventDefault();
+            // Trigger submit handler
+            this.wethFormHandleSubmit();
+          },
+          async wethFormHandleSubmit() {
+            console.log("wethFormHandleSubmit");
+            // Exit when the form isn't valid
+            if (!this.checkWethFormValidity()) {
+              return;
+            }
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            if (this.wethFormData.direction == "ew") {
+              try {
+                const tx = await signer.sendTransaction({ to: WETH9ADDRESS_SEPOLIA, value: ethers.utils.parseEther(this.wethFormData.amount) });
+                console.log("tx: " + JSON.stringify(tx));
+              } catch (e) {
+                console.log("wethFormHandleSubmit error: " + JSON.stringify(e));
+              }
+            } else {
+              const wethContract = new ethers.Contract(WETH9ADDRESS_SEPOLIA, WETH9ABI_SEPOLIA, provider);
+              const wethContractWithSigner = wethContract.connect(provider.getSigner());
+              try {
+                const tx = await wethContractWithSigner.withdraw(ethers.utils.parseEther(this.wethFormData.amount));
+                console.log("tx: " + JSON.stringify(tx));
+              } catch (e) {
+                console.log("swapIt error: " + JSON.stringify(e));
+              }
+            }
+            // Hide the modal manually
+            this.$nextTick(() => {
+              this.$bvModal.hide('new-account-modal-prevent-closing');
+            })
+          },
+
           toggleAccountField(account, field) {
             Vue.set(this.settings.accounts[account], field, !this.settings.accounts[account][field]);
             this.saveSettings();
@@ -1640,6 +1725,97 @@
               Vue.set(this.settings.accounts[item.address], 'include', !(someTrue && !someFalse));
             }
             this.saveSettings();
+          },
+          async mintWeenus(weenusAddress) {
+              console.log("mintWeenus()");
+              const provider = new ethers.providers.Web3Provider(window.ethereum);
+              const signer = provider.getSigner();
+              try {
+                const tx = await signer.sendTransaction({ to: weenusAddress, value: "0" });
+                console.log("tx: " + JSON.stringify(tx));
+              } catch (e) {
+                console.log("mintWeenus error: " + JSON.stringify(e));
+              }
+          },
+          async mintWeth(wethAddress, action) {
+              console.log("mintWeth - action: " + action);
+              const h = this.$createElement;
+              const messageVNode = h('div', { class: ['confirm-modal'] }, [
+                // h('b-row', {
+                //   }, [
+                //     h('b-col', { class: ['text-right'], props: { cols: 3 } }, 'From:'),
+                //     h('b-col',
+                //       [
+                //         h('a', { class: ['blah'], attrs: { 'href': 'https://etherscan.io/address/' + from, 'target': '_blank' } }, this.ensOrAddress(from)),
+                //       ]
+                //     ),
+                //   ]
+                // ),
+                // h('b-row', {
+                //   }, [
+                //     h('b-col', { class: ['text-right'], props: { cols: 3 } }, 'To Umswap Pool:'),
+                //     h('b-col',
+                //       [
+                //         h('a', { class: ['blah'], attrs: { 'href': 'https://etherscan.io/address/' + this.selectedPool + '#code', 'target': '_blank' } }, this.ensOrAddress(this.selectedPool)),
+                //       ]
+                //     ),
+                //   ]
+                // ),
+                h('b-row', {
+                  }, [
+                    h('b-col', { class: ['text-right'], props: { cols: 3 } }, 'swap('),
+                    h('b-col', ''),
+                  ]
+                ),
+                // h('b-row', {
+                //   }, [
+                //     h('b-col', { class: ['text-right'], props: { cols: 3 } }, 'inTokenIds:'),
+                //     h('b-col', '[' + this.tokenIdsToSwapIn.join(", ") + ']'),
+                //   ]
+                // ),
+                // h('b-row', {
+                //   }, [
+                //     h('b-col', { class: ['text-right'], props: { cols: 3 } }, 'outTokenIds:'),
+                //     h('b-col', '[' + this.tokenIdsToSwapOut.join(", ") + ']'),
+                //   ]
+                // ),
+                h('b-row', {
+                  }, [
+                    h('b-col', { class: ['text-right'], props: { cols: 3 } }, ')'),
+                    h('b-col', ''),
+                  ]
+                ),
+                h('b-row', {
+                  }, [
+                    h('b-col', { class: ['text-right'], props: { cols: 3 } }, 'Note:'),
+                    h('b-col', 'Please refresh using the blue [Sync] buttons on the left a few minutes after your transaction has been executed'),
+                  ]
+                ),
+              ]);
+              this.$bvModal.msgBoxConfirm([messageVNode], {
+                title: 'Swap NFTs Into or Out Of This Pool',
+                size: 'lg',
+                buttonSize: 'sm',
+                centered: true,
+                okVariant: 'danger',
+                okTitle: 'Confirm',
+                cancelTitle: 'Cancel',
+              }).then( async value1 => {
+                if (value1) {
+                  event.preventDefault();
+                  try {
+                    // const tx = await umswapContractWithSigner.swap(this.tokenIdsToSwapIn, this.tokenIdsToSwapOut);
+              //       this.newUmswap.txHash = tx.hash;
+                    // console.log("tx: " + JSON.stringify(tx));
+                  } catch (e) {
+              //       this.newUmswap.error = e.message.toString();
+                    // console.log("swapIt error: " + JSON.stringify(e));
+                  }
+                }
+              }).catch(err => {
+                // this.newUmswap.error = err.message.toString();
+                // console.log("swapIt error: " + JSON.stringify(e));
+              });
           },
           async syncAll() {
             console.log("syncAll");
