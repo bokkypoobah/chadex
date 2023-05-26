@@ -221,9 +221,29 @@
                 <b-pagination size="sm" v-model="settings.coinsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.coinsTable.pageSize" style="height: 0;"></b-pagination>
               </div>
               <div class="mt-0 pl-1">
-                <b-form-select size="sm" v-model="settings.coinsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Tokens page size'"></b-form-select>
+                <b-form-select size="sm" v-model="settings.coinsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
               </div>
             </div>
+
+            <b-modal id="allowance-modal-prevent-closing" ref="modal" title="Change Allowance To Dexz" @show="allowanceFormResetModal" @hidden="allowanceFormResetModal" @ok="allowanceFormHandleOk">
+              <form ref="allowanceForm" @submit.stop.prevent="allowanceFormHandleSubmit">
+                <b-form-group label="Amount" label-for="allowance-amount" :state="allowanceAmountState" invalid-feedback="Please enter a valid amount">
+                  <b-form-input id="allowance-amount" v-model="allowanceFormData.amount" :state="allowanceAmountState" required placeholder="0.12345"></b-form-input>
+                </b-form-group>
+              </form>
+            </b-modal>
+
+            <b-modal id="weth-modal-prevent-closing" ref="modal" title="ETH To WETH Convertor" @show="wethFormResetModal" @hidden="wethFormResetModal" @ok="wethFormHandleOk">
+              <form ref="wethForm" @submit.stop.prevent="wethFormHandleSubmit">
+                <b-form-group label="">
+                  <b-form-radio v-model="wethFormData.direction" value="ew">Wrap ETH</b-form-radio>
+                  <b-form-radio v-model="wethFormData.direction" value="we">Unwrap WETH</b-form-radio>
+                </b-form-group>
+                <b-form-group label="Amount" label-for="weth-amount" :state="wethAmountState" invalid-feedback="Please enter a valid amount">
+                  <b-form-input id="weth-amount" v-model="wethFormData.amount" :state="wethAmountState" required placeholder="0.12345"></b-form-input>
+                </b-form-group>
+              </form>
+            </b-modal>
 
             <b-table small fixed striped responsive hover :fields="coinsFields" :items="pagedFilteredSortedCoins" show-empty empty-html="Click [+] above to add a new ERC-20 token contract. Currently only TURBO supported" head-variant="light" class="mx-0 my-1">
               <template #head(address)="data">
@@ -266,7 +286,7 @@
                 </b-link>
               </template>
               <template #cell(allowance)="data">
-                {{ formatERC20(data.item.allowance, data.item.decimals) }}
+                <b-link v-b-modal.allowance-modal-prevent-closing @click="allowanceFormData.token = data.item.address; allowanceFormData.decimals = data.item.decimals;" variant="link" v-b-popover.hover.top="'Change allowance. Click Sync after tx included'">{{ formatERC20(data.item.allowance, data.item.decimals) }}</b-link>
               </template>
               <template #cell(balance)="data">
                 {{ formatERC20(data.item.balance, data.item.decimals) }}
@@ -286,17 +306,6 @@
                 </div>
                 <div v-else-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weth'">
                   <b-link v-b-modal.weth-modal-prevent-closing variant="link" v-b-popover.hover.top="'Wrap/Unwrap ETH. Click Sync after tx included'">Convert</b-link>
-                  <b-modal id="weth-modal-prevent-closing" ref="modal" title="ETH To WETH Convertor" @show="wethFormResetModal" @hidden="wethFormResetModal" @ok="wethFormHandleOk">
-                    <form ref="wethForm" @submit.stop.prevent="wethFormHandleSubmit">
-                      <b-form-group label="">
-                        <b-form-radio v-model="wethFormData.direction" value="ew">Wrap ETH</b-form-radio>
-                        <b-form-radio v-model="wethFormData.direction" value="we">Unwrap WETH</b-form-radio>
-                      </b-form-group>
-                      <b-form-group label="Amount" label-for="weth-amount" :state="wethAmountState" invalid-feedback="Please enter a valid amount">
-                        <b-form-input id="weth-amount" v-model="wethFormData.amount" :state="wethAmountState" required placeholder="0.12345"></b-form-input>
-                      </b-form-group>
-                    </form>
-                  </b-modal>
                 </div>
                 <div v-else>
                   On Exchange
@@ -304,7 +313,7 @@
                 <!-- <b-form-checkbox size="sm" :checked="data.item.include ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'include')" v-b-popover.hover="'Include in NFTs view?'"></b-form-checkbox> -->
               </template>
               <template #cell(delete)="data">
-                <b-link size="sm" @click="deleteCoin(data.item.address)" variant="link" v-b-popover.hover="'Delete account'"><b-icon-trash style="color: #ff0000;" shift-v="+1" font-scale="1.0"></b-icon-trash></b-link>
+                <b-link size="sm" @click="deleteCoin(data.item.address)" variant="link" v-b-popover.hover="'Delete token'"><b-icon-trash style="color: #ff0000;" shift-v="+1" font-scale="1.0"></b-icon-trash></b-link>
               </template>
             </b-table>
 
@@ -428,7 +437,7 @@
                 <b-pagination size="sm" v-model="settings.transfersTable.currentPage" @input="saveSettings" :total-rows="filteredSortedTransfers.length" :per-page="settings.transfersTable.pageSize" style="height: 0;"></b-pagination>
               </div>
               <div class="mt-0 pl-1">
-                <b-form-select size="sm" v-model="settings.transfersTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Tokens page size'"></b-form-select>
+                <b-form-select size="sm" v-model="settings.transfersTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
               </div>
             </div>
 
@@ -867,6 +876,11 @@
           },
           newCoinAddress: null,
           newAddress: null,
+          allowanceFormData: {
+            amount: null,
+            token: null,
+            decimals: null,
+          },
           wethFormData: {
             direction: "ew",
             amount: null,
@@ -1130,6 +1144,22 @@
                 const a = ethers.utils.getAddress(this.newAddress);
                 return a && a.length > 0;
               } catch (e) {
+                return false;
+              }
+            }
+            return null;
+          },
+          allowanceAmountState() {
+            if (this.allowanceFormData.amount) {
+              if (/^[+-]?\d+(\.\d+)?$/.test(this.allowanceFormData.amount)) {
+                try {
+                  const a = !isNaN(parseFloat(this.allowanceFormData.amount));
+                  console.log("allowanceAmountState: " + a);
+                  return a;
+                } catch (e) {
+                  return false;
+                }
+              } else {
                 return false;
               }
             }
@@ -1572,19 +1602,13 @@
               return valid;
             }
           },
+          checkAllowanceFormValidity() {
+            const valid = this.$refs.allowanceForm.checkValidity()
+            return valid;
+          },
           checkWethFormValidity() {
             const valid = this.$refs.wethForm.checkValidity()
-            // if (this.wethFormData.amount && this.wethFormData.amount.length > 0) {
-            //   try {
-            //     const a = ethers.utils.getAddress(this.newCoinAddress);
-            //     status = a && a.length > 0;
-            //     return status;
-            //   } catch (e) {
-            //     return false;
-            //   }
-            // } else {
-              return valid;
-            // }
+            return valid;
           },
           checkAccountFormValidity() {
             const valid = this.$refs.accountForm.checkValidity()
@@ -1743,15 +1767,45 @@
             this.saveSettings();
           },
 
+          allowanceFormResetModal() {
+            this.allowanceFormData.amount = null;
+          },
           wethFormResetModal() {
             this.wethFormData.direction = "ew";
             this.wethFormData.amount = null;
+          },
+          allowanceFormHandleOk(bvModalEvent) {
+            // Prevent modal from closing
+            bvModalEvent.preventDefault();
+            // Trigger submit handler
+            this.allowanceFormHandleSubmit();
           },
           wethFormHandleOk(bvModalEvent) {
             // Prevent modal from closing
             bvModalEvent.preventDefault();
             // Trigger submit handler
             this.wethFormHandleSubmit();
+          },
+          async allowanceFormHandleSubmit() {
+            console.log("allowanceFormHandleSubmit");
+            // Exit when the form isn't valid
+            if (!this.checkAllowanceFormValidity()) {
+              return;
+            }
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const erc20Contract = new ethers.Contract(this.allowanceFormData.token, ERC20ABI, provider);
+            const erc20ContractWithSigner = erc20Contract.connect(provider.getSigner());
+            try {
+              const tx = await erc20ContractWithSigner.approve(DEXZADDRESS_SEPOLIA, ethers.utils.parseUnits(this.allowanceFormData.amount, this.allowanceFormData.decimals).toString() );
+              console.log("tx: " + JSON.stringify(tx));
+            } catch (e) {
+              console.log("allowanceFormHandleSubmit error: " + JSON.stringify(e));
+            }
+            // Hide the modal manually
+            this.$nextTick(() => {
+              this.$bvModal.hide('allowance-modal-prevent-closing');
+            })
           },
           async wethFormHandleSubmit() {
             console.log("wethFormHandleSubmit");
@@ -1775,12 +1829,12 @@
                 const tx = await wethContractWithSigner.withdraw(ethers.utils.parseEther(this.wethFormData.amount));
                 console.log("tx: " + JSON.stringify(tx));
               } catch (e) {
-                console.log("swapIt error: " + JSON.stringify(e));
+                console.log("wethFormHandleSubmit error: " + JSON.stringify(e));
               }
             }
             // Hide the modal manually
             this.$nextTick(() => {
-              this.$bvModal.hide('new-account-modal-prevent-closing');
+              this.$bvModal.hide('weth-modal-prevent-closing');
             })
           },
 
