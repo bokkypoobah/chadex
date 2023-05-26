@@ -142,11 +142,57 @@
           </b-modal>
 
           <b-card v-if="coinbase && settings.tabIndex == 0" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
-            Pairs
+            <template #header>
+              Pairs
+            </template>
+            <b-card-text class="m-0 p-0">
+              WIP - See Tokens & Raw
+              <!-- <b-card no-body no-header bg-variant="light" class="m-1 p-1 w-75">
+                <b-card-body class="m-1 p-1">
+                  <b-form-group label-cols-lg="2" label="Raw Dexz" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
+                    <b-form-group label="To:" label-for="message-to" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="message-to" v-model.trim="message.to" placeholder="0x1234... (optional)" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Topic:" label-for="message-topic" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="message-topic" v-model.trim="message.topic" placeholder="{topic}" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Text:" label-for="message-text" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="message-text" v-model.trim="message.text" placeholder="{text}" class="w-75"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="" label-for="message-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-button size="sm" :disabled="message.topic == null && message.text == null" id="message-submit" @click="sendMessage()" variant="warning">Send Message</b-button>
+                    </b-form-group>
+                  </b-form-group>
+                </b-card-body>
+              </b-card> -->
+            </b-card-text>
           </b-card>
 
           <b-card v-if="coinbase && settings.tabIndex == 1" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
-            Pair
+            <template #header>
+              Pair
+            </template>
+            <b-card-text class="m-0 p-0">
+              WIP - See Tokens & Raw
+              <!-- <b-card no-body no-header bg-variant="light" class="m-1 p-1 w-75">
+                <b-card-body class="m-1 p-1">
+                  <b-form-group label-cols-lg="2" label="Raw Dexz" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
+                    <b-form-group label="To:" label-for="message-to" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="message-to" v-model.trim="message.to" placeholder="0x1234... (optional)" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Topic:" label-for="message-topic" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="message-topic" v-model.trim="message.topic" placeholder="{topic}" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Text:" label-for="message-text" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="message-text" v-model.trim="message.text" placeholder="{text}" class="w-75"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="" label-for="message-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-button size="sm" :disabled="message.topic == null && message.text == null" id="message-submit" @click="sendMessage()" variant="warning">Send Message</b-button>
+                    </b-form-group>
+                  </b-form-group>
+                </b-card-body>
+              </b-card> -->
+            </b-card-text>
           </b-card>
 
           <b-card v-if="coinbase && settings.tabIndex == 2" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
@@ -159,7 +205,7 @@
               <div class="mt-0 flex-grow-1">
               </div>
               <div v-if="!sync.section" class="mt-0 pr-1">
-                <b-button size="sm" @click="syncTokens()" variant="primary" v-b-popover.hover.top="'Select token balances and total supply'">Sync</b-button>
+                <b-button size="sm" @click="syncTokens()" variant="primary" v-b-popover.hover.top="'Sync token balances and total supplies'">Sync</b-button>
               </div>
               <div class="mt-0 flex-grow-1">
               </div>
@@ -175,13 +221,13 @@
                 <b-pagination size="sm" v-model="settings.coinsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.coinsTable.pageSize" style="height: 0;"></b-pagination>
               </div>
               <div class="mt-0 pl-1">
-                <b-form-select size="sm" v-model="settings.coinsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Coins page size'"></b-form-select>
+                <b-form-select size="sm" v-model="settings.coinsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Tokens page size'"></b-form-select>
               </div>
             </div>
 
             <b-table small fixed striped responsive hover :fields="coinsFields" :items="pagedFilteredSortedCoins" show-empty empty-html="Click [+] above to add a new ERC-20 token contract. Currently only TURBO supported" head-variant="light" class="mx-0 my-1">
               <template #head(address)="data">
-                ERC-20 Token Address <b-link v-b-modal.new-coin-modal-prevent-closing variant="link" v-b-popover.hover.top="'Add new coin'"><b-icon-plus-square shift-v="+1" font-scale="0.8"></b-icon-plus-square></b-link>
+                ERC-20 Token Address <b-link v-b-modal.new-coin-modal-prevent-closing variant="link" v-b-popover.hover.top="'Add new token'"><b-icon-plus-square shift-v="+1" font-scale="0.8"></b-icon-plus-square></b-link>
                 <b-modal id="new-coin-modal-prevent-closing" ref="modal" title="New ERC-20 Coin Address" @show="newCoinAddressResetModal" @hidden="newCoinAddressResetModal" @ok="newCoinAddressHandleOk">
                   <form ref="coinForm" @submit.stop.prevent="newCoinAddressHandleSubmit">
                     <b-form-group label="Address" label-for="name-input" :state="newCoinAddressState" description="Pre-filled with WEENUS for initial testing" invalid-feedback="Please enter a valid Ethereum ERC-20 address">
@@ -228,7 +274,7 @@
               </template>
               <template #cell(getSome)="data">
                 <div v-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weenus'">
-                  <b-link @click="mintWeenus(data.item.address);" v-b-popover.hover.top="'Faucet drips 1,000 tokens each tx'">Mint</b-link>
+                  <b-link @click="mintWeenus(data.item.address);" v-b-popover.hover.top="'Faucet drips 1,000 tokens each 0 value tx'">Drip</b-link>
                 </div>
                 <div v-else-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weth'">
                   <b-link v-b-modal.weth-modal-prevent-closing variant="link" v-b-popover.hover.top="'Wrap/Unwrap ETH'">Convert</b-link>
@@ -261,8 +307,52 @@
               Raw Interface
             </template>
             <b-card-text class="m-0 p-0">
-              Blah
+              <b-card no-body no-header bg-variant="light" class="m-1 p-1 w-75">
+                <b-card-body class="m-1 p-1">
+                  <b-form-group label-cols-lg="2" label="Raw Dexz" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
+                    <!-- <b-form-group label="To:" label-for="message-to" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="message-to" v-model.trim="message.to" placeholder="0x1234... (optional)" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Topic:" label-for="message-topic" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="message-topic" v-model.trim="message.topic" placeholder="{topic}" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Text:" label-for="message-text" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="message-text" v-model.trim="message.text" placeholder="{text}" class="w-75"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="" label-for="message-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-button size="sm" :disabled="message.topic == null && message.text == null" id="message-submit" @click="sendMessage()" variant="warning">Send Message</b-button>
+                    </b-form-group> -->
+                  </b-form-group>
+                </b-card-body>
+              </b-card>
             </b-card>
+          </b-card>
+
+          <b-card v-if="coinbase && settings.tabIndex == 4" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
+            <template #header>
+              Info
+            </template>
+            <b-card-text class="m-0 p-0">
+              WIP - See Tokens & Raw
+              <!-- <b-card no-body no-header bg-variant="light" class="m-1 p-1 w-75">
+                <b-card-body class="m-1 p-1">
+                  <b-form-group label-cols-lg="2" label="Raw Dexz" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
+                    <b-form-group label="To:" label-for="message-to" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="message-to" v-model.trim="message.to" placeholder="0x1234... (optional)" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Topic:" label-for="message-topic" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="message-topic" v-model.trim="message.topic" placeholder="{topic}" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Text:" label-for="message-text" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="message-text" v-model.trim="message.text" placeholder="{text}" class="w-75"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="" label-for="message-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-button size="sm" :disabled="message.topic == null && message.text == null" id="message-submit" @click="sendMessage()" variant="warning">Send Message</b-button>
+                    </b-form-group>
+                  </b-form-group>
+                </b-card-body>
+              </b-card> -->
+            </b-card-text>
           </b-card>
 
           <b-card v-if="coinbase && settings.tabIndex == 10" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
@@ -534,8 +624,6 @@
               </template>
             </b-table>
           </b-card>
-
-
 
           <b-card v-if="coinbase && settings.tabIndex == 40" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <div class="d-flex flex-wrap m-0 p-0">
