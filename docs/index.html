@@ -190,7 +190,13 @@
           <!-- 1:PAIR -->
           <b-card v-if="coinbase && settings.tabIndex == 1" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
-              Pair
+              <div class="d-flex flex-wrap m-0 p-0">
+                <div class="mt-0 pr-2">
+                  Pair
+                </div>
+                <div class="mt-0 pr-1">
+                  <b-form-select size="sm" v-model="settings.selectedPair" :options="pairsOptions"></b-form-select>
+                </div>
             </template>
             <b-card-text class="m-0 p-0">
               WIP - See Tokens & Raw
@@ -815,6 +821,7 @@
           chainId: null,
           settings: {
             tabIndex: 0,
+            selectedPair: null,
             showAdditionalFilters: false,
             filters: {},
             tokens: {
@@ -1111,6 +1118,13 @@
         computed: {
           dexzAddress() {
             return DEXZADDRESS_SEPOLIA;
+          },
+          pairsOptions() {
+            const results = [ { value: null, text: '(select)' } ];
+            for (const item of this.filteredPairs) {
+              results.push({ value: item.pairKey, text: item.base.symbol + '/' + item.quote.symbol });
+            }
+            return results;
           },
           getAllGroups() {
             const groupsMap = {};
