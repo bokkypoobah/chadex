@@ -181,7 +181,7 @@
 
             <b-table small fixed striped responsive hover :fields="coinsFields" :items="pagedFilteredSortedCoins" show-empty empty-html="Click [+] above to add a new ERC-20 token contract. Currently only TURBO supported" head-variant="light" class="mx-0 my-1">
               <template #head(address)="data">
-                ERC-20 Coin Address <b-button v-b-modal.new-coin-modal-prevent-closing variant="link" v-b-popover.hover.top="'Add new coin'"><b-icon-plus-square shift-v="+1" font-scale="0.8"></b-icon-plus-square></b-button>
+                ERC-20 Token Address <b-link v-b-modal.new-coin-modal-prevent-closing variant="link" v-b-popover.hover.top="'Add new coin'"><b-icon-plus-square shift-v="+1" font-scale="0.8"></b-icon-plus-square></b-link>
                 <b-modal id="new-coin-modal-prevent-closing" ref="modal" title="New ERC-20 Coin Address" @show="newCoinAddressResetModal" @hidden="newCoinAddressResetModal" @ok="newCoinAddressHandleOk">
                   <form ref="coinForm" @submit.stop.prevent="newCoinAddressHandleSubmit">
                     <b-form-group label="Address" label-for="name-input" :state="newCoinAddressState" description="Pre-filled with WEENUS for initial testing" invalid-feedback="Please enter a valid Ethereum ERC-20 address">
@@ -1569,7 +1569,6 @@
               } catch (e) {
                 console.log("syncTokens ERROR - totalSupply - token: " + address + ", message: " + e.message);
               }
-              console.log(balance + " " + totalSupply);
               Vue.set(this.settings.coins[address], 'balance', balance);
               Vue.set(this.settings.coins[address], 'totalSupply', totalSupply);
             }
