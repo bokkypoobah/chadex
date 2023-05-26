@@ -13,7 +13,6 @@ Compiled 1 Solidity file successfully
         Token1 deployed
         > Deployed WETH - gasUsed: 555407 ~ ETH 0.02221628 ~ USD 44
         WETH deployed
-Duplicate definition of Trade (Trade((bytes32,bytes32,uint8,address,address,uint256,uint256,uint64)), Trade(bytes32,bytes32,uint8,address,address,uint256,uint256,uint64))
         > Deployed Dexz - gasUsed: 4229133 ~ ETH 0.16916532 ~ USD 338
         Dexz deployed
         > Transfer Token0 - gasUsed: 51421 ~ ETH 0.00205684 ~ USD 4
@@ -85,7 +84,7 @@ Duplicate definition of Trade (Trade((bytes32,bytes32,uint8,address,address,uint
     "base": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
     "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     "price": "690100000",
-    "expiry": 1685019602,
+    "expiry": 1685092054,
     "tokens": "1000000000000000000"
   },
   {
@@ -94,7 +93,7 @@ Duplicate definition of Trade (Trade((bytes32,bytes32,uint8,address,address,uint
     "base": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
     "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     "price": "690200000",
-    "expiry": 1685019602,
+    "expiry": 1685092054,
     "tokens": "2000000000000000000"
   },
   {
@@ -103,26 +102,23 @@ Duplicate definition of Trade (Trade((bytes32,bytes32,uint8,address,address,uint
     "base": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
     "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     "price": "690300000",
-    "expiry": 1685019602,
+    "expiry": 1685092054,
     "tokens": "3000000000000000000"
   }
 ]
-Duplicate definition of Trade (Trade((bytes32,bytes32,uint8,address,address,uint256,uint256,uint64)), Trade(bytes32,bytes32,uint8,address,address,uint256,uint256,uint64))
         > user0->dexz.execute(actionsA) - gasUsed: 537740 ~ ETH 0.0215096 ~ USD 43
           + Dexz:0xCf7E 29.0 PairAdded(pairKey: 0x4c038ad6, base: Token0:0x5FbD, quote: WETH:0x9fE4, baseDecimals: 18, quoteDecimals: 18, multiplier: 9, divisor: 0)
-          + Dexz:0xCf7E 29.1 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x509f7742, maker: user0:0x7099, buySell: 0, price: 0.6901, expiry: 1685019602, tokens: 1.0)
-          + Dexz:0xCf7E 29.2 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x689c9f9d, maker: user0:0x7099, buySell: 0, price: 0.6902, expiry: 1685019602, tokens: 2.0)
-          + Dexz:0xCf7E 29.3 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x6c61b3da, maker: user0:0x7099, buySell: 0, price: 0.6903, expiry: 1685019602, tokens: 3.0)
-Duplicate definition of Trade (Trade((bytes32,bytes32,uint8,address,address,uint256,uint256,uint64)), Trade(bytes32,bytes32,uint8,address,address,uint256,uint256,uint64))
+          + Dexz:0xCf7E 29.1 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x509f7742, maker: user0:0x7099, buySell: 0, price: 0.6901, expiry: 1685092054, tokens: 1.0)
+          + Dexz:0xCf7E 29.2 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x689c9f9d, maker: user0:0x7099, buySell: 0, price: 0.6902, expiry: 1685092054, tokens: 2.0)
+          + Dexz:0xCf7E 29.3 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x6c61b3da, maker: user0:0x7099, buySell: 0, price: 0.6903, expiry: 1685092054, tokens: 3.0)
         > user1->dexz.execute(actionsA) - gasUsed: 295119 ~ ETH 0.01180476 ~ USD 23
-          + Dexz:0xCf7E 30.0 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x4eba897b, maker: user1:0x3C44, buySell: 0, price: 0.6901, expiry: 1685019602, tokens: 1.0)
-          + Dexz:0xCf7E 30.1 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x9ab678ab, maker: user1:0x3C44, buySell: 0, price: 0.6902, expiry: 1685019602, tokens: 2.0)
-          + Dexz:0xCf7E 30.2 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0xfb54b8c8, maker: user1:0x3C44, buySell: 0, price: 0.6903, expiry: 1685019602, tokens: 3.0)
-Duplicate definition of Trade (Trade((bytes32,bytes32,uint8,address,address,uint256,uint256,uint64)), Trade(bytes32,bytes32,uint8,address,address,uint256,uint256,uint64))
+          + Dexz:0xCf7E 30.0 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x4eba897b, maker: user1:0x3C44, buySell: 0, price: 0.6901, expiry: 1685092054, tokens: 1.0)
+          + Dexz:0xCf7E 30.1 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x9ab678ab, maker: user1:0x3C44, buySell: 0, price: 0.6902, expiry: 1685092054, tokens: 2.0)
+          + Dexz:0xCf7E 30.2 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0xfb54b8c8, maker: user1:0x3C44, buySell: 0, price: 0.6903, expiry: 1685092054, tokens: 3.0)
         > user2->dexz.execute(actionsA) - gasUsed: 295119 ~ ETH 0.01180476 ~ USD 23
-          + Dexz:0xCf7E 31.0 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x3daa4d27, maker: user2:0x90F7, buySell: 0, price: 0.6901, expiry: 1685019602, tokens: 1.0)
-          + Dexz:0xCf7E 31.1 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x735c0228, maker: user2:0x90F7, buySell: 0, price: 0.6902, expiry: 1685019602, tokens: 2.0)
-          + Dexz:0xCf7E 31.2 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x429b768c, maker: user2:0x90F7, buySell: 0, price: 0.6903, expiry: 1685019602, tokens: 3.0)
+          + Dexz:0xCf7E 31.0 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x3daa4d27, maker: user2:0x90F7, buySell: 0, price: 0.6901, expiry: 1685092054, tokens: 1.0)
+          + Dexz:0xCf7E 31.1 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x735c0228, maker: user2:0x90F7, buySell: 0, price: 0.6902, expiry: 1685092054, tokens: 2.0)
+          + Dexz:0xCf7E 31.2 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x429b768c, maker: user2:0x90F7, buySell: 0, price: 0.6903, expiry: 1685092054, tokens: 3.0)
 
         --- After Adding Orders ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
@@ -172,11 +168,10 @@ Duplicate definition of Trade (Trade((bytes32,bytes32,uint8,address,address,uint
     "base": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
     "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     "price": "690200000",
-    "expiry": 1685019602,
+    "expiry": 1685092054,
     "tokens": "100000000000000000000"
   }
 ]
-Duplicate definition of Trade (Trade((bytes32,bytes32,uint8,address,address,uint256,uint256,uint64)), Trade(bytes32,bytes32,uint8,address,address,uint256,uint256,uint64))
         > user2->dexz.execute(actions) - gasUsed: 392745 ~ ETH 0.0157098 ~ USD 31
           + Token0:0x5FbD 32.0 Transfer(from: user2:0x90F7, to: user0:0x7099, tokens: 3.0)
           + WETH:0x9fE4 32.1 Transfer(from: user0:0x7099, to: user2:0x90F7, tokens: 2.0709)
@@ -192,7 +187,7 @@ Duplicate definition of Trade (Trade((bytes32,bytes32,uint8,address,address,uint
           + WETH:0x9fE4 32.11 Transfer(from: user1:0x3C44, to: user2:0x90F7, tokens: 1.3804)
           + Dexz:0xCf7E 32.12 Trade(tradeInfo: 0x4c038ad6bfca2133ee6f20ac54377d10fb6f3756d2321ead7428e24817161e77,0x9ab678ab089fab452f7c61c889e3597a3cc3a927a7ea1e09bab12f78e944b7d8,1,0x90F79bf6EB2c4f870365E785982E1f101E93b906,0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC,2000000000000000000,1380400000000000000,690200000)
           + Dexz:0xCf7E 32.13 Trade(tradeInfo: 0x4c038ad6bfca2133ee6f20ac54377d10fb6f3756d2321ead7428e24817161e77,0x735c0228192bb6855c4d0a3157b88036a9d27e63c178258c385ce3329131e869,1,0x90F79bf6EB2c4f870365E785982E1f101E93b906,0x90F79bf6EB2c4f870365E785982E1f101E93b906,2000000000000000000,1380400000000000000,690200000)
-          + Dexz:0xCf7E 32.14 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x8fece353, maker: user2:0x90F7, buySell: 1, price: 0.6902, expiry: 1685019602, tokens: 85.0)
+          + Dexz:0xCf7E 32.14 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x8fece353, maker: user2:0x90F7, buySell: 1, price: 0.6902, expiry: 1685092054, tokens: 85.0)
           + Dexz:0xCf7E 32.15 TradeSummary(buySell: 1, taker: user2:0x90F7, filled: 15000000000000000000, quoteTokensFilled: 10.3539, price: 0.69026, tokensOnOrder: 85000000000000000000)
 
         --- After Executing Against Orders ---
@@ -225,7 +220,7 @@ Duplicate definition of Trade (Trade((bytes32,bytes32,uint8,address,address,uint
             price: 0.6902 head=0x8fece353 tail=0x8fece353
               Order key=0x8fece353 next=0x00000000 maker=user2:0x90F7 expiry=59.98s tokens=85.0 filled=0.0
 
-    ✔ 00. Test 00 (340ms)
+    ✔ 00. Test 00 (328ms)
 
 
   1 passing (1s)
