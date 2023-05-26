@@ -1893,7 +1893,25 @@
               console.log("Pair");
               for (let i = 0; i < 2; i++) {
                 const orders = await dexzContract.getOrders(this.settings.pairTable.selectedPair, i, 100, 0, ORDERKEY_SENTINEL);
-                console.log("orders: " + JSON.stringify(orders, null, 2));
+
+                // function getOrders(PairKey pairKey, BuySell buySell, uint count, Price price, OrderKey firstOrderKey) public view returns
+                // (Price[] memory prices, OrderKey[] memory orderKeys, OrderKey[] memory nextOrderKeys, Account[] memory makers,
+                // Unixtime[] memory expiries, Tokens[] memory tokenss, Tokens[] memory filleds) {
+
+                for (let j = 0; j < orders[0].length; j++) {
+                  const price = orders[0][j];
+                  if (price == 0) {
+                    break;
+                  }
+                  const orderKey = orders[1][j];
+                  const nextOrderKey = orders[2][j];
+                  const maker = orders[3][j];
+                  const expiry = parseInt(orders[4][j]);
+                  const tokens = ethers.BigNumber.from(orders[5][j]).toString();
+                  const filled = ethers.BigNumber.from(orders[6][j]).toString();
+                  console.log(price + " " + orderKey.substring(0, 10) + " " + nextOrderKey.substring(0, 10) + " " +
+                    maker.substring(0, 10) + " " + expiry + " " + ethers.utils.formatEther(tokens) + " " + ethers.utils.formatEther(filled));
+                }
               }
             }
 
