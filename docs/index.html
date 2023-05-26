@@ -141,19 +141,20 @@
             </b-form-group>
           </b-modal>
 
+          <!-- 0:PAIRS -->
           <b-card v-if="coinbase && settings.tabIndex == 0" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
               Pairs
             </template>
             <b-card-text class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
-                <!-- <div class="mt-0 pr-1">
-                  <b-form-input type="text" size="sm" v-model.trim="settings.coinsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Account address/name filter'" placeholder="🔍 add/name regex" style="min-width: 8.0rem;"></b-form-input>
-                </div>                -->
+                <div class="mt-0 pr-1">
+                  <b-form-input type="text" size="sm" v-model.trim="settings.pairsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Base or quote symbol and name filter'" placeholder="🔍 sym/name regex" style="min-width: 8.0rem;"></b-form-input>
+                </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncDexz()" variant="primary" v-b-popover.hover.top="'Sync Dexz'">Sync</b-button>
+                  <b-button size="sm" @click="syncPairs('pairs')" variant="primary" v-b-popover.hover.top="'Sync Dexz'">Sync</b-button>
                 </div>
                 <div class="mt-1" style="width: 250px;">
                   <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
@@ -168,21 +169,25 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <!-- <div class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.coinsTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.pairsTable.sortOption" @change="saveSettings" :options="pairsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
                 </div> -->
-                <!-- <div class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedCoins.length + '/' + Object.keys(settings.coins).length }}</font>
-                </div> -->
-                <!-- <div class="mt-0 pl-1">
-                  <b-pagination size="sm" v-model="settings.coinsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.coinsTable.pageSize" style="height: 0;"></b-pagination>
-                </div> -->
-                <!-- <div class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.coinsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
-                </div> -->
+                <div class="mt-0 pl-1">
+                  <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedPairs.length + '/' + Object.keys(pairs).length }}</font>
+                </div>
+                <div class="mt-0 pl-1">
+                  <b-pagination size="sm" v-model="settings.pairsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.pairsTable.pageSize" style="height: 0;"></b-pagination>
+                </div>
+                <div class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.pairsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
+                </div>
               </div>
             </b-card-text>
+            <b-table small fixed striped responsive hover :fields="pairsFields" :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1">
+            <!-- <b-table small fixed striped responsive hover :items="pagedFilteredSortedPairs" show-empty empty-html="Click [+] above to add a new ERC-20 token contract. Currently only TURBO supported" head-variant="light" class="mx-0 my-1"> -->
+            </b-table>
           </b-card>
 
+          <!-- 1:PAIR -->
           <b-card v-if="coinbase && settings.tabIndex == 1" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
               Pair
@@ -210,18 +215,19 @@
             </b-card-text>
           </b-card>
 
+          <!-- 2:TOKENS -->
           <b-card v-if="coinbase && settings.tabIndex == 2" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
               Tokens
             </template>
             <div class="d-flex flex-wrap m-0 p-0">
-              <!-- <div class="mt-0 pr-1">
-                <b-form-input type="text" size="sm" v-model.trim="settings.coinsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Account address/name filter'" placeholder="🔍 add/name regex" style="min-width: 8.0rem;"></b-form-input>
-              </div>              -->
+              <div class="mt-0 pr-1">
+                <b-form-input type="text" size="sm" v-model.trim="settings.tokensTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Account address/name filter'" placeholder="🔍 add/name regex" style="min-width: 8.0rem;"></b-form-input>
+              </div>
               <div class="mt-0 flex-grow-1">
               </div>
               <div v-if="!sync.section" class="mt-0 pr-1">
-                <b-button size="sm" @click="syncTokens()" variant="primary" v-b-popover.hover.top="'Sync token balances and total supplies'">Sync</b-button>
+                <b-button size="sm" @click="syncTokens()" variant="primary" v-b-popover.hover.top="'Sync token allowance to Dexz, balances and total supplies'">Sync</b-button>
               </div>
               <div class="mt-1" style="width: 250px;">
                 <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
@@ -237,17 +243,17 @@
               </div>
               <!--
               <div class="mt-0 pl-1">
-                <b-form-select size="sm" v-model="settings.coinsTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
+                <b-form-select size="sm" v-model="settings.tokensTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
               </div>
               -->
               <div class="mt-0 pl-1">
-                <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedCoins.length + '/' + Object.keys(settings.coins).length }}</font>
+                <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedTokens.length + '/' + Object.keys(settings.tokens).length }}</font>
               </div>
               <div class="mt-0 pl-1">
-                <b-pagination size="sm" v-model="settings.coinsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.coinsTable.pageSize" style="height: 0;"></b-pagination>
+                <b-pagination size="sm" v-model="settings.tokensTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.tokensTable.pageSize" style="height: 0;"></b-pagination>
               </div>
               <div class="mt-0 pl-1">
-                <b-form-select size="sm" v-model="settings.coinsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
+                <b-form-select size="sm" v-model="settings.tokensTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
               </div>
             </div>
 
@@ -271,7 +277,7 @@
               </form>
             </b-modal>
 
-            <b-table small fixed striped responsive hover :fields="coinsFields" :items="pagedFilteredSortedCoins" show-empty empty-html="Click [+] above to add a new ERC-20 token contract. Currently only TURBO supported" head-variant="light" class="mx-0 my-1">
+            <b-table small fixed striped responsive hover :fields="tokensFields" :items="pagedFilteredSortedTokens" show-empty empty-html="Click [+] above to add a new ERC-20 token contract. Currently only TURBO supported" head-variant="light" class="mx-0 my-1">
               <template #head(address)="data">
                 ERC-20 Token Address <b-link v-b-modal.new-coin-modal-prevent-closing variant="link" v-b-popover.hover.top="'Add new token'"><b-icon-plus-square shift-v="+1" font-scale="0.8"></b-icon-plus-square></b-link>
                 <b-modal id="new-coin-modal-prevent-closing" ref="modal" title="New ERC-20 Token Address" @show="newCoinAddressResetModal" @hidden="newCoinAddressResetModal" @ok="newCoinAddressHandleOk">
@@ -339,12 +345,13 @@
                 <!-- <b-form-checkbox size="sm" :checked="data.item.include ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'include')" v-b-popover.hover="'Include in NFTs view?'"></b-form-checkbox> -->
               </template>
               <template #cell(delete)="data">
-                <b-link size="sm" @click="deleteCoin(data.item.address)" variant="link" v-b-popover.hover="'Delete token'"><b-icon-trash style="color: #ff0000;" shift-v="+1" font-scale="1.0"></b-icon-trash></b-link>
+                <b-link size="sm" @click="deleteToken(data.item.address)" variant="link" v-b-popover.hover="'Delete token'"><b-icon-trash style="color: #ff0000;" shift-v="+1" font-scale="1.0"></b-icon-trash></b-link>
               </template>
             </b-table>
 
           </b-card>
 
+          <!-- 3:RAW -->
           <b-card v-if="coinbase && settings.tabIndex == 3" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
               Raw Interface
@@ -396,6 +403,7 @@
             </b-card-text>
           </b-card>
 
+          <!-- 4:INFO -->
           <b-card v-if="coinbase && settings.tabIndex == 4" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
               Info
@@ -529,7 +537,7 @@
 
             </div>
 
-            <!-- <b-table small fixed striped responsive hover selectable select-mode="single" @row-selected="showModalDetails" :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Add your coins in the [Coins] menu, then click [Sync] above" head-variant="light" class="mx-0 my-1"> -->
+            <!-- <b-table small fixed striped responsive hover selectable select-mode="single" @row-selected="showModalDetails" :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Add your tokens in the [tokens] menu, then click [Sync] above" head-variant="light" class="mx-0 my-1"> -->
             <b-table small fixed striped responsive hover :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Please click [Sync] above" head-variant="light" class="mx-0 my-1">
               <template #cell(number)="data">
                 <!--
@@ -809,8 +817,7 @@
             tabIndex: 0,
             showAdditionalFilters: false,
             filters: {},
-            editCoins: false,
-            coins: {
+            tokens: {
               "0x03563574B3839e2CdD6281D8741497Ba82FD6739": {
                   "sync": true,
                   "include": true,
@@ -878,7 +885,13 @@
                   "totalSupply": "1000000",
               }
             },
-            coinsTable: {
+            pairsTable: {
+              filter: null,
+              currentPage: 1,
+              pageSize: 10,
+              sortOption: 'symbolquotebaseasc',
+            },
+            tokensTable: {
               filter: null,
               currentPage: 1,
               pageSize: 10,
@@ -905,7 +918,7 @@
               pageSize: 10,
               sortOption: 'lastsaledsc',
             },
-            version: 3,
+            version: 4,
           },
           newCoinAddress: null,
           newAddress: null,
@@ -985,6 +998,10 @@
                 "symbol": "ZEENUS",
             }
           },
+          pairsSortOptions: [
+            { value: 'symbolquotebaseasc', text: '▲ Quote, ▲ Base' },
+            { value: 'symbolbasequoteasc', text: '▲ Base, ▲ Quote' },
+          ],
           accountsSortOptions: [
             { value: 'groupnameasc', text: '▲ Group, ▲ Name' },
             { value: 'groupnamedsc', text: '▼ Group, ▲ Name' },
@@ -1010,7 +1027,14 @@
             { value: 2500, text: '2.5k' },
             { value: 10000, text: '10k' },
           ],
-          coinsFields: [
+          pairsFields: [
+            { key: 'pairKey', label: 'Pair Key', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
+            { key: 'base.symbol', label: 'Base', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+            { key: 'base.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+            { key: 'quote.symbol', label: 'Quote', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+            { key: 'quote.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+          ],
+          tokensFields: [
             { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
@@ -1040,12 +1064,6 @@
             { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'token', label: 'Token', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'rate', label: 'Rate', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-          ],
-          tokensFields: [
-            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'token', label: 'Token', sortable: false, thStyle: 'width: 55%;', tdClass: 'text-truncate' },
-            { key: 'lastSaleAmount', label: 'Last Sale Amount', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
-            { key: 'lastSaleTime', label: 'Last Sale', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
           ],
           groupsFilterFields: [
             { key: 'select', label: '', thStyle: 'width: 15%;' },
@@ -1216,10 +1234,39 @@
             }
             return null;
           },
-          filteredCoins() {
+          filteredPairs() {
             const results = [];
-            const filterRegex = this.settings.coinsTable.filter && this.settings.coinsTable.filter.length > 0 ? new RegExp(this.settings.coinsTable.filter, 'i') : null;
-            for (const [address, item] of Object.entries(this.settings.coins)) {
+            const filterRegex = this.settings.pairsTable.filter && this.settings.pairsTable.filter.length > 0 ? new RegExp(this.settings.pairsTable.filter, 'i') : null;
+            console.log("filterRegex: " + JSON.stringify(filterRegex));
+            for (const [pairKey, pair] of Object.entries(this.pairs)) {
+              console.log("filteredPairs - pairKey: " + pairKey + ", pair: " + JSON.stringify(pair, null, 2));
+              let include = true;
+              if (filterRegex) {
+                if (!filterRegex.test(pair.base.symbol) && !filterRegex.test(pair.base.name) && !filterRegex.test(pair.quote.symbol) && !filterRegex.test(pair.quote.name)) {
+                  include = false;
+                }
+              }
+              if (include) {
+                results.push({
+                  pairKey,
+                  ...pair,
+                });
+              }
+            }
+            return results;
+          },
+          filteredSortedPairs() {
+            let results = this.filteredPairs;
+            // TODO
+            return results;
+          },
+          pagedFilteredSortedPairs() {
+            return this.filteredSortedPairs.slice((this.settings.tokensTable.currentPage - 1) * this.settings.tokensTable.pageSize, this.settings.tokensTable.currentPage * this.settings.tokensTable.pageSize);
+          },
+          filteredTokens() {
+            const results = [];
+            const filterRegex = this.settings.tokensTable.filter && this.settings.tokensTable.filter.length > 0 ? new RegExp(this.settings.tokensTable.filter, 'i') : null;
+            for (const [address, item] of Object.entries(this.settings.tokens)) {
               let include = true;
               if (filterRegex) {
                 if (!filterRegex.test(item.name) && !filterRegex.test(item.group) && !filterRegex.test(address)) {
@@ -1243,12 +1290,13 @@
             }
             return results;
           },
-          filteredSortedCoins() {
-            let results = this.filteredCoins;
+          filteredSortedTokens() {
+            let results = this.filteredTokens;
+            console.log("filteredSortedTokens: " + JSON.stringify(results, null, 2));
             return results;
           },
-          pagedFilteredSortedCoins() {
-            return this.filteredSortedCoins.slice((this.settings.coinsTable.currentPage - 1) * this.settings.coinsTable.pageSize, this.settings.coinsTable.currentPage * this.settings.coinsTable.pageSize);
+          pagedFilteredSortedTokens() {
+            return this.filteredSortedTokens.slice((this.settings.tokensTable.currentPage - 1) * this.settings.tokensTable.pageSize, this.settings.tokensTable.currentPage * this.settings.tokensTable.pageSize);
           },
           filteredAccounts() {
             const results = [];
@@ -1396,8 +1444,8 @@
                 // for (const log of logs) {
                 //   // const tokenIndex = log[5];
                 //   // const tokenAddress = this.indexToAddress[tokenIndex];
-                //   // const tokenSymbol = this.settings.coins[tokenAddress] && this.settings.coins[tokenAddress].symbol || null;
-                //   // const decimals = this.settings.coins[tokenAddress] && this.settings.coins[tokenAddress].decimals || 18;
+                //   // const tokenSymbol = this.settings.tokens[tokenAddress] && this.settings.tokens[tokenAddress].symbol || null;
+                //   // const decimals = this.settings.tokens[tokenAddress] && this.settings.tokens[tokenAddress].decimals || 18;
                 //   // actions.push([ log[0], log[1], tokenAddress, tokenSymbol, decimals, this.indexToAddress[log[3]], this.indexToAddress[log[4]], log[5] ]);
                 //   actions.push([ ...log, /*tokenSymbol, decimals*/ ]);
                 // }
@@ -1674,7 +1722,7 @@
             if (!this.checkCoinFormValidity()) {
               return;
             }
-            if (!(this.newCoinAddress in this.settings.coins)) {
+            if (!(this.newCoinAddress in this.settings.tokens)) {
               console.log("Adding: " + this.newCoinAddress);
               const provider = new ethers.providers.Web3Provider(window.ethereum);
               const coinInfo = {
@@ -1703,7 +1751,7 @@
               } catch (e) {
                 console.log("newCoinAddressHandleSubmit ERROR - totalSupply - account: " + this.newCoinAddress + ", message: " + e.message);
               }
-              Vue.set(this.settings.coins, this.newCoinAddress, coinInfo);
+              Vue.set(this.settings.tokens, this.newCoinAddress, coinInfo);
 
 
 
@@ -1731,7 +1779,7 @@
               //   } catch (e) {
               //     console.log("newCoinAddressHandleSubmit ERROR - decimals - account: " + this.newCoinAddress + ", message: " + e.message);
               //   }
-              //   Vue.set(this.settings.coins, this.newCoinAddress, { ...coinInfo, mask: undefined });
+              //   Vue.set(this.settings.tokens, this.newCoinAddress, { ...coinInfo, mask: undefined });
               // } else {
               //   console.log("Not ERC-20: " + this.newCoinAddress);
               // }
@@ -1744,14 +1792,42 @@
             })
             this.saveSettings();
           },
+          async syncPairs(section) {
+            console.log("syncTokens");
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const addresses = Object.keys(this.settings.tokens);
+            this.sync.completed = 0;
+            const dexzContract = new ethers.Contract(DEXZADDRESS_SEPOLIA, DEXZABI, provider);
+            const pairsLength = parseInt(ethers.BigNumber.from(await dexzContract.pairsLength()).toString());
+            if (pairsLength > Object.keys(this.pairs).length) {
+              this.sync.total = pairsLength;
+              for (let i = 0; i < pairsLength; i++) {
+                const [pairKey, baseAddress, quoteAddress, multiplier, divisor] = await dexzContract.pair(i);
+                if (!(pairKey in this.pairs)) {
+                  const base = await this.getERC20TokenDetails({ provider }, baseAddress);
+                  const quote = await this.getERC20TokenDetails({ provider }, quoteAddress);
+                  Vue.set(this.pairs, pairKey, {
+                    base,
+                    quote,
+                    multiplier,
+                    divisor,
+                  });
+                }
+                this.sync.completed++;
+              }
+              localStorage.dexzPairs = JSON.stringify(this.pairs);
+            }
+            this.sync.section = null;
+            this.sync.halt = false;
+          },
           async syncTokens() {
             console.log("syncTokens");
             const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const addresses = Object.keys(this.settings.coins);
+            const addresses = Object.keys(this.settings.tokens);
             this.sync.completed = 0;
             this.sync.total = addresses.length;
             for (const [addressIndex, address] of addresses.entries()) {
-              this.sync.section = this.settings.coins[address].symbol;
+              this.sync.section = this.settings.tokens[address].symbol;
               const erc20 = new ethers.Contract(address, ERC20ABI, provider);
               let allowance = null, balance = null, totalSupply = null;
               try {
@@ -1769,48 +1845,12 @@
               } catch (e) {
                 console.log("syncTokens ERROR - totalSupply - token: " + address + ", message: " + e.message);
               }
-              Vue.set(this.settings.coins[address], 'allowance', allowance);
-              Vue.set(this.settings.coins[address], 'balance', balance);
-              Vue.set(this.settings.coins[address], 'totalSupply', totalSupply);
+              Vue.set(this.settings.tokens[address], 'allowance', allowance);
+              Vue.set(this.settings.tokens[address], 'balance', balance);
+              Vue.set(this.settings.tokens[address], 'totalSupply', totalSupply);
               this.sync.completed++;
             }
             this.saveSettings();
-            this.sync.section = null;
-            this.sync.halt = false;
-          },
-          async syncDexz() {
-            console.log("syncTokens");
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const addresses = Object.keys(this.settings.coins);
-            this.sync.completed = 0;
-
-            const dexzContract = new ethers.Contract(DEXZADDRESS_SEPOLIA, DEXZABI, provider);
-            const pairsLength = parseInt(ethers.BigNumber.from(await dexzContract.pairsLength()).toString());
-            const pairs = this.pairs;
-            this.sync.total = pairsLength;
-            for (let i = 0; i < pairsLength; i++) {
-              const pair = await dexzContract.pair(i);
-              console.log("pair: " + JSON.stringify(pair, null, 2));
-              if (!pair[0] in pairs) {
-                const base = await this.getERC20TokenDetails({ provider }, pair[1]);
-                console.log("base: " + JSON.stringify(base, null, 2));
-                const quote = await this.getERC20TokenDetails({ provider }, pair[2]);
-                console.log("quote: " + JSON.stringify(quote, null, 2));
-                pairs[pair[0]] = {
-                  base,
-                  quote,
-                  multiplier: parseInt(pair[3]),
-                  divisor: parseInt(pair[4]),
-                };
-              }
-              this.sync.completed++;
-            }
-            console.log("pairs: " + JSON.stringify(pairs, null, 2));
-            Vue.set(this, 'pairs', pairs);
-            // console.log("this.pairs: " + JSON.stringify(this.pairs, null, 2));
-            localStorage.dexzPairs = JSON.stringify(this.pairs);
-
-            // this.saveSettings();
             this.sync.section = null;
             this.sync.halt = false;
           },
@@ -1923,8 +1963,8 @@
             Vue.set(this.settings.accounts[account], field, value);
             this.saveSettings();
           },
-          deleteCoin(coin) {
-            Vue.delete(this.settings.coins, coin);
+          deleteToken(coin) {
+            Vue.delete(this.settings.tokens, coin);
             this.saveSettings();
           },
           deleteAccount(account) {
@@ -2193,7 +2233,7 @@
             const confirmedBlockNumber = block && block.number && (block.number - CONFIRMATIONS) || null;
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
-            for (const [address, coinInfo] of Object.entries(this.settings.coins)) {
+            for (const [address, coinInfo] of Object.entries(this.settings.tokens)) {
               if (coinInfo.sync && !this.sync.halt) {
                 const context = { provider, confirmedBlockNumber, db, address, symbol: coinInfo.symbol };
                 // await this.syncCoinTransfers(context);
@@ -2976,7 +3016,7 @@
             this.sync.completed = 0;
             this.sync.total = null;
             const poolsToProcess = [];
-            for (const [coinAddress, coinInfo] of Object.entries(this.settings.coins)) {
+            for (const [coinAddress, coinInfo] of Object.entries(this.settings.tokens)) {
               if (coinInfo.include) {
                 const uniswapV2PoolsDataObject = await context.db.cache.where("objectName").equals(coinAddress + "_uniswapv2pools").toArray();
                 if (uniswapV2PoolsDataObject.length == 1) {
@@ -3141,7 +3181,7 @@
             const transfers = {};
             const pools = {};
             let count = 0;
-            for (const [coinAddress, coinInfo] of Object.entries(this.settings.coins)) {
+            for (const [coinAddress, coinInfo] of Object.entries(this.settings.tokens)) {
               if (coinInfo.include) {
                 console.log(moment().format("HH:mm:ss") + " loadCurrentData: " + coinAddress + " " + coinInfo.symbol + " " + coinInfo.name);
                 const tokenIndex = this.addressToIndex[coinAddress];
@@ -3758,15 +3798,7 @@
           }
           if ('dexzPairs' in localStorage) {
             this.pairs = JSON.parse(localStorage.dexzPairs);
-            console.log("Loaded this.pairs: " + JSON.stringify(this.pairs, null, 2));
           }
-          // if ('selectedCollections' in localStorage) {
-          //   this.selectedCollections = JSON.parse(localStorage.selectedCollections);
-          //   console.log("mounted - selectedCollections: " + JSON.stringify(this.selectedCollections, null, 2));
-          // }
-          // if ('selectedMainTable' in localStorage) {
-          //   this.selectedMainTable = JSON.parse(localStorage.selectedMainTable);
-          // }
           if ('dexzSettings' in localStorage) {
             const tempSettings = JSON.parse(localStorage.dexzSettings);
             if ('version' in tempSettings && tempSettings.version == this.settings.version) {
