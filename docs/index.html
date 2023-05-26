@@ -260,6 +260,9 @@
                 </b-dropdown>
                 -->
               </template>
+              <template #cell(allowance)="data">
+                {{ formatERC20(data.item.allowance, data.item.decimals) }}
+              </template>
               <template #cell(balance)="data">
                 {{ formatERC20(data.item.balance, data.item.decimals) }}
               </template>
@@ -776,6 +779,7 @@
                   "symbol": "BOKKY",
                   "name": "BokkyPooBah wuz here!",
                   "decimals": 18,
+                  "allowance": null,
                   "balance": null,
                   "totalSupply": "1000000000000000000000000",
               },
@@ -786,6 +790,7 @@
                   "symbol": "WEENUS",
                   "name": "Weenus 💪",
                   "decimals": 18,
+                  "allowance": null,
                   "balance": null,
                   "totalSupply": "1008000000000000000000000",
               },
@@ -796,6 +801,7 @@
                   "symbol": "WETH",
                   "name": "Wrapped Ether",
                   "decimals": 18,
+                  "allowance": null,
                   "balance": null,
                   "totalSupply": "0",
               },
@@ -806,6 +812,7 @@
                   "symbol": "XEENUS",
                   "name": "Xeenus 💪",
                   "decimals": 18,
+                  "allowance": null,
                   "balance": null,
                   "totalSupply": "1023000000000000000000000",
               },
@@ -816,6 +823,7 @@
                   "symbol": "YEENUS",
                   "name": "Yeenus 💪",
                   "decimals": 8,
+                  "allowance": null,
                   "balance": null,
                   "totalSupply": "100200000000000",
               },
@@ -826,6 +834,7 @@
                   "symbol": "ZEENUS",
                   "name": "Zeenus 💪",
                   "decimals": 0,
+                  "allowance": null,
                   "balance": null,
                   "totalSupply": "1000000",
               }
@@ -857,7 +866,7 @@
               pageSize: 10,
               sortOption: 'lastsaledsc',
             },
-            version: 2,
+            version: 3,
           },
           newCoinAddress: null,
           newAddress: null,
@@ -956,10 +965,11 @@
             { value: 10000, text: '10k' },
           ],
           coinsFields: [
-            { key: 'address', label: '#', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
-            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+            { key: 'address', label: '#', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
-            { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 7%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'allowance', label: 'Allowance', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
             // { key: 'sync', label: 'Sync', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
@@ -1157,6 +1167,7 @@
                   symbol: item.symbol,
                   name: item.name,
                   decimals: item.decimals,
+                  allowance: item.allowance,
                   balance: item.balance,
                   totalSupply: item.totalSupply,
                   sync: item.sync,
@@ -1680,7 +1691,12 @@
             const addresses = Object.keys(this.settings.coins);
             for (const address of addresses) {
               const erc20 = new ethers.Contract(address, ERC20ABI, provider);
-              let balance = null, totalSupply = null;
+              let allowance = null, balance = null, totalSupply = null;
+              try {
+                allowance = ethers.BigNumber.from(await erc20.allowance(this.coinbase, DEXZADDRESS_SEPOLIA)).toString();
+              } catch (e) {
+                console.log("syncTokens ERROR - allowance - token: " + address + ", message: " + e.message);
+              }
               try {
                 balance = ethers.BigNumber.from(await erc20.balanceOf(this.coinbase)).toString();
               } catch (e) {
@@ -1691,6 +1707,7 @@
               } catch (e) {
                 console.log("syncTokens ERROR - totalSupply - token: " + address + ", message: " + e.message);
               }
+              Vue.set(this.settings.coins[address], 'allowance', allowance);
               Vue.set(this.settings.coins[address], 'balance', balance);
               Vue.set(this.settings.coins[address], 'totalSupply', totalSupply);
             }
