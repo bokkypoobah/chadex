@@ -1866,6 +1866,7 @@
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const addresses = Object.keys(this.settings.tokens);
             this.sync.completed = 0;
+            this.sync.section = "Pairs";
             const dexzContract = new ethers.Contract(DEXZADDRESS_SEPOLIA, DEXZABI, provider);
             const pairsLength = parseInt(ethers.BigNumber.from(await dexzContract.pairsLength()).toString());
             if (pairsLength > Object.keys(this.pairs).length) {
@@ -1886,6 +1887,16 @@
               }
               localStorage.dexzPairs = JSON.stringify(this.pairs);
             }
+            console.log("this.settings.pairTable.selectedPair: " + this.settings.pairTable.selectedPair);
+            if (section == "pair" && this.settings.pairTable.selectedPair in this.pairs) {
+              this.sync.section = "Pair";
+              console.log("Pair");
+              for (let i = 0; i < 2; i++) {
+                const orders = await dexzContract.getOrders(this.settings.pairTable.selectedPair, i, 100, 0, ORDERKEY_SENTINEL);
+                console.log("orders: " + JSON.stringify(orders, null, 2));
+              }
+            }
+
             this.sync.section = null;
             this.sync.halt = false;
           },
