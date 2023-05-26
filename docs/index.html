@@ -51,11 +51,12 @@
             <em v-b-popover.hover.bottom="'gm gm gm'">Dexz</em>
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
-            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings()" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'View/sync Pairs'">Dexz</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings()" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'View/sync Pair'">Dexz</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings()" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'View/sync Pairs'">Pairs</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings()" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'View/sync Pair'">Pair</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View/edit ERC-20 tokens'">Tokens</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings()" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Execute raw Dexz transactions'">Raw</b-nav-item>
-            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings()" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'View/edit my accounts'">Accounts</b-nav-item> -->
+            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings()" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'View info'">Info</b-nav-item>
+            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings()" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'View/edit my accounts'">Accounts</b-nav-item> -->
             <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="processIt('connect')" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
