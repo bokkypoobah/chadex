@@ -228,9 +228,9 @@
             <b-table small fixed striped responsive hover :fields="coinsFields" :items="pagedFilteredSortedCoins" show-empty empty-html="Click [+] above to add a new ERC-20 token contract. Currently only TURBO supported" head-variant="light" class="mx-0 my-1">
               <template #head(address)="data">
                 ERC-20 Token Address <b-link v-b-modal.new-coin-modal-prevent-closing variant="link" v-b-popover.hover.top="'Add new token'"><b-icon-plus-square shift-v="+1" font-scale="0.8"></b-icon-plus-square></b-link>
-                <b-modal id="new-coin-modal-prevent-closing" ref="modal" title="New ERC-20 Coin Address" @show="newCoinAddressResetModal" @hidden="newCoinAddressResetModal" @ok="newCoinAddressHandleOk">
+                <b-modal id="new-coin-modal-prevent-closing" ref="modal" title="New ERC-20 Token Address" @show="newCoinAddressResetModal" @hidden="newCoinAddressResetModal" @ok="newCoinAddressHandleOk">
                   <form ref="coinForm" @submit.stop.prevent="newCoinAddressHandleSubmit">
-                    <b-form-group label="Address" label-for="name-input" :state="newCoinAddressState" description="Pre-filled with WEENUS for initial testing" invalid-feedback="Please enter a valid Ethereum ERC-20 address">
+                    <b-form-group label="Address" label-for="name-input" :state="newCoinAddressState" description="Pre-filled with WEENUS on Sepolia for initial testing" invalid-feedback="Please enter a valid Ethereum ERC-20 address">
                       <b-form-input id="name-input" v-model="newCoinAddress" :state="newCoinAddressState" required placeholder="0x1234..."></b-form-input>
                     </b-form-group>
                   </form>
@@ -296,7 +296,7 @@
                 <!-- <b-form-checkbox size="sm" :checked="data.item.include ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'include')" v-b-popover.hover="'Include in NFTs view?'"></b-form-checkbox> -->
               </template>
               <template #cell(delete)="data">
-                <b-button size="sm" @click="deleteCoin(data.item.address)" variant="link" v-b-popover.hover="'Delete account'"><b-icon-trash style="color: #ff0000;" shift-v="+1" font-scale="1.0"></b-icon-trash></b-button>
+                <b-link size="sm" @click="deleteCoin(data.item.address)" variant="link" v-b-popover.hover="'Delete account'"><b-icon-trash style="color: #ff0000;" shift-v="+1" font-scale="1.0"></b-icon-trash></b-link>
               </template>
             </b-table>
 
