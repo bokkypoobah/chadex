@@ -51,9 +51,11 @@
             <em v-b-popover.hover.bottom="'gm gm gm'">Dexz</em>
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
-            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings()" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'View/sync Dexz Data'">Dexz</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings()" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'View/edit ERC-20 coins'">Tokens</b-nav-item>
-            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View/edit my accounts'">Accounts</b-nav-item> -->
+            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings()" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'View/sync Pairs'">Dexz</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings()" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'View/sync Pair'">Dexz</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View/edit ERC-20 tokens'">Tokens</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings()" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Execute raw Dexz transactions'">Raw</b-nav-item>
+            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings()" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'View/edit my accounts'">Accounts</b-nav-item> -->
             <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="processIt('connect')" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
@@ -139,6 +141,130 @@
           </b-modal>
 
           <b-card v-if="coinbase && settings.tabIndex == 0" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
+            Pairs
+          </b-card>
+
+          <b-card v-if="coinbase && settings.tabIndex == 1" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
+            Pair
+          </b-card>
+
+          <b-card v-if="coinbase && settings.tabIndex == 2" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
+            <div class="d-flex flex-wrap m-0 p-0">
+              <!--
+              <div class="mt-0 pr-1">
+                <b-form-input type="text" size="sm" v-model.trim="settings.coinsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Account address/name filter'" placeholder="🔍 add/name regex" style="min-width: 8.0rem;"></b-form-input>
+              </div>
+              -->
+              <div class="mt-0 flex-grow-1">
+              </div>
+              <div v-if="!sync.section" class="mt-0 pr-1">
+                <b-button size="sm" @click="syncTokens()" variant="primary" v-b-popover.hover.top="'Select token balances and total supply'">Sync</b-button>
+              </div>
+              <div class="mt-0 flex-grow-1">
+              </div>
+              <!--
+              <div class="mt-0 pl-1">
+                <b-form-select size="sm" v-model="settings.coinsTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
+              </div>
+              -->
+              <div class="mt-0 pl-1">
+                <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedCoins.length + '/' + Object.keys(settings.coins).length }}</font>
+              </div>
+              <div class="mt-0 pl-1">
+                <b-pagination size="sm" v-model="settings.coinsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.coinsTable.pageSize" style="height: 0;"></b-pagination>
+              </div>
+              <div class="mt-0 pl-1">
+                <b-form-select size="sm" v-model="settings.coinsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Coins page size'"></b-form-select>
+              </div>
+            </div>
+
+            <b-table small fixed striped responsive hover :fields="coinsFields" :items="pagedFilteredSortedCoins" show-empty empty-html="Click [+] above to add a new ERC-20 token contract. Currently only TURBO supported" head-variant="light" class="mx-0 my-1">
+              <template #head(address)="data">
+                ERC-20 Coin Address <b-button v-b-modal.new-coin-modal-prevent-closing variant="link" v-b-popover.hover.top="'Add new coin'"><b-icon-plus-square shift-v="+1" font-scale="0.8"></b-icon-plus-square></b-button>
+                <b-modal id="new-coin-modal-prevent-closing" ref="modal" title="New ERC-20 Coin Address" @show="newCoinAddressResetModal" @hidden="newCoinAddressResetModal" @ok="newCoinAddressHandleOk">
+                  <form ref="coinForm" @submit.stop.prevent="newCoinAddressHandleSubmit">
+                    <b-form-group label="Address" label-for="name-input" :state="newCoinAddressState" description="Pre-filled with WEENUS for initial testing" invalid-feedback="Please enter a valid Ethereum ERC-20 address">
+                      <b-form-input id="name-input" v-model="newCoinAddress" :state="newCoinAddressState" required placeholder="0x1234..."></b-form-input>
+                    </b-form-group>
+                  </form>
+                </b-modal>
+              </template>
+              <template #head(sync)="data">
+                Sync
+                <!--
+                <b-dropdown size="sm" variant="link" v-b-popover.hover="'Toggle selection'">
+                  <template #button-content>
+                    <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
+                  </template>
+                  <b-dropdown-item href="#" @click="toggleSyncAccounts(pagedFilteredSortedAccounts)">Toggle sync for all accounts on this page</b-dropdown-item>
+                  <b-dropdown-item href="#" @click="toggleSyncAccounts(filteredSortedAccounts)">Toggle sync for all accounts on all pages</b-dropdown-item>
+                </b-dropdown>
+                -->
+              </template>
+              <template #head(include)="data">
+                Include
+                <!--
+                <b-dropdown size="sm" variant="link" v-b-popover.hover="'Toggle selection'">
+                  <template #button-content>
+                    <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
+                  </template>
+                  <b-dropdown-item href="#" @click="toggleIncludeAccounts(pagedFilteredSortedAccounts)">Toggle include for all accounts on this page</b-dropdown-item>
+                  <b-dropdown-item href="#" @click="toggleIncludeAccounts(filteredSortedAccounts)">Toggle include for all accounts on all pages</b-dropdown-item>
+                </b-dropdown>
+                -->
+              </template>
+              <template #cell(balance)="data">
+                {{ formatERC20(data.item.balance, data.item.decimals) }}
+              </template>
+              <template #cell(totalSupply)="data">
+                {{ formatERC20(data.item.totalSupply, data.item.decimals) }}
+              </template>
+              <template #cell(sync)="data">
+                <b-form-checkbox size="sm" :checked="data.item.sync ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'sync')" v-b-popover.hover="'Include in sync process?'"></b-form-checkbox>
+              </template>
+              <template #cell(include)="data">
+                <b-form-checkbox size="sm" :checked="data.item.include ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'include')" v-b-popover.hover="'Include in NFTs view?'"></b-form-checkbox>
+              </template>
+              <template #cell(getSome)="data">
+                <div v-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weenus'">
+                  <b-link @click="mintWeenus(data.item.address);" v-b-popover.hover.top="'Faucet drips 1,000 tokens each tx'">Mint</b-link>
+                </div>
+                <div v-else-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weth'">
+                  <b-link v-b-modal.weth-modal-prevent-closing variant="link" v-b-popover.hover.top="'Wrap/Unwrap ETH'">Convert</b-link>
+                  <b-modal id="weth-modal-prevent-closing" ref="modal" title="ETH To WETH Convertor" @show="wethFormResetModal" @hidden="wethFormResetModal" @ok="wethFormHandleOk">
+                    <form ref="wethForm" @submit.stop.prevent="wethFormHandleSubmit">
+                      <b-form-group label="">
+                        <b-form-radio v-model="wethFormData.direction" value="ew">Wrap ETH</b-form-radio>
+                        <b-form-radio v-model="wethFormData.direction" value="we">Unwrap WETH</b-form-radio>
+                      </b-form-group>
+                      <b-form-group label="Amount" label-for="weth-amount" :state="wethAmountState" invalid-feedback="Please enter a valid amount">
+                        <b-form-input id="weth-amount" v-model="wethFormData.amount" :state="wethAmountState" required placeholder="0.12345"></b-form-input>
+                      </b-form-group>
+                    </form>
+                  </b-modal>
+                </div>
+                <div v-else>
+                  On Exchange
+                </div>
+                <!-- <b-form-checkbox size="sm" :checked="data.item.include ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'include')" v-b-popover.hover="'Include in NFTs view?'"></b-form-checkbox> -->
+              </template>
+              <template #cell(delete)="data">
+                <b-button size="sm" @click="deleteCoin(data.item.address)" variant="link" v-b-popover.hover="'Delete account'"><b-icon-trash style="color: #ff0000;" shift-v="+1" font-scale="1.0"></b-icon-trash></b-button>
+              </template>
+            </b-table>
+
+          </b-card>
+
+          <b-card v-if="coinbase && settings.tabIndex == 3" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
+            <template #header>
+              Raw Interface
+            </template>
+            <b-card-text class="m-0 p-0">
+              Blah
+            </b-card>
+          </b-card>
+
+          <b-card v-if="coinbase && settings.tabIndex == 10" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <div class="d-flex flex-wrap m-0 p-0">
               <div v-if="false" class="mt-0 pr-1">
                 <b-form-input type="text" size="sm" v-model.trim="settings.tokensTable.tokenFilter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Token id and name filter'" placeholder="🔍 token id/name regex" style="min-width: 8.0rem;"></b-form-input>
@@ -408,114 +534,9 @@
             </b-table>
           </b-card>
 
-          <b-card v-if="coinbase && settings.tabIndex == 1" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
-            <div class="d-flex flex-wrap m-0 p-0">
-              <!--
-              <div class="mt-0 pr-1">
-                <b-form-input type="text" size="sm" v-model.trim="settings.coinsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Account address/name filter'" placeholder="🔍 add/name regex" style="min-width: 8.0rem;"></b-form-input>
-              </div>
-              -->
-              <div class="mt-0 flex-grow-1">
-              </div>
-              <div v-if="!sync.section" class="mt-0 pr-1">
-                <b-button size="sm" @click="syncTokens()" variant="primary" v-b-popover.hover.top="'Select token balances and total supply'">Sync</b-button>
-              </div>
-              <div class="mt-0 flex-grow-1">
-              </div>
-              <!--
-              <div class="mt-0 pl-1">
-                <b-form-select size="sm" v-model="settings.coinsTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
-              </div>
-              -->
-              <div class="mt-0 pl-1">
-                <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedCoins.length + '/' + Object.keys(settings.coins).length }}</font>
-              </div>
-              <div class="mt-0 pl-1">
-                <b-pagination size="sm" v-model="settings.coinsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.coinsTable.pageSize" style="height: 0;"></b-pagination>
-              </div>
-              <div class="mt-0 pl-1">
-                <b-form-select size="sm" v-model="settings.coinsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Coins page size'"></b-form-select>
-              </div>
-            </div>
 
-            <b-table small fixed striped responsive hover :fields="coinsFields" :items="pagedFilteredSortedCoins" show-empty empty-html="Click [+] above to add a new ERC-20 token contract. Currently only TURBO supported" head-variant="light" class="mx-0 my-1">
-              <template #head(address)="data">
-                ERC-20 Coin Address <b-button v-b-modal.new-coin-modal-prevent-closing variant="link" v-b-popover.hover.top="'Add new coin'"><b-icon-plus-square shift-v="+1" font-scale="0.8"></b-icon-plus-square></b-button>
-                <b-modal id="new-coin-modal-prevent-closing" ref="modal" title="New ERC-20 Coin Address" @show="newCoinAddressResetModal" @hidden="newCoinAddressResetModal" @ok="newCoinAddressHandleOk">
-                  <form ref="coinForm" @submit.stop.prevent="newCoinAddressHandleSubmit">
-                    <b-form-group label="Address" label-for="name-input" :state="newCoinAddressState" description="Pre-filled with WEENUS for initial testing" invalid-feedback="Please enter a valid Ethereum ERC-20 address">
-                      <b-form-input id="name-input" v-model="newCoinAddress" :state="newCoinAddressState" required placeholder="0x1234..."></b-form-input>
-                    </b-form-group>
-                  </form>
-                </b-modal>
-              </template>
-              <template #head(sync)="data">
-                Sync
-                <!--
-                <b-dropdown size="sm" variant="link" v-b-popover.hover="'Toggle selection'">
-                  <template #button-content>
-                    <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
-                  </template>
-                  <b-dropdown-item href="#" @click="toggleSyncAccounts(pagedFilteredSortedAccounts)">Toggle sync for all accounts on this page</b-dropdown-item>
-                  <b-dropdown-item href="#" @click="toggleSyncAccounts(filteredSortedAccounts)">Toggle sync for all accounts on all pages</b-dropdown-item>
-                </b-dropdown>
-                -->
-              </template>
-              <template #head(include)="data">
-                Include
-                <!--
-                <b-dropdown size="sm" variant="link" v-b-popover.hover="'Toggle selection'">
-                  <template #button-content>
-                    <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
-                  </template>
-                  <b-dropdown-item href="#" @click="toggleIncludeAccounts(pagedFilteredSortedAccounts)">Toggle include for all accounts on this page</b-dropdown-item>
-                  <b-dropdown-item href="#" @click="toggleIncludeAccounts(filteredSortedAccounts)">Toggle include for all accounts on all pages</b-dropdown-item>
-                </b-dropdown>
-                -->
-              </template>
-              <template #cell(balance)="data">
-                {{ formatERC20(data.item.balance, data.item.decimals) }}
-              </template>
-              <template #cell(totalSupply)="data">
-                {{ formatERC20(data.item.totalSupply, data.item.decimals) }}
-              </template>
-              <template #cell(sync)="data">
-                <b-form-checkbox size="sm" :checked="data.item.sync ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'sync')" v-b-popover.hover="'Include in sync process?'"></b-form-checkbox>
-              </template>
-              <template #cell(include)="data">
-                <b-form-checkbox size="sm" :checked="data.item.include ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'include')" v-b-popover.hover="'Include in NFTs view?'"></b-form-checkbox>
-              </template>
-              <template #cell(getSome)="data">
-                <div v-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weenus'">
-                  <b-link @click="mintWeenus(data.item.address);" v-b-popover.hover.top="'Faucet drips 1,000 tokens each tx'">Mint</b-link>
-                </div>
-                <div v-else-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weth'">
-                  <b-link v-b-modal.weth-modal-prevent-closing variant="link" v-b-popover.hover.top="'Wrap/Unwrap ETH'">Convert</b-link>
-                  <b-modal id="weth-modal-prevent-closing" ref="modal" title="ETH To WETH Convertor" @show="wethFormResetModal" @hidden="wethFormResetModal" @ok="wethFormHandleOk">
-                    <form ref="wethForm" @submit.stop.prevent="wethFormHandleSubmit">
-                      <b-form-group label="">
-                        <b-form-radio v-model="wethFormData.direction" value="ew">Wrap ETH</b-form-radio>
-                        <b-form-radio v-model="wethFormData.direction" value="we">Unwrap WETH</b-form-radio>
-                      </b-form-group>
-                      <b-form-group label="Amount" label-for="weth-amount" :state="wethAmountState" invalid-feedback="Please enter a valid amount">
-                        <b-form-input id="weth-amount" v-model="wethFormData.amount" :state="wethAmountState" required placeholder="0.12345"></b-form-input>
-                      </b-form-group>
-                    </form>
-                  </b-modal>
-                </div>
-                <div v-else>
-                  On Exchange
-                </div>
-                <!-- <b-form-checkbox size="sm" :checked="data.item.include ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'include')" v-b-popover.hover="'Include in NFTs view?'"></b-form-checkbox> -->
-              </template>
-              <template #cell(delete)="data">
-                <b-button size="sm" @click="deleteCoin(data.item.address)" variant="link" v-b-popover.hover="'Delete account'"><b-icon-trash style="color: #ff0000;" shift-v="+1" font-scale="1.0"></b-icon-trash></b-button>
-              </template>
-            </b-table>
 
-          </b-card>
-
-          <b-card v-if="coinbase && settings.tabIndex == 2" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
+          <b-card v-if="coinbase && settings.tabIndex == 40" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <div class="d-flex flex-wrap m-0 p-0">
               <!--
               <div class="mt-0 pr-1">
