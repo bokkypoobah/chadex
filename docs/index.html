@@ -260,6 +260,11 @@
                 </b-dropdown>
                 -->
               </template>
+              <template #cell(address)="data">
+                <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.address + '#code'" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                  {{ data.item.address }}
+                </b-link>
+              </template>
               <template #cell(allowance)="data">
                 {{ formatERC20(data.item.allowance, data.item.decimals) }}
               </template>
@@ -353,7 +358,7 @@
                   </b-form-group>
                 </b-card-body>
               </b-card>
-            </b-card>
+            </b-card-text>
           </b-card>
 
           <b-card v-if="coinbase && settings.tabIndex == 4" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
@@ -361,25 +366,17 @@
               Info
             </template>
             <b-card-text class="m-0 p-0">
-              WIP - See Tokens & Raw
-              <!-- <b-card no-body no-header bg-variant="light" class="m-1 p-1 w-75">
+              <b-card no-body no-header bg-variant="light" class="m-1 p-1 w-75">
                 <b-card-body class="m-1 p-1">
-                  <b-form-group label-cols-lg="2" label="Raw Dexz" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
-                    <b-form-group label="To:" label-for="message-to" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="message-to" v-model.trim="message.to" placeholder="0x1234... (optional)" class="w-50"></b-form-input>
-                    </b-form-group>
-                    <b-form-group label="Topic:" label-for="message-topic" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="message-topic" v-model.trim="message.topic" placeholder="{topic}" class="w-50"></b-form-input>
-                    </b-form-group>
-                    <b-form-group label="Text:" label-for="message-text" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="message-text" v-model.trim="message.text" placeholder="{text}" class="w-75"></b-form-input>
-                    </b-form-group>
-                    <b-form-group label="" label-for="message-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-button size="sm" :disabled="message.topic == null && message.text == null" id="message-submit" @click="sendMessage()" variant="warning">Send Message</b-button>
+                  <b-form-group label-cols-lg="2" label="Dexz Info" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
+                    <b-form-group label="Address:" label-for="info-dexzaddress" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-link id="info-dexzaddress" :href="'https://sepolia.etherscan.io/address/' + dexzAddress + '#code'" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                        {{ dexzAddress }}
+                      </b-link>
                     </b-form-group>
                   </b-form-group>
                 </b-card-body>
-              </b-card> -->
+              </b-card>
             </b-card-text>
           </b-card>
 
@@ -965,7 +962,7 @@
             { value: 10000, text: '10k' },
           ],
           coinsFields: [
-            { key: 'address', label: '#', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 7%;', thClass: 'text-right', tdClass: 'text-right' },
@@ -1045,6 +1042,9 @@
 
         // --- COMPUTED ---
         computed: {
+          dexzAddress() {
+            return DEXZADDRESS_SEPOLIA;
+          },
           getAllGroups() {
             const groupsMap = {};
             for (const token of this.filteredTransfers) {
