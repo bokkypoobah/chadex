@@ -146,25 +146,40 @@
               Pairs
             </template>
             <b-card-text class="m-0 p-0">
-              WIP - See Tokens & Raw
-              <!-- <b-card no-body no-header bg-variant="light" class="m-1 p-1 w-75">
-                <b-card-body class="m-1 p-1">
-                  <b-form-group label-cols-lg="2" label="Raw Dexz" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
-                    <b-form-group label="To:" label-for="message-to" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="message-to" v-model.trim="message.to" placeholder="0x1234... (optional)" class="w-50"></b-form-input>
-                    </b-form-group>
-                    <b-form-group label="Topic:" label-for="message-topic" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="message-topic" v-model.trim="message.topic" placeholder="{topic}" class="w-50"></b-form-input>
-                    </b-form-group>
-                    <b-form-group label="Text:" label-for="message-text" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="message-text" v-model.trim="message.text" placeholder="{text}" class="w-75"></b-form-input>
-                    </b-form-group>
-                    <b-form-group label="" label-for="message-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-button size="sm" :disabled="message.topic == null && message.text == null" id="message-submit" @click="sendMessage()" variant="warning">Send Message</b-button>
-                    </b-form-group>
-                  </b-form-group>
-                </b-card-body>
-              </b-card> -->
+              <div class="d-flex flex-wrap m-0 p-0">
+                <!-- <div class="mt-0 pr-1">
+                  <b-form-input type="text" size="sm" v-model.trim="settings.coinsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Account address/name filter'" placeholder="🔍 add/name regex" style="min-width: 8.0rem;"></b-form-input>
+                </div>                -->
+                <div class="mt-0 flex-grow-1">
+                </div>
+                <div v-if="!sync.section" class="mt-0 pr-1">
+                  <b-button size="sm" @click="syncDexz()" variant="primary" v-b-popover.hover.top="'Sync Dexz'">Sync</b-button>
+                </div>
+                <div class="mt-1" style="width: 250px;">
+                  <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
+                    <b-progress-bar :value="sync.completed">
+                      {{ sync.total == null || sync.total == 0 ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
+                    </b-progress-bar>
+                  </b-progress>
+                </div>
+                <div class="ml-0 mt-1">
+                  <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.top="'Click to stop. It may take a few minutes to clean up. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
+                </div>
+                <div class="mt-0 flex-grow-1">
+                </div>
+                <!-- <div class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.coinsTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
+                </div> -->
+                <!-- <div class="mt-0 pl-1">
+                  <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedCoins.length + '/' + Object.keys(settings.coins).length }}</font>
+                </div> -->
+                <!-- <div class="mt-0 pl-1">
+                  <b-pagination size="sm" v-model="settings.coinsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.coinsTable.pageSize" style="height: 0;"></b-pagination>
+                </div> -->
+                <!-- <div class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.coinsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
+                </div> -->
+              </div>
             </b-card-text>
           </b-card>
 
@@ -200,11 +215,9 @@
               Tokens
             </template>
             <div class="d-flex flex-wrap m-0 p-0">
-              <!--
-              <div class="mt-0 pr-1">
+              <!-- <div class="mt-0 pr-1">
                 <b-form-input type="text" size="sm" v-model.trim="settings.coinsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Account address/name filter'" placeholder="🔍 add/name regex" style="min-width: 8.0rem;"></b-form-input>
-              </div>
-              -->
+              </div>              -->
               <div class="mt-0 flex-grow-1">
               </div>
               <div v-if="!sync.section" class="mt-0 pr-1">
@@ -934,6 +947,8 @@
           indexToName: {},
           indexToSymbols: {},
           indexToDecimals: {},
+
+          pairs: {},
 
           transfers: {},
           pools: {},
@@ -1760,6 +1775,42 @@
               this.sync.completed++;
             }
             this.saveSettings();
+            this.sync.section = null;
+            this.sync.halt = false;
+          },
+          async syncDexz() {
+            console.log("syncTokens");
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const addresses = Object.keys(this.settings.coins);
+            this.sync.completed = 0;
+
+            const dexzContract = new ethers.Contract(DEXZADDRESS_SEPOLIA, DEXZABI, provider);
+            const pairsLength = parseInt(ethers.BigNumber.from(await dexzContract.pairsLength()).toString());
+            const pairs = this.pairs;
+            this.sync.total = pairsLength;
+            for (let i = 0; i < pairsLength; i++) {
+              const pair = await dexzContract.pair(i);
+              console.log("pair: " + JSON.stringify(pair, null, 2));
+              if (!pair[0] in pairs) {
+                const base = await this.getERC20TokenDetails({ provider }, pair[1]);
+                console.log("base: " + JSON.stringify(base, null, 2));
+                const quote = await this.getERC20TokenDetails({ provider }, pair[2]);
+                console.log("quote: " + JSON.stringify(quote, null, 2));
+                pairs[pair[0]] = {
+                  base,
+                  quote,
+                  multiplier: parseInt(pair[3]),
+                  divisor: parseInt(pair[4]),
+                };
+              }
+              this.sync.completed++;
+            }
+            console.log("pairs: " + JSON.stringify(pairs, null, 2));
+            Vue.set(this, 'pairs', pairs);
+            // console.log("this.pairs: " + JSON.stringify(this.pairs, null, 2));
+            localStorage.dexzPairs = JSON.stringify(this.pairs);
+
+            // this.saveSettings();
             this.sync.section = null;
             this.sync.halt = false;
           },
@@ -3704,6 +3755,10 @@
           }
           if ('dexzChainId' in localStorage) {
             this.chainId = localStorage.dexzChainId;
+          }
+          if ('dexzPairs' in localStorage) {
+            this.pairs = JSON.parse(localStorage.dexzPairs);
+            console.log("Loaded this.pairs: " + JSON.stringify(this.pairs, null, 2));
           }
           // if ('selectedCollections' in localStorage) {
           //   this.selectedCollections = JSON.parse(localStorage.selectedCollections);
