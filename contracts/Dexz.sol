@@ -148,7 +148,7 @@ contract DexzBase {
     event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens);
     event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, Tokens filled);
     event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens);
-    event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, Account indexed taker, Account maker, uint tokens, uint quoteTokens, Price price);
+    // event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, Account indexed taker, Account maker, uint tokens, uint quoteTokens, Price price);
     event TradeSummary(BuySell buySell, Account indexed taker, Tokens filled, Tokens quoteTokensFilled, Price price, Tokens tokensOnOrder);
 
     error CannotRemoveMissingOrder();

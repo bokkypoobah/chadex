@@ -274,10 +274,10 @@
               </template>
               <template #cell(getSome)="data">
                 <div v-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weenus'">
-                  <b-link @click="mintWeenus(data.item.address);" v-b-popover.hover.top="'Faucet drips 1,000 tokens each 0 value tx'">Drip</b-link>
+                  <b-link @click="mintWeenus(data.item.address);" v-b-popover.hover.top="'Faucet drips 1,000 tokens each 0 value tx. Click Sync after tx included'">Drip</b-link>
                 </div>
                 <div v-else-if="tokenInfo[data.item.address] && tokenInfo[data.item.address].faucet == 'weth'">
-                  <b-link v-b-modal.weth-modal-prevent-closing variant="link" v-b-popover.hover.top="'Wrap/Unwrap ETH'">Convert</b-link>
+                  <b-link v-b-modal.weth-modal-prevent-closing variant="link" v-b-popover.hover.top="'Wrap/Unwrap ETH. Click Sync after tx included'">Convert</b-link>
                   <b-modal id="weth-modal-prevent-closing" ref="modal" title="ETH To WETH Convertor" @show="wethFormResetModal" @hidden="wethFormResetModal" @ok="wethFormHandleOk">
                     <form ref="wethForm" @submit.stop.prevent="wethFormHandleSubmit">
                       <b-form-group label="">
@@ -310,22 +310,25 @@
               <b-card no-body no-header bg-variant="light" class="m-1 p-1 w-75">
                 <b-card-body class="m-1 p-1">
                   <b-form-group label-cols-lg="2" label="Dexz Execute" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
-                    <b-form-group label="Base Token:" label-for="raw-basetoken" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="raw-basetoken" v-model.trim="raw.base" placeholder="0x1234..." class="w-50"></b-form-input>
+                    <b-form-group label="Action:" label-for="raw-action" label-size="sm" label-cols-sm="2" label-align-sm="right" description="'0' fill, '1' fill or kill, '2' fill & add order, '3' remove order, '5' update expiry and tokens" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="raw-action" v-model.trim="raw.action" placeholder="'0' to '4'" class="w-25"></b-form-input>
                     </b-form-group>
-                    <b-form-group label="Quote Token:" label-for="raw-quotetoken" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="raw-quotetoken" v-model.trim="raw.quote" placeholder="0x1234..." class="w-50"></b-form-input>
+                    <b-form-group label="Base Token:" label-for="raw-basetoken" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Defaults to WEENUS" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="raw-basetoken" v-model.trim="raw.base" placeholder="0x1234..." class="w-75"></b-form-input>
                     </b-form-group>
-                    <b-form-group label="Buy or Sell:" label-for="raw-buysell" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="raw-buysell" v-model.trim="raw.buysell" placeholder="'b' or 's'" class="w-50"></b-form-input>
+                    <b-form-group label="Quote Token:" label-for="raw-quotetoken" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Defaults to WETH" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="raw-quotetoken" v-model.trim="raw.quote" placeholder="0x1234..." class="w-75"></b-form-input>
                     </b-form-group>
-                    <b-form-group label="Price:" label-for="raw-price" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="raw-price" v-model.trim="raw.price" placeholder="0.691234567" class="w-50"></b-form-input>
+                    <b-form-group label="Buy or Sell:" label-for="raw-buysell" label-size="sm" label-cols-sm="2" label-align-sm="right" description="'0' buy, '1' sell" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="raw-buysell" v-model.trim="raw.buySell" placeholder="'0' or '1'" class="w-25"></b-form-input>
                     </b-form-group>
-                    <b-form-group label="Expiry:" label-for="raw-expiry" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="raw-expiry" v-model.trim="raw.expiry" placeholder="Unix time. '0' for no expiry" class="w-50"></b-form-input>
+                    <b-form-group label="Price:" label-for="raw-price" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Raw prices with 9 decimal places" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="raw-price" v-model.trim="raw.price" placeholder="e.g. '690100000' for 0.69" class="w-25"></b-form-input>
                     </b-form-group>
-                    <b-form-group label="Tokens:" label-for="raw-tokens" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                    <b-form-group label="Expiry:" label-for="raw-expiry" label-size="sm" label-cols-sm="2" label-align-sm="right"  description="Unix time. '0' for no expiry" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="raw-expiry" v-model.trim="raw.expiry" placeholder="e.g. '1704027599' for 23:59:59 31/12/2023" class="w-25"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Tokens:" label-for="raw-tokens" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Raw tokens, without decimals. e.g. 1e = '1000000000000000000'" class="mx-0 my-1 p-0">
                       <b-form-input type="text" size="sm" id="raw-tokens" v-model.trim="raw.tokens" placeholder="1.01234567891234567" class="w-50"></b-form-input>
                     </b-form-group>
                     <b-form-group label="" label-for="raw-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -863,12 +866,13 @@
             amount: null,
           },
           raw: {
-            base: null,
-            quote: null,
-            buySell: null,
-            price: null,
-            expiry: null,
-            tokens: null,
+            action: 0,
+            base: "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9",
+            quote: "0x07391dbE03e7a0DEa0fce6699500da081537B6c3",
+            buySell: 0,
+            price: 690100000,
+            expiry: 1704027599,
+            tokens: "1000000000000000000",
           },
 
           restoreFile: null,
@@ -1903,26 +1907,55 @@
             this.saveSettings();
           },
           async mintWeenus(weenusAddress) {
-              console.log("mintWeenus()");
-              const provider = new ethers.providers.Web3Provider(window.ethereum);
-              const signer = provider.getSigner();
-              try {
-                const tx = await signer.sendTransaction({ to: weenusAddress, value: "0" });
-                console.log("tx: " + JSON.stringify(tx));
-              } catch (e) {
-                console.log("mintWeenus error: " + JSON.stringify(e));
-              }
+            console.log("mintWeenus()");
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            try {
+              const tx = await signer.sendTransaction({ to: weenusAddress, value: "0" });
+              console.log("tx: " + JSON.stringify(tx));
+            } catch (e) {
+              console.log("mintWeenus error: " + JSON.stringify(e));
+            }
           },
           async executeRaw() {
-              console.log("executeRaw(): " + JSON.stringify(this.raw, null, 2));
-              // const provider = new ethers.providers.Web3Provider(window.ethereum);
-              // const signer = provider.getSigner();
-              // try {
-              //   const tx = await signer.sendTransaction({ to: weenusAddress, value: "0" });
-              //   console.log("tx: " + JSON.stringify(tx));
-              // } catch (e) {
-              //   console.log("mintWeenus error: " + JSON.stringify(e));
-              // }
+            // raw: {
+            //   action: null,
+            //   base: null,
+            //   quote: null,
+            //   buySell: null,
+            //   price: null,
+            //   expiry: null,
+            //   tokens: null,
+            // },
+            console.log("executeRaw(): " + JSON.stringify(this.raw, null, 2));
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const dexzContract = new ethers.Contract(DEXZADDRESS_SEPOLIA, DEXZABI, provider);
+            const dexzContractWithSigner = dexzContract.connect(provider.getSigner());
+
+            // struct Info {
+            //     Action action;
+            //     BuySell buySell;
+            //     Token base;
+            //     Token quote;
+            //     Price price;
+            //     Unixtime expiry;
+            //     Delta tokens;
+            // }
+
+
+            try {
+              const tx = await dexzContractWithSigner.execute([this.raw]);
+              console.log("tx: " + JSON.stringify(tx));
+            } catch (e) {
+              console.log("swapIt error: " + JSON.stringify(e));
+            }
+            // const signer = provider.getSigner();
+            // try {
+            //   const tx = await signer.sendTransaction({ to: weenusAddress, value: "0" });
+            //   console.log("tx: " + JSON.stringify(tx));
+            // } catch (e) {
+            //   console.log("mintWeenus error: " + JSON.stringify(e));
+            // }
           },
           async mintWeth(wethAddress, action) {
               console.log("mintWeth - action: " + action);
