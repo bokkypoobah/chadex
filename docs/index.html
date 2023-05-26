@@ -309,7 +309,29 @@
             <b-card-text class="m-0 p-0">
               <b-card no-body no-header bg-variant="light" class="m-1 p-1 w-75">
                 <b-card-body class="m-1 p-1">
-                  <b-form-group label-cols-lg="2" label="Raw Dexz" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
+                  <b-form-group label-cols-lg="2" label="Dexz Execute" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
+                    <b-form-group label="Base Token:" label-for="raw-basetoken" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="raw-basetoken" v-model.trim="raw.base" placeholder="0x1234..." class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Quote Token:" label-for="raw-quotetoken" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="raw-quotetoken" v-model.trim="raw.quote" placeholder="0x1234..." class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Buy or Sell:" label-for="raw-buysell" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="raw-buysell" v-model.trim="raw.buysell" placeholder="'b' or 's'" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Price:" label-for="raw-price" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="raw-price" v-model.trim="raw.price" placeholder="0.691234567" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Expiry:" label-for="raw-expiry" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="raw-expiry" v-model.trim="raw.expiry" placeholder="Unix time. '0' for no expiry" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Tokens:" label-for="raw-tokens" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="raw-tokens" v-model.trim="raw.tokens" placeholder="1.01234567891234567" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="" label-for="raw-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-button size="sm" :disabled="false" id="raw-submit" @click="executeRaw()" variant="warning">Execute</b-button>
+                    </b-form-group>
+
                     <!-- <b-form-group label="To:" label-for="message-to" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-form-input type="text" size="sm" id="message-to" v-model.trim="message.to" placeholder="0x1234... (optional)" class="w-50"></b-form-input>
                     </b-form-group>
@@ -839,6 +861,14 @@
           wethFormData: {
             direction: "ew",
             amount: null,
+          },
+          raw: {
+            base: null,
+            quote: null,
+            buySell: null,
+            price: null,
+            expiry: null,
+            tokens: null,
           },
 
           restoreFile: null,
@@ -1882,6 +1912,17 @@
               } catch (e) {
                 console.log("mintWeenus error: " + JSON.stringify(e));
               }
+          },
+          async executeRaw() {
+              console.log("executeRaw(): " + JSON.stringify(this.raw, null, 2));
+              // const provider = new ethers.providers.Web3Provider(window.ethereum);
+              // const signer = provider.getSigner();
+              // try {
+              //   const tx = await signer.sendTransaction({ to: weenusAddress, value: "0" });
+              //   console.log("tx: " + JSON.stringify(tx));
+              // } catch (e) {
+              //   console.log("mintWeenus error: " + JSON.stringify(e));
+              // }
           },
           async mintWeth(wethAddress, action) {
               console.log("mintWeth - action: " + action);
