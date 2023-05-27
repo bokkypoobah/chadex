@@ -1917,6 +1917,28 @@
                 }
                 console.log("records: " + JSON.stringify(records));
               }
+
+              const block = await provider.getBlock();
+              const blockNumber = block.number;
+              const startBlock = 0; // UMSWAPFACTORYDEPLOYMENTBLOCK;
+              const endBlock = blockNumber;
+              const filter = {
+                address: DEXZADDRESS_SEPOLIA,
+                fromBlock: startBlock,
+                toBlock: endBlock,
+                topics: [
+                  null,
+                  // [
+                  //   '0x077e1cf6babf9ad326aba5f77f1dc9829deb8eb27be7e883108bb3837ad0214e', // NewUmswap (index_topic_1 address creator, uint256 timestamp, index_topic_2 address umswap, index_topic_3 address collection, string name, uint256[] tokenIds)
+                  //   '0xecf7cba0a43f1cd8521a490776b3d7ce17c6521eb4e164acede254de0551ba7f', // Message (index_topic_1 address from, uint256 timestamp, index_topic_2 address to, index_topic_3 address umswapOrCollection, string topic, string message)
+                  // ],
+                  null,
+                  null,
+                ],
+              };
+
+              const eventLogs = await provider.getLogs(filter);
+              console.log("eventLogs: " + JSON.stringify(eventLogs));
             }
 
             this.sync.section = null;
