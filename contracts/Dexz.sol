@@ -44,6 +44,7 @@ type Tokens is uint128;
 type Unixtime is uint64;
 
 enum BuySell { Buy, Sell }
+// enum Action { FillAny, FillAllOrNothing, FillAnyAndAddOrUpdateOrder(unique on price - update expiry and tokens), RemoveOrder }
 enum Action { FillAny, FillAllOrNothing, FillAnyAndAddOrder, RemoveOrder, UpdateExpiryAndTokens }
 
 
@@ -122,8 +123,8 @@ contract DexzBase {
         Factor divisor;
     }
 
-    uint8 constant public PRICE_DECIMALS = 9;
-    uint constant public TENPOW18 = uint(10)**18;
+    uint8 public constant PRICE_DECIMALS = 9;
+    uint public constant TENPOW18 = uint(10)**18;
     Price public constant PRICE_EMPTY = Price.wrap(0);
     Price public constant PRICE_MIN = Price.wrap(1);
     Price public constant PRICE_MAX = Price.wrap(999_999_999_999_999_999); // 2^64 = 18,446,744,073,709,551,616
@@ -212,6 +213,30 @@ contract DexzBase {
         return OrderKey.wrap(keccak256(abi.encodePacked(buySell, maker, base, quote, price)));
     }
 
+
+    // 123 => 123 * 10-18
+    // Allow to
+    // type Decimals18 uint256;
+
+    // Price:
+    // Want to allow 0.000 111 111 111 which is 999 999 999 * 10^-12
+    // Want to allow 999 999 999 000.0 which is 999 999 999 * 10^3
+    // Want to represent by 999 999 999 * 10^-12 to 999 999 999 * 10^3
+
+    // ERC-20
+    // ONLY permit decimals from 0 to 24
+    // Want to do token calculations on uint precision
+    // Want to limit calculated range within a safe range
+
+    // Can limit DEX trading Tokens, to limit the input
+
+    // Remove Delta - make the tokens calculated get updated
+
+
+    // 2^16 = 65,536
+    // 2^32 = 4,294,967,296
+    // 2^48 = 281,474,976,710,656
+    // 2^60 = 1, 152,921,504, 606,846,976
     // 2^64 = 18, 446,744,073,709,551,616
     // 2^128 = 340, 282,366,920,938,463,463, 374,607,431,768,211,456
     // 2^256 = 115,792, 089,237,316,195,423,570, 985,008,687,907,853,269, 984,665,640,564,039,457, 584,007,913,129,639,936
@@ -278,6 +303,8 @@ contract Dexz is DexzBase, ReentrancyGuard {
         if (Token.unwrap(pair.base) == address(0)) {
             uint8 baseDecimals = IERC20(Token.unwrap(info.base)).decimals();
             uint8 quoteDecimals = IERC20(Token.unwrap(info.quote)).decimals();
+            // TODO Permit ERC-20 token decimals from 0 to 24
+            // / 10^0 to / 10^24
             if (baseDecimals >= quoteDecimals) {
                 multiplier = Factor.wrap(baseDecimals - quoteDecimals + PRICE_DECIMALS);
                 divisor = Factor.wrap(0);
