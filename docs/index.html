@@ -386,7 +386,7 @@
               <b-card no-body no-header bg-variant="light" class="m-1 p-1 w-75">
                 <b-card-body class="m-1 p-1">
                   <b-form-group label-cols-lg="2" label="Dexz Execute" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
-                    <b-form-group label="Action:" label-for="raw-action" label-size="sm" label-cols-sm="2" label-align-sm="right" description="'0' fill, '1' fill or kill, '2' fill & add order, '3' remove order, '5' update expiry and tokens" class="mx-0 my-1 p-0">
+                    <b-form-group label="Action:" label-for="raw-action" label-size="sm" label-cols-sm="2" label-align-sm="right" description="'0' fill, '1' fill or kill, '2' fill & add order, '3' remove order, '4' update expiry and tokens" class="mx-0 my-1 p-0">
                       <b-form-input type="text" size="sm" id="raw-action" v-model.trim="raw.action" placeholder="'0' to '4'" class="w-25"></b-form-input>
                     </b-form-group>
                     <b-form-group label="Base Token:" label-for="raw-basetoken" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Defaults to WEENUS" class="mx-0 my-1 p-0">
@@ -398,8 +398,8 @@
                     <b-form-group label="Buy or Sell:" label-for="raw-buysell" label-size="sm" label-cols-sm="2" label-align-sm="right" description="'0' buy, '1' sell" class="mx-0 my-1 p-0">
                       <b-form-input type="text" size="sm" id="raw-buysell" v-model.trim="raw.buySell" placeholder="'0' or '1'" class="w-25"></b-form-input>
                     </b-form-group>
-                    <b-form-group label="Price:" label-for="raw-price" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Raw prices with 9 decimal places" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="raw-price" v-model.trim="raw.price" placeholder="e.g. '690100000' for 0.69" class="w-25"></b-form-input>
+                    <b-form-group label="Price:" label-for="raw-price" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Raw prices with 12 decimal places" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="raw-price" v-model.trim="raw.price" placeholder="e.g. '690100000000' for 0.69" class="w-50"></b-form-input>
                     </b-form-group>
                     <b-form-group label="Expiry:" label-for="raw-expiry" label-size="sm" label-cols-sm="2" label-align-sm="right"  description="Unix time. '0' for no expiry" class="mx-0 my-1 p-0">
                       <b-form-input type="text" size="sm" id="raw-expiry" v-model.trim="raw.expiry" placeholder="e.g. '1704027599' for 23:59:59 31/12/2023" class="w-25"></b-form-input>
@@ -965,11 +965,11 @@
             amount: null,
           },
           raw: {
-            action: 0,
+            action: 2,
             base: "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9",
             quote: "0x07391dbE03e7a0DEa0fce6699500da081537B6c3",
             buySell: 0,
-            price: 690100000,
+            price: 690100000000,
             expiry: 1704027599,
             tokens: "1000000000000000000",
           },
@@ -1870,7 +1870,7 @@
             this.sync.section = "Pairs";
             const dexzContract = new ethers.Contract(DEXZADDRESS_SEPOLIA, DEXZABI, provider);
             const pairsLength = parseInt(ethers.BigNumber.from(await dexzContract.pairsLength()).toString());
-            if (pairsLength > Object.keys(this.pairs).length) {
+            // if (pairsLength > Object.keys(this.pairs).length) {
               this.sync.total = pairsLength;
               for (let i = 0; i < pairsLength; i++) {
                 const [pairKey, baseAddress, quoteAddress, multiplier, divisor] = await dexzContract.pair(i);
@@ -1887,7 +1887,7 @@
                 this.sync.completed++;
               }
               localStorage.dexzPairs = JSON.stringify(this.pairs);
-            }
+            // }
             console.log("this.settings.pairTable.selectedPair: " + this.settings.pairTable.selectedPair);
             if (section == "pair" && this.settings.pairTable.selectedPair in this.pairs) {
               this.sync.section = "Pair";
