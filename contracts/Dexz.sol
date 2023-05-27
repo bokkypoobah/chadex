@@ -7,14 +7,6 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 //
 // STATUS: In Development
 //
-// Notes:
-//   quoteTokens = divisor * baseTokens * price / 10^9 / multiplier
-//   baseTokens = multiplier * quoteTokens * 10^9 / price / divisor
-//   price = multiplier * quoteTokens * 10^9 / baseTokens / divisor
-// Including the 10^9 with the multiplier:
-//   quoteTokens = divisor * baseTokens * price / multiplier
-//   baseTokens = multiplier * quoteTokens / price / divisor
-//   price = multiplier * quoteTokens / baseTokens / divisor
 //
 // TODO:
 //   * Work around stack too deep requiring IR that is not easy to source validate
@@ -130,6 +122,7 @@ contract DexzBase {
         Factor divisor;
     }
 
+    uint8 constant public PRICE_DECIMALS = 9;
     uint constant public TENPOW18 = uint(10)**18;
     Price public constant PRICE_EMPTY = Price.wrap(0);
     Price public constant PRICE_MIN = Price.wrap(1);
@@ -218,6 +211,22 @@ contract DexzBase {
     function generateOrderKey(BuySell buySell, Account maker, Token base, Token quote, Price price) internal pure returns (OrderKey) {
         return OrderKey.wrap(keccak256(abi.encodePacked(buySell, maker, base, quote, price)));
     }
+
+    // 2^64 = 18, 446,744,073,709,551,616
+    // 2^128 = 340, 282,366,920,938,463,463, 374,607,431,768,211,456
+    // 2^256 = 115,792, 089,237,316,195,423,570, 985,008,687,907,853,269, 984,665,640,564,039,457, 584,007,913,129,639,936
+    // Price uint64 -> uint128 340, 282,366,920,938,463,463, 374,607,431,768,211,456
+    // Tokens uint128 -> int128 and remove Delta int128
+    //
+    // Notes:
+    //   quoteTokens = divisor * baseTokens * price / 10^9 / multiplier
+    //   baseTokens = multiplier * quoteTokens * 10^9 / price / divisor
+    //   price = multiplier * quoteTokens * 10^9 / baseTokens / divisor
+    // Including the 10^9 with the multiplier:
+    //   quoteTokens = divisor * baseTokens * price / multiplier
+    //   baseTokens = multiplier * quoteTokens / price / divisor
+    //   price = multiplier * quoteTokens / baseTokens / divisor
+
     function baseToQuote(MoreInfo memory moreInfo, uint tokens, Price price) pure internal returns (uint quoteTokens) {
         quoteTokens = uint128((10 ** Factor.unwrap(moreInfo.divisor)) * tokens * uint(Price.unwrap(price)) / (10 ** Factor.unwrap(moreInfo.multiplier)));
     }
@@ -270,7 +279,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
             uint8 baseDecimals = IERC20(Token.unwrap(info.base)).decimals();
             uint8 quoteDecimals = IERC20(Token.unwrap(info.quote)).decimals();
             if (baseDecimals >= quoteDecimals) {
-                multiplier = Factor.wrap(baseDecimals - quoteDecimals + 9);
+                multiplier = Factor.wrap(baseDecimals - quoteDecimals + PRICE_DECIMALS);
                 divisor = Factor.wrap(0);
             } else {
                 multiplier = Factor.wrap(9);
