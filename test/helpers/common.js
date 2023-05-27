@@ -105,7 +105,7 @@ class Data {
               } else if (a.name == 'wad' || a.name == 'amount' || a.name == 'balance' || a.name == 'value') {
                 result = result + ethers.utils.formatUnits(data.args[a.name], 18);
               } else if (a.name == 'price') {
-                result = result + ethers.utils.formatUnits(data.args[a.name], 9);
+                result = result + ethers.utils.formatUnits(data.args[a.name], 12);
               } else {
                 result = result + data.args[a.name].toString();
               }
@@ -237,8 +237,8 @@ class Data {
         const pair = pairInfos[j];
         console.log("          ----- Pair " + pair.pairKey + " " + this.getShortAccountName(pair.baseToken) + "/" + this.getShortAccountName(pair.quoteToken) + " " + pair.multiplier + " " + pair.divisor + " -----");
         for (let buySell = 0; buySell < 2; buySell++) {
-          console.log("              #   " + (buySell == 0 ? " BUY" : "SELL") +" Price OrderKey   Next       Maker         Expiry(s)                Tokens                Filled")
-          console.log("            --- ------------ ---------- ---------- ------------ ---------- --------------------- ---------------------");
+          console.log("              #     " + (buySell == 0 ? " BUY" : "SELL") +" Price OrderKey   Next       Maker         Expiry(s)                Tokens                Filled")
+          console.log("            --- -------------- ---------- ---------- ------------ ---------- --------------------- ---------------------");
 
           let price = PRICE_EMPTY;
           let firstOrderKey = ORDERKEY_SENTINEL;
@@ -250,7 +250,7 @@ class Data {
             for (let k = 0; k < results[0].length && parseInt(results[0][k]) != 0; k++) {
               var minutes = (results[4][k] - now / 1000) / 60;
               console.log("              " + (row++) + " " +
-                this.padLeft(ethers.utils.formatUnits(results[0][k], 9), 12) + " " +
+                this.padLeft(ethers.utils.formatUnits(results[0][k], 12), 14) + " " +
                 results[1][k].substring(0, 10) + " " +
                 results[2][k].substring(0, 10) + " " +
                 this.getShortAccountName(results[3][k]) + " " +

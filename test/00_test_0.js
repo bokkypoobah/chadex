@@ -149,7 +149,7 @@ describe("Dexz", function () {
     console.log("      00. Test 00 - Happy Path - Specified Set");
 
     // Add Orders
-    const price1 = "0.6901";
+    const price1 = "0.690123456789";
     const price2 = "0.6902";
     const price3 = "0.6903";
     const price5 = "0.6905";
@@ -164,9 +164,9 @@ describe("Dexz", function () {
     const baseTokens5 = ethers.utils.parseUnits("69", data.decimals0);
 
     const actionsA = [
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), expiry: expiry, tokens: baseTokens1.toString() },
-      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 9).toString(), expiry: expiry, tokens: baseTokens2.toString() },
-      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 9).toString(), expiry: expiry, tokens: baseTokens3.toString() },
+      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 12).toString(), expiry: expiry, tokens: baseTokens1.toString() },
+      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 12).toString(), expiry: expiry, tokens: baseTokens2.toString() },
+      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 12).toString(), expiry: expiry, tokens: baseTokens3.toString() },
     ];
     console.log("        Executing: " + JSON.stringify(actionsA, null, 2));
 
@@ -181,18 +181,27 @@ describe("Dexz", function () {
 
     await data.printState("After Adding Orders");
 
-    const baseTokensB = ethers.utils.parseUnits("100", data.decimals0);
+    const baseTokensB = ethers.utils.parseUnits("0.69", data.decimals0);
     const actionsB = [
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), expiry: expiry, tokens: baseTokensB.toString() },
+      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 12).toString(), expiry: expiry, tokens: baseTokensB.toString() },
     ];
     console.log("        Executing: " + JSON.stringify(actionsB, null, 2));
-    const execute1Tx = await data.dexz.connect(data.user2Signer).execute(actionsB);
-    await data.printEvents("user2->dexz.execute(actions)", await execute1Tx.wait());
+    const executeBTx = await data.dexz.connect(data.user2Signer).execute(actionsB);
+    await data.printEvents("user2->dexz.execute(actions)", await executeBTx.wait());
+    await data.printState("After Executing Against Orders");
+
+    const baseTokensB1 = ethers.utils.parseUnits("0.31", data.decimals0);
+    const actionsB1 = [
+      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 12).toString(), expiry: expiry, tokens: baseTokensB1.toString() },
+    ];
+    console.log("        Executing: " + JSON.stringify(actionsB1, null, 2));
+    const executeB1Tx = await data.dexz.connect(data.user2Signer).execute(actionsB1);
+    await data.printEvents("user2->dexz.execute(actions)", await executeB1Tx.wait());
     await data.printState("After Executing Against Orders");
 
     // const baseTokensC = ethers.utils.parseUnits("-1", data.decimals0);
     // const actionsC = [
-    //   { action: Action.RemoveOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 9).toString(), expiry: expiry, tokens: baseTokensC.toString() },
+    //   { action: Action.RemoveOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 12).toString(), expiry: expiry, tokens: baseTokensC.toString() },
     // ];
     // console.log("        Executing: " + JSON.stringify(actionsC, null, 2));
     // const executeCTx = await data.dexz.connect(data.user2Signer).execute(actionsC);
@@ -202,7 +211,7 @@ describe("Dexz", function () {
     // const newExpiry = parseInt(new Date()/1000) + 24*60*60;
     // const baseTokensD = ethers.utils.parseUnits("1.23", data.decimals0);
     // const actionsD = [
-    //   { action: Action.UpdateExpiryAndTokens, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), expiry: newExpiry, tokens: baseTokensD.toString() },
+    //   { action: Action.UpdateExpiryAndTokens, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 12).toString(), expiry: newExpiry, tokens: baseTokensD.toString() },
     // ];
     // console.log("        Executing: " + JSON.stringify(actionsD, null, 2));
     // const executeDTx = await data.dexz.connect(data.user2Signer).execute(actionsD);
@@ -212,7 +221,7 @@ describe("Dexz", function () {
 
     // // Execute against orders
     // const sellBaseTokens = ethers.utils.parseUnits("1", data.decimals0);
-    // const trade4Tx = await data.dexz.connect(data.user3Signer).trade(Action.FillAnyAndAddOrder, BuySell.Buy, data.token0.address, data.weth.address, ethers.utils.parseUnits(price1, 9), expiry, sellBaseTokens, []);
+    // const trade4Tx = await data.dexz.connect(data.user3Signer).trade(Action.FillAnyAndAddOrder, BuySell.Buy, data.token0.address, data.weth.address, ethers.utils.parseUnits(price1, 12), expiry, sellBaseTokens, []);
     // await data.printEvents("user3->dexz.trade(FillAnyAndAddOrder, BUY, token0, WETH, " + price1 + ", expiry, sellBaseTokens, [])", await trade4Tx.wait());
     // await data.printState("After Executing Against Orders");
 

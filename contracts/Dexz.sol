@@ -123,7 +123,7 @@ contract DexzBase {
         Factor divisor;
     }
 
-    uint8 public constant PRICE_DECIMALS = 9;
+    uint8 public constant PRICE_DECIMALS = 12;
     uint public constant TENPOW18 = uint(10)**18;
     Price public constant PRICE_EMPTY = Price.wrap(0);
     Price public constant PRICE_MIN = Price.wrap(1);

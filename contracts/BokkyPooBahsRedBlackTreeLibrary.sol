@@ -13,7 +13,7 @@ pragma solidity ^0.8.0;
 //
 // Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2020. The MIT Licence.
 // ----------------------------------------------------------------------------
-type Price is uint64;
+type Price is uint128;
 
 library BokkyPooBahsRedBlackTreeLibrary {
 
