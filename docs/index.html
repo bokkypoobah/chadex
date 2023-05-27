@@ -1951,19 +1951,30 @@
                 } else if (logData.eventFragment.name == "OrderAdded") {
                   const [pairKey, orderKey, maker, buySell, price, expiry, tokens] = logData.args;
                   console.log("OrderAdded(" + pairKey + ", " + orderKey + ", " + maker + ", " + buySell + ", " + price + ", " + expiry + ", " + tokens + ")");
+                // event Trade(TradeInfo tradeInfo);
+                // struct TradeInfo {
+                //     PairKey pairKey;
+                //     OrderKey orderKey;
+                //     BuySell buySell;
+                //     Account taker;
+                //     Account maker;
+                //     uint tokens;
+                //     uint quoteTokens;
+                //     Price price;
+                // }
                 } else if (logData.eventFragment.name == "Trade") {
-                  console.log(logData.eventFragment.name + ": " + JSON.stringify(event));
-                  // const [pairKey, orderKey, maker, buySell, price, expiry, tokens] = logData.args;
-                  // console.log("OrderAdded(" + pairKey + ", " + orderKey + ", " + maker + ", " + buySell + ", " + price + ", " + expiry + ", " + tokens + ")");
-                } else if (logData.eventFragment.name == "Trade") {
-                  console.log(logData.eventFragment.name + ": " + JSON.stringify(event));
+                  const [tradeInfo] = logData.args;
+                  // console.log(logData.eventFragment.name + ": " + JSON.stringify(event, null, 2));
+                  // console.log(" -      : " + JSON.stringify(tradeInfo, null, 2));
+                  const [pairKey, orderKey, buySell, taker, maker, tokens, quoteTokens, price] = tradeInfo;
+                  console.log("Trade(" + pairKey + ", " + orderKey + ", " + buySell + ", " + taker + ", " + maker + ", " + tokens + ", " + quoteTokens + ", " + price + ")");
+                  // event TradeSummary(BuySell buySell, Account indexed taker, Tokens filled, Tokens quoteTokensFilled, Price price, Tokens tokensOnOrder);
                 } else if (logData.eventFragment.name == "TradeSummary") {
-                  console.log(logData.eventFragment.name + ": " + JSON.stringify(event));
+                  const [buySell, taker, filled, quoteTokensFilled, tokensOnOrder] = logData.args;
+                  console.log("TradeSummary(" + buySell + ", " + taker + ", " + filled + ", " + quoteTokensFilled + ", " + tokensOnOrder + ")");
                 }
                 // event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, Tokens filled);
                 // event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens);
-                // // event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, Account indexed taker, Account maker, uint tokens, uint quoteTokens, Price price);
-                // event TradeSummary(BuySell buySell, Account indexed taker, Tokens filled, Tokens quoteTokensFilled, Price price, Tokens tokensOnOrder);
               }
             }
 
