@@ -252,7 +252,7 @@ contract DexzBase {
         tokens = (10 ** Factor.unwrap(moreInfo.multiplier)) * quoteTokens / uint(Price.unwrap(price)) / (10 ** Factor.unwrap(moreInfo.divisor));
     }
     function baseAndQuoteToPrice(MoreInfo memory moreInfo, uint tokens, uint quoteTokens) pure internal returns (Price price) {
-        price = Price.wrap(uint64((10 ** Factor.unwrap(moreInfo.multiplier)) * quoteTokens / tokens / (10 ** Factor.unwrap(moreInfo.divisor))));
+        price = Price.wrap(uint128((10 ** Factor.unwrap(moreInfo.multiplier)) * quoteTokens / tokens / (10 ** Factor.unwrap(moreInfo.divisor))));
     }
     function availableTokens(Token token, Account wallet) internal view returns (uint tokens) {
         uint allowance = IERC20(Token.unwrap(token)).allowance(Account.unwrap(wallet), address(this));
@@ -564,14 +564,27 @@ contract Dexz is DexzBase, ReentrancyGuard {
         emit OrderUpdated(moreInfo.pairKey, orderKey, moreInfo.taker, info.buySell, info.price, info.expiry, order.tokens);
     }
 
-    function getOrders(PairKey pairKey, BuySell buySell, uint count, Price price, OrderKey firstOrderKey) public view returns (Price[] memory prices, OrderKey[] memory orderKeys, OrderKey[] memory nextOrderKeys, Account[] memory makers, Unixtime[] memory expiries, Tokens[] memory tokenss, Tokens[] memory filleds) {
-        prices = new Price[](count);
-        orderKeys = new OrderKey[](count);
-        nextOrderKeys = new OrderKey[](count);
-        makers = new Account[](count);
-        expiries = new Unixtime[](count);
-        tokenss = new Tokens[](count);
-        filleds = new Tokens[](count);
+    struct OrderInfo {
+        Price price;
+        OrderKey orderKey;
+        OrderKey nextOrderKey;
+        Account maker;
+        Unixtime expiry;
+        Tokens tokens;
+        Tokens filled;
+        Tokens available;
+    }
+
+    function getOrders(PairKey pairKey, BuySell buySell, uint count, Price price, OrderKey firstOrderKey) public view returns (OrderInfo[] memory orderInfos) {
+        orderInfos = new OrderInfo[](count);
+        // orderKeys = new OrderKey[](count);
+        // nextOrderKeys = new OrderKey[](count);
+        // makers = new Account[](count);
+        // expiries = new Unixtime[](count);
+        // tokenss = new Tokens[](count);
+        // filleds = new Tokens[](count);
+        // availables = new Tokens[](count);
+        Pair memory pair = pairs[pairKey];
         uint i;
         if (BokkyPooBahsRedBlackTreeLibrary.isEmpty(price)) {
             price = getBestPrice(pairKey, buySell);
@@ -592,13 +605,15 @@ contract Dexz is DexzBase, ReentrancyGuard {
             }
             while (isNotSentinel(orderKey) && i < count) {
                 Order memory order = orders[orderKey];
-                prices[i] = price;
-                orderKeys[i] = orderKey;
-                nextOrderKeys[i] = order.next;
-                makers[i] = order.maker;
-                expiries[i] = order.expiry;
-                tokenss[i] = order.tokens;
-                filleds[i] = order.filled;
+                // prices[i] = price;
+                // orderKeys[i] = orderKey;
+                // nextOrderKeys[i] = order.next;
+                // makers[i] = order.maker;
+                // expiries[i] = order.expiry;
+                // tokenss[i] = order.tokens;
+                // filleds[i] = order.filled;
+                Tokens available = Tokens.wrap(uint128(availableTokens(buySell == BuySell.Buy ? pair.base : pair.quote, order.maker)));
+                orderInfos[i] = OrderInfo(price, orderKey, order.next, order.maker, order.expiry, order.tokens, order.filled, available);
                 orderKey = order.next;
                 i = onePlus(i);
             }
