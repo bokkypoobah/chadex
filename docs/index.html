@@ -1315,6 +1315,22 @@
               for (let buySell = 0; buySell < 2; buySell++) {
                 const orders = pair[buySell];
                 console.log("buySell: " + buySell + " " + JSON.stringify(orders, null, 2));
+                for (const [orderIndex, order] of orders.entries()) {
+                  console.log(orderIndex + " " + JSON.stringify(order));
+                  results.push({
+                    price: order.price,
+                    orderIndex,
+                    buySell,
+                    orderKey: order.orderKey,
+                    nextOrderKey: order.nextOrderKey,
+                    maker: order.maker,
+                    expiry: order.expiry,
+                    tokens: order.tokens,
+                    filled: order.filled,
+                    availableBase: order.availableBase,
+                    availableQuote: order.availableQuote,
+                  });
+                }
               }
             }
 
