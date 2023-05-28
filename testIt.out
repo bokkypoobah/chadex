@@ -1,4 +1,3 @@
-Compiled 1 Solidity file successfully
 
 
   Dexz
@@ -84,17 +83,17 @@ Compiled 1 Solidity file successfully
     "base": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
     "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     "price": "690100000000",
-    "expiry": 1685238301,
+    "expiry": 1685241466,
     "tokens": "1000000000000000000"
   }
 ]
         > user0->dexz.execute(actionsA) - gasUsed: 277627 ~ ETH 0.01110508 ~ USD 22
           + Dexz:0xCf7E 29.0 PairAdded(pairKey: 0x4c038ad6, base: Token0:0x5FbD, quote: WETH:0x9fE4, baseDecimals: 18, quoteDecimals: 18, multiplier: 12, divisor: 0)
-          + Dexz:0xCf7E 29.1 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0xf8b1520a, maker: user0:0x7099, buySell: 0, price: 0.6901, expiry: 1685238301, tokens: 1.0)
+          + Dexz:0xCf7E 29.1 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0xf8b1520a, maker: user0:0x7099, buySell: 0, price: 0.6901, expiry: 1685241466, tokens: 1.0)
         > user1->dexz.execute(actionsA) - gasUsed: 116723 ~ ETH 0.00466892 ~ USD 9
-          + Dexz:0xCf7E 30.0 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0xa7fb7af5, maker: user1:0x3C44, buySell: 0, price: 0.6901, expiry: 1685238301, tokens: 1.0)
+          + Dexz:0xCf7E 30.0 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0xa7fb7af5, maker: user1:0x3C44, buySell: 0, price: 0.6901, expiry: 1685241466, tokens: 1.0)
         > user2->dexz.execute(actionsA) - gasUsed: 116723 ~ ETH 0.00466892 ~ USD 9
-          + Dexz:0xCf7E 31.0 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x247d02de, maker: user2:0x90F7, buySell: 0, price: 0.6901, expiry: 1685238301, tokens: 1.0)
+          + Dexz:0xCf7E 31.0 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x247d02de, maker: user2:0x90F7, buySell: 0, price: 0.6901, expiry: 1685241466, tokens: 1.0)
 
         --- After Adding Orders ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
@@ -110,14 +109,14 @@ Compiled 1 Solidity file successfully
           ----- Pair 0x4c038ad6bfca2133ee6f20ac54377d10fb6f3756d2321ead7428e24817161e77 Token0:0x5FbD/WETH:0x9fE4 12 0 -----
               #      BUY Price OrderKey   Next       Maker         Expiry(s)                Tokens                Filled         AvailableBase        AvailableQuote
             --- -------------- ---------- ---------- ------------ ---------- --------------------- --------------------- --------------------- ---------------------
-              0         0.6901 0xf8b1520a 0xa7fb7af5 user0:0x7099      59.98                   1.0                   0.0 72.632082306912041733              50.1234
-              1         0.6901 0xa7fb7af5 0x247d02de user1:0x3C44      59.98                   1.0                   0.0 72.632082306912041733              50.1234
-              2         0.6901 0x247d02de 0x00000000 user2:0x90F7      59.98                   1.0                   0.0 72.632082306912041733              50.1234
+              0         0.6901 0xf8b1520a 0xa7fb7af5 user0:0x7099      59.99                   1.0                   0.0 72.632082306912041733              50.1234
+              1         0.6901 0xa7fb7af5 0x247d02de user1:0x3C44      59.99                   1.0                   0.0 72.632082306912041733              50.1234
+              2         0.6901 0x247d02de 0x00000000 user2:0x90F7      59.99                   1.0                   0.0 72.632082306912041733              50.1234
 
             price: 0.6901 head=0xf8b1520a tail=0x247d02de
-              Order key=0xf8b1520a next=0xa7fb7af5 maker=user0:0x7099 expiry=59.98s tokens=1.0 filled=0.0
-              Order key=0xa7fb7af5 next=0x247d02de maker=user1:0x3C44 expiry=59.98s tokens=1.0 filled=0.0
-              Order key=0x247d02de next=0x00000000 maker=user2:0x90F7 expiry=59.98s tokens=1.0 filled=0.0
+              Order key=0xf8b1520a next=0xa7fb7af5 maker=user0:0x7099 expiry=59.99s tokens=1.0 filled=0.0
+              Order key=0xa7fb7af5 next=0x247d02de maker=user1:0x3C44 expiry=59.99s tokens=1.0 filled=0.0
+              Order key=0x247d02de next=0x00000000 maker=user2:0x90F7 expiry=59.99s tokens=1.0 filled=0.0
 
               #     SELL Price OrderKey   Next       Maker         Expiry(s)                Tokens                Filled         AvailableBase        AvailableQuote
             --- -------------- ---------- ---------- ------------ ---------- --------------------- --------------------- --------------------- ---------------------
@@ -130,7 +129,7 @@ Compiled 1 Solidity file successfully
     "base": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
     "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     "price": "690100000000",
-    "expiry": 1685238301,
+    "expiry": 1685241466,
     "tokens": "69000000000000000000"
   }
 ]
@@ -142,7 +141,7 @@ Compiled 1 Solidity file successfully
           + WETH:0x9fE4 32.4 Transfer(from: user1:0x3C44, to: user2:0x90F7, tokens: 0.6901)
           + Dexz:0xCf7E 32.5 Trade(tradeInfo: 0x4c038ad6bfca2133ee6f20ac54377d10fb6f3756d2321ead7428e24817161e77,0xa7fb7af54ba1d085586d3a9a7a36dacf4f1a79fb9e6fe698943ad5aad078d448,1,0x90F79bf6EB2c4f870365E785982E1f101E93b906,0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC,1000000000000000000,690100000000000000,690100000000)
           + Dexz:0xCf7E 32.6 Trade(tradeInfo: 0x4c038ad6bfca2133ee6f20ac54377d10fb6f3756d2321ead7428e24817161e77,0x247d02de516fae42ee96b529c6908ac6b1f0093e07aa515d334bc725e98dc2c3,1,0x90F79bf6EB2c4f870365E785982E1f101E93b906,0x90F79bf6EB2c4f870365E785982E1f101E93b906,1000000000000000000,690100000000000000,690100000000)
-          + Dexz:0xCf7E 32.7 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x19828f94, maker: user2:0x90F7, buySell: 1, price: 0.6901, expiry: 1685238301, tokens: 66.0)
+          + Dexz:0xCf7E 32.7 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x19828f94, maker: user2:0x90F7, buySell: 1, price: 0.6901, expiry: 1685241466, tokens: 66.0)
           + Dexz:0xCf7E 32.8 TradeSummary(buySell: 1, taker: user2:0x90F7, filled: 3000000000000000000, quoteTokensFilled: 2.0703, price: 0.6901, tokensOnOrder: 66000000000000000000)
 
         --- After Executing Against Orders ---
@@ -163,12 +162,12 @@ Compiled 1 Solidity file successfully
 
               #     SELL Price OrderKey   Next       Maker         Expiry(s)                Tokens                Filled         AvailableBase        AvailableQuote
             --- -------------- ---------- ---------- ------------ ---------- --------------------- --------------------- --------------------- ---------------------
-              0         0.6901 0x19828f94 0x00000000 user2:0x90F7      59.98                  66.0                   0.0                  98.0              67.6298
+              0         0.6901 0x19828f94 0x00000000 user2:0x90F7      59.99                  66.0                   0.0                  98.0              67.6298
 
             price: 0.6901 head=0x19828f94 tail=0x19828f94
-              Order key=0x19828f94 next=0x00000000 maker=user2:0x90F7 expiry=59.98s tokens=66.0 filled=0.0
+              Order key=0x19828f94 next=0x00000000 maker=user2:0x90F7 expiry=59.99s tokens=66.0 filled=0.0
 
-    ✔ 00. Test 00 (206ms)
+    ✔ 00. Test 00 (224ms)
 
 
   1 passing (1s)
