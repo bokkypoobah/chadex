@@ -284,6 +284,22 @@
                 <template #cell(action)="data">
                   {{ actionText[data.item.action] || "Unknown" }}
                 </template>
+                <template #cell(taker)="data">
+                  {{ data.item.taker }}
+                </template>
+                <template #cell(maker)="data">
+                  {{ data.item.maker }}
+                </template>
+                <template #cell(base)="data">
+                  <b-link v-if="data.item.base" :href="'https://sepolia.etherscan.io/token/' + data.item.base" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                    {{ data.item.base.substring(0, 10) }}
+                  </b-link>
+                </template>
+                <template #cell(quote)="data">
+                  <b-link v-if="data.item.quote" :href="'https://sepolia.etherscan.io/token/' + data.item.quote" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                    {{ data.item.quote.substring(0, 10) }}
+                  </b-link>
+                </template>
                 <template #cell(price)="data">
                   {{ formatERC20(data.item.price, 12) }}
                 </template>
@@ -292,6 +308,9 @@
                 </template>
                 <template #cell(expiry)="data">
                   {{ formatExpiry(data.item.expiry) }}
+                </template>
+                <template #cell(tokens)="data">
+                  {{ data.item }}
                 </template>
               </b-table>
             </b-card-text>
@@ -1161,7 +1180,7 @@
           pairHistoryFields: [
             { key: 'blockNumber', label: 'Block #', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'action', label: 'Action', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'account', label: 'Account', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'taker', label: 'Taker', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'base', label: 'Base', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'quote', label: 'Quote', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
@@ -1476,9 +1495,10 @@
               for (const [itemIndex, item] of pair.history.entries()) {
                 console.log(itemIndex + " " + JSON.stringify(item));
                 results.push({
-                  txHash: item.txHash,
-                  blockNumber: item.blockNumber,
-                  action: item.action,
+                  // txHash: item.txHash,
+                  // blockNumber: item.blockNumber,
+                  // action: item.action,
+                  ...item,
                 //   price: order.price,
                 //   orderIndex,
                 //   orderKey: order.orderKey,
