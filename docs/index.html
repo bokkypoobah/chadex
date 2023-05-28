@@ -285,19 +285,23 @@
                   {{ actionText[data.item.action] || "Unknown" }}
                 </template>
                 <template #cell(taker)="data">
-                  {{ data.item.taker }}
+                  <b-link v-if="data.item.taker" :href="'https://sepolia.etherscan.io/address/' + data.item.taker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                    {{ data.item.taker.substring(0, 10) }}
+                  </b-link>
                 </template>
                 <template #cell(maker)="data">
-                  {{ data.item.maker }}
+                  <b-link v-if="data.item.maker" :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                    {{ data.item.maker.substring(0, 10) }}
+                  </b-link>
                 </template>
                 <template #cell(base)="data">
                   <b-link v-if="data.item.base" :href="'https://sepolia.etherscan.io/token/' + data.item.base" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                    {{ data.item.base.substring(0, 10) }}
+                    {{ settings.tokens[data.item.base] && settings.tokens[data.item.base].symbol }}
                   </b-link>
                 </template>
                 <template #cell(quote)="data">
                   <b-link v-if="data.item.quote" :href="'https://sepolia.etherscan.io/token/' + data.item.quote" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                    {{ data.item.quote.substring(0, 10) }}
+                    {{ settings.tokens[data.item.quote] && settings.tokens[data.item.quote].symbol }}
                   </b-link>
                 </template>
                 <template #cell(price)="data">
