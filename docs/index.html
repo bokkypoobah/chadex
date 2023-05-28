@@ -238,7 +238,7 @@
               </div>
               <!-- <b-table small fixed striped responsive hover :fields="pairFields" :items="pagedFilteredSortedPair" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1"> -->
               <b-row class="m-0 p-0">
-                <b-col class="ml-0 mr-0 pl-2">
+                <b-col class="ml-0 mr-0 pl-0">
                   <b-table small fixed striped responsive hover :fields="pairBuyOrdersFields" :items="pagedFilteredSortedPairBuyOrders" show-empty empty-html="Click Sync above to retrieve buy orders" head-variant="light" class="mx-0 my-1">
                     <template #cell(price)="data">
                       {{ formatERC20(data.item.price, 12) }}
@@ -249,9 +249,12 @@
                     <template #cell(expiry)="data">
                       {{ formatExpiry(data.item.expiry) }}
                     </template>
+                    <template #cell(maker)="data">
+                      {{ data.item.maker.substring(0, 10) }}
+                    </template>
                   </b-table>
                 </b-col>
-                <b-col class="ml-0 mr-0 pr-2">
+                <b-col class="ml-0 mr-0 pr-0">
                   <b-table small fixed striped responsive hover :fields="pairSellOrdersFields" :items="pagedFilteredSortedPairSellOrders" show-empty empty-html="Click Sync above to retrieve sell orders" head-variant="light" class="mx-0 my-1">
                     <template #cell(price)="data">
                       {{ formatERC20(data.item.price, 12) }}
@@ -262,9 +265,23 @@
                     <template #cell(expiry)="data">
                       {{ formatExpiry(data.item.expiry) }}
                     </template>
+                    <template #cell(maker)="data">
+                      {{ data.item.maker.substring(0, 10) }}
+                    </template>
                   </b-table>
                 </b-col>
               </b-row>
+              <b-table small fixed striped responsive hover :fields="pairHistoryFields" :items="pagedFilteredSortedPairHistory" show-empty empty-html="Click Sync above to retrieve sell orders" head-variant="light" class="mx-0 my-1">
+                <template #cell(price)="data">
+                  {{ formatERC20(data.item.price, 12) }}
+                </template>
+                <template #cell(tokens)="data">
+                  {{ formatERC20(data.item.tokens, 18) }}
+                </template>
+                <template #cell(expiry)="data">
+                  {{ formatExpiry(data.item.expiry) }}
+                </template>
+              </b-table>
             </b-card-text>
           </b-card>
 
@@ -958,6 +975,12 @@
                 pageSize: 10,
                 // sortOption: 'symbolquotebaseasc',
               },
+              history: {
+                filter: null,
+                currentPage: 1,
+                pageSize: 10,
+                sortOption: 'timestampdsc',
+              },
             },
             tokensTable: {
               filter: null,
@@ -986,7 +1009,7 @@
               pageSize: 10,
               sortOption: 'lastsaledsc',
             },
-            version: 6,
+            version: 7,
           },
           newCoinAddress: null,
           newAddress: null,
@@ -1104,7 +1127,7 @@
             { key: 'quote.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
           ],
           pairBuyOrdersFields: [
-            { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 25%;', tdClass: 'text-truncate text-right' },
+            { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 25%;', tdClass: 'text-left' },
             { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'tokens', label: 'Buy Amount', sortable: false, thStyle: 'width: 30%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'price', label: 'Price', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
@@ -1113,22 +1136,32 @@
             { key: 'price', label: 'Price', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'tokens', label: 'Sell Amount', sortable: false, thStyle: 'width: 30%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 25%;', tdClass: 'text-truncate' },
+            { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 25%;', tdClass: 'text-left' },
           ],
-          pairFields: [
-            { key: 'makerBuyInfo', label: 'Maker Buy Info', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-            { key: 'makerBuy', label: 'Maker Buy', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-            { key: 'makerBuyAmount', label: 'Buy Amount', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-            { key: 'price', label: 'Price', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-            { key: 'makerSellAmount', label: 'Sell Amount', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-            { key: 'makerSell', label: 'Maker Sell', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-            { key: 'makerSellInfo', label: 'Maker Sell Info', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-            // { key: 'pairKey', label: 'Pair Key', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-            // { key: 'base.symbol', label: 'Base', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-            // { key: 'base.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
-            // { key: 'quote.symbol', label: 'Quote', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-            // { key: 'quote.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+          pairHistoryFields: [
+            { key: 'blockNumber', label: 'Block #', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'account', label: 'Account', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+            // { key: 'price', label: 'Price', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
+            // { key: 'tokens', label: 'Sell Amount', sortable: false, thStyle: 'width: 30%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+            // { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 25%;', tdClass: 'text-left' },
           ],
+          // pairFields: [
+          //   { key: 'makerBuyInfo', label: 'Maker Buy Info', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
+          //   { key: 'makerBuy', label: 'Maker Buy', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
+          //   { key: 'makerBuyAmount', label: 'Buy Amount', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
+          //   { key: 'price', label: 'Price', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
+          //   { key: 'makerSellAmount', label: 'Sell Amount', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
+          //   { key: 'makerSell', label: 'Maker Sell', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
+          //   { key: 'makerSellInfo', label: 'Maker Sell Info', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
+          //   // { key: 'pairKey', label: 'Pair Key', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
+          //   // { key: 'base.symbol', label: 'Base', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+          //   // { key: 'base.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+          //   // { key: 'quote.symbol', label: 'Quote', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+          //   // { key: 'quote.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+          // ],
           tokensFields: [
             { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
@@ -1370,10 +1403,7 @@
             const results = [];
             if (this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
-              const orders = pair[0];
-              // console.log("orders: " + JSON.stringify(orders, null, 2));
-              for (const [orderIndex, order] of orders.entries()) {
-                console.log(orderIndex + " " + JSON.stringify(order));
+              for (const [orderIndex, order] of pair[0].entries()) {
                 results.push({
                   price: order.price,
                   orderIndex,
@@ -1395,10 +1425,7 @@
             const results = [];
             if (this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
-              const orders = pair[1];
-              // console.log("orders: " + JSON.stringify(orders, null, 2));
-              for (const [orderIndex, order] of orders.entries()) {
-                console.log(orderIndex + " " + JSON.stringify(order));
+              for (const [orderIndex, order] of pair[1].entries()) {
                 results.push({
                   price: order.price,
                   orderIndex,
@@ -1415,6 +1442,32 @@
             }
             return results;
           },
+          filteredPairHistory() {
+            console.log("filteredPairHistory");
+            const results = [];
+            if (this.settings.pairTable.selectedPair in this.pair) {
+              const pair = this.pair[this.settings.pairTable.selectedPair];
+              for (const [itemIndex, item] of pair.history.entries()) {
+                console.log(itemIndex + " " + JSON.stringify(item));
+                results.push({
+                  blockNumber: item.blockNumber,
+                  type: item.type,
+                //   price: order.price,
+                //   orderIndex,
+                //   orderKey: order.orderKey,
+                //   nextOrderKey: order.nextOrderKey,
+                //   maker: order.maker,
+                //   expiry: order.expiry,
+                //   tokens: order.tokens,
+                //   filled: order.filled,
+                //   availableBase: order.availableBase,
+                //   availableQuote: order.availableQuote,
+                });
+              }
+            }
+            console.log("filteredPairHistory: " + JSON.stringify(results, null, 2));
+            return results;
+          },
           filteredSortedPairBuyOrders() {
             let results = this.filteredPairBuyOrders;
             // TODO
@@ -1425,12 +1478,23 @@
             // TODO
             return results;
           },
+          filteredSortedPairHistory() {
+            let results = this.filteredPairHistory;
+            // TODO
+            return results;
+          },
           pagedFilteredSortedPairBuyOrders() {
             return this.filteredSortedPairBuyOrders.slice((this.settings.pairTable.buyOrders.currentPage - 1) * this.settings.pairTable.buyOrders.pageSize, this.settings.pairTable.buyOrders.currentPage * this.settings.pairTable.buyOrders.pageSize);
           },
           pagedFilteredSortedPairSellOrders() {
             return this.filteredSortedPairSellOrders.slice((this.settings.pairTable.sellOrders.currentPage - 1) * this.settings.pairTable.sellOrders.pageSize, this.settings.pairTable.sellOrders.currentPage * this.settings.pairTable.sellOrders.pageSize);
           },
+          pagedFilteredSortedPairHistory() {
+            return this.filteredSortedPairHistory.slice((this.settings.pairTable.buyOrders.currentPage - 1) * this.settings.pairTable.buyOrders.pageSize, this.settings.pairTable.buyOrders.currentPage * this.settings.pairTable.buyOrders.pageSize);
+          },
+          // pagedFilteredSortedPairHistory() {
+          //   return this.filteredSortedPairHistory.slice((this.settings.pairTable.history.currentPage - 1) * this.settings.pairTable.history.pageSize, this.settings.pairTable.history.currentPage * this.settings.pairTable.history.pageSize);
+          // },
           filteredTokens() {
             const results = [];
             const filterRegex = this.settings.tokensTable.filter && this.settings.tokensTable.filter.length > 0 ? new RegExp(this.settings.tokensTable.filter, 'i') : null;
