@@ -246,6 +246,9 @@
                     <template #cell(tokens)="data">
                       {{ formatERC20(data.item.tokens, 18) }}
                     </template>
+                    <template #cell(expiry)="data">
+                      {{ formatExpiry(data.item.expiry) }}
+                    </template>
                   </b-table>
                 </b-col>
                 <b-col class="ml-0 mr-0 pr-2">
@@ -255,6 +258,9 @@
                     </template>
                     <template #cell(tokens)="data">
                       {{ formatERC20(data.item.tokens, 18) }}
+                    </template>
+                    <template #cell(expiry)="data">
+                      {{ formatExpiry(data.item.expiry) }}
                     </template>
                   </b-table>
                 </b-col>
@@ -419,13 +425,13 @@
                     <b-form-group label="Buy or Sell:" label-for="raw-buysell" label-size="sm" label-cols-sm="2" label-align-sm="right" description="'0' buy, '1' sell" class="mx-0 my-1 p-0">
                       <b-form-input type="text" size="sm" id="raw-buysell" v-model.trim="raw.buySell" placeholder="'0' or '1'" class="w-25"></b-form-input>
                     </b-form-group>
-                    <b-form-group label="Price:" label-for="raw-price" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Raw prices with 12 decimal places" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="raw-price" v-model.trim="raw.price" placeholder="e.g. '690100000000' for 0.69" class="w-50"></b-form-input>
+                    <b-form-group label="Price:" label-for="raw-price" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Raw price with up to 12 whole-number and 11 decimal places" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="raw-price" v-model.trim="raw.price" placeholder="e.g. 0.69012345678'" class="w-50"></b-form-input>
                     </b-form-group>
                     <b-form-group label="Expiry:" label-for="raw-expiry" label-size="sm" label-cols-sm="2" label-align-sm="right"  description="Unix time. '0' for no expiry" class="mx-0 my-1 p-0">
                       <b-form-input type="text" size="sm" id="raw-expiry" v-model.trim="raw.expiry" placeholder="e.g. '1704027599' for 23:59:59 31/12/2023" class="w-25"></b-form-input>
                     </b-form-group>
-                    <b-form-group label="Tokens:" label-for="raw-tokens" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Raw tokens, without decimals. e.g. 1e = '1000000000000000000'" class="mx-0 my-1 p-0">
+                    <b-form-group label="Tokens:" label-for="raw-tokens" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
                       <b-form-input type="text" size="sm" id="raw-tokens" v-model.trim="raw.tokens" placeholder="1.01234567891234567" class="w-50"></b-form-input>
                     </b-form-group>
                     <b-form-group label="" label-for="raw-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -998,9 +1004,9 @@
             base: "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9",
             quote: "0x07391dbE03e7a0DEa0fce6699500da081537B6c3",
             buySell: 0,
-            price: 690100000000,
+            price: "0.69012345678",
             expiry: 1704027599,
-            tokens: "1000000000000000000",
+            tokens: "1.012345678901234567",
           },
 
           restoreFile: null,
@@ -1098,15 +1104,15 @@
             { key: 'quote.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
           ],
           pairBuyOrdersFields: [
-            { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 25%;', tdClass: 'text-truncate' },
-            { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 25%;', tdClass: 'text-truncate text-right' },
+            { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'tokens', label: 'Buy Amount', sortable: false, thStyle: 'width: 30%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'price', label: 'Price', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
           ],
           pairSellOrdersFields: [
             { key: 'price', label: 'Price', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'tokens', label: 'Sell Amount', sortable: false, thStyle: 'width: 30%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 25%;', tdClass: 'text-truncate' },
           ],
           pairFields: [
@@ -2376,44 +2382,29 @@
             }
           },
           async executeRaw() {
-            // raw: {
-            //   action: null,
-            //   base: null,
-            //   quote: null,
-            //   buySell: null,
-            //   price: null,
-            //   expiry: null,
-            //   tokens: null,
-            // },
             console.log("executeRaw(): " + JSON.stringify(this.raw, null, 2));
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const dexzContract = new ethers.Contract(DEXZADDRESS_SEPOLIA, DEXZABI, provider);
+            const erc20 = new ethers.Contract(this.raw.base, ERC20ABI, provider);
+            const baseDecimals = parseInt(ethers.BigNumber.from(await erc20.decimals()).toString());
             const dexzContractWithSigner = dexzContract.connect(provider.getSigner());
-
-            // struct Info {
-            //     Action action;
-            //     BuySell buySell;
-            //     Token base;
-            //     Token quote;
-            //     Price price;
-            //     Unixtime expiry;
-            //     Delta tokens;
-            // }
-
-
+            const action = {
+              action: this.raw.action,
+              base: this.raw.base,
+              quote: this.raw.quote,
+              buySell: this.raw.buySell,
+              price: ethers.utils.parseUnits(this.raw.price, 12).toString(),
+              expiry: this.raw.expiry,
+              tokens: ethers.utils.parseUnits(this.raw.tokens, baseDecimals).toString(),
+            };
+            // console.log("this.raw: " + JSON.stringify(this.raw, null, 2));
+            // console.log("action: " + JSON.stringify(action, null, 2));
             try {
-              const tx = await dexzContractWithSigner.execute([this.raw]);
+              const tx = await dexzContractWithSigner.execute([action]);
               console.log("tx: " + JSON.stringify(tx));
             } catch (e) {
-              console.log("swapIt error: " + JSON.stringify(e));
+              console.log("executeRaw error: " + JSON.stringify(e));
             }
-            // const signer = provider.getSigner();
-            // try {
-            //   const tx = await signer.sendTransaction({ to: weenusAddress, value: "0" });
-            //   console.log("tx: " + JSON.stringify(tx));
-            // } catch (e) {
-            //   console.log("mintWeenus error: " + JSON.stringify(e));
-            // }
           },
           async mintWeth(wethAddress, action) {
               console.log("mintWeth - action: " + action);
@@ -3697,6 +3688,17 @@
             } catch (err) {
             }
             return e.toString();
+          },
+          formatExpiry(unixtime) {
+            if (!unixtime) {
+              return "no expiry";
+            } else {
+              if (unixtime > moment().unix()) {
+                return moment.unix(unixtime).fromNow();
+              } else {
+                return "expired";
+              }
+            }
           },
           ensOrAddress(addressOrAddressIndex, length = 0) {
             let result = null;
