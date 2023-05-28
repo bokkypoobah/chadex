@@ -308,13 +308,10 @@
                   {{ formatERC20(data.item.price, 12) }}
                 </template>
                 <template #cell(tokens)="data">
-                  {{ formatERC20(data.item.tokens, 18) }}
+                  {{ formatERC20(data.item.tokens, data.item.baseDecimals) }}
                 </template>
-                <template #cell(expiry)="data">
-                  {{ formatExpiry(data.item.expiry) }}
-                </template>
-                <template #cell(tokens)="data">
-                  {{ data.item }}
+                <template #cell(quoteTokens)="data">
+                  {{ formatERC20(data.item.quoteTokens, data.item.quoteDecimals) }}
                 </template>
               </b-table>
             </b-card-text>
@@ -1013,7 +1010,7 @@
               history: {
                 filter: null,
                 currentPage: 1,
-                pageSize: 10,
+                pageSize: 20,
                 sortOption: 'timestampdsc',
               },
             },
@@ -1044,7 +1041,7 @@
               pageSize: 10,
               sortOption: 'lastsaledsc',
             },
-            version: 7,
+            version: 8,
           },
           newCoinAddress: null,
           newAddress: null,
@@ -1189,28 +1186,9 @@
             { key: 'base', label: 'Base', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'quote', label: 'Quote', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'price', label: 'Price', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'tokens', label: 'Base Tokens', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'quoteTokens', label: 'Quote Tokens', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
-            // { key: 'details', label: 'Details', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-left' },
-            // { key: 'price', label: 'Price', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
-            // { key: 'tokens', label: 'Sell Amount', sortable: false, thStyle: 'width: 30%;', thClass: 'text-right', tdClass: 'text-right' },
-            // { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-            // { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 25%;', tdClass: 'text-left' },
+            { key: 'tokens', label: 'Base Tokens', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'quoteTokens', label: 'Quote Tokens', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
-          // pairFields: [
-          //   { key: 'makerBuyInfo', label: 'Maker Buy Info', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-          //   { key: 'makerBuy', label: 'Maker Buy', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-          //   { key: 'makerBuyAmount', label: 'Buy Amount', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-          //   { key: 'price', label: 'Price', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-          //   { key: 'makerSellAmount', label: 'Sell Amount', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-          //   { key: 'makerSell', label: 'Maker Sell', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-          //   { key: 'makerSellInfo', label: 'Maker Sell Info', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-          //   // { key: 'pairKey', label: 'Pair Key', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-          //   // { key: 'base.symbol', label: 'Base', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-          //   // { key: 'base.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
-          //   // { key: 'quote.symbol', label: 'Quote', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-          //   // { key: 'quote.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
-          // ],
           tokensFields: [
             { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
@@ -1497,7 +1475,7 @@
             if (this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
               for (const [itemIndex, item] of pair.history.entries()) {
-                console.log(itemIndex + " " + JSON.stringify(item));
+                // console.log(itemIndex + " " + JSON.stringify(item));
                 results.push({
                   // txHash: item.txHash,
                   // blockNumber: item.blockNumber,
@@ -1531,7 +1509,7 @@
           },
           filteredSortedPairHistory() {
             let results = this.filteredPairHistory;
-            // TODO
+            results.sort((a, b) => b.blockNumber - a.blockNumber);
             return results;
           },
           pagedFilteredSortedPairBuyOrders() {
@@ -1541,7 +1519,7 @@
             return this.filteredSortedPairSellOrders.slice((this.settings.pairTable.sellOrders.currentPage - 1) * this.settings.pairTable.sellOrders.pageSize, this.settings.pairTable.sellOrders.currentPage * this.settings.pairTable.sellOrders.pageSize);
           },
           pagedFilteredSortedPairHistory() {
-            return this.filteredSortedPairHistory.slice((this.settings.pairTable.buyOrders.currentPage - 1) * this.settings.pairTable.buyOrders.pageSize, this.settings.pairTable.buyOrders.currentPage * this.settings.pairTable.buyOrders.pageSize);
+            return this.filteredSortedPairHistory.slice((this.settings.pairTable.history.currentPage - 1) * this.settings.pairTable.history.pageSize, this.settings.pairTable.history.currentPage * this.settings.pairTable.history.pageSize);
           },
           // pagedFilteredSortedPairHistory() {
           //   return this.filteredSortedPairHistory.slice((this.settings.pairTable.history.currentPage - 1) * this.settings.pairTable.history.pageSize, this.settings.pairTable.history.currentPage * this.settings.pairTable.history.pageSize);
@@ -2163,38 +2141,20 @@
                 const txHash = event.transactionHash;
                 const blockNumber = event.blockNumber;
                 let record = null;
-                // event PairAdded(PairKey indexed pairKey, Token indexed base, Token indexed quote, uint8 baseDecimals, uint8 quoteDecimals, Factor multiplier, Factor divisor);
                 if (logData.eventFragment.name == "PairAdded") {
                   const [pairKey, base, quote, baseDecimals, quoteDecimals, multiplier, divisor] = logData.args;
-                  // console.log("PairAdded(" + pairKey + ", " + base + ", " + quote + ", " + baseDecimals + ", " + quoteDecimals + ", " + multiplier + ", " + divisor + ")");
                   record = { action: "pairadded", pairKey, base, quote, baseDecimals, quoteDecimals, multiplier, divisor };
-                  // event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens);
                 } else if (logData.eventFragment.name == "OrderAdded") {
                   const [pairKey, orderKey, maker, buySell, price, expiry, tokens] = logData.args;
-                  // console.log("OrderAdded(" + pairKey + ", " + orderKey + ", " + maker + ", " + buySell + ", " + price + ", " + expiry + ", " + tokens + ")");
-                  record = { action: "orderadded", pairKey, orderKey, maker, buySell, price: ethers.BigNumber.from(price).toString(), expiry: parseInt(expiry), tokens: ethers.BigNumber.from(tokens).toString() };
-                // event Trade(TradeInfo tradeInfo);
-                // struct TradeInfo {
-                //     PairKey pairKey;
-                //     OrderKey orderKey;
-                //     BuySell buySell;
-                //     Account taker;
-                //     Account maker;
-                //     uint tokens;
-                //     uint quoteTokens;
-                //     Price price;
-                // }
+                  const pair = this.pairs[pairKey];
+                  record = { action: "orderadded", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, maker, buySell, price: ethers.BigNumber.from(price).toString(), expiry: parseInt(expiry), tokens: ethers.BigNumber.from(tokens).toString() };
                 } else if (logData.eventFragment.name == "Trade") {
                   const [tradeInfo] = logData.args;
-                  // console.log(logData.eventFragment.name + ": " + JSON.stringify(event, null, 2));
-                  // console.log(" -      : " + JSON.stringify(tradeInfo, null, 2));
                   const [pairKey, orderKey, buySell, taker, maker, tokens, quoteTokens, price] = tradeInfo;
-                  // console.log("Trade(" + pairKey + ", " + orderKey + ", " + buySell + ", " + taker + ", " + maker + ", " + tokens + ", " + quoteTokens + ", " + price + ")");
-                  record = { action: "trade", pairKey, orderKey, taker, maker, tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), price: ethers.BigNumber.from(price).toString() };
-                  // event TradeSummary(BuySell buySell, Account indexed taker, Tokens filled, Tokens quoteTokensFilled, Price price, Tokens tokensOnOrder);
+                  const pair = this.pairs[pairKey];
+                  record = { action: "trade", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, taker, maker, tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), price: ethers.BigNumber.from(price).toString() };
                 } else if (logData.eventFragment.name == "TradeSummary") {
                   const [buySell, taker, filled, quoteTokensFilled, tokensOnOrder] = logData.args;
-                  // console.log("TradeSummary(" + buySell + ", " + taker + ", " + filled + ", " + quoteTokensFilled + ", " + tokensOnOrder + ")");
                   record = { action: "tradesummary", buySell, taker, filled: ethers.BigNumber.from(filled).toString(), quoteTokensFilled: ethers.BigNumber.from(quoteTokensFilled).toString(), tokensOnOrder: ethers.BigNumber.from(tokensOnOrder).toString() };
                 }
                 // event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, Tokens filled);
