@@ -1281,7 +1281,7 @@
             const filterRegex = this.settings.pairsTable.filter && this.settings.pairsTable.filter.length > 0 ? new RegExp(this.settings.pairsTable.filter, 'i') : null;
             console.log("filterRegex: " + JSON.stringify(filterRegex));
             for (const [pairKey, pair] of Object.entries(this.pairs)) {
-              console.log("filteredPairs - pairKey: " + pairKey + ", pair: " + JSON.stringify(pair, null, 2));
+              // console.log("filteredPairs - pairKey: " + pairKey + ", pair: " + JSON.stringify(pair, null, 2));
               let include = true;
               if (filterRegex) {
                 if (!filterRegex.test(pair.base.symbol) && !filterRegex.test(pair.base.name) && !filterRegex.test(pair.quote.symbol) && !filterRegex.test(pair.quote.name)) {
@@ -1306,24 +1306,35 @@
             return this.filteredSortedPairs.slice((this.settings.pairsTable.currentPage - 1) * this.settings.pairsTable.pageSize, this.settings.pairsTable.currentPage * this.settings.pairsTable.pageSize);
           },
           filteredPair() {
+            console.log("filteredPair");
             const results = [];
-            const filterRegex = this.settings.pairsTable.filter && this.settings.pairsTable.filter.length > 0 ? new RegExp(this.settings.pairsTable.filter, 'i') : null;
-            console.log("filterRegex: " + JSON.stringify(filterRegex));
-            for (const [pairKey, pair] of Object.entries(this.pairs)) {
-              console.log("filteredPair - pairKey: " + pairKey + ", pair: " + JSON.stringify(pair, null, 2));
-              let include = true;
-              if (filterRegex) {
-                if (!filterRegex.test(pair.base.symbol) && !filterRegex.test(pair.base.name) && !filterRegex.test(pair.quote.symbol) && !filterRegex.test(pair.quote.name)) {
-                  include = false;
-                }
-              }
-              if (include) {
-                results.push({
-                  pairKey,
-                  ...pair,
-                });
+
+            if (this.settings.pairTable.selectedPair in this.pair) {
+              const pair = this.pair[this.settings.pairTable.selectedPair];
+              console.log("pair: " + JSON.stringify(pair, null, 2));
+              for (let buySell = 0; buySell < 2; buySell++) {
+                const orders = pair[buySell];
+                console.log("buySell: " + buySell + " " + JSON.stringify(orders, null, 2));
               }
             }
+
+            // const filterRegex = this.settings.pairTable.filter && this.settings.pairTable.filter.length > 0 ? new RegExp(this.settings.pairTable.filter, 'i') : null;
+            // console.log("filterRegex: " + JSON.stringify(filterRegex));
+            // for (const [pairKey, pair] of Object.entries(this.pairs)) {
+            //   console.log("filteredPair - pairKey: " + pairKey + ", pair: " + JSON.stringify(pair, null, 2));
+            //   let include = true;
+            //   if (filterRegex) {
+            //     if (!filterRegex.test(pair.base.symbol) && !filterRegex.test(pair.base.name) && !filterRegex.test(pair.quote.symbol) && !filterRegex.test(pair.quote.name)) {
+            //       include = false;
+            //     }
+            //   }
+            //   if (include) {
+            //     results.push({
+            //       pairKey,
+            //       ...pair,
+            //     });
+            //   }
+            // }
             return results;
           },
           filteredSortedPair() {
@@ -1332,7 +1343,7 @@
             return results;
           },
           pagedFilteredSortedPair() {
-            return this.filteredSortedPairs.slice((this.settings.tokensTable.currentPage - 1) * this.settings.tokensTable.pageSize, this.settings.tokensTable.currentPage * this.settings.tokensTable.pageSize);
+            return this.filteredSortedPair.slice((this.settings.pairTable.currentPage - 1) * this.settings.pairTable.pageSize, this.settings.pairTable.currentPage * this.settings.pairTable.pageSize);
           },
           filteredTokens() {
             const results = [];
