@@ -1,3 +1,4 @@
+Compiled 1 Solidity file successfully
 
 
   Dexz
@@ -12,7 +13,7 @@
         Token1 deployed
         > Deployed WETH - gasUsed: 555407 ~ ETH 0.02221628 ~ USD 44
         WETH deployed
-        > Deployed Dexz - gasUsed: 4064052 ~ ETH 0.16256208 ~ USD 325
+        > Deployed Dexz - gasUsed: 4152219 ~ ETH 0.16608876 ~ USD 332
         Dexz deployed
         > Transfer Token0 - gasUsed: 51421 ~ ETH 0.00205684 ~ USD 4
           + Token0:0x5FbD 5.0 Transfer(from: deployer:0xf39F, to: user0:0x7099, tokens: 100.0)
@@ -64,14 +65,14 @@
         > user3->weth.approve(dexz, 50.1234) - gasUsed: 46179 ~ ETH 0.00184716 ~ USD 3
           + WETH:0x9fE4 28.0 Approval(tokenOwner: user3:0x15d3, spender: Dexz:0xCf7E, tokens: 50.1234)
 
-        --- Setup Completed. Dexz bytecode ~18597 ---
+        --- Setup Completed. Dexz bytecode ~19005 ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
           -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F       9999.990130310070136557                      0.0                      0.0                      0.0
-          user0:0x7099          9899.999794983164158084                    100.0                    100.0                    100.0
-          user1:0x3C44          9899.999800423475269363                    100.0                    100.0                    100.0
-          user2:0x90F7          9899.999804285905571681                    100.0                    100.0                    100.0
-          user3:0x15d3          9899.999807063333863029                    100.0                    100.0                    100.0
+          deployer:0xf39F       9999.989989551784783451                      0.0                      0.0                      0.0
+          user0:0x7099          9899.999794965606505179                    100.0                    100.0                    100.0
+          user1:0x3C44          9899.999800410315581499                    100.0                    100.0                    100.0
+          user2:0x90F7          9899.999804275868217509                    100.0                    100.0                    100.0
+          user3:0x15d3          9899.999807055541814698                    100.0                    100.0                    100.0
           Dexz:0xCf7E                               0.0                      0.0                      0.0                      0.0
 
           Dexz: Dexz:0xCf7E
@@ -83,40 +84,61 @@
     "base": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
     "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     "price": "690100000000",
-    "expiry": 1685241466,
+    "targetPrice": "690100000000",
+    "expiry": 1685292135,
     "tokens": "1000000000000000000"
+  },
+  {
+    "action": 2,
+    "buySell": 0,
+    "base": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+    "price": "690200000000",
+    "targetPrice": "690200000000",
+    "expiry": 1685292135,
+    "tokens": "2000000000000000000"
+  },
+  {
+    "action": 2,
+    "buySell": 0,
+    "base": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+    "price": "690300000000",
+    "targetPrice": "690300000000",
+    "expiry": 1685292135,
+    "tokens": "3000000000000000000"
   }
 ]
-        > user0->dexz.execute(actionsA) - gasUsed: 277627 ~ ETH 0.01110508 ~ USD 22
-          + Dexz:0xCf7E 29.0 PairAdded(pairKey: 0x4c038ad6, base: Token0:0x5FbD, quote: WETH:0x9fE4, baseDecimals: 18, quoteDecimals: 18, multiplier: 12, divisor: 0)
-          + Dexz:0xCf7E 29.1 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0xf8b1520a, maker: user0:0x7099, buySell: 0, price: 0.6901, expiry: 1685241466, tokens: 1.0)
-        > user1->dexz.execute(actionsA) - gasUsed: 116723 ~ ETH 0.00466892 ~ USD 9
-          + Dexz:0xCf7E 30.0 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0xa7fb7af5, maker: user1:0x3C44, buySell: 0, price: 0.6901, expiry: 1685241466, tokens: 1.0)
-        > user2->dexz.execute(actionsA) - gasUsed: 116723 ~ ETH 0.00466892 ~ USD 9
-          + Dexz:0xCf7E 31.0 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x247d02de, maker: user2:0x90F7, buySell: 0, price: 0.6901, expiry: 1685241466, tokens: 1.0)
+        > user0->dexz.execute(actionsA) - gasUsed: 608010 ~ ETH 0.0243204 ~ USD 48
+          + Dexz:0xCf7E 29.0 PairAdded(pairKey: 0x4c038ad6, maker: user0:0x7099, base: Token0:0x5FbD, quote: WETH:0x9fE4, baseDecimals: 18, quoteDecimals: 18, multiplier: 12, divisor: 0)
+          + Dexz:0xCf7E 29.1 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0xf8b1520a, maker: user0:0x7099, buySell: 0, price: 0.6901, expiry: 1685292135, tokens: 1.0, quoteTokens: 0.6901)
+          + Dexz:0xCf7E 29.2 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0xaf619da9, maker: user0:0x7099, buySell: 0, price: 0.6902, expiry: 1685292135, tokens: 2.0, quoteTokens: 1.3804)
+          + Dexz:0xCf7E 29.3 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0xb64444b7, maker: user0:0x7099, buySell: 0, price: 0.6903, expiry: 1685292135, tokens: 3.0, quoteTokens: 2.0709)
 
         --- After Adding Orders ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
           -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F       9999.990130310070136557                      0.0                      0.0                      0.0
-          user0:0x7099          9899.999511197345924635                    100.0                    100.0                    100.0
-          user1:0x3C44          9899.999681428796135589                    100.0                    100.0                    100.0
-          user2:0x90F7          9899.999685572976617335                    100.0                    100.0                    100.0
-          user3:0x15d3          9899.999807063333863029                    100.0                    100.0                    100.0
+          deployer:0xf39F       9999.989989551784783451                      0.0                      0.0                      0.0
+          user0:0x7099          9899.999173456738119969                    100.0                    100.0                    100.0
+          user1:0x3C44          9899.999800410315581499                    100.0                    100.0                    100.0
+          user2:0x90F7          9899.999804275868217509                    100.0                    100.0                    100.0
+          user3:0x15d3          9899.999807055541814698                    100.0                    100.0                    100.0
           Dexz:0xCf7E                               0.0                      0.0                      0.0                      0.0
 
           Dexz: Dexz:0xCf7E
           ----- Pair 0x4c038ad6bfca2133ee6f20ac54377d10fb6f3756d2321ead7428e24817161e77 Token0:0x5FbD/WETH:0x9fE4 12 0 -----
               #      BUY Price OrderKey   Next       Maker         Expiry(s)                Tokens                Filled         AvailableBase        AvailableQuote
             --- -------------- ---------- ---------- ------------ ---------- --------------------- --------------------- --------------------- ---------------------
-              0         0.6901 0xf8b1520a 0xa7fb7af5 user0:0x7099      59.99                   1.0                   0.0 72.632082306912041733              50.1234
-              1         0.6901 0xa7fb7af5 0x247d02de user1:0x3C44      59.99                   1.0                   0.0 72.632082306912041733              50.1234
-              2         0.6901 0x247d02de 0x00000000 user2:0x90F7      59.99                   1.0                   0.0 72.632082306912041733              50.1234
+              0         0.6903 0xb64444b7 0x00000000 user0:0x7099      59.99                   3.0                   0.0 72.611038678835289004              50.1234
+              1         0.6902 0xaf619da9 0x00000000 user0:0x7099      59.99                   2.0                   0.0 72.621558968414952187              50.1234
+              2         0.6901 0xf8b1520a 0x00000000 user0:0x7099      59.99                   1.0                   0.0 72.632082306912041733              50.1234
 
-            price: 0.6901 head=0xf8b1520a tail=0x247d02de
-              Order key=0xf8b1520a next=0xa7fb7af5 maker=user0:0x7099 expiry=59.99s tokens=1.0 filled=0.0
-              Order key=0xa7fb7af5 next=0x247d02de maker=user1:0x3C44 expiry=59.99s tokens=1.0 filled=0.0
-              Order key=0x247d02de next=0x00000000 maker=user2:0x90F7 expiry=59.99s tokens=1.0 filled=0.0
+            price: 0.6903 head=0xb64444b7 tail=0xb64444b7
+              Order key=0xb64444b7 next=0x00000000 maker=user0:0x7099 expiry=59.99s tokens=3.0 filled=0.0
+            price: 0.6902 head=0xaf619da9 tail=0xaf619da9
+              Order key=0xaf619da9 next=0x00000000 maker=user0:0x7099 expiry=59.99s tokens=2.0 filled=0.0
+            price: 0.6901 head=0xf8b1520a tail=0xf8b1520a
+              Order key=0xf8b1520a next=0x00000000 maker=user0:0x7099 expiry=59.99s tokens=1.0 filled=0.0
 
               #     SELL Price OrderKey   Next       Maker         Expiry(s)                Tokens                Filled         AvailableBase        AvailableQuote
             --- -------------- ---------- ---------- ------------ ---------- --------------------- --------------------- --------------------- ---------------------
@@ -129,29 +151,32 @@
     "base": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
     "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     "price": "690100000000",
-    "expiry": 1685241466,
+    "targetPrice": "690233333333",
+    "expiry": 1685292135,
     "tokens": "69000000000000000000"
   }
 ]
-        > user2->dexz.execute(actions) - gasUsed: 318108 ~ ETH 0.01272432 ~ USD 25
-          + Token0:0x5FbD 32.0 Transfer(from: user2:0x90F7, to: user0:0x7099, tokens: 1.0)
-          + WETH:0x9fE4 32.1 Transfer(from: user0:0x7099, to: user2:0x90F7, tokens: 0.6901)
-          + Dexz:0xCf7E 32.2 Trade(tradeInfo: 0x4c038ad6bfca2133ee6f20ac54377d10fb6f3756d2321ead7428e24817161e77,0xf8b1520a05692c21e0e99fd02dececad608cb71c5c888ce0b01567289fefbd70,1,0x90F79bf6EB2c4f870365E785982E1f101E93b906,0x70997970C51812dc3A010C7d01b50e0d17dc79C8,1000000000000000000,690100000000000000,690100000000)
-          + Token0:0x5FbD 32.3 Transfer(from: user2:0x90F7, to: user1:0x3C44, tokens: 1.0)
-          + WETH:0x9fE4 32.4 Transfer(from: user1:0x3C44, to: user2:0x90F7, tokens: 0.6901)
-          + Dexz:0xCf7E 32.5 Trade(tradeInfo: 0x4c038ad6bfca2133ee6f20ac54377d10fb6f3756d2321ead7428e24817161e77,0xa7fb7af54ba1d085586d3a9a7a36dacf4f1a79fb9e6fe698943ad5aad078d448,1,0x90F79bf6EB2c4f870365E785982E1f101E93b906,0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC,1000000000000000000,690100000000000000,690100000000)
-          + Dexz:0xCf7E 32.6 Trade(tradeInfo: 0x4c038ad6bfca2133ee6f20ac54377d10fb6f3756d2321ead7428e24817161e77,0x247d02de516fae42ee96b529c6908ac6b1f0093e07aa515d334bc725e98dc2c3,1,0x90F79bf6EB2c4f870365E785982E1f101E93b906,0x90F79bf6EB2c4f870365E785982E1f101E93b906,1000000000000000000,690100000000000000,690100000000)
-          + Dexz:0xCf7E 32.7 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x19828f94, maker: user2:0x90F7, buySell: 1, price: 0.6901, expiry: 1685241466, tokens: 66.0)
-          + Dexz:0xCf7E 32.8 TradeSummary(buySell: 1, taker: user2:0x90F7, filled: 3000000000000000000, quoteTokensFilled: 2.0703, price: 0.6901, tokensOnOrder: 66000000000000000000)
+        > user2->dexz.execute(actions) - gasUsed: 352856 ~ ETH 0.01411424 ~ USD 28
+          + Token0:0x5FbD 30.0 Transfer(from: user2:0x90F7, to: user0:0x7099, tokens: 3.0)
+          + WETH:0x9fE4 30.1 Transfer(from: user0:0x7099, to: user2:0x90F7, tokens: 2.0709)
+          + Dexz:0xCf7E 30.2 Trade(tradeInfo: 0x4c038ad6bfca2133ee6f20ac54377d10fb6f3756d2321ead7428e24817161e77,0xb64444b745ad2cfa5dcd3d9743ad6768ca10ae7181a9780c0355ba0b3ea5935a,0x90F79bf6EB2c4f870365E785982E1f101E93b906,0x70997970C51812dc3A010C7d01b50e0d17dc79C8,1,690300000000,3000000000000000000,2070900000000000000)
+          + Token0:0x5FbD 30.3 Transfer(from: user2:0x90F7, to: user0:0x7099, tokens: 2.0)
+          + WETH:0x9fE4 30.4 Transfer(from: user0:0x7099, to: user2:0x90F7, tokens: 1.3804)
+          + Dexz:0xCf7E 30.5 Trade(tradeInfo: 0x4c038ad6bfca2133ee6f20ac54377d10fb6f3756d2321ead7428e24817161e77,0xaf619da916099e74128cadcf5032b2bb30ab00716d1a8640762f27caca36ec43,0x90F79bf6EB2c4f870365E785982E1f101E93b906,0x70997970C51812dc3A010C7d01b50e0d17dc79C8,1,690200000000,2000000000000000000,1380400000000000000)
+          + Token0:0x5FbD 30.6 Transfer(from: user2:0x90F7, to: user0:0x7099, tokens: 1.0)
+          + WETH:0x9fE4 30.7 Transfer(from: user0:0x7099, to: user2:0x90F7, tokens: 0.6901)
+          + Dexz:0xCf7E 30.8 Trade(tradeInfo: 0x4c038ad6bfca2133ee6f20ac54377d10fb6f3756d2321ead7428e24817161e77,0xf8b1520a05692c21e0e99fd02dececad608cb71c5c888ce0b01567289fefbd70,0x90F79bf6EB2c4f870365E785982E1f101E93b906,0x70997970C51812dc3A010C7d01b50e0d17dc79C8,1,690100000000,1000000000000000000,690100000000000000)
+          + Dexz:0xCf7E 30.9 OrderAdded(pairKey: 0x4c038ad6, orderKey: 0x19828f94, maker: user2:0x90F7, buySell: 1, price: 0.6901, expiry: 1685292135, tokens: 63.0, quoteTokens: 43.4763)
+          + Dexz:0xCf7E 30.10 TradeSummary(pairKey: 0x4c038ad6, taker: user2:0x90F7, buySell: 1, price: 0.690233333333, tokens: 6.0, quoteTokens: 4.1414, tokensOnOrder: 63000000000000000000)
 
         --- After Executing Against Orders ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
           -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F       9999.990130310070136557                      0.0                      0.0                      0.0
-          user0:0x7099          9899.999511197345924635                    101.0                    100.0                  99.3099
-          user1:0x3C44          9899.999681428796135589                    101.0                    100.0                  99.3099
-          user2:0x90F7          9899.999362714400415859                     98.0                    100.0                 101.3802
-          user3:0x15d3          9899.999807063333863029                    100.0                    100.0                    100.0
+          deployer:0xf39F       9999.989989551784783451                      0.0                      0.0                      0.0
+          user0:0x7099          9899.999173456738119969                    106.0                    100.0                  95.8586
+          user1:0x3C44          9899.999800410315581499                    100.0                    100.0                    100.0
+          user2:0x90F7          9899.999444525415892077                     94.0                    100.0                 104.1414
+          user3:0x15d3          9899.999807055541814698                    100.0                    100.0                    100.0
           Dexz:0xCf7E                               0.0                      0.0                      0.0                      0.0
 
           Dexz: Dexz:0xCf7E
@@ -162,12 +187,12 @@
 
               #     SELL Price OrderKey   Next       Maker         Expiry(s)                Tokens                Filled         AvailableBase        AvailableQuote
             --- -------------- ---------- ---------- ------------ ---------- --------------------- --------------------- --------------------- ---------------------
-              0         0.6901 0x19828f94 0x00000000 user2:0x90F7      59.99                  66.0                   0.0                  98.0              67.6298
+              0         0.6901 0x19828f94 0x00000000 user2:0x90F7      59.99                  63.0                   0.0                  94.0              64.8694
 
             price: 0.6901 head=0x19828f94 tail=0x19828f94
-              Order key=0x19828f94 next=0x00000000 maker=user2:0x90F7 expiry=59.99s tokens=66.0 filled=0.0
+              Order key=0x19828f94 next=0x00000000 maker=user2:0x90F7 expiry=59.99s tokens=63.0 filled=0.0
 
-    ✔ 00. Test 00 (224ms)
+    ✔ 00. Test 00 (235ms)
 
 
   1 passing (1s)

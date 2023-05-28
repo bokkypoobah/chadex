@@ -250,8 +250,8 @@
                       {{ formatExpiry(data.item.expiry) }}
                     </template>
                     <template #cell(maker)="data">
-                      <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                        {{ data.item.maker.substring(0, 10) }}
+                      <b-link v-if="data.item.maker" :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                        {{ data.item.maker == coinbase ? "(me)" : data.item.maker.substring(0, 10) }}
                       </b-link>
                     </template>
                   </b-table>
@@ -268,8 +268,8 @@
                       {{ formatExpiry(data.item.expiry) }}
                     </template>
                     <template #cell(maker)="data">
-                      <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                        {{ data.item.maker.substring(0, 10) }}
+                      <b-link v-if="data.item.maker" :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                        {{ data.item.maker == coinbase ? "(me)" : data.item.maker.substring(0, 10) }}
                       </b-link>
                     </template>
                   </b-table>
@@ -277,21 +277,24 @@
               </b-row>
               <b-table small fixed striped responsive hover :fields="pairHistoryFields" :items="pagedFilteredSortedPairHistory" show-empty empty-html="Click Sync above to retrieve sell orders" head-variant="light" class="mx-0 my-1">
                 <template #cell(blockNumber)="data">
-                  <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                  <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'txIndex: ' + data.item.transactionIndex + ' logIndex: ' + data.item.logIndex" target="_blank">
                     {{ data.item.blockNumber }}
                   </b-link>
+                  <!-- <font size="-2">
+                    {{ '.' + data.item.transactionIndex + '/' + data.item.logIndex }}
+                  </font> -->
                 </template>
                 <template #cell(action)="data">
                   {{ actionText[data.item.action] || "Unknown" }}
                 </template>
                 <template #cell(taker)="data">
                   <b-link v-if="data.item.taker" :href="'https://sepolia.etherscan.io/address/' + data.item.taker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                    {{ data.item.taker.substring(0, 10) }}
+                    {{ data.item.taker == coinbase ? "(me)" : data.item.taker.substring(0, 10) }}
                   </b-link>
                 </template>
                 <template #cell(maker)="data">
                   <b-link v-if="data.item.maker" :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                    {{ data.item.maker.substring(0, 10) }}
+                    {{ data.item.maker == coinbase ? "(me)" : data.item.maker.substring(0, 10) }}
                   </b-link>
                 </template>
                 <template #cell(base)="data">
@@ -320,7 +323,7 @@
           <!-- 2:TOKENS -->
           <b-card v-if="coinbase && settings.tabIndex == 2" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
-              Tokens
+              ERC-20 Tokens
             </template>
             <div class="d-flex flex-wrap m-0 p-0">
               <div class="mt-0 pr-1">
@@ -381,7 +384,7 @@
 
             <b-table small fixed striped responsive hover :fields="tokensFields" :items="pagedFilteredSortedTokens" show-empty empty-html="Click [+] above to add a new ERC-20 token contract. Currently only TURBO supported" head-variant="light" class="mx-0 my-1">
               <template #head(address)="data">
-                ERC-20 Token Address <b-link v-b-modal.new-coin-modal-prevent-closing variant="link" v-b-popover.hover.top="'Add new token'"><b-icon-plus-square shift-v="+1" font-scale="0.8"></b-icon-plus-square></b-link>
+                Address <b-link v-b-modal.new-coin-modal-prevent-closing variant="link" v-b-popover.hover.top="'Add new token'"><b-icon-plus-square shift-v="+1" font-scale="0.8"></b-icon-plus-square></b-link>
                 <b-modal id="new-coin-modal-prevent-closing" ref="modal" title="New ERC-20 Token Address" @show="newCoinAddressResetModal" @hidden="newCoinAddressResetModal" @ok="newCoinAddressHandleOk">
                   <form ref="coinForm" @submit.stop.prevent="newCoinAddressHandleSubmit">
                     <b-form-group label="Address" label-for="name-input" :state="newCoinAddressState" description="Pre-filled with WEENUS on Sepolia for initial testing" invalid-feedback="Please enter a valid Ethereum ERC-20 address">
@@ -416,7 +419,7 @@
               </template>
               <template #cell(address)="data">
                 <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.address + '#code'" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                  {{ data.item.address }}
+                  {{ data.item.address.substring(0, 10) }}
                 </b-link>
               </template>
               <template #cell(allowance)="data">
@@ -475,7 +478,10 @@
                       <b-form-input type="text" size="sm" id="raw-buysell" v-model.trim="raw.buySell" placeholder="'0' or '1'" class="w-25"></b-form-input>
                     </b-form-group>
                     <b-form-group label="Price:" label-for="raw-price" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Raw price with up to 12 whole-number and 11 decimal places" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="raw-price" v-model.trim="raw.price" placeholder="e.g. 0.69012345678'" class="w-50"></b-form-input>
+                      <b-form-input type="text" size="sm" id="raw-price" v-model.trim="raw.price" placeholder="e.g. 0.69012345678" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Target Price:" label-for="raw-targetprice" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Target price ONLY when filling orders (max for Buy, min for Sell, 0 to ignore)" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="raw-targetprice" v-model.trim="raw.targetPrice" placeholder="e.g. 0.69015" class="w-50"></b-form-input>
                     </b-form-group>
                     <b-form-group label="Expiry:" label-for="raw-expiry" label-size="sm" label-cols-sm="2" label-align-sm="right"  description="Unix time. '0' for no expiry" class="mx-0 my-1 p-0">
                       <b-form-input type="text" size="sm" id="raw-expiry" v-model.trim="raw.expiry" placeholder="e.g. '1704027599' for 23:59:59 31/12/2023" class="w-25"></b-form-input>
@@ -1060,6 +1066,7 @@
             quote: "0x07391dbE03e7a0DEa0fce6699500da081537B6c3",
             buySell: 0,
             price: "0.69012345678",
+            targetPrice: "0.69015",
             expiry: 1704027599,
             tokens: "1.012345678901234567",
           },
@@ -1185,22 +1192,22 @@
             { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'base', label: 'Base', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'quote', label: 'Quote', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'price', label: 'Price', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'tokens', label: 'Base Tokens', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'quoteTokens', label: 'Quote Tokens', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'price', label: 'Price', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'tokens', label: 'Base Tokens', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'quoteTokens', label: 'Quote Tokens', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
           ],
           tokensFields: [
-            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
             { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
-            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
-            { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 7%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'allowance', label: 'Allowance', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 13%;', tdClass: 'text-truncate' },
+            { key: 'decimals', label: 'Decs', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'allowance', label: 'Allowance', sortable: false, thStyle: 'width: 17%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 17%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 17%;', thClass: 'text-right', tdClass: 'text-right' },
             // { key: 'sync', label: 'Sync', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
             // { key: 'include', label: 'Include', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
             { key: 'getSome', label: 'Get Some', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-            { key: 'delete', label: 'Delete', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+            { key: 'delete', label: 'Delete', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
           ],
           accountsFields: [
             { key: 'address', label: '#', sortable: false, thStyle: 'width: 30%;', tdClass: 'text-truncate' },
@@ -1509,7 +1516,17 @@
           },
           filteredSortedPairHistory() {
             let results = this.filteredPairHistory;
-            results.sort((a, b) => b.blockNumber - a.blockNumber);
+            results.sort((a, b) => {
+              if (a.blockNumber == b.blockNumber) {
+                if (a.transactionIndex == b.transactionIndex) {
+                  return a.logIndex - b.logIndex;
+                } else {
+                  return a.transactionIndex - b.transactionIndex;
+                }
+              } else {
+                return b.blockNumber - a.blockNumber;
+              }
+            });
             return results;
           },
           pagedFilteredSortedPairBuyOrders() {
@@ -2077,7 +2094,7 @@
                 }
                 this.sync.completed++;
               }
-              localStorage.dexzPairs = JSON.stringify(this.pairs);
+              localStorage.dexzPairsV1 = JSON.stringify(this.pairs);
             // }
             console.log("this.settings.pairTable.selectedPair: " + this.settings.pairTable.selectedPair);
             if (section == "pair" && this.settings.pairTable.selectedPair in this.pairs) {
@@ -2137,35 +2154,38 @@
               const eventLogs = await provider.getLogs(filter);
               for (const event of eventLogs) {
                 const logData = dexzContract.interface.parseLog(event);
-                // console.log(logData.eventFragment.name + ": " + JSON.stringify(event));
+                console.log(logData.eventFragment.name + ": " + JSON.stringify(event));
                 const txHash = event.transactionHash;
                 const blockNumber = event.blockNumber;
+                const transactionIndex = event.transactionIndex;
+                const logIndex = event.logIndex;
                 let record = null;
                 if (logData.eventFragment.name == "PairAdded") {
-                  const [pairKey, base, quote, baseDecimals, quoteDecimals, multiplier, divisor] = logData.args;
-                  record = { action: "pairadded", pairKey, base, quote, baseDecimals, quoteDecimals, multiplier, divisor };
+                  const [pairKey, maker, base, quote, baseDecimals, quoteDecimals, multiplier, divisor] = logData.args;
+                  record = { action: "pairadded", pairKey, maker, base, quote, baseDecimals, quoteDecimals, multiplier, divisor };
                 } else if (logData.eventFragment.name == "OrderAdded") {
-                  const [pairKey, orderKey, maker, buySell, price, expiry, tokens] = logData.args;
+                  const [pairKey, orderKey, maker, buySell, price, expiry, tokens, quoteTokens] = logData.args;
                   const pair = this.pairs[pairKey];
-                  record = { action: "orderadded", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, maker, buySell, price: ethers.BigNumber.from(price).toString(), expiry: parseInt(expiry), tokens: ethers.BigNumber.from(tokens).toString() };
+                  record = { action: "orderadded", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, maker, buySell, price: ethers.BigNumber.from(price).toString(), expiry: parseInt(expiry), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString() };
                 } else if (logData.eventFragment.name == "Trade") {
                   const [tradeInfo] = logData.args;
-                  const [pairKey, orderKey, buySell, taker, maker, tokens, quoteTokens, price] = tradeInfo;
+                  const [pairKey, orderKey, taker, maker, buySell, price, tokens, quoteTokens] = tradeInfo;
                   const pair = this.pairs[pairKey];
-                  record = { action: "trade", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, taker, maker, tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), price: ethers.BigNumber.from(price).toString() };
+                  record = { action: "trade", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, taker, maker, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString() };
                 } else if (logData.eventFragment.name == "TradeSummary") {
-                  const [buySell, taker, filled, quoteTokensFilled, tokensOnOrder] = logData.args;
-                  record = { action: "tradesummary", buySell, taker, filled: ethers.BigNumber.from(filled).toString(), quoteTokensFilled: ethers.BigNumber.from(quoteTokensFilled).toString(), tokensOnOrder: ethers.BigNumber.from(tokensOnOrder).toString() };
+                  const [pairKey, taker, buySell, price, filled, quoteTokensFilled, tokensOnOrder] = logData.args;
+                  const pair = this.pairs[pairKey];
+                  record = { action: "tradesummary", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, taker, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(filled).toString(), quoteTokens: ethers.BigNumber.from(quoteTokensFilled).toString(), tokensOnOrder: ethers.BigNumber.from(tokensOnOrder).toString() };
                 }
                 // event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, Tokens filled);
                 // event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens);
                 if (record) {
-                  records.push({ txHash, blockNumber, ...record });
+                  records.push({ txHash, blockNumber, transactionIndex, logIndex, ...record });
                 }
               }
               Vue.set(this.pair[this.settings.pairTable.selectedPair], 'history', records);
               console.log("this.pair: " + JSON.stringify(this.pair, null, 2));
-              localStorage.dexzPair = JSON.stringify(this.pair);
+              localStorage.dexzPairV1 = JSON.stringify(this.pair);
             }
 
             this.sync.section = null;
@@ -2469,6 +2489,7 @@
               quote: this.raw.quote,
               buySell: this.raw.buySell,
               price: ethers.utils.parseUnits(this.raw.price, 12).toString(),
+              targetPrice: ethers.utils.parseUnits(this.raw.targetPrice, 12).toString(),
               expiry: this.raw.expiry,
               tokens: ethers.utils.parseUnits(this.raw.tokens, baseDecimals).toString(),
             };
@@ -4143,11 +4164,11 @@
           if ('dexzChainId' in localStorage) {
             this.chainId = localStorage.dexzChainId;
           }
-          if ('dexzPairs' in localStorage) {
-            this.pairs = JSON.parse(localStorage.dexzPairs);
+          if ('dexzPairsV1' in localStorage) {
+            this.pairs = JSON.parse(localStorage.dexzPairsV1);
           }
-          if ('dexzPair' in localStorage) {
-            this.pair = JSON.parse(localStorage.dexzPair);
+          if ('dexzPairV1' in localStorage) {
+            this.pair = JSON.parse(localStorage.dexzPairV1);
             console.log("this.pair: " + JSON.stringify(this.pair, null, 2));
           }
           if ('dexzSettings' in localStorage) {
