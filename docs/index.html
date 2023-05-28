@@ -236,7 +236,8 @@
                   <b-form-select size="sm" v-model="settings.pairsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
                 </div>
               </div>
-              <b-table small fixed striped responsive hover :fields="pairsFields" :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1">
+              <!-- <b-table small fixed striped responsive hover :fields="pairsFields" :items="pagedFilteredSortedPair" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1"> -->
+              <b-table small fixed striped responsive hover :items="pagedFilteredSortedPair" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1">
               </b-table>
             </b-card-text>
           </b-card>
@@ -3979,7 +3980,7 @@
           }
           if ('dexzPair' in localStorage) {
             this.pair = JSON.parse(localStorage.dexzPair);
-            console.log("this.pair: " + JSON.stringify(this.pair));
+            console.log("this.pair: " + JSON.stringify(this.pair, null, 2));
           }
           if ('dexzSettings' in localStorage) {
             const tempSettings = JSON.parse(localStorage.dexzSettings);
