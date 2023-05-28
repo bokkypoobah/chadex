@@ -250,7 +250,9 @@
                       {{ formatExpiry(data.item.expiry) }}
                     </template>
                     <template #cell(maker)="data">
-                      {{ data.item.maker.substring(0, 10) }}
+                      <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                        {{ data.item.maker.substring(0, 10) }}
+                      </b-link>
                     </template>
                   </b-table>
                 </b-col>
@@ -266,12 +268,19 @@
                       {{ formatExpiry(data.item.expiry) }}
                     </template>
                     <template #cell(maker)="data">
-                      {{ data.item.maker.substring(0, 10) }}
+                      <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                        {{ data.item.maker.substring(0, 10) }}
+                      </b-link>
                     </template>
                   </b-table>
                 </b-col>
               </b-row>
               <b-table small fixed striped responsive hover :fields="pairHistoryFields" :items="pagedFilteredSortedPairHistory" show-empty empty-html="Click Sync above to retrieve sell orders" head-variant="light" class="mx-0 my-1">
+                <template #cell(blockNumber)="data">
+                  <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                    {{ data.item.blockNumber }}
+                  </b-link>
+                </template>
                 <template #cell(action)="data">
                   {{ actionText[data.item.action] || "Unknown" }}
                 </template>
@@ -1467,6 +1476,7 @@
               for (const [itemIndex, item] of pair.history.entries()) {
                 console.log(itemIndex + " " + JSON.stringify(item));
                 results.push({
+                  txHash: item.txHash,
                   blockNumber: item.blockNumber,
                   action: item.action,
                 //   price: order.price,
