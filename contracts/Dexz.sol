@@ -612,8 +612,18 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 // expiries[i] = order.expiry;
                 // tokenss[i] = order.tokens;
                 // filleds[i] = order.filled;
-                Tokens available = Tokens.wrap(uint128(availableTokens(buySell == BuySell.Buy ? pair.base : pair.quote, order.maker)));
-                orderInfos[i] = OrderInfo(price, orderKey, order.next, order.maker, order.expiry, order.tokens, order.filled, available);
+                uint available;
+                if (buySell == BuySell.Buy) {
+                    available = availableTokens(pair.base, order.maker);
+                } else {
+                    available = availableTokens(pair.quote, order.maker);
+                }
+                // Tokens available = Tokens.wrap(uint128(availableTokens(buySell == BuySell.Buy ? pair.base : pair.quote, order.maker)));
+
+                // uint quoteTokens = baseToQuote(moreInfo, uint(uint128(Delta.unwrap(info.tokens))), info.price);
+
+
+                orderInfos[i] = OrderInfo(price, orderKey, order.next, order.maker, order.expiry, order.tokens, order.filled, Tokens.wrap(uint128(available)));
                 orderKey = order.next;
                 i = onePlus(i);
             }
