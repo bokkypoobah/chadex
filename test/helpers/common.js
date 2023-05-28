@@ -237,19 +237,20 @@ class Data {
         const pair = pairInfos[j];
         console.log("          ----- Pair " + pair.pairKey + " " + this.getShortAccountName(pair.baseToken) + "/" + this.getShortAccountName(pair.quoteToken) + " " + pair.multiplier + " " + pair.divisor + " -----");
         for (let buySell = 0; buySell < 2; buySell++) {
-          console.log("              #     " + (buySell == 0 ? " BUY" : "SELL") +" Price OrderKey   Next       Maker         Expiry(s)                Tokens                Filled             Available")
-          console.log("            --- -------------- ---------- ---------- ------------ ---------- --------------------- --------------------- ---------------------");
+          console.log("              #     " + (buySell == 0 ? " BUY" : "SELL") +" Price OrderKey   Next       Maker         Expiry(s)                Tokens                Filled         AvailableBase        AvailableQuote")
+          console.log("            --- -------------- ---------- ---------- ------------ ---------- --------------------- --------------------- --------------------- ---------------------");
 
           let price = PRICE_EMPTY;
           let firstOrderKey = ORDERKEY_SENTINEL;
           const ORDERSIZE = 5;
           const baseDecimals = this.decimals[pair.baseToken];
+          const quoteDecimals = this.decimals[pair.quoteToken];
           let results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
           while (parseInt(results[0][0]) != 0) {
             // console.log("            * --- Start price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
             for (let k = 0; k < results.length && parseInt(results[k][0]) != 0; k++) {
               const orderInfo = results[k];
-              const [price1, orderKey, nextOrderKey, maker, expiry, tokens, filled, available] = orderInfo;
+              const [price1, orderKey, nextOrderKey, maker, expiry, tokens, filled, availableBase, availableQuote] = orderInfo;
               var minutes = (expiry - now / 1000) / 60;
               console.log("              " + (row++) + " " +
                 this.padLeft(ethers.utils.formatUnits(price1, 12), 14) + " " +
@@ -259,7 +260,8 @@ class Data {
                 this.padLeft(minutes.toFixed(2), 10) + " " +
                 this.padLeft(ethers.utils.formatUnits(tokens, baseDecimals), 21) + " " +
                 this.padLeft(ethers.utils.formatUnits(filled, baseDecimals), 21) + " " +
-                this.padLeft(ethers.utils.formatUnits(available, baseDecimals), 21)
+                this.padLeft(ethers.utils.formatUnits(availableBase, baseDecimals), 21) +
+                this.padLeft(ethers.utils.formatUnits(availableQuote, quoteDecimals), 21)
             );
               price = results[k][0];
               firstOrderKey = results[k][2];

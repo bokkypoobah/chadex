@@ -248,8 +248,14 @@ contract DexzBase {
     function baseToQuote(MoreInfo memory moreInfo, uint tokens, Price price) pure internal returns (uint quoteTokens) {
         quoteTokens = uint128((10 ** Factor.unwrap(moreInfo.divisor)) * tokens * uint(Price.unwrap(price)) / (10 ** Factor.unwrap(moreInfo.multiplier)));
     }
+    function baseToQuotePair(Pair memory _pair, uint tokens, Price price) pure internal returns (uint quoteTokens) {
+        quoteTokens = uint128((10 ** Factor.unwrap(_pair.divisor)) * tokens * uint(Price.unwrap(price)) / (10 ** Factor.unwrap(_pair.multiplier)));
+    }
     function quoteToBase(MoreInfo memory moreInfo, uint quoteTokens, Price price) pure internal returns (uint tokens) {
         tokens = (10 ** Factor.unwrap(moreInfo.multiplier)) * quoteTokens / uint(Price.unwrap(price)) / (10 ** Factor.unwrap(moreInfo.divisor));
+    }
+    function quoteToBasePair(Pair memory _pair, uint quoteTokens, Price price) pure internal returns (uint tokens) {
+        tokens = (10 ** Factor.unwrap(_pair.multiplier)) * quoteTokens / uint(Price.unwrap(price)) / (10 ** Factor.unwrap(_pair.divisor));
     }
     function baseAndQuoteToPrice(MoreInfo memory moreInfo, uint tokens, uint quoteTokens) pure internal returns (Price price) {
         price = Price.wrap(uint128((10 ** Factor.unwrap(moreInfo.multiplier)) * quoteTokens / tokens / (10 ** Factor.unwrap(moreInfo.divisor))));
@@ -572,7 +578,8 @@ contract Dexz is DexzBase, ReentrancyGuard {
         Unixtime expiry;
         Tokens tokens;
         Tokens filled;
-        Tokens available;
+        Tokens availableBase;
+        Tokens availableQuote;
     }
 
     function getOrders(PairKey pairKey, BuySell buySell, uint count, Price price, OrderKey firstOrderKey) public view returns (OrderInfo[] memory orderInfos) {
@@ -612,18 +619,21 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 // expiries[i] = order.expiry;
                 // tokenss[i] = order.tokens;
                 // filleds[i] = order.filled;
-                uint available;
+                uint availableBase;
+                uint availableQuote;
                 if (buySell == BuySell.Buy) {
-                    available = availableTokens(pair.base, order.maker);
+                    availableQuote = availableTokens(pair.quote, order.maker);
+                    availableBase = quoteToBasePair(pair, availableQuote, price);
                 } else {
-                    available = availableTokens(pair.quote, order.maker);
+                    availableBase = availableTokens(pair.base, order.maker);
+                    availableQuote = baseToQuotePair(pair, availableBase, price);
                 }
                 // Tokens available = Tokens.wrap(uint128(availableTokens(buySell == BuySell.Buy ? pair.base : pair.quote, order.maker)));
 
                 // uint quoteTokens = baseToQuote(moreInfo, uint(uint128(Delta.unwrap(info.tokens))), info.price);
 
 
-                orderInfos[i] = OrderInfo(price, orderKey, order.next, order.maker, order.expiry, order.tokens, order.filled, Tokens.wrap(uint128(available)));
+                orderInfos[i] = OrderInfo(price, orderKey, order.next, order.maker, order.expiry, order.tokens, order.filled, Tokens.wrap(uint128(availableBase)), Tokens.wrap(uint128(availableQuote)));
                 orderKey = order.next;
                 i = onePlus(i);
             }
