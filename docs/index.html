@@ -1892,6 +1892,9 @@
             if (section == "pair" && this.settings.pairTable.selectedPair in this.pairs) {
               this.sync.section = "Pair";
               console.log("Pair");
+              if (!(this.settings.pairTable.selectedPair in this.pair)) {
+                Vue.set(this.pair, this.settings.pairTable.selectedPair, {});
+              }
               for (let i = 0; i < 2; i++) {
                 const orders = await dexzContract.getOrders(this.settings.pairTable.selectedPair, i, 1000, 0, ORDERKEY_SENTINEL);
                 const records = [];
@@ -1914,8 +1917,11 @@
                     availableQuote: ethers.BigNumber.from(availableQuote).toString(),
                   });
                 }
-                console.log("records: " + JSON.stringify(records, null, 2));
+                Vue.set(this.pair[this.settings.pairTable.selectedPair], i, records);
+                // console.log("records: " + JSON.stringify(records, null, 2));
               }
+
+              // console.log("this.pair: " + JSON.stringify(this.pair, null, 2));
 
               const block = await provider.getBlock();
               const blockNumber = block.number;
@@ -1936,20 +1942,24 @@
                 ],
               };
 
+              const records = [];
               const eventLogs = await provider.getLogs(filter);
               for (const event of eventLogs) {
                 const logData = dexzContract.interface.parseLog(event);
                 // console.log(logData.eventFragment.name + ": " + JSON.stringify(event));
                 const txHash = event.transactionHash;
                 const blockNumber = event.blockNumber;
+                let record = null;
                 // event PairAdded(PairKey indexed pairKey, Token indexed base, Token indexed quote, uint8 baseDecimals, uint8 quoteDecimals, Factor multiplier, Factor divisor);
                 if (logData.eventFragment.name == "PairAdded") {
                   const [pairKey, base, quote, baseDecimals, quoteDecimals, multiplier, divisor] = logData.args;
-                  console.log("PairAdded(" + pairKey + ", " + base + ", " + quote + ", " + baseDecimals + ", " + quoteDecimals + ", " + multiplier + ", " + divisor + ")");
+                  // console.log("PairAdded(" + pairKey + ", " + base + ", " + quote + ", " + baseDecimals + ", " + quoteDecimals + ", " + multiplier + ", " + divisor + ")");
+                  record = { type: "pairadded", pairKey, base, quote, baseDecimals, quoteDecimals, multiplier, divisor };
                   // event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens);
                 } else if (logData.eventFragment.name == "OrderAdded") {
                   const [pairKey, orderKey, maker, buySell, price, expiry, tokens] = logData.args;
-                  console.log("OrderAdded(" + pairKey + ", " + orderKey + ", " + maker + ", " + buySell + ", " + price + ", " + expiry + ", " + tokens + ")");
+                  // console.log("OrderAdded(" + pairKey + ", " + orderKey + ", " + maker + ", " + buySell + ", " + price + ", " + expiry + ", " + tokens + ")");
+                  record = { type: "orderadded", pairKey, orderKey, maker, buySell, price: ethers.BigNumber.from(price).toString(), expiry: parseInt(expiry), tokens: ethers.BigNumber.from(tokens).toString() };
                 // event Trade(TradeInfo tradeInfo);
                 // struct TradeInfo {
                 //     PairKey pairKey;
@@ -1966,15 +1976,22 @@
                   // console.log(logData.eventFragment.name + ": " + JSON.stringify(event, null, 2));
                   // console.log(" -      : " + JSON.stringify(tradeInfo, null, 2));
                   const [pairKey, orderKey, buySell, taker, maker, tokens, quoteTokens, price] = tradeInfo;
-                  console.log("Trade(" + pairKey + ", " + orderKey + ", " + buySell + ", " + taker + ", " + maker + ", " + tokens + ", " + quoteTokens + ", " + price + ")");
+                  // console.log("Trade(" + pairKey + ", " + orderKey + ", " + buySell + ", " + taker + ", " + maker + ", " + tokens + ", " + quoteTokens + ", " + price + ")");
+                  record = { type: "trade", pairKey, orderKey, taker, maker, tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), price: ethers.BigNumber.from(price).toString() };
                   // event TradeSummary(BuySell buySell, Account indexed taker, Tokens filled, Tokens quoteTokensFilled, Price price, Tokens tokensOnOrder);
                 } else if (logData.eventFragment.name == "TradeSummary") {
                   const [buySell, taker, filled, quoteTokensFilled, tokensOnOrder] = logData.args;
-                  console.log("TradeSummary(" + buySell + ", " + taker + ", " + filled + ", " + quoteTokensFilled + ", " + tokensOnOrder + ")");
+                  // console.log("TradeSummary(" + buySell + ", " + taker + ", " + filled + ", " + quoteTokensFilled + ", " + tokensOnOrder + ")");
+                  record = { type: "tradesummary", buySell, taker, filled: ethers.BigNumber.from(filled).toString(), quoteTokensFilled: ethers.BigNumber.from(quoteTokensFilled).toString(), tokensOnOrder: ethers.BigNumber.from(tokensOnOrder).toString() };
                 }
                 // event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, Tokens filled);
                 // event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens);
+                if (record) {
+                  records.push({ txHash, blockNumber, ...record });
+                }
               }
+              Vue.set(this.pair[this.settings.pairTable.selectedPair], 'history', records);
+              console.log("this.pair: " + JSON.stringify(this.pair, null, 2));
             }
 
             this.sync.section = null;
