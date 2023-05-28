@@ -1992,6 +1992,7 @@
               }
               Vue.set(this.pair[this.settings.pairTable.selectedPair], 'history', records);
               console.log("this.pair: " + JSON.stringify(this.pair, null, 2));
+              localStorage.dexzPair = JSON.stringify(this.pair);
             }
 
             this.sync.section = null;
@@ -3978,7 +3979,7 @@
           }
           if ('dexzPair' in localStorage) {
             this.pair = JSON.parse(localStorage.dexzPair);
-            console.log("this.pair: " + JSON.stringify(pair));
+            console.log("this.pair: " + JSON.stringify(this.pair));
           }
           if ('dexzSettings' in localStorage) {
             const tempSettings = JSON.parse(localStorage.dexzSettings);
