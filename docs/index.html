@@ -237,7 +237,10 @@
                 </div>
               </div>
               <!-- <b-table small fixed striped responsive hover :fields="pairsFields" :items="pagedFilteredSortedPair" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1"> -->
-              <b-table small fixed striped responsive hover :items="pagedFilteredSortedPair" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1">
+              <b-table small fixed striped responsive hover :fields="pairFields" :items="pagedFilteredSortedPair" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1">
+                <template #cell(price)="data">
+                  {{ formatERC20(data.item.price, 12) }}
+                </template>
               </b-table>
             </b-card-text>
           </b-card>
@@ -1068,6 +1071,16 @@
             { key: 'base.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
             { key: 'quote.symbol', label: 'Quote', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
             { key: 'quote.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+          ],
+          pairFields: [
+            { key: 'makerBuy', label: 'Maker Buy', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
+            { key: 'price', label: 'Price', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
+            { key: 'makerSell', label: 'Maker Sell', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
+            // { key: 'pairKey', label: 'Pair Key', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
+            // { key: 'base.symbol', label: 'Base', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+            // { key: 'base.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+            // { key: 'quote.symbol', label: 'Quote', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+            // { key: 'quote.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
           ],
           tokensFields: [
             { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
