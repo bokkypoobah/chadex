@@ -206,11 +206,11 @@ contract DexzBase {
     function inverseBuySell(BuySell buySell) internal pure returns (BuySell inverse) {
         inverse = (buySell == BuySell.Buy) ? BuySell.Sell : BuySell.Buy;
     }
-    function generatePairKey(Info memory info) internal pure returns (PairKey) {
-        return PairKey.wrap(keccak256(abi.encodePacked(info.base, info.quote)));
+    function generatePairKey(Info memory info) internal view returns (PairKey) {
+        return PairKey.wrap(keccak256(abi.encodePacked(this, info.base, info.quote)));
     }
-    function generateOrderKey(BuySell buySell, Account maker, Token base, Token quote, Price price) internal pure returns (OrderKey) {
-        return OrderKey.wrap(keccak256(abi.encodePacked(buySell, maker, base, quote, price)));
+    function generateOrderKey(Account maker, BuySell buySell, Token base, Token quote, Price price) internal view returns (OrderKey) {
+        return OrderKey.wrap(keccak256(abi.encodePacked(this, maker, buySell, base, quote, price)));
     }
 
     // Price:
@@ -492,7 +492,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
     }
 
     function _addOrder(Info memory info, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
-        orderKey = generateOrderKey(info.buySell, moreInfo.taker, info.base, info.quote, info.price);
+        orderKey = generateOrderKey(moreInfo.taker, info.buySell, info.base, info.quote, info.price);
         if (Account.unwrap(orders[orderKey].maker) != address(0)) {
             revert CannotInsertDuplicateOrder(orderKey);
         }
@@ -562,7 +562,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         if (Delta.unwrap(info.tokens) > int128(Tokens.unwrap(TOKENS_MAX))) {
             revert InvalidTokens(info.tokens, TOKENS_MAX);
         }
-        orderKey = generateOrderKey(info.buySell, moreInfo.taker, info.base, info.quote, info.price);
+        orderKey = generateOrderKey(moreInfo.taker, info.buySell, info.base, info.quote, info.price);
         Order storage order = orders[orderKey];
         if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
             revert OrderNotFoundForUpdate(orderKey);
