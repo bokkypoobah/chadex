@@ -181,7 +181,8 @@ class Data {
     const pairsLength = parseInt(await this.dexz.pairsLength());
     for (let j = 0; j < pairsLength; j++) {
       const info = await this.dexz.pair(j);
-      const [pairKey, baseToken, quoteToken, multiplier, divisor] = info;
+      // console.log("info: " + JSON.stringify(info));
+      const [pairKey, baseToken, quoteToken, factors] = info;
       const baseDecimals = this.decimals[baseToken];
       const quoteDecimals = this.decimals[quoteToken];
       const orders = {};
@@ -191,16 +192,19 @@ class Data {
         const ORDERSIZE = 4;
         orders[buySell] = [];
         let results = await this.dexz.getOrders(pairKey, buySell, ORDERSIZE, price, firstOrderKey);
+        // console.log("results: " + JSON.stringify(results, null, 2));
         while (parseInt(results[0][0]) != 0) {
-          for (let k = 0; k < results[0].length && parseInt(results[0][k]) != 0; k++) {
-            orders[buySell].push({ price: parseInt(results[0][k]), orderKey: results[1][k], nextOrderKey: results[2][k], maker: results[3][k], expiry: parseInt(results[4][k]), baseTokens: results[5][k].toString(), baseTokensFilled: results[6][k].toString() })
-            price = results[0][k];
-            firstOrderKey = results[2][k];
+
+          for (let k = 0; k < results.length && parseInt(results[k][0]) != 0; k++) {
+            // console.log("results[" + k + "]: " + JSON.stringify(results[k], null, 2));
+            orders[buySell].push({ price: parseInt(results[k][0]), orderKey: results[k][1], nextOrderKey: results[k][2], maker: results[k][3], expiry: parseInt(results[k][4]), baseTokens: results[k][5].toString(), baseTokensFilled: results[k][6].toString() })
+            price = results[k][0];
+            firstOrderKey = results[k][2];
           }
           results = await this.dexz.getOrders(pairKey, buySell, ORDERSIZE, price, firstOrderKey);
         }
       }
-      pairs[pairKey] = { baseToken, quoteToken, multiplier, divisor, baseDecimals, quoteDecimals, orders };
+      pairs[pairKey] = { baseToken, quoteToken, factors, baseDecimals, quoteDecimals, orders };
     }
     return pairs;
   }
@@ -228,7 +232,8 @@ class Data {
       const pairInfos = [];
       for (let j = 0; j < pairsLength; j++) {
         const info = await this.dexz.pair(j);
-        pairInfos.push({ pairKey: info[0], baseToken: info[1], quoteToken: info[2], multiplier: info[3], divisor: info[4] })
+        // console.log("info: " + JSON.stringify(info));
+        pairInfos.push({ pairKey: info[0], baseToken: info[1], quoteToken: info[2], factors: info[3] })
       }
 
       let now = new Date();
@@ -334,9 +339,9 @@ class Data {
       // }
       const pairs = await this.dexz.getPairs(2, 0);
       for (let i = 0; i < pairs.length && pairs[i][0] != 0; i++) {
-        const [pairKey, base, quote, multiplier, divisor, bestBuyOrder, bestSellOrder] = pairs[i];
+        const [pairKey, base, quote, factors, bestBuyOrder, bestSellOrder] = pairs[i];
         console.log("            pairKey: " + pairKey + ", base=" + JSON.stringify(base) + ", quote=" + JSON.stringify(quote) +
-          ", multiplier=" + multiplier + ", divisor=" + divisor +
+          ", factors=" + factors +
           ", bestBuyOrder=" + JSON.stringify(bestBuyOrder) + ", bestSellOrder=" + JSON.stringify(bestSellOrder));
       }
       console.log();

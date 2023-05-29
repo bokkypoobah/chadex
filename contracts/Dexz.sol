@@ -297,8 +297,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
 
     function _getMoreInfo(TradeInput memory tradeInput, Account taker) internal returns (MoreInfo memory moreInfo) {
         PairKey pairKey = generatePairKey(tradeInput);
-        // Factor multiplier;
-        // Factor divisor;
         Factors memory factors;
         Pair memory pair = pairs[pairKey];
         if (Token.unwrap(pair.base) == address(0)) {
