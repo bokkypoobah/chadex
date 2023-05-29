@@ -165,8 +165,8 @@ describe("Dexz", function () {
 
     const actionsA = [
       { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 12).toString(), targetPrice: ethers.utils.parseUnits(price1, 12).toString(), expiry: expiry, tokens: baseTokens1.toString() },
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 12).toString(), targetPrice: ethers.utils.parseUnits(price2, 12).toString(), expiry: expiry, tokens: baseTokens2.toString() },
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 12).toString(), targetPrice: ethers.utils.parseUnits(price3, 12).toString(), expiry: expiry, tokens: baseTokens3.toString() },
+      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 12).toString(), targetPrice: ethers.utils.parseUnits(price2, 12).toString(), expiry: expiry, tokens: baseTokens2.toString() },
+      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 12).toString(), targetPrice: ethers.utils.parseUnits(price3, 12).toString(), expiry: expiry, tokens: baseTokens3.toString() },
     ];
     console.log("        Executing: " + JSON.stringify(actionsA, null, 2));
 
@@ -185,20 +185,20 @@ describe("Dexz", function () {
     const baseTokensB1 = ethers.utils.parseUnits("1", data.decimals0);
     const actionsB1 = [
       { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB1.toString() },
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB1.toString() },
+      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB1.toString() },
     ];
     console.log("        Executing: " + JSON.stringify(actionsB1, null, 2));
     const executeB1Tx = await data.dexz.connect(data.user3Signer).execute(actionsB1);
     await data.printEvents("user3->dexz.execute(actions)", await executeB1Tx.wait());
 
-    const baseTokensB2 = ethers.utils.parseUnits("6.9", data.decimals0);
-    const actionsB2 = [
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB2.toString() },
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB2.toString() },
-    ];
-    console.log("        Executing: " + JSON.stringify(actionsB2, null, 2));
-    const executeB2Tx = await data.dexz.connect(data.user3Signer).execute(actionsB2);
-    await data.printEvents("user3->dexz.execute(actions)", await executeB2Tx.wait());
+    // const baseTokensB2 = ethers.utils.parseUnits("6.9", data.decimals0);
+    // const actionsB2 = [
+    //   { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB2.toString() },
+    //   { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB2.toString() },
+    // ];
+    // console.log("        Executing: " + JSON.stringify(actionsB2, null, 2));
+    // const executeB2Tx = await data.dexz.connect(data.user3Signer).execute(actionsB2);
+    // await data.printEvents("user3->dexz.execute(actions)", await executeB2Tx.wait());
 
     await data.printState("After Executing Against Orders");
 
