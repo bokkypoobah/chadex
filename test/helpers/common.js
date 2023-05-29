@@ -271,15 +271,6 @@ class Data {
           }
           console.log();
 
-          const pairs = await this.dexz.getPairs(2, 0);
-          // console.log("pairs: " + JSON.stringify(pairs, null, 2));
-          for (let i = 0; i < pairs.length && pairs[i][0] != 0; i++) {
-            // console.log("pair[" + i + "]: " + JSON.stringify(pairs[i], null, 2));
-            const [pairKey, base, quote, multiplier, divisor, bestBuyOrderResult, bestSellOrderResult] = pairs[i];
-            console.log("pairKey: " + pairKey + ", base=" + JSON.stringify(base) + ", quote=" + JSON.stringify(quote) +
-              ", multiplier=" + multiplier + ", divisor=" + divisor +
-              ", bestBuyOrderResult=" + JSON.stringify(bestBuyOrderResult) + ", bestSellOrderResult=" + JSON.stringify(bestSellOrderResult));
-          }
           // struct PairTokenResult {
           //     Token token;
           //     string symbol;
@@ -292,9 +283,16 @@ class Data {
           //     PairTokenResult quote;
           //     Factor multiplier;
           //     Factor divisor;
-          //     BestOrderResult bestBuyOrderResult;
-          //     BestOrderResult bestSellOrderResult;
+          //     BestOrderResult bestBuyOrder;
+          //     BestOrderResult bestSellOrder;
           // }
+          const pairs = await this.dexz.getPairs(2, 0);
+          for (let i = 0; i < pairs.length && pairs[i][0] != 0; i++) {
+            const [pairKey, base, quote, multiplier, divisor, bestBuyOrder, bestSellOrder] = pairs[i];
+            console.log("            pairKey: " + pairKey + ", base=" + JSON.stringify(base) + ", quote=" + JSON.stringify(quote) +
+              ", multiplier=" + multiplier + ", divisor=" + divisor +
+              ", bestBuyOrder=" + JSON.stringify(bestBuyOrder) + ", bestSellOrder=" + JSON.stringify(bestSellOrder));
+          }
           console.log();
 
           price = await this.dexz.getBestPrice(pair.pairKey, buySell);

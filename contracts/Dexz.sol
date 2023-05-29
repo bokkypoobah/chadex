@@ -674,20 +674,24 @@ contract Dexz is DexzBase, ReentrancyGuard {
         PairTokenResult quote;
         Factor multiplier;
         Factor divisor;
-        BestOrderResult bestBuyOrderResult;
-        BestOrderResult bestSellOrderResult;
+        BestOrderResult bestBuyOrder;
+        BestOrderResult bestSellOrder;
     }
+    function getPair(uint i) public view returns (PairResult memory pairResult) {
+        PairKey pairKey = pairKeys[i];
+        Pair memory pair = pairs[pairKey];
+        BestOrderResult memory bestBuyOrderResult = getBestOrder(pairKey, BuySell.Buy);
+        BestOrderResult memory bestSellOrderResult = getBestOrder(pairKey, BuySell.Sell);
+        pairResult = PairResult(pairKey,
+            PairTokenResult(pair.base, IERC20(Token.unwrap(pair.base)).symbol(), IERC20(Token.unwrap(pair.base)).name(), IERC20(Token.unwrap(pair.base)).decimals()),
+            PairTokenResult(pair.quote, IERC20(Token.unwrap(pair.quote)).symbol(), IERC20(Token.unwrap(pair.quote)).name(), IERC20(Token.unwrap(pair.quote)).decimals()),
+            pair.multiplier, pair.divisor, bestBuyOrderResult, bestSellOrderResult);
+    }
+
     function getPairs(uint count, uint offset) public view returns (PairResult[] memory pairResults) {
         pairResults = new PairResult[](count);
         for (uint i = offset; i < offset + count && i < pairKeys.length; i = onePlus(i)) {
-            PairKey pairKey = pairKeys[i];
-            Pair memory pair = pairs[pairKey];
-            BestOrderResult memory bestBuyOrderResult = getBestOrder(pairKey, BuySell.Buy);
-            BestOrderResult memory bestSellOrderResult = getBestOrder(pairKey, BuySell.Sell);
-            pairResults[i] = PairResult(pairKey,
-                PairTokenResult(pair.base, IERC20(Token.unwrap(pair.base)).symbol(), IERC20(Token.unwrap(pair.base)).name(), IERC20(Token.unwrap(pair.base)).decimals()),
-                PairTokenResult(pair.quote, IERC20(Token.unwrap(pair.quote)).symbol(), IERC20(Token.unwrap(pair.quote)).name(), IERC20(Token.unwrap(pair.quote)).decimals()),
-                pair.multiplier, pair.divisor, bestBuyOrderResult, bestSellOrderResult);
+            pairResults[i] = getPair(i);
         }
     }
 
