@@ -483,6 +483,9 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
 
+    // event TradeSummary(PairKey indexed pairKey, Account indexed taker, BuySell buySell, Price price, Tokens tokens, Tokens quoteTokens, Tokens tokensOnOrder, uint timestamp);
+
+
     function _addOrder(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
         orderKey = generateOrderKey(moreInfo.taker, tradeInput.buySell, tradeInput.base, tradeInput.quote, tradeInput.price);
         if (Account.unwrap(orders[orderKey].maker) != address(0)) {
