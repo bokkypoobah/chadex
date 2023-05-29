@@ -350,7 +350,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         uint quoteTokensToTransfer;
     }
 
-    function _trade(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (Tokens filled, Tokens quoteTokensFilled, Tokens tokensOnOrder, OrderKey orderKey) {
+    function _trade(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (Tokens filled, Tokens quoteFilled, Tokens tokensOnOrder, OrderKey orderKey) {
         if (Price.unwrap(tradeInput.price) < Price.unwrap(PRICE_MIN) || Price.unwrap(tradeInput.price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice(tradeInput.price, PRICE_MAX);
         }
@@ -424,7 +424,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                     }
                     order.filled = Tokens.wrap(int128(uint128(Tokens.unwrap(order.filled)) + uint128(stdw.tokensToTransfer)));
                     filled = Tokens.wrap(int128(uint128(Tokens.unwrap(filled)) + uint128(stdw.tokensToTransfer)));
-                    quoteTokensFilled = Tokens.wrap(int128(uint128(Tokens.unwrap(quoteTokensFilled)) + uint128(stdw.quoteTokensToTransfer)));
+                    quoteFilled = Tokens.wrap(int128(uint128(Tokens.unwrap(quoteFilled)) + uint128(stdw.quoteTokensToTransfer)));
                     tradeInput.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(tradeInput.tokens)) - uint128(stdw.tokensToTransfer)));
                 } else {
                     stdw.deleteOrder = true;
@@ -466,8 +466,8 @@ contract Dexz is DexzBase, ReentrancyGuard {
             orderKey = _addOrder(tradeInput, moreInfo);
             tokensOnOrder = tradeInput.tokens;
         }
-        if (Tokens.unwrap(filled) > 0 || Tokens.unwrap(quoteTokensFilled) > 0) {
-            Price price = Tokens.unwrap(filled) > 0 ? baseAndQuoteToPrice(moreInfo, uint(uint128(Tokens.unwrap(filled))), uint(uint128(Tokens.unwrap(quoteTokensFilled)))) : Price.wrap(0);
+        if (Tokens.unwrap(filled) > 0 || Tokens.unwrap(quoteFilled) > 0) {
+            Price price = Tokens.unwrap(filled) > 0 ? baseAndQuoteToPrice(moreInfo, uint(uint128(Tokens.unwrap(filled))), uint(uint128(Tokens.unwrap(quoteFilled)))) : Price.wrap(0);
             if (Price.unwrap(tradeInput.targetPrice) != 0) {
                 if (tradeInput.buySell == BuySell.Buy) {
                     if (Price.unwrap(price) > Price.unwrap(tradeInput.targetPrice)) {
@@ -479,20 +479,20 @@ contract Dexz is DexzBase, ReentrancyGuard {
                     }
                 }
             }
-            emit TradeSummary(moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteTokensFilled, tokensOnOrder, block.timestamp);
-            trades.push(TradeEvent(uint48(block.number), uint48(block.timestamp), moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteTokensFilled));
+            emit TradeSummary(moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled, tokensOnOrder, block.timestamp);
+            trades.push(TradeEvent(uint48(block.number), uint48(block.timestamp), moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled));
         }
     }
 
     struct TradeEvent {
         uint48 blockNumber; // 2^48 = 281,474,976,710,656
         uint48 timestamp; // 2^48 = 281,474,976,710,656
-        PairKey pairKey;
-        Account taker;
-        BuySell buySell;
-        Price price;
-        Tokens filled;
-        Tokens quoteTokensFilled;
+        PairKey pairKey; // bytes32
+        Account taker; // address
+        BuySell buySell; // uint8
+        Price price; // uint128
+        Tokens filled; // int128
+        Tokens quoteFilled; // int128
     }
     TradeEvent[] public trades;
     // event TradeSummary(PairKey indexed pairKey, Account indexed taker, BuySell buySell, Price price, Tokens tokens, Tokens quoteTokens, Tokens tokensOnOrder, uint timestamp);
