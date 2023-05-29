@@ -192,6 +192,9 @@ describe("Dexz", function () {
     await data.printEvents("user3->dexz.execute(actions)", await executeBTx.wait());
     await data.printState("After Executing Against Orders");
 
+    // const tradeEvents = await data.dexz.getTradeEvents(10, 0);
+    // console.log("tradeEvents: " + JSON.stringify(tradeEvents, null, 2));
+
     // const pairs = await data.dexz.getPairs(2, 0);
     // console.log("pairs: " + JSON.stringify(pairs, null, 2));
     // struct PairTokenResult {

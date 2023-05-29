@@ -480,9 +480,21 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 }
             }
             emit TradeSummary(moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteTokensFilled, tokensOnOrder, block.timestamp);
+            trades.push(TradeEvent(uint48(block.number), uint48(block.timestamp), moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteTokensFilled));
         }
     }
 
+    struct TradeEvent {
+        uint48 blockNumber; // 2^48 = 281,474,976,710,656
+        uint48 timestamp; // 2^48 = 281,474,976,710,656
+        PairKey pairKey;
+        Account taker;
+        BuySell buySell;
+        Price price;
+        Tokens filled;
+        Tokens quoteTokensFilled;
+    }
+    TradeEvent[] public trades;
     // event TradeSummary(PairKey indexed pairKey, Account indexed taker, BuySell buySell, Price price, Tokens tokens, Tokens quoteTokens, Tokens tokensOnOrder, uint timestamp);
 
 
@@ -695,6 +707,15 @@ contract Dexz is DexzBase, ReentrancyGuard {
         pairResults = new PairResult[](count);
         for (uint i = offset; i < offset + count && i < pairKeys.length; i = onePlus(i)) {
             pairResults[i] = getPair(i);
+        }
+    }
+    function tradesLength() public view returns (uint) {
+        return trades.length;
+    }
+    function getTradeEvents(uint count, uint offset) public view returns (TradeEvent[] memory results) {
+        results = new TradeEvent[](count);
+        for (uint i = 0; i < count && ((i + offset) < trades.length); i = onePlus(i)) {
+            results[i] = trades[i + offset];
         }
     }
 
