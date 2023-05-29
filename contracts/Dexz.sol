@@ -480,22 +480,21 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 }
             }
             emit TradeSummary(moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled, tokensOnOrder, block.timestamp);
-            trades.push(TradeEvent(uint48(block.number), uint48(block.timestamp), moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled));
+            trades.push(TradeEvent(moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled, uint48(block.number), uint48(block.timestamp)));
         }
     }
 
     struct TradeEvent {
-        uint48 blockNumber; // 2^48 = 281,474,976,710,656
-        uint48 timestamp; // 2^48 = 281,474,976,710,656
         PairKey pairKey; // bytes32
         Account taker; // address
         BuySell buySell; // uint8
         Price price; // uint128
         Tokens filled; // int128
         Tokens quoteFilled; // int128
+        uint48 blockNumber; // 2^48 = 281,474,976,710,656
+        uint48 timestamp; // 2^48 = 281,474,976,710,656
     }
     TradeEvent[] public trades;
-    // event TradeSummary(PairKey indexed pairKey, Account indexed taker, BuySell buySell, Price price, Tokens tokens, Tokens quoteTokens, Tokens tokensOnOrder, uint timestamp);
 
 
     function _addOrder(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {

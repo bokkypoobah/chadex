@@ -291,21 +291,21 @@ class Data {
       }
 
       // struct TradeEvent {
-      //     uint48 blockNumber; // 2^48 = 281,474,976,710,656
-      //     uint48 timestamp; // 2^48 = 281,474,976,710,656
       //     PairKey pairKey; // bytes32
       //     Account taker; // address
       //     BuySell buySell; // uint8
       //     Price price; // uint128
       //     Tokens filled; // int128
       //     Tokens quoteFilled; // int128
+      //     uint48 blockNumber; // 2^48 = 281,474,976,710,656
+      //     uint48 timestamp; // 2^48 = 281,474,976,710,656
       // }
       console.log("              # Block  Timestamp Pair Key   Taker        B/S            Price                Filled   Quote Tokens Filled")
       console.log("            --- ----- ---------- ---------- ------------ ---- --------------- --------------------- ---------------------");
       const tradeLength = await this.dexz.tradesLength();
       const tradeEvents = await this.dexz.getTradeEvents(parseInt(tradeLength) + 1, 0); // Adding 1 to show empty record at end
       for (let i = 0; i < tradeEvents.length && tradeEvents[i][0] != 0; i++) {
-        const [blockNumber, timestamp, pairKey, taker, buySell, price, filled, quoteFilled] = tradeEvents[i];
+        const [pairKey, taker, buySell, price, filled, quoteFilled, blockNumber, timestamp] = tradeEvents[i];
         // var seconds = (timestamp - new Date() / 1000);
         console.log("              " + i + " " + this.padLeft(blockNumber, 5) + " " + timestamp + " " +
           pairKey.substring(0, 10) + " " + this.getShortAccountName(taker) + (buySell == 1 ? " Buy  " : " Sell ") + " " +
