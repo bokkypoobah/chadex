@@ -133,12 +133,12 @@ contract DexzBase {
     mapping(PairKey => mapping(BuySell => mapping(Price => OrderQueue))) orderQueues;
     mapping(OrderKey => Order) orders;
 
-    event PairAdded(PairKey indexed pairKey, Account maker, Token indexed base, Token indexed quote, uint8 baseDecimals, uint8 quoteDecimals, Factor multiplier, Factor divisor);
-    event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens, Tokens quoteTokens);
+    event PairAdded(PairKey indexed pairKey, Account maker, Token indexed base, Token indexed quote, uint8 baseDecimals, uint8 quoteDecimals, Factor multiplier, Factor divisor, uint timestamp);
+    event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens, Tokens quoteTokens, uint timestamp);
     event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, Tokens filled);
     event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens);
     // event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, Account indexed taker, Account maker, uint tokens, uint quoteTokens, Price price);
-    event TradeSummary(PairKey indexed pairKey, Account indexed taker, BuySell buySell, Price price, Tokens tokens, Tokens quoteTokens, Tokens tokensOnOrder);
+    event TradeSummary(PairKey indexed pairKey, Account indexed taker, BuySell buySell, Price price, Tokens tokens, Tokens quoteTokens, Tokens tokensOnOrder, uint timestamp);
 
     error CannotRemoveMissingOrder();
     error InvalidPrice(Price price, Price priceMax);
@@ -307,7 +307,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
             }
             pairs[pairKey] = Pair(tradeInput.base, tradeInput.quote, multiplier, divisor);
             pairKeys.push(pairKey);
-            emit PairAdded(pairKey, Account.wrap(msg.sender), tradeInput.base, tradeInput.quote, baseDecimals, quoteDecimals, multiplier, divisor);
+            emit PairAdded(pairKey, Account.wrap(msg.sender), tradeInput.base, tradeInput.quote, baseDecimals, quoteDecimals, multiplier, divisor, block.timestamp);
         } else {
             multiplier = pair.multiplier;
             divisor = pair.divisor;
@@ -348,6 +348,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         Price price;
         uint tokens;
         uint quoteTokens;
+        uint timestamp;
     }
     event Trade(TradeResult tradeResult);
 
@@ -393,7 +394,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                                 transferFrom(tradeInput.base, order.maker, Account.wrap(msg.sender), stdw.tokensToTransfer);
                             }
                             // emit Trade(moreInfo.pairKey, bestMatchingOrderKey, tradeInput.buySell, moreInfo.taker, order.maker, stdw.tokensToTransfer, stdw.quoteTokensToTransfer, bestMatchingPrice);
-                            emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, stdw.tokensToTransfer, stdw.quoteTokensToTransfer));
+                            emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, stdw.tokensToTransfer, stdw.quoteTokensToTransfer, block.timestamp));
                         } else {
                             stdw.deleteOrder = true;
                         }
@@ -418,7 +419,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                                 transferFrom(tradeInput.base, Account.wrap(msg.sender), order.maker, stdw.tokensToTransfer);
                                 transferFrom(tradeInput.quote, order.maker, Account.wrap(msg.sender), stdw.quoteTokensToTransfer);
                             }
-                            emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, stdw.tokensToTransfer, stdw.quoteTokensToTransfer));
+                            emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, stdw.tokensToTransfer, stdw.quoteTokensToTransfer, block.timestamp));
                         } else {
                             stdw.deleteOrder = true;
                         }
@@ -480,7 +481,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                     }
                 }
             }
-            emit TradeSummary(moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteTokensFilled, tokensOnOrder);
+            emit TradeSummary(moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteTokensFilled, tokensOnOrder, block.timestamp);
         }
     }
 
@@ -508,7 +509,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
             orderQueue.tail = orderKey;
         }
         uint quoteTokens = baseToQuote(moreInfo, uint(uint128(Tokens.unwrap(tradeInput.tokens))), tradeInput.price);
-        emit OrderAdded(moreInfo.pairKey, orderKey, moreInfo.taker, tradeInput.buySell, tradeInput.price, tradeInput.expiry, tradeInput.tokens, Tokens.wrap(int128(uint128(quoteTokens))));
+        emit OrderAdded(moreInfo.pairKey, orderKey, moreInfo.taker, tradeInput.buySell, tradeInput.price, tradeInput.expiry, tradeInput.tokens, Tokens.wrap(int128(uint128(quoteTokens))), block.timestamp);
     }
 
     function _removeOrder(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
