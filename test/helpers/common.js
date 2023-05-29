@@ -242,8 +242,8 @@ class Data {
         const pair = pairInfos[j];
         console.log("          ----- Pair " + pair.pairKey + " " + this.getShortAccountName(pair.baseToken) + "/" + this.getShortAccountName(pair.quoteToken) + " " + pair.multiplier + " " + pair.divisor + " -----");
         for (let buySell = 0; buySell < 2; buySell++) {
-          console.log("              #     " + (buySell == 0 ? " BUY" : "SELL") +" Price OrderKey   Next       Maker         Expiry(s)                Tokens                Filled         AvailableBase        AvailableQuote")
-          console.log("            --- -------------- ---------- ---------- ------------ ---------- --------------------- --------------------- --------------------- ---------------------");
+          console.log("              #     " + (buySell == 0 ? " BUY" : "SELL") +" Price OrderKey   Next       Maker         Expiry(s)                Tokens         AvailableBase        AvailableQuote")
+          console.log("            --- -------------- ---------- ---------- ------------ ---------- --------------------- --------------------- ---------------------");
 
           let price = PRICE_EMPTY;
           let firstOrderKey = ORDERKEY_SENTINEL;
@@ -255,7 +255,7 @@ class Data {
             // console.log("            * --- Start price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
             for (let k = 0; k < results.length && parseInt(results[k][0]) != 0; k++) {
               const orderInfo = results[k];
-              const [price1, orderKey, nextOrderKey, maker, expiry, tokens, filled, availableBase, availableQuote] = orderInfo;
+              const [price1, orderKey, nextOrderKey, maker, expiry, tokens, availableBase, availableQuote] = orderInfo;
               var minutes = (expiry - now / 1000) / 60;
               console.log("              " + (row++) + " " +
                 this.padLeft(ethers.utils.formatUnits(price1, 12), 14) + " " +
@@ -264,7 +264,6 @@ class Data {
                 this.getShortAccountName(maker) + " " +
                 this.padLeft(minutes.toFixed(2), 10) + " " +
                 this.padLeft(ethers.utils.formatUnits(tokens, baseDecimals), 21) + " " +
-                this.padLeft(ethers.utils.formatUnits(filled, baseDecimals), 21) + " " +
                 this.padLeft(ethers.utils.formatUnits(availableBase, baseDecimals), 21) +
                 this.padLeft(ethers.utils.formatUnits(availableQuote, quoteDecimals), 21)
             );
@@ -286,7 +285,7 @@ class Data {
               var minutes = (order[2] - new Date() / 1000) / 60;
               console.log("              Order key=" + orderKey.substring(0, 10) + " next=" + order[0].substring(0, 10) +
                 " maker=" + this.getShortAccountName(order[1]) +
-                " expiry=" + minutes.toFixed(2) + "s tokens=" + ethers.utils.formatUnits(order[3], pair.baseDecimals) + " filled=" + ethers.utils.formatUnits(order[4], pair.baseDecimals));
+                " expiry=" + minutes.toFixed(2) + "s tokens=" + ethers.utils.formatUnits(order[3], pair.baseDecimals));
               orderKey = order[0];
             }
             price = await this.dexz.getNextBestPrice(pair.pairKey, buySell, price);

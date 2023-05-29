@@ -102,7 +102,7 @@ contract DexzBase {
         Account maker;
         Unixtime expiry;
         Tokens tokens;
-        Tokens filled; // TODO: Remove
+        // Tokens filled; // TODO: Remove
     }
     struct TradeInput {
         Action action;
@@ -148,7 +148,7 @@ contract DexzBase {
 
     event PairAdded(PairKey indexed pairKey, Account maker, Token indexed base, Token indexed quote, uint8 baseDecimals, uint8 quoteDecimals, Factors factors, uint timestamp);
     event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens, Tokens quoteTokens, uint timestamp);
-    event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, Tokens filled, uint timestamp);
+    event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, uint timestamp);
     event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens, uint timestamp);
     event Trade(TradeResult tradeResult);
     event TradeSummary(PairKey indexed pairKey, Account indexed taker, BuySell buySell, Price price, Tokens tokens, Tokens quoteTokens, Tokens tokensOnOrder, uint timestamp);
@@ -179,9 +179,9 @@ contract DexzBase {
         OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
         return (orderQueue.head, orderQueue.tail);
     }
-    function getOrder(OrderKey orderKey) public view returns (OrderKey _next, Account maker, Unixtime expiry, Tokens tokens, Tokens filled) {
+    function getOrder(OrderKey orderKey) public view returns (OrderKey _next, Account maker, Unixtime expiry, Tokens tokens) {
         Order memory order = orders[orderKey];
-        return (order.next, order.maker, order.expiry, order.tokens, order.filled);
+        return (order.next, order.maker, order.expiry, order.tokens);
     }
     function getBestPrice(PairKey pairKey, BuySell buySell) public view returns (Price price) {
         price = (buySell == BuySell.Buy) ? priceTrees[pairKey][buySell].last() : priceTrees[pairKey][buySell].first();
@@ -366,7 +366,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 StackTooDeepWorkaround memory stdw;
                 stdw.deleteOrder = false;
                 if (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) >= block.timestamp) {
-                    stdw.makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)) - uint128(Tokens.unwrap(order.filled)));
+                    stdw.makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
                     stdw.tokensToTransfer = 0;
                     stdw.quoteTokensToTransfer = 0;
                     if (tradeInput.buySell == BuySell.Buy) {
@@ -417,7 +417,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                             stdw.deleteOrder = true;
                         }
                     }
-                    order.filled = Tokens.wrap(int128(uint128(Tokens.unwrap(order.filled)) + uint128(stdw.tokensToTransfer)));
+                    order.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(order.tokens)) - uint128(stdw.tokensToTransfer)));
                     filled = Tokens.wrap(int128(uint128(Tokens.unwrap(filled)) + uint128(stdw.tokensToTransfer)));
                     quoteFilled = Tokens.wrap(int128(uint128(Tokens.unwrap(quoteFilled)) + uint128(stdw.quoteTokensToTransfer)));
                     tradeInput.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(tradeInput.tokens)) - uint128(stdw.tokensToTransfer)));
@@ -509,10 +509,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
         if (isSentinel(orderQueue.tail)) {
             orderQueue.head = orderKey;
             orderQueue.tail = orderKey;
-            orders[orderKey] = Order(ORDERKEY_SENTINEL, moreInfo.taker, tradeInput.expiry, tradeInput.tokens, Tokens.wrap(0));
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, moreInfo.taker, tradeInput.expiry, tradeInput.tokens);
         } else {
             orders[orderQueue.tail].next = orderKey;
-            orders[orderKey] = Order(ORDERKEY_SENTINEL, moreInfo.taker, tradeInput.expiry, tradeInput.tokens, Tokens.wrap(0));
+            orders[orderKey] = Order(ORDERKEY_SENTINEL, moreInfo.taker, tradeInput.expiry, tradeInput.tokens);
             orderQueue.tail = orderKey;
         }
         uint quoteTokens = baseToQuote(moreInfo.factors, uint(uint128(Tokens.unwrap(tradeInput.tokens))), tradeInput.price);
@@ -528,7 +528,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
             Order memory order = orders[orderKey];
             if (Account.unwrap(order.maker) == Account.unwrap(moreInfo.taker)) {
                 OrderKey temp = orderKey;
-                emit OrderRemoved(moreInfo.pairKey, orderKey, order.maker, tradeInput.buySell, tradeInput.price, order.tokens, order.filled, block.timestamp);
+                emit OrderRemoved(moreInfo.pairKey, orderKey, order.maker, tradeInput.buySell, tradeInput.price, order.tokens, block.timestamp);
                 if (OrderKey.unwrap(orderQueue.head) == OrderKey.unwrap(orderKey)) {
                     orderQueue.head = order.next;
                 } else {
@@ -566,8 +566,8 @@ contract Dexz is DexzBase, ReentrancyGuard {
             revert OrderNotFoundForUpdate(orderKey);
         }
         order.tokens = Tokens.wrap(Tokens.unwrap(order.tokens) + Tokens.unwrap(tradeInput.tokens));
-        if (Tokens.unwrap(order.tokens) < Tokens.unwrap(order.filled)) {
-            order.tokens = order.filled;
+        if (Tokens.unwrap(order.tokens) < 0) {
+            order.tokens = Tokens.wrap(0);
         }
         if (Tokens.unwrap(order.tokens) > Tokens.unwrap(TOKENS_MAX)) {
             revert InvalidTokens(tradeInput.tokens, TOKENS_MAX);
@@ -584,7 +584,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
         Account maker;
         Unixtime expiry;
         Tokens tokens;
-        Tokens filled;
         Tokens availableBase;
         Tokens availableQuote;
     }
@@ -620,7 +619,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                     availableBase = availableTokens(pair.base, order.maker);
                     availableQuote = baseToQuote(pair.factors, availableBase, price);
                 }
-                orderResults[i] = OrderResult(price, orderKey, order.next, order.maker, order.expiry, order.tokens, order.filled, Tokens.wrap(int128(uint128(availableBase))), Tokens.wrap(int128(uint128(availableQuote))));
+                orderResults[i] = OrderResult(price, orderKey, order.next, order.maker, order.expiry, order.tokens, Tokens.wrap(int128(uint128(availableBase))), Tokens.wrap(int128(uint128(availableQuote))));
                 orderKey = order.next;
                 i = onePlus(i);
             }
@@ -636,7 +635,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
         Account maker;
         Unixtime expiry;
         Tokens tokens;
-        Tokens filled;
         Tokens availableBase;
         Tokens availableQuote;
     }
@@ -658,7 +656,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                     availableQuote = baseToQuote(pair.factors, availableBase, price);
                 }
                 if (availableBase > 0 && availableQuote > 0 && (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) > block.timestamp)) {
-                    orderResult = BestOrderResult(price, orderKey, order.next, order.maker, order.expiry, order.tokens, order.filled, Tokens.wrap(int128(uint128(availableBase))), Tokens.wrap(int128(uint128(availableQuote))));
+                    orderResult = BestOrderResult(price, orderKey, order.next, order.maker, order.expiry, order.tokens, Tokens.wrap(int128(uint128(availableBase))), Tokens.wrap(int128(uint128(availableQuote))));
                     break;
                 }
                 orderKey = order.next;
