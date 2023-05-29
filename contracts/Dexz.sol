@@ -339,7 +339,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
         uint quoteTokensToTransfer;
     }
 
-    event Trade(TradeResult tradeInfo);
     struct TradeResult {
         PairKey pairKey;
         OrderKey orderKey;
@@ -350,6 +349,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         uint tokens;
         uint quoteTokens;
     }
+    event Trade(TradeResult tradeResult);
 
     function _trade(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (Tokens filled, Tokens quoteTokensFilled, Tokens tokensOnOrder, OrderKey orderKey) {
         if (Price.unwrap(tradeInput.price) < Price.unwrap(PRICE_MIN) || Price.unwrap(tradeInput.price) > Price.unwrap(PRICE_MAX)) {
@@ -619,4 +619,77 @@ contract Dexz is DexzBase, ReentrancyGuard {
             price = getNextBestPrice(pairKey, buySell, price);
         }
     }
+
+
+    struct BestOrderResult {
+        Price price;
+        OrderKey orderKey;
+        OrderKey nextOrderKey;
+        Account maker;
+        Unixtime expiry;
+        Tokens tokens;
+        Tokens filled;
+        Tokens availableBase;
+        Tokens availableQuote;
+    }
+    function getBestOrder(PairKey pairKey, BuySell buySell) public view returns (BestOrderResult memory orderResult) {
+        Pair memory pair = pairs[pairKey];
+        Price price = getBestPrice(pairKey, buySell);
+        while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(price)) {
+            OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
+            OrderKey orderKey = orderQueue.head;
+            while (isNotSentinel(orderKey)) {
+                Order memory order = orders[orderKey];
+                uint availableBase;
+                uint availableQuote;
+                if (buySell == BuySell.Buy) {
+                    availableQuote = availableTokens(pair.quote, order.maker);
+                    availableBase = quoteToBasePair(pair, availableQuote, price);
+                } else {
+                    availableBase = availableTokens(pair.base, order.maker);
+                    availableQuote = baseToQuotePair(pair, availableBase, price);
+                }
+                if (availableBase > 0 && availableQuote > 0 && (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) > block.timestamp)) {
+                    orderResult = BestOrderResult(price, orderKey, order.next, order.maker, order.expiry, order.tokens, order.filled, Tokens.wrap(int128(uint128(availableBase))), Tokens.wrap(int128(uint128(availableQuote))));
+                    break;
+                }
+                orderKey = order.next;
+            }
+            if (Price.unwrap(orderResult.price) > 0) {
+                break;
+            }
+            price = getNextBestPrice(pairKey, buySell, price);
+        }
+    }
+
+
+    struct PairTokenResult {
+        Token token;
+        string symbol;
+        string name;
+        uint8 decimals;
+    }
+    struct PairResult {
+        PairKey pairKey;
+        PairTokenResult base;
+        PairTokenResult quote;
+        Factor multiplier;
+        Factor divisor;
+        BestOrderResult bestBuyOrderResult;
+        BestOrderResult bestSellOrderResult;
+    }
+    function getPairs(uint count, uint offset) public view returns (PairResult[] memory pairResults) {
+        pairResults = new PairResult[](count);
+        for (uint i = offset; i < offset + count && i < pairKeys.length; i = onePlus(i)) {
+            PairKey pairKey = pairKeys[i];
+            Pair memory pair = pairs[pairKey];
+            BestOrderResult memory bestBuyOrderResult = getBestOrder(pairKey, BuySell.Buy);
+            BestOrderResult memory bestSellOrderResult = getBestOrder(pairKey, BuySell.Sell);
+            pairResults[i] = PairResult(pairKey,
+                PairTokenResult(pair.base, IERC20(Token.unwrap(pair.base)).symbol(), IERC20(Token.unwrap(pair.base)).name(), IERC20(Token.unwrap(pair.base)).decimals()),
+                PairTokenResult(pair.quote, IERC20(Token.unwrap(pair.quote)).symbol(), IERC20(Token.unwrap(pair.quote)).name(), IERC20(Token.unwrap(pair.quote)).decimals()),
+                pair.multiplier, pair.divisor, bestBuyOrderResult, bestSellOrderResult);
+        }
+    }
+
 }
