@@ -181,7 +181,7 @@ describe("Dexz", function () {
 
     await data.printState("After Adding Orders");
 
-    const targetPrice1 = "0.6901";
+    const targetPrice1 = "0.6902";
     const baseTokensB1 = ethers.utils.parseUnits("1", data.decimals0);
     const actionsB1 = [
       { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB1.toString() },

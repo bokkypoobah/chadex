@@ -102,7 +102,7 @@ contract DexzBase {
         Account maker;
         Unixtime expiry;
         Tokens tokens;
-        Tokens filled;
+        Tokens filled; // TODO: Remove
     }
     struct TradeInput {
         Action action;
@@ -308,7 +308,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 factors.multiplier = Factor.wrap(baseDecimals - quoteDecimals + PRICE_DECIMALS);
                 factors.divisor = Factor.wrap(0);
             } else {
-                factors.multiplier = Factor.wrap(9);
+                factors.multiplier = Factor.wrap(PRICE_DECIMALS);
                 factors.divisor = Factor.wrap(quoteDecimals - baseDecimals);
             }
             pairs[pairKey] = Pair(tradeInput.base, tradeInput.quote, factors);

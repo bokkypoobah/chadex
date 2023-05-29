@@ -2094,6 +2094,7 @@
                 }
                 this.sync.completed++;
               }
+              console.log("JSON.stringify(this.pairs): " + JSON.stringify(this.pairs));
               localStorage.dexzPairsV1 = JSON.stringify(this.pairs);
             // }
             console.log("this.settings.pairTable.selectedPair: " + this.settings.pairTable.selectedPair);
