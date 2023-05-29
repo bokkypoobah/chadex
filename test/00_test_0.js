@@ -192,8 +192,23 @@ describe("Dexz", function () {
     await data.printEvents("user3->dexz.execute(actions)", await executeBTx.wait());
     await data.printState("After Executing Against Orders");
 
-    const pairs = await data.dexz.getPairs(2, 0);
-    console.log("pairs: " + JSON.stringify(pairs, null, 2));
+    // const pairs = await data.dexz.getPairs(2, 0);
+    // console.log("pairs: " + JSON.stringify(pairs, null, 2));
+    // struct PairTokenResult {
+    //     Token token;
+    //     string symbol;
+    //     string name;
+    //     uint8 decimals;
+    // }
+    // struct PairResult {
+    //     PairKey pairKey;
+    //     PairTokenResult base;
+    //     PairTokenResult quote;
+    //     Factor multiplier;
+    //     Factor divisor;
+    //     BestOrderResult bestBuyOrderResult;
+    //     BestOrderResult bestSellOrderResult;
+    // }
 
 
 

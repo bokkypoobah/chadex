@@ -271,6 +271,32 @@ class Data {
           }
           console.log();
 
+          const pairs = await this.dexz.getPairs(2, 0);
+          // console.log("pairs: " + JSON.stringify(pairs, null, 2));
+          for (let i = 0; i < pairs.length && pairs[i][0] != 0; i++) {
+            // console.log("pair[" + i + "]: " + JSON.stringify(pairs[i], null, 2));
+            const [pairKey, base, quote, multiplier, divisor, bestBuyOrderResult, bestSellOrderResult] = pairs[i];
+            console.log("pairKey: " + pairKey + ", base=" + JSON.stringify(base) + ", quote=" + JSON.stringify(quote) +
+              ", multiplier=" + multiplier + ", divisor=" + divisor +
+              ", bestBuyOrderResult=" + JSON.stringify(bestBuyOrderResult) + ", bestSellOrderResult=" + JSON.stringify(bestSellOrderResult));
+          }
+          // struct PairTokenResult {
+          //     Token token;
+          //     string symbol;
+          //     string name;
+          //     uint8 decimals;
+          // }
+          // struct PairResult {
+          //     PairKey pairKey;
+          //     PairTokenResult base;
+          //     PairTokenResult quote;
+          //     Factor multiplier;
+          //     Factor divisor;
+          //     BestOrderResult bestBuyOrderResult;
+          //     BestOrderResult bestSellOrderResult;
+          // }
+          console.log();
+
           price = await this.dexz.getBestPrice(pair.pairKey, buySell);
           while (price != 0) {
             var orderQueue = await this.dexz.getOrderQueue(pair.pairKey, buySell, price);
