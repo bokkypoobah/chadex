@@ -118,6 +118,17 @@ contract DexzBase {
         Factor multiplier;
         Factor divisor;
     }
+    struct TradeResult {
+        PairKey pairKey;
+        OrderKey orderKey;
+        Account taker;
+        Account maker;
+        BuySell buySell;
+        Price price;
+        uint tokens;
+        uint quoteTokens;
+        uint timestamp;
+    }
 
     uint8 public constant PRICE_DECIMALS = 12;
     Price public constant PRICE_EMPTY = Price.wrap(0);
@@ -135,9 +146,9 @@ contract DexzBase {
 
     event PairAdded(PairKey indexed pairKey, Account maker, Token indexed base, Token indexed quote, uint8 baseDecimals, uint8 quoteDecimals, Factor multiplier, Factor divisor, uint timestamp);
     event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens, Tokens quoteTokens, uint timestamp);
-    event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, Tokens filled);
-    event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens);
-    // event Trade(PairKey indexed pairKey, OrderKey indexed orderKey, BuySell buySell, Account indexed taker, Account maker, uint tokens, uint quoteTokens, Price price);
+    event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, Tokens filled, uint timestamp);
+    event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens, uint timestamp);
+    event Trade(TradeResult tradeResult);
     event TradeSummary(PairKey indexed pairKey, Account indexed taker, BuySell buySell, Price price, Tokens tokens, Tokens quoteTokens, Tokens tokensOnOrder, uint timestamp);
 
     error CannotRemoveMissingOrder();
@@ -339,19 +350,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
         uint quoteTokensToTransfer;
     }
 
-    struct TradeResult {
-        PairKey pairKey;
-        OrderKey orderKey;
-        Account taker;
-        Account maker;
-        BuySell buySell;
-        Price price;
-        uint tokens;
-        uint quoteTokens;
-        uint timestamp;
-    }
-    event Trade(TradeResult tradeResult);
-
     function _trade(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (Tokens filled, Tokens quoteTokensFilled, Tokens tokensOnOrder, OrderKey orderKey) {
         if (Price.unwrap(tradeInput.price) < Price.unwrap(PRICE_MIN) || Price.unwrap(tradeInput.price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice(tradeInput.price, PRICE_MAX);
@@ -521,7 +519,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
             Order memory order = orders[orderKey];
             if (Account.unwrap(order.maker) == Account.unwrap(moreInfo.taker)) {
                 OrderKey temp = orderKey;
-                emit OrderRemoved(moreInfo.pairKey, orderKey, order.maker, tradeInput.buySell, tradeInput.price, order.tokens, order.filled);
+                emit OrderRemoved(moreInfo.pairKey, orderKey, order.maker, tradeInput.buySell, tradeInput.price, order.tokens, order.filled, block.timestamp);
                 if (OrderKey.unwrap(orderQueue.head) == OrderKey.unwrap(orderKey)) {
                     orderQueue.head = order.next;
                 } else {
@@ -567,7 +565,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
         // TODO - Decide whether to have this check _checkTakerAvailableTokens(tradeInput, moreInfo);
         order.expiry = tradeInput.expiry;
-        emit OrderUpdated(moreInfo.pairKey, orderKey, moreInfo.taker, tradeInput.buySell, tradeInput.price, tradeInput.expiry, order.tokens);
+        emit OrderUpdated(moreInfo.pairKey, orderKey, moreInfo.taker, tradeInput.buySell, tradeInput.price, tradeInput.expiry, order.tokens, block.timestamp);
     }
 
     struct OrderResult {
