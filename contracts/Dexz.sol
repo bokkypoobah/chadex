@@ -705,8 +705,8 @@ contract Dexz is DexzBase, ReentrancyGuard {
 
     function getPairs(uint count, uint offset) public view returns (PairResult[] memory pairResults) {
         pairResults = new PairResult[](count);
-        for (uint i = offset; i < offset + count && i < pairKeys.length; i = onePlus(i)) {
-            pairResults[i] = getPair(i);
+        for (uint i = 0; i < count && ((i + offset) < pairKeys.length); i = onePlus(i)) {
+            pairResults[i] = getPair(i + offset);
         }
     }
     function tradesLength() public view returns (uint) {
