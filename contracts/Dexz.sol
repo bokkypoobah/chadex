@@ -297,8 +297,9 @@ contract Dexz is DexzBase, ReentrancyGuard {
 
     function _getMoreInfo(TradeInput memory tradeInput, Account taker) internal returns (MoreInfo memory moreInfo) {
         PairKey pairKey = generatePairKey(tradeInput);
-        Factor multiplier;
-        Factor divisor;
+        // Factor multiplier;
+        // Factor divisor;
+        Factors memory factors;
         Pair memory pair = pairs[pairKey];
         if (Token.unwrap(pair.base) == address(0)) {
             uint8 baseDecimals = IERC20(Token.unwrap(tradeInput.base)).decimals();
@@ -306,20 +307,20 @@ contract Dexz is DexzBase, ReentrancyGuard {
             // TODO Permit ERC-20 token decimals from 0 to 24
             // / 10^0 to / 10^24
             if (baseDecimals >= quoteDecimals) {
-                multiplier = Factor.wrap(baseDecimals - quoteDecimals + PRICE_DECIMALS);
-                divisor = Factor.wrap(0);
+                factors.multiplier = Factor.wrap(baseDecimals - quoteDecimals + PRICE_DECIMALS);
+                factors.divisor = Factor.wrap(0);
             } else {
-                multiplier = Factor.wrap(9);
-                divisor = Factor.wrap(quoteDecimals - baseDecimals);
+                factors.multiplier = Factor.wrap(9);
+                factors.divisor = Factor.wrap(quoteDecimals - baseDecimals);
             }
-            pairs[pairKey] = Pair(tradeInput.base, tradeInput.quote, Factors(multiplier, divisor));
+            pairs[pairKey] = Pair(tradeInput.base, tradeInput.quote, factors);
             pairKeys.push(pairKey);
-            emit PairAdded(pairKey, Account.wrap(msg.sender), tradeInput.base, tradeInput.quote, baseDecimals, quoteDecimals, Factors(multiplier, divisor), block.timestamp);
+            emit PairAdded(pairKey, Account.wrap(msg.sender), tradeInput.base, tradeInput.quote, baseDecimals, quoteDecimals, factors, block.timestamp);
         } else {
-            multiplier = pair.factors.multiplier;
-            divisor = pair.factors.divisor;
+            factors.multiplier = pair.factors.multiplier;
+            factors.divisor = pair.factors.divisor;
         }
-        return MoreInfo(taker, inverseBuySell(tradeInput.buySell), pairKey, Factors(multiplier, divisor));
+        return MoreInfo(taker, inverseBuySell(tradeInput.buySell), pairKey, factors);
     }
 
     function _checkTakerAvailableTokens(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal view {
