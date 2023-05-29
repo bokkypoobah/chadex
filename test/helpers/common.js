@@ -306,7 +306,7 @@ class Data {
       const tradeEvents = await this.dexz.getTradeEvents(parseInt(tradeLength) + 1, 0); // Adding 1 to show empty record at end
       for (let i = 0; i < tradeEvents.length && tradeEvents[i][0] != 0; i++) {
         const [pairKey, taker, buySell, price, filled, quoteFilled, blockNumber, timestamp] = tradeEvents[i];
-        // var seconds = (timestamp - new Date() / 1000);
+        // var minutes = (timestamp - (now / 1000)) / 60;
         console.log("              " + i + " " + this.padLeft(blockNumber, 5) + " " + timestamp + " " +
           pairKey.substring(0, 10) + " " + this.getShortAccountName(taker) + (buySell == 1 ? " Buy  " : " Sell ") + " " +
           this.padLeft(ethers.utils.formatUnits(price, 12), 14) + " " +
