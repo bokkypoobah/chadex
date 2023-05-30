@@ -339,29 +339,23 @@ contract Dexz is DexzBase, ReentrancyGuard {
     }
 
     struct Vars {
-        // uint availableTokens;
         bool deleteOrder;
         uint makerTokensToFill;
         uint tokensToTransfer;
         uint quoteTokensToTransfer;
     }
 
-    event Debug(string name, uint value);
-
     function _handleOrder(TradeInput memory tradeInput, MoreInfo memory moreInfo, Price price, OrderKey orderKey, Order storage order) internal returns (Vars memory vars) {
         bool deleteOrder;
         uint makerTokensToFill;
         uint tokensToTransfer;
         uint quoteTokensToTransfer;
-        emit Debug("_handleOrder", 0);
         if (Unixtime.unwrap(order.expiry) != 0 && Unixtime.unwrap(order.expiry) < block.timestamp) {
             deleteOrder = true;
         } else {
             makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
-            emit Debug("_handleOrder - makerTokensToFill", makerTokensToFill);
             if (tradeInput.buySell == BuySell.Buy) {
                 uint _availableTokens = availableTokens(tradeInput.base, order.maker);
-                emit Debug("_handleOrder - _availableTokens", _availableTokens);
                 if (_availableTokens > 0) {
                     if (makerTokensToFill > _availableTokens) {
                         makerTokensToFill = _availableTokens;
@@ -383,16 +377,12 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 }
             } else {
                 uint availableQuoteTokens = availableTokens(tradeInput.quote, order.maker);
-                emit Debug("_handleOrder - availableQuoteTokens", availableQuoteTokens);
                 if (availableQuoteTokens > 0) {
                     uint availableQuoteTokensInBaseTokens = quoteToBase(moreInfo.factors, availableQuoteTokens, price);
-                    emit Debug("availableQuoteTokensInBaseTokens", availableQuoteTokensInBaseTokens);
                     if (makerTokensToFill > availableQuoteTokensInBaseTokens) {
                         makerTokensToFill = availableQuoteTokensInBaseTokens;
-                        emit Debug("_handleOrder - S makerTokensToFill", makerTokensToFill);
                     } else {
                         availableQuoteTokens = baseToQuote(moreInfo.factors, makerTokensToFill, price);
-                        emit Debug("_handleOrder - S availableQuoteTokens", availableQuoteTokens);
                     }
                     if (uint128(Tokens.unwrap(tradeInput.tokens)) >= makerTokensToFill) {
                         tokensToTransfer = makerTokensToFill;
@@ -410,7 +400,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 }
             }
         }
-        emit Debug("_handleOrder - deleteOrder", deleteOrder ? 1 : 0);
         return Vars(deleteOrder, makerTokensToFill, tokensToTransfer, quoteTokensToTransfer);
     }
 
@@ -432,78 +421,11 @@ contract Dexz is DexzBase, ReentrancyGuard {
             OrderKey bestMatchingOrderKey = orderQueue.head;
             while (isNotSentinel(bestMatchingOrderKey)) {
                 Order storage order = orders[bestMatchingOrderKey];
-
                 Vars memory vars = _handleOrder(tradeInput, moreInfo, bestMatchingPrice, bestMatchingOrderKey, order);
                 order.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(order.tokens)) - uint128(vars.tokensToTransfer)));
                 filled = Tokens.wrap(int128(uint128(Tokens.unwrap(filled)) + uint128(vars.tokensToTransfer)));
                 quoteFilled = Tokens.wrap(int128(uint128(Tokens.unwrap(quoteFilled)) + uint128(vars.quoteTokensToTransfer)));
                 tradeInput.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(tradeInput.tokens)) - uint128(vars.tokensToTransfer)));
-                // if (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) >= block.timestamp) {
-                //     vars.tokensToTransfer = 0;
-                //     vars.quoteTokensToTransfer = 0;
-                //     if (tradeInput.buySell == BuySell.Buy) {
-                //         vars.makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
-                //         uint _availableTokens = availableTokens(tradeInput.base, order.maker);
-                //         if (_availableTokens > 0) {
-                //             // if (vars.makerTokensToFill > _availableTokens) {
-                //             //     vars.makerTokensToFill = _availableTokens;
-                //             // }
-                //             // if (uint128(Tokens.unwrap(tradeInput.tokens)) >= vars.makerTokensToFill) {
-                //             //     vars.tokensToTransfer = vars.makerTokensToFill;
-                //             //     vars.deleteOrder = true;
-                //             // } else {
-                //             //     vars.tokensToTransfer = uint(uint128(Tokens.unwrap(tradeInput.tokens)));
-                //             // }
-                //             // vars.quoteTokensToTransfer = baseToQuote(moreInfo.factors, vars.tokensToTransfer, bestMatchingPrice);
-                //             // if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
-                //             //     transferFrom(tradeInput.quote, moreInfo.taker, order.maker, vars.quoteTokensToTransfer);
-                //             //     transferFrom(tradeInput.base, order.maker, moreInfo.taker, vars.tokensToTransfer);
-                //             // }
-                //             // emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, vars.tokensToTransfer, vars.quoteTokensToTransfer, block.timestamp));
-                //         } else {
-                //             vars.deleteOrder = true;
-                //         }
-                //     } else {
-                //         emit Debug("bestMatchingPrice", uint256(Price.unwrap(bestMatchingPrice)));
-                //         vars.makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
-                //         emit Debug("vars.makerTokensToFill", vars.makerTokensToFill);
-                //         uint availableQuoteTokens = availableTokens(tradeInput.quote, order.maker);
-                //         emit Debug("availableQuoteTokens", availableQuoteTokens);
-                //         if (availableQuoteTokens > 0) {
-                //             uint availableQuoteTokensInBaseTokens = quoteToBase(moreInfo.factors, availableQuoteTokens, bestMatchingPrice);
-                //             emit Debug("availableQuoteTokensInBaseTokens", availableQuoteTokensInBaseTokens);
-                //
-                //             if (vars.makerTokensToFill > availableQuoteTokensInBaseTokens) {
-                //                 vars.makerTokensToFill = availableQuoteTokensInBaseTokens;
-                //             } else {
-                //                 availableQuoteTokens = baseToQuote(moreInfo.factors, vars.makerTokensToFill, bestMatchingPrice);
-                //             }
-                //
-                //             if (uint128(Tokens.unwrap(tradeInput.tokens)) >= vars.makerTokensToFill) {
-                //                 vars.tokensToTransfer = vars.makerTokensToFill;
-                //                 vars.quoteTokensToTransfer = availableQuoteTokens;
-                //                 vars.deleteOrder = true;
-                //             } else {
-                //                 vars.tokensToTransfer = uint(uint128(Tokens.unwrap(tradeInput.tokens)));
-                //                 vars.quoteTokensToTransfer = baseToQuote(moreInfo.factors, vars.tokensToTransfer, bestMatchingPrice);
-                //             }
-                //
-                //             if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
-                //                 transferFrom(tradeInput.base, moreInfo.taker, order.maker, vars.tokensToTransfer);
-                //                 transferFrom(tradeInput.quote, order.maker, moreInfo.taker, vars.quoteTokensToTransfer);
-                //             }
-                //             emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, vars.tokensToTransfer, vars.quoteTokensToTransfer, block.timestamp));
-                //         } else {
-                //             vars.deleteOrder = true;
-                //         }
-                //     }
-                //     order.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(order.tokens)) - uint128(vars.tokensToTransfer)));
-                //     filled = Tokens.wrap(int128(uint128(Tokens.unwrap(filled)) + uint128(vars.tokensToTransfer)));
-                //     quoteFilled = Tokens.wrap(int128(uint128(Tokens.unwrap(quoteFilled)) + uint128(vars.quoteTokensToTransfer)));
-                //     tradeInput.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(tradeInput.tokens)) - uint128(vars.tokensToTransfer)));
-                // } else {
-                //     vars.deleteOrder = true;
-                // }
                 if (vars.deleteOrder) {
                     OrderKey temp = bestMatchingOrderKey;
                     bestMatchingOrderKey = order.next;
@@ -537,7 +459,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
             }
         }
         if (Tokens.unwrap(tradeInput.tokens) > 0 && (tradeInput.action == Action.FillAnyAndAddOrder)) {
-            // TODO require(moreInfo.expiry > block.timestamp);
+            // TODO ? require(moreInfo.expiry > block.timestamp);
             orderKey = _addOrder(tradeInput, moreInfo);
             tokensOnOrder = tradeInput.tokens;
         }
@@ -751,8 +673,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
 
     struct PairTokenResult {
         Token token;
-        string symbol;
-        string name;
         uint8 decimals;
     }
     struct PairResult {
@@ -763,15 +683,14 @@ contract Dexz is DexzBase, ReentrancyGuard {
         BestOrderResult bestBuyOrder;
         BestOrderResult bestSellOrder;
     }
-    // TODO: Remove symbol and name to minimise issues, or make optional
     function getPair(uint i) public view returns (PairResult memory pairResult) {
         PairKey pairKey = pairKeys[i];
         Pair memory pair = pairs[pairKey];
         BestOrderResult memory bestBuyOrderResult = getBestOrder(pairKey, BuySell.Buy);
         BestOrderResult memory bestSellOrderResult = getBestOrder(pairKey, BuySell.Sell);
         pairResult = PairResult(pairKey,
-            PairTokenResult(pair.base, IERC20(Token.unwrap(pair.base)).symbol(), IERC20(Token.unwrap(pair.base)).name(), IERC20(Token.unwrap(pair.base)).decimals()),
-            PairTokenResult(pair.quote, IERC20(Token.unwrap(pair.quote)).symbol(), IERC20(Token.unwrap(pair.quote)).name(), IERC20(Token.unwrap(pair.quote)).decimals()),
+            PairTokenResult(pair.base, IERC20(Token.unwrap(pair.base)).decimals()),
+            PairTokenResult(pair.quote, IERC20(Token.unwrap(pair.quote)).decimals()),
             pair.factors, bestBuyOrderResult, bestSellOrderResult);
     }
 
