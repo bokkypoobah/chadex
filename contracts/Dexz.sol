@@ -113,6 +113,7 @@ contract DexzBase {
         Price targetPrice;
         Unixtime expiry;
         Tokens tokens;
+        // TODO bool _checkTakerAvailableTokens
     }
     struct MoreInfo {
         Account taker;
@@ -692,6 +693,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         BestOrderResult bestBuyOrder;
         BestOrderResult bestSellOrder;
     }
+    // TODO: Remove symbol and name to minimise issues, or make optional
     function getPair(uint i) public view returns (PairResult memory pairResult) {
         PairKey pairKey = pairKeys[i];
         Pair memory pair = pairs[pairKey];

@@ -89,13 +89,13 @@ Compiled 1 Solidity file successfully
     "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     "price": "690100000000",
     "targetPrice": "690100000000",
-    "expiry": 1685415530,
+    "expiry": 1685416031,
     "tokens": "100000000000000000000"
   }
 ]
         > user0->dexz.execute(actionsA) - gasUsed: 301497 ~ ETH 0.01205988 ~ USD 24
-          + Dexz:0xCf7E 29.0 PairAdded(pairKey: 0x2230c662, maker: user0:0x7099, base: Token0:0x5FbD, quote: WETH:0x9fE4, baseDecimals: 18, quoteDecimals: 18, factors: 12,0, timestamp: 1685411956)
-          + Dexz:0xCf7E 29.1 OrderAdded(pairKey: 0x2230c662, orderKey: 0x029dbe28, maker: user0:0x7099, buySell: 0, price: 0.6901, expiry: 1685415530, tokens: 100000000000000000000, quoteTokens: 69010000000000000000, timestamp: 1685411956)
+          + Dexz:0xCf7E 29.0 PairAdded(pairKey: 0x2230c662, maker: user0:0x7099, base: Token0:0x5FbD, quote: WETH:0x9fE4, baseDecimals: 18, quoteDecimals: 18, factors: 12,0, timestamp: 1685412458)
+          + Dexz:0xCf7E 29.1 OrderAdded(pairKey: 0x2230c662, orderKey: 0x029dbe28, maker: user0:0x7099, buySell: 0, price: 0.6901, expiry: 1685416031, tokens: 100000000000000000000, quoteTokens: 69010000000000000000, timestamp: 1685412458)
 
         --- After Adding Orders ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
@@ -111,7 +111,7 @@ Compiled 1 Solidity file successfully
           ----- Pair 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d Token0:0x5FbD/WETH:0x9fE4 12 0 -----
               #      BUY Price OrderKey   Next       Maker         Expiry(s)                Tokens         AvailableBase        AvailableQuote
             --- -------------- ---------- ---------- ------------ ---------- --------------------- --------------------- ---------------------
-              0         0.6901 0x029dbe28 0x00000000 user0:0x7099      60.00                 100.0 99.985509346471525865                 69.0
+              0         0.6901 0x029dbe28 0x00000000 user0:0x7099      59.99                 100.0 99.985509346471525865                 69.0
 
             price: 0.6901 head=0x029dbe28 tail=0x029dbe28
               Order key=0x029dbe28 next=0x00000000 maker=user0:0x7099 expiry=59.99s tokens=100.0
@@ -123,7 +123,7 @@ Compiled 1 Solidity file successfully
               # Block  Timestamp Pair Key   Taker        B/S            Price                Filled   Quote Tokens Filled
             --- ----- ---------- ---------- ------------ ---- --------------- --------------------- ---------------------
 
-            pairKey: 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d, base=["0x5FbDB2315678afecb367f032d93F642f64180aa3","TOK0","Token0",18], quote=["0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0","WETH","Wrapped Ether",18], factors=12,0, bestBuyOrder=[{"type":"BigNumber","hex":"0xa0ad2a5500"},"0x029dbe282b96de95c4b5c614ab564c21b14b8151a225e087810236cbdff74d88","0x0000000000000000000000000000000000000000000000000000000000000000","0x70997970C51812dc3A010C7d01b50e0d17dc79C8",{"type":"BigNumber","hex":"0x6475666a"},{"type":"BigNumber","hex":"0x056bc75e2d63100000"},{"type":"BigNumber","hex":"0x056b93e30132ef3de9"},{"type":"BigNumber","hex":"0x03bd913e6c1df40000"}], bestSellOrder=[{"type":"BigNumber","hex":"0x00"},"0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000",{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"}]
+            pairKey: 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d, base=["0x5FbDB2315678afecb367f032d93F642f64180aa3","TOK0","Token0",18], quote=["0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0","WETH","Wrapped Ether",18], factors=12,0, bestBuyOrder=[{"type":"BigNumber","hex":"0xa0ad2a5500"},"0x029dbe282b96de95c4b5c614ab564c21b14b8151a225e087810236cbdff74d88","0x0000000000000000000000000000000000000000000000000000000000000000","0x70997970C51812dc3A010C7d01b50e0d17dc79C8",{"type":"BigNumber","hex":"0x6475685f"},{"type":"BigNumber","hex":"0x056bc75e2d63100000"},{"type":"BigNumber","hex":"0x056b93e30132ef3de9"},{"type":"BigNumber","hex":"0x03bd913e6c1df40000"}], bestSellOrder=[{"type":"BigNumber","hex":"0x00"},"0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000",{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"}]
 
         Executing: [
   {
@@ -133,7 +133,7 @@ Compiled 1 Solidity file successfully
     "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     "price": "690100000000",
     "targetPrice": "690100000000",
-    "expiry": 1685415530,
+    "expiry": 1685416031,
     "tokens": "100000000000000000000"
   }
 ]
@@ -144,9 +144,9 @@ Compiled 1 Solidity file successfully
           + Dexz:0xCf7E 30.3 Debug(name: availableQuoteTokensInBaseTokens, value: 99.985509346471525865)
           + Token0:0x5FbD 30.4 Transfer(from: user3:0x15d3, to: user0:0x7099, tokens: 99.985509346471525865)
           + WETH:0x9fE4 30.5 Transfer(from: user0:0x7099, to: user3:0x15d3, tokens: 69.0)
-          + Dexz:0xCf7E 30.6 Trade(tradeResult: 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d,0x029dbe282b96de95c4b5c614ab564c21b14b8151a225e087810236cbdff74d88,0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65,0x70997970C51812dc3A010C7d01b50e0d17dc79C8,1,690100000000,99985509346471525865,69000000000000000000,1685411957)
-          + Dexz:0xCf7E 30.7 OrderAdded(pairKey: 0x2230c662, orderKey: 0xfabe48a7, maker: user3:0x15d3, buySell: 1, price: 0.6901, expiry: 1685415530, tokens: 14490653528474135, quoteTokens: 10000000000000000, timestamp: 1685411957)
-          + Dexz:0xCf7E 30.8 TradeSummary(pairKey: 0x2230c662, taker: user3:0x15d3, buySell: 1, price: 0.6901, tokens: 99985509346471525865, quoteTokens: 69000000000000000000, tokensOnOrder: 14490653528474135, timestamp: 1685411957)
+          + Dexz:0xCf7E 30.6 Trade(tradeResult: 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d,0x029dbe282b96de95c4b5c614ab564c21b14b8151a225e087810236cbdff74d88,0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65,0x70997970C51812dc3A010C7d01b50e0d17dc79C8,1,690100000000,99985509346471525865,69000000000000000000,1685412459)
+          + Dexz:0xCf7E 30.7 OrderAdded(pairKey: 0x2230c662, orderKey: 0xfabe48a7, maker: user3:0x15d3, buySell: 1, price: 0.6901, expiry: 1685416031, tokens: 14490653528474135, quoteTokens: 10000000000000000, timestamp: 1685412459)
+          + Dexz:0xCf7E 30.8 TradeSummary(pairKey: 0x2230c662, taker: user3:0x15d3, buySell: 1, price: 0.6901, tokens: 99985509346471525865, quoteTokens: 69000000000000000000, tokensOnOrder: 14490653528474135, timestamp: 1685412459)
 
         --- After Executing Against Orders ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
@@ -166,19 +166,19 @@ Compiled 1 Solidity file successfully
 
               #     SELL Price OrderKey   Next       Maker         Expiry(s)                Tokens         AvailableBase        AvailableQuote
             --- -------------- ---------- ---------- ------------ ---------- --------------------- --------------------- ---------------------
-              0         0.6901 0xfabe48a7 0x00000000 user3:0x15d3      59.99  0.014490653528474135  0.014490653528474135                 0.01
+              0         0.6901 0xfabe48a7 0x00000000 user3:0x15d3      59.98  0.014490653528474135  0.014490653528474135                 0.01
 
             price: 0.6901 head=0xfabe48a7 tail=0xfabe48a7
-              Order key=0xfabe48a7 next=0x00000000 maker=user3:0x15d3 expiry=59.99s tokens=0.014490653528474135
+              Order key=0xfabe48a7 next=0x00000000 maker=user3:0x15d3 expiry=59.98s tokens=0.014490653528474135
 
               # Block  Timestamp Pair Key   Taker        B/S            Price                Filled   Quote Tokens Filled
             --- ----- ---------- ---------- ------------ ---- --------------- --------------------- ---------------------
-              0    30 1685411957 0x2230c662 user3:0x15d3 Buy           0.6901 99.985509346471525865                  69.0
+              0    30 1685412459 0x2230c662 user3:0x15d3 Buy           0.6901 99.985509346471525865                  69.0
 
-            pairKey: 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d, base=["0x5FbDB2315678afecb367f032d93F642f64180aa3","TOK0","Token0",18], quote=["0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0","WETH","Wrapped Ether",18], factors=12,0, bestBuyOrder=[{"type":"BigNumber","hex":"0x00"},"0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000",{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"}], bestSellOrder=[{"type":"BigNumber","hex":"0xa0ad2a5500"},"0xfabe48a7394a9046945c853d4a9691fb29eaea5de76e7ab34019c550845d39ca","0x0000000000000000000000000000000000000000000000000000000000000000","0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",{"type":"BigNumber","hex":"0x6475666a"},{"type":"BigNumber","hex":"0x337b2c3020c217"},{"type":"BigNumber","hex":"0x337b2c3020c217"},{"type":"BigNumber","hex":"0x2386f26fc10000"}]
+            pairKey: 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d, base=["0x5FbDB2315678afecb367f032d93F642f64180aa3","TOK0","Token0",18], quote=["0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0","WETH","Wrapped Ether",18], factors=12,0, bestBuyOrder=[{"type":"BigNumber","hex":"0x00"},"0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000",{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"}], bestSellOrder=[{"type":"BigNumber","hex":"0xa0ad2a5500"},"0xfabe48a7394a9046945c853d4a9691fb29eaea5de76e7ab34019c550845d39ca","0x0000000000000000000000000000000000000000000000000000000000000000","0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",{"type":"BigNumber","hex":"0x6475685f"},{"type":"BigNumber","hex":"0x337b2c3020c217"},{"type":"BigNumber","hex":"0x337b2c3020c217"},{"type":"BigNumber","hex":"0x2386f26fc10000"}]
 
 
-    ✔ 00. Test 00 (230ms)
+    ✔ 00. Test 00 (237ms)
 
 
   1 passing (1s)
