@@ -1,4 +1,4 @@
-const { ZERO_ADDRESS, BUYORSELL, ANYORALL, BUYORSELLSTRING, ANYORALLSTRING, Data, generateRange } = require('./helpers/common');
+const { ZERO_ADDRESS, PAIRKEY_NULL, ORDERKEY_SENTINEL, BUYORSELL, ANYORALL, BUYORSELLSTRING, ANYORALLSTRING, Data, generateRange } = require('./helpers/common');
 const { singletons, expectRevert } = require("@openzeppelin/test-helpers");
 const { expect, assert } = require("chai");
 const { BigNumber } = require("ethers");
@@ -201,6 +201,11 @@ describe("Dexz", function () {
     // await data.printEvents("user3->dexz.execute(actions)", await executeB2Tx.wait());
 
     await data.printState("After Executing Against Orders");
+
+    const sendMessageTx = await data.dexz.connect(data.user3Signer).sendMessage(ZERO_ADDRESS, PAIRKEY_NULL, ORDERKEY_SENTINEL, "Hello", "World!");
+    await data.printEvents("user3->dexz.sendMessage(blah)", await sendMessageTx.wait());
+
+    // function sendMessage(address to, bytes32 pairKey, bytes32 orderKey, string calldata topic, string calldata text) public {
 
     // const tradeEvents = await data.dexz.getTradeEvents(10, 0);
     // console.log("tradeEvents: " + JSON.stringify(tradeEvents, null, 2));

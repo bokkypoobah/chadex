@@ -140,6 +140,8 @@ contract DexzBase {
     Tokens public constant TOKENS_MIN = Tokens.wrap(0);
     Tokens public constant TOKENS_MAX = Tokens.wrap(999_999_999_999_999_999_999_999_999_999_999_999); // 2^128 = 340, 282,366,920, 938,463,463, 374,607,431, 768,211,456
     OrderKey public constant ORDERKEY_SENTINEL = OrderKey.wrap(0x0);
+    uint constant TOPIC_LENGTH_MAX = 48;
+    uint constant TEXT_LENGTH_MAX = 280;
 
     PairKey[] public pairKeys;
     mapping(PairKey => Pair) public pairs;
@@ -153,6 +155,7 @@ contract DexzBase {
     event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens, uint timestamp);
     event Trade(TradeResult tradeResult);
     event TradeSummary(PairKey indexed pairKey, Account indexed taker, BuySell buySell, Price price, Tokens tokens, Tokens quoteTokens, Tokens tokensOnOrder, uint timestamp);
+    event Message(address indexed from, address indexed to, bytes32 indexed pairKey, bytes32 orderKey, string topic, string text, uint timestamp);
 
     error CannotRemoveMissingOrder();
     error InvalidPrice(Price price, Price priceMax);
@@ -167,6 +170,8 @@ contract DexzBase {
     error UnableToSellAboveTargetPrice(Price price, Price targetPrice);
     error OrderNotFoundForUpdate(OrderKey orderKey);
     error OnlyPositiveTokensAccepted(Tokens tokens);
+    error InvalidMessageTopic(uint maxLength);
+    error InvalidMessageText(uint maxLength);
 
     function pair(uint i) public view returns (PairKey pairKey, Token base, Token quote, Factors memory factors) {
         pairKey = pairKeys[i];
@@ -280,6 +285,21 @@ contract DexzBase {
 contract Dexz is DexzBase, ReentrancyGuard {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
+    struct TradeEvent {
+        PairKey pairKey; // bytes32
+        // OrderKey orderKey;
+        Account taker; // address
+        // Account maker; // address
+        BuySell buySell; // uint8
+        Price price; // uint128
+        Tokens filled; // int128
+        Tokens quoteFilled; // int128
+        uint48 blockNumber; // 2^48 = 281,474,976,710,656
+        uint48 timestamp; // 2^48 = 281,474,976,710,656
+    }
+    TradeEvent[] public trades;
+
+
     function execute(TradeInput[] calldata tradeInputs) public {
         for (uint i = 0; i < tradeInputs.length; i = onePlus(i)) {
             TradeInput memory tradeInput = tradeInputs[i];
@@ -339,14 +359,13 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
 
-    struct Vars {
+    struct HandleOrderResults {
         bool deleteOrder;
         uint makerTokensToFill;
         uint tokensToTransfer;
         uint quoteTokensToTransfer;
     }
-
-    function _handleOrder(TradeInput memory tradeInput, MoreInfo memory moreInfo, Price price, OrderKey orderKey, Order storage order) internal returns (Vars memory vars) {
+    function _handleOrder(TradeInput memory tradeInput, MoreInfo memory moreInfo, Price price, OrderKey orderKey, Order storage order) internal returns (HandleOrderResults memory vars) {
         bool deleteOrder;
         uint makerTokensToFill;
         uint tokensToTransfer;
@@ -405,7 +424,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 }
             }
         }
-        return Vars(deleteOrder, makerTokensToFill, tokensToTransfer, quoteTokensToTransfer);
+        return HandleOrderResults(deleteOrder, makerTokensToFill, tokensToTransfer, quoteTokensToTransfer);
     }
 
     function _trade(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (Tokens filled, Tokens quoteFilled, Tokens tokensOnOrder, OrderKey orderKey) {
@@ -428,7 +447,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
             OrderKey bestMatchingOrderKey = orderQueue.head;
             while (isNotSentinel(bestMatchingOrderKey)) {
                 Order storage order = orders[bestMatchingOrderKey];
-                Vars memory vars = _handleOrder(tradeInput, moreInfo, bestMatchingPrice, bestMatchingOrderKey, order);
+                HandleOrderResults memory vars = _handleOrder(tradeInput, moreInfo, bestMatchingPrice, bestMatchingOrderKey, order);
                 order.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(order.tokens)) - uint128(vars.tokensToTransfer)));
                 filled = Tokens.wrap(int128(uint128(Tokens.unwrap(filled)) + uint128(vars.tokensToTransfer)));
                 quoteFilled = Tokens.wrap(int128(uint128(Tokens.unwrap(quoteFilled)) + uint128(vars.quoteTokensToTransfer)));
@@ -487,21 +506,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
             trades.push(TradeEvent(moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled, uint48(block.number), uint48(block.timestamp)));
         }
     }
-
-    struct TradeEvent {
-        PairKey pairKey; // bytes32
-        // OrderKey orderKey;
-        Account taker; // address
-        // Account maker; // address
-        BuySell buySell; // uint8
-        Price price; // uint128
-        Tokens filled; // int128
-        Tokens quoteFilled; // int128
-        uint48 blockNumber; // 2^48 = 281,474,976,710,656
-        uint48 timestamp; // 2^48 = 281,474,976,710,656
-    }
-    TradeEvent[] public trades;
-
 
     function _addOrder(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
         orderKey = generateOrderKey(moreInfo.taker, tradeInput.buySell, tradeInput.base, tradeInput.quote, tradeInput.price);
@@ -583,10 +587,35 @@ contract Dexz is DexzBase, ReentrancyGuard {
         if (Tokens.unwrap(order.tokens) > Tokens.unwrap(TOKENS_MAX)) {
             revert InvalidTokens(tradeInput.tokens, TOKENS_MAX);
         }
-        // TODO - Decide whether to have this check _checkTakerAvailableTokens(tradeInput, moreInfo);
+        if (!tradeInput.skipCheck) {
+            _checkTakerAvailableTokens(tradeInput, moreInfo);
+        }
         order.expiry = tradeInput.expiry;
         emit OrderUpdated(moreInfo.pairKey, orderKey, moreInfo.taker, tradeInput.buySell, tradeInput.price, tradeInput.expiry, order.tokens, block.timestamp);
     }
+
+
+    /// @dev Send message
+    /// @param to Destination address, or address(0) for general messages
+    /// @param pairKey Key to specific pair, or bytes32(0) for no specific pair
+    /// @param orderKey Key to specific order, or bytes32(0) for no specific order
+    /// @param topic Message topic. Length between 0 and `TOPIC_LENGTH_MAX`
+    /// @param text Message text. Length between 1 and `TEXT_LENGTH_MAX`
+    function sendMessage(address to, bytes32 pairKey, bytes32 orderKey, string calldata topic, string calldata text) public {
+        bytes memory topicBytes = bytes(topic);
+        if (topicBytes.length > TOPIC_LENGTH_MAX) {
+            revert InvalidMessageTopic(TOPIC_LENGTH_MAX);
+        }
+        bytes memory textBytes = bytes(text);
+        if (textBytes.length < 1 || textBytes.length > TEXT_LENGTH_MAX) {
+            revert InvalidMessageText(TEXT_LENGTH_MAX);
+        }
+        // if (pairKey != bytes32(0) && !umswapExists[bytes32] && !isERC721(umswapOrCollection)) {
+        //     revert InvalidUmswapOrCollection();
+        // }
+        emit Message(msg.sender, to, pairKey, orderKey, topic, text, block.timestamp);
+    }
+
 
     struct OrderResult {
         Price price;
