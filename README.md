@@ -1,10 +1,10 @@
-# Dexz
+# chadex
 
 Fully on-chain ERC-20/ERC-20 DEX using Red-Black Trees and queues for sorted orderbook executions.
 
 Status: Work in progress
 
-https://bokkypoobah.github.io/Dexz/
+https://bokkypoobah.github.io/chadex/
 
 <br />
 
