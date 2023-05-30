@@ -172,6 +172,8 @@ contract DexzBase {
     error OnlyPositiveTokensAccepted(Tokens tokens);
     error InvalidMessageTopic(uint maxLength);
     error InvalidMessageText(uint maxLength);
+    error CalculatedBaseTokensOverflow(uint baseTokens, uint max);
+    error CalculatedQuoteTokensOverflow(uint quoteTokens, uint max);
 
     function pair(uint i) public view returns (PairKey pairKey, Token base, Token quote, Factors memory factors) {
         pairKey = pairKeys[i];
@@ -261,12 +263,18 @@ contract DexzBase {
 
     function baseToQuote(Factors memory factors, uint tokens, Price price) pure internal returns (uint quoteTokens) {
         quoteTokens = uint128((10 ** Factor.unwrap(factors.divisor)) * tokens * uint(Price.unwrap(price)) / (10 ** (Factor.unwrap(factors.multiplier) + PRICE_DECIMALS)));
+        if (quoteTokens >= uint(uint128(Tokens.unwrap(TOKENS_MAX)))) {
+            revert CalculatedQuoteTokensOverflow(quoteTokens, uint(uint128(Tokens.unwrap(TOKENS_MAX))));
+        }
     }
     function quoteToBase(Factors memory factors, uint quoteTokens, Price price) pure internal returns (uint tokens) {
         tokens = (10 ** (Factor.unwrap(factors.multiplier) + PRICE_DECIMALS)) * quoteTokens / uint(Price.unwrap(price)) / (10 ** Factor.unwrap(factors.divisor));
+        if (tokens >= uint(uint128(Tokens.unwrap(TOKENS_MAX)))) {
+            revert CalculatedBaseTokensOverflow(tokens, uint(uint128(Tokens.unwrap(TOKENS_MAX))));
+        }
     }
     function baseAndQuoteToPrice(Factors memory factors, uint tokens, uint quoteTokens) pure internal returns (Price price) {
-        price = Price.wrap(uint128((10 ** (Factor.unwrap(factors.multiplier) + PRICE_DECIMALS)) * quoteTokens / tokens / (10 ** Factor.unwrap(factors.divisor))));
+        price = tokens == 0 ? Price.wrap(0) : Price.wrap(uint128((10 ** (Factor.unwrap(factors.multiplier) + PRICE_DECIMALS)) * quoteTokens / tokens / (10 ** Factor.unwrap(factors.divisor))));
     }
     function availableTokens(Token token, Account wallet) internal view returns (uint tokens) {
         uint allowance = IERC20(Token.unwrap(token)).allowance(Account.unwrap(wallet), address(this));
