@@ -337,7 +337,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
         }
     }
 
-    struct StackTooDeepWorkaround {
+    struct Vars {
         // uint availableTokens;
         bool deleteOrder;
         uint makerTokensToFill;
@@ -365,76 +365,76 @@ contract Dexz is DexzBase, ReentrancyGuard {
             OrderKey bestMatchingOrderKey = orderQueue.head;
             while (isNotSentinel(bestMatchingOrderKey)) {
                 Order storage order = orders[bestMatchingOrderKey];
-                StackTooDeepWorkaround memory stdw;
-                stdw.deleteOrder = false;
+                Vars memory vars;
+                vars.deleteOrder = false;
                 if (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) >= block.timestamp) {
-                    stdw.tokensToTransfer = 0;
-                    stdw.quoteTokensToTransfer = 0;
+                    vars.tokensToTransfer = 0;
+                    vars.quoteTokensToTransfer = 0;
                     if (tradeInput.buySell == BuySell.Buy) {
-                        stdw.makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
+                        vars.makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
                         uint _availableTokens = availableTokens(tradeInput.base, order.maker);
                         if (_availableTokens > 0) {
-                            if (stdw.makerTokensToFill > _availableTokens) {
-                                stdw.makerTokensToFill = _availableTokens;
+                            if (vars.makerTokensToFill > _availableTokens) {
+                                vars.makerTokensToFill = _availableTokens;
                             }
-                            if (uint128(Tokens.unwrap(tradeInput.tokens)) >= stdw.makerTokensToFill) {
-                                stdw.tokensToTransfer = stdw.makerTokensToFill;
-                                stdw.deleteOrder = true;
+                            if (uint128(Tokens.unwrap(tradeInput.tokens)) >= vars.makerTokensToFill) {
+                                vars.tokensToTransfer = vars.makerTokensToFill;
+                                vars.deleteOrder = true;
                             } else {
-                                stdw.tokensToTransfer = uint(uint128(Tokens.unwrap(tradeInput.tokens)));
+                                vars.tokensToTransfer = uint(uint128(Tokens.unwrap(tradeInput.tokens)));
                             }
-                            stdw.quoteTokensToTransfer = baseToQuote(moreInfo.factors, stdw.tokensToTransfer, bestMatchingPrice);
+                            vars.quoteTokensToTransfer = baseToQuote(moreInfo.factors, vars.tokensToTransfer, bestMatchingPrice);
                             if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
-                                transferFrom(tradeInput.quote, moreInfo.taker, order.maker, stdw.quoteTokensToTransfer);
-                                transferFrom(tradeInput.base, order.maker, moreInfo.taker, stdw.tokensToTransfer);
+                                transferFrom(tradeInput.quote, moreInfo.taker, order.maker, vars.quoteTokensToTransfer);
+                                transferFrom(tradeInput.base, order.maker, moreInfo.taker, vars.tokensToTransfer);
                             }
-                            // emit Trade(moreInfo.pairKey, bestMatchingOrderKey, tradeInput.buySell, moreInfo.taker, order.maker, stdw.tokensToTransfer, stdw.quoteTokensToTransfer, bestMatchingPrice);
-                            emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, stdw.tokensToTransfer, stdw.quoteTokensToTransfer, block.timestamp));
+                            // emit Trade(moreInfo.pairKey, bestMatchingOrderKey, tradeInput.buySell, moreInfo.taker, order.maker, vars.tokensToTransfer, vars.quoteTokensToTransfer, bestMatchingPrice);
+                            emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, vars.tokensToTransfer, vars.quoteTokensToTransfer, block.timestamp));
                         } else {
-                            stdw.deleteOrder = true;
+                            vars.deleteOrder = true;
                         }
                     } else {
                         emit Debug("bestMatchingPrice", uint256(Price.unwrap(bestMatchingPrice)));
-                        stdw.makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
-                        emit Debug("stdw.makerTokensToFill", stdw.makerTokensToFill);
+                        vars.makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
+                        emit Debug("vars.makerTokensToFill", vars.makerTokensToFill);
                         uint availableQuoteTokens = availableTokens(tradeInput.quote, order.maker);
                         emit Debug("availableQuoteTokens", availableQuoteTokens);
                         if (availableQuoteTokens > 0) {
                             uint availableQuoteTokensInBaseTokens = quoteToBase(moreInfo.factors, availableQuoteTokens, bestMatchingPrice);
                             emit Debug("availableQuoteTokensInBaseTokens", availableQuoteTokensInBaseTokens);
 
-                            if (stdw.makerTokensToFill > availableQuoteTokensInBaseTokens) {
-                                stdw.makerTokensToFill = availableQuoteTokensInBaseTokens;
+                            if (vars.makerTokensToFill > availableQuoteTokensInBaseTokens) {
+                                vars.makerTokensToFill = availableQuoteTokensInBaseTokens;
                             } else {
-                                availableQuoteTokens = baseToQuote(moreInfo.factors, stdw.makerTokensToFill, bestMatchingPrice);
+                                availableQuoteTokens = baseToQuote(moreInfo.factors, vars.makerTokensToFill, bestMatchingPrice);
                             }
 
-                            if (uint128(Tokens.unwrap(tradeInput.tokens)) >= stdw.makerTokensToFill) {
-                                stdw.tokensToTransfer = stdw.makerTokensToFill;
-                                stdw.quoteTokensToTransfer = availableQuoteTokens;
-                                stdw.deleteOrder = true;
+                            if (uint128(Tokens.unwrap(tradeInput.tokens)) >= vars.makerTokensToFill) {
+                                vars.tokensToTransfer = vars.makerTokensToFill;
+                                vars.quoteTokensToTransfer = availableQuoteTokens;
+                                vars.deleteOrder = true;
                             } else {
-                                stdw.tokensToTransfer = uint(uint128(Tokens.unwrap(tradeInput.tokens)));
-                                stdw.quoteTokensToTransfer = baseToQuote(moreInfo.factors, stdw.tokensToTransfer, bestMatchingPrice);
+                                vars.tokensToTransfer = uint(uint128(Tokens.unwrap(tradeInput.tokens)));
+                                vars.quoteTokensToTransfer = baseToQuote(moreInfo.factors, vars.tokensToTransfer, bestMatchingPrice);
                             }
 
                             if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
-                                transferFrom(tradeInput.base, moreInfo.taker, order.maker, stdw.tokensToTransfer);
-                                transferFrom(tradeInput.quote, order.maker, moreInfo.taker, stdw.quoteTokensToTransfer);
+                                transferFrom(tradeInput.base, moreInfo.taker, order.maker, vars.tokensToTransfer);
+                                transferFrom(tradeInput.quote, order.maker, moreInfo.taker, vars.quoteTokensToTransfer);
                             }
-                            emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, stdw.tokensToTransfer, stdw.quoteTokensToTransfer, block.timestamp));
+                            emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, vars.tokensToTransfer, vars.quoteTokensToTransfer, block.timestamp));
                         } else {
-                            stdw.deleteOrder = true;
+                            vars.deleteOrder = true;
                         }
                     }
-                    order.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(order.tokens)) - uint128(stdw.tokensToTransfer)));
-                    filled = Tokens.wrap(int128(uint128(Tokens.unwrap(filled)) + uint128(stdw.tokensToTransfer)));
-                    quoteFilled = Tokens.wrap(int128(uint128(Tokens.unwrap(quoteFilled)) + uint128(stdw.quoteTokensToTransfer)));
-                    tradeInput.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(tradeInput.tokens)) - uint128(stdw.tokensToTransfer)));
+                    order.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(order.tokens)) - uint128(vars.tokensToTransfer)));
+                    filled = Tokens.wrap(int128(uint128(Tokens.unwrap(filled)) + uint128(vars.tokensToTransfer)));
+                    quoteFilled = Tokens.wrap(int128(uint128(Tokens.unwrap(quoteFilled)) + uint128(vars.quoteTokensToTransfer)));
+                    tradeInput.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(tradeInput.tokens)) - uint128(vars.tokensToTransfer)));
                 } else {
-                    stdw.deleteOrder = true;
+                    vars.deleteOrder = true;
                 }
-                if (stdw.deleteOrder) {
+                if (vars.deleteOrder) {
                     OrderKey temp = bestMatchingOrderKey;
                     bestMatchingOrderKey = order.next;
                     orderQueue.head = order.next;
