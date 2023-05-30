@@ -388,7 +388,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
                                 transferFrom(tradeInput.quote, moreInfo.taker, order.maker, vars.quoteTokensToTransfer);
                                 transferFrom(tradeInput.base, order.maker, moreInfo.taker, vars.tokensToTransfer);
                             }
-                            // emit Trade(moreInfo.pairKey, bestMatchingOrderKey, tradeInput.buySell, moreInfo.taker, order.maker, vars.tokensToTransfer, vars.quoteTokensToTransfer, bestMatchingPrice);
                             emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, vars.tokensToTransfer, vars.quoteTokensToTransfer, block.timestamp));
                         } else {
                             vars.deleteOrder = true;
