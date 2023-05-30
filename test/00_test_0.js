@@ -107,7 +107,7 @@ describe("Dexz", function () {
 
     const approveAmount0 = ethers.utils.parseUnits("100", data.decimals0);
     const approveAmount1 = ethers.utils.parseUnits("100", data.decimals1);
-    const approveAmountWeth = ethers.utils.parseUnits("69", data.decimalsWeth);
+    const approveAmountWeth = ethers.utils.parseUnits("0.8", data.decimalsWeth);
 
     const approve00Tx = await data.token0.connect(data.user0Signer).approve(data.dexz.address, approveAmount0);
     const approve10Tx = await data.token1.connect(data.user0Signer).approve(data.dexz.address, approveAmount1);
@@ -157,7 +157,7 @@ describe("Dexz", function () {
     const price7 = "0.6907";
     const expired = parseInt(new Date()/1000) - 60*60;
     const expiry = parseInt(new Date()/1000) + 60*60;
-    const baseTokens1 = ethers.utils.parseUnits("100", data.decimals0);
+    const baseTokens1 = ethers.utils.parseUnits("1", data.decimals0);
     const baseTokens2 = ethers.utils.parseUnits("2", data.decimals0);
     const baseTokens3 = ethers.utils.parseUnits("3", data.decimals0);
     const baseTokens4 = ethers.utils.parseUnits("6.9", data.decimals0);
@@ -182,7 +182,7 @@ describe("Dexz", function () {
     await data.printState("After Adding Orders");
 
     const targetPrice1 = "0.6901";
-    const baseTokensB1 = ethers.utils.parseUnits("100", data.decimals0);
+    const baseTokensB1 = ethers.utils.parseUnits("0.69", data.decimals0);
     const actionsB1 = [
       { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB1.toString() },
       // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB1.toString() },

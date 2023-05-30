@@ -348,6 +348,72 @@ contract Dexz is DexzBase, ReentrancyGuard {
 
     event Debug(string name, uint value);
 
+    function _handleOrder(TradeInput memory tradeInput, MoreInfo memory moreInfo, Price price, OrderKey orderKey, Order storage order) internal returns (Vars memory vars) {
+        bool deleteOrder;
+        uint makerTokensToFill;
+        uint tokensToTransfer;
+        uint quoteTokensToTransfer;
+        emit Debug("_handleOrder", 0);
+        if (Unixtime.unwrap(order.expiry) != 0 && Unixtime.unwrap(order.expiry) < block.timestamp) {
+            deleteOrder = true;
+        } else {
+            makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
+            emit Debug("_handleOrder - makerTokensToFill", makerTokensToFill);
+            if (tradeInput.buySell == BuySell.Buy) {
+                uint _availableTokens = availableTokens(tradeInput.base, order.maker);
+                emit Debug("_handleOrder - _availableTokens", _availableTokens);
+                if (_availableTokens > 0) {
+                    if (makerTokensToFill > _availableTokens) {
+                        makerTokensToFill = _availableTokens;
+                    }
+                    if (uint128(Tokens.unwrap(tradeInput.tokens)) >= makerTokensToFill) {
+                        tokensToTransfer = makerTokensToFill;
+                        deleteOrder = true;
+                    } else {
+                        tokensToTransfer = uint(uint128(Tokens.unwrap(tradeInput.tokens)));
+                    }
+                    quoteTokensToTransfer = baseToQuote(moreInfo.factors, tokensToTransfer, price);
+                    if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
+                        transferFrom(tradeInput.quote, moreInfo.taker, order.maker, quoteTokensToTransfer);
+                        transferFrom(tradeInput.base, order.maker, moreInfo.taker, tokensToTransfer);
+                    }
+                    emit Trade(TradeResult(moreInfo.pairKey, orderKey, moreInfo.taker, order.maker, tradeInput.buySell, price, tokensToTransfer, quoteTokensToTransfer, block.timestamp));
+                } else {
+                    deleteOrder = true;
+                }
+            } else {
+                uint availableQuoteTokens = availableTokens(tradeInput.quote, order.maker);
+                emit Debug("_handleOrder - availableQuoteTokens", availableQuoteTokens);
+                if (availableQuoteTokens > 0) {
+                    uint availableQuoteTokensInBaseTokens = quoteToBase(moreInfo.factors, availableQuoteTokens, price);
+                    emit Debug("availableQuoteTokensInBaseTokens", availableQuoteTokensInBaseTokens);
+                    if (makerTokensToFill > availableQuoteTokensInBaseTokens) {
+                        makerTokensToFill = availableQuoteTokensInBaseTokens;
+                        emit Debug("_handleOrder - S makerTokensToFill", makerTokensToFill);
+                    } else {
+                        availableQuoteTokens = baseToQuote(moreInfo.factors, makerTokensToFill, price);
+                        emit Debug("_handleOrder - S availableQuoteTokens", availableQuoteTokens);
+                    }
+                    if (uint128(Tokens.unwrap(tradeInput.tokens)) >= makerTokensToFill) {
+                        tokensToTransfer = makerTokensToFill;
+                        quoteTokensToTransfer = availableQuoteTokens;
+                        deleteOrder = true;
+                    } else {
+                        tokensToTransfer = uint(uint128(Tokens.unwrap(tradeInput.tokens)));
+                        quoteTokensToTransfer = baseToQuote(moreInfo.factors, tokensToTransfer, price);
+                    }
+                    if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
+                        transferFrom(tradeInput.base, moreInfo.taker, order.maker, tokensToTransfer);
+                        transferFrom(tradeInput.quote, order.maker, moreInfo.taker, quoteTokensToTransfer);
+                    }
+                    emit Trade(TradeResult(moreInfo.pairKey, orderKey, moreInfo.taker, order.maker, tradeInput.buySell, price, tokensToTransfer, quoteTokensToTransfer, block.timestamp));
+                }
+            }
+        }
+        emit Debug("_handleOrder - deleteOrder", deleteOrder ? 1 : 0);
+        return Vars(deleteOrder, makerTokensToFill, tokensToTransfer, quoteTokensToTransfer);
+    }
+
     function _trade(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (Tokens filled, Tokens quoteFilled, Tokens tokensOnOrder, OrderKey orderKey) {
         if (Price.unwrap(tradeInput.price) < Price.unwrap(PRICE_MIN) || Price.unwrap(tradeInput.price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice(tradeInput.price, PRICE_MAX);
@@ -366,74 +432,78 @@ contract Dexz is DexzBase, ReentrancyGuard {
             OrderKey bestMatchingOrderKey = orderQueue.head;
             while (isNotSentinel(bestMatchingOrderKey)) {
                 Order storage order = orders[bestMatchingOrderKey];
-                Vars memory vars;
-                vars.deleteOrder = false;
-                if (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) >= block.timestamp) {
-                    vars.tokensToTransfer = 0;
-                    vars.quoteTokensToTransfer = 0;
-                    if (tradeInput.buySell == BuySell.Buy) {
-                        vars.makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
-                        uint _availableTokens = availableTokens(tradeInput.base, order.maker);
-                        if (_availableTokens > 0) {
-                            if (vars.makerTokensToFill > _availableTokens) {
-                                vars.makerTokensToFill = _availableTokens;
-                            }
-                            if (uint128(Tokens.unwrap(tradeInput.tokens)) >= vars.makerTokensToFill) {
-                                vars.tokensToTransfer = vars.makerTokensToFill;
-                                vars.deleteOrder = true;
-                            } else {
-                                vars.tokensToTransfer = uint(uint128(Tokens.unwrap(tradeInput.tokens)));
-                            }
-                            vars.quoteTokensToTransfer = baseToQuote(moreInfo.factors, vars.tokensToTransfer, bestMatchingPrice);
-                            if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
-                                transferFrom(tradeInput.quote, moreInfo.taker, order.maker, vars.quoteTokensToTransfer);
-                                transferFrom(tradeInput.base, order.maker, moreInfo.taker, vars.tokensToTransfer);
-                            }
-                            emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, vars.tokensToTransfer, vars.quoteTokensToTransfer, block.timestamp));
-                        } else {
-                            vars.deleteOrder = true;
-                        }
-                    } else {
-                        emit Debug("bestMatchingPrice", uint256(Price.unwrap(bestMatchingPrice)));
-                        vars.makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
-                        emit Debug("vars.makerTokensToFill", vars.makerTokensToFill);
-                        uint availableQuoteTokens = availableTokens(tradeInput.quote, order.maker);
-                        emit Debug("availableQuoteTokens", availableQuoteTokens);
-                        if (availableQuoteTokens > 0) {
-                            uint availableQuoteTokensInBaseTokens = quoteToBase(moreInfo.factors, availableQuoteTokens, bestMatchingPrice);
-                            emit Debug("availableQuoteTokensInBaseTokens", availableQuoteTokensInBaseTokens);
 
-                            if (vars.makerTokensToFill > availableQuoteTokensInBaseTokens) {
-                                vars.makerTokensToFill = availableQuoteTokensInBaseTokens;
-                            } else {
-                                availableQuoteTokens = baseToQuote(moreInfo.factors, vars.makerTokensToFill, bestMatchingPrice);
-                            }
-
-                            if (uint128(Tokens.unwrap(tradeInput.tokens)) >= vars.makerTokensToFill) {
-                                vars.tokensToTransfer = vars.makerTokensToFill;
-                                vars.quoteTokensToTransfer = availableQuoteTokens;
-                                vars.deleteOrder = true;
-                            } else {
-                                vars.tokensToTransfer = uint(uint128(Tokens.unwrap(tradeInput.tokens)));
-                                vars.quoteTokensToTransfer = baseToQuote(moreInfo.factors, vars.tokensToTransfer, bestMatchingPrice);
-                            }
-
-                            if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
-                                transferFrom(tradeInput.base, moreInfo.taker, order.maker, vars.tokensToTransfer);
-                                transferFrom(tradeInput.quote, order.maker, moreInfo.taker, vars.quoteTokensToTransfer);
-                            }
-                            emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, vars.tokensToTransfer, vars.quoteTokensToTransfer, block.timestamp));
-                        } else {
-                            vars.deleteOrder = true;
-                        }
-                    }
-                    order.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(order.tokens)) - uint128(vars.tokensToTransfer)));
-                    filled = Tokens.wrap(int128(uint128(Tokens.unwrap(filled)) + uint128(vars.tokensToTransfer)));
-                    quoteFilled = Tokens.wrap(int128(uint128(Tokens.unwrap(quoteFilled)) + uint128(vars.quoteTokensToTransfer)));
-                    tradeInput.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(tradeInput.tokens)) - uint128(vars.tokensToTransfer)));
-                } else {
-                    vars.deleteOrder = true;
-                }
+                Vars memory vars = _handleOrder(tradeInput, moreInfo, bestMatchingPrice, bestMatchingOrderKey, order);
+                order.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(order.tokens)) - uint128(vars.tokensToTransfer)));
+                filled = Tokens.wrap(int128(uint128(Tokens.unwrap(filled)) + uint128(vars.tokensToTransfer)));
+                quoteFilled = Tokens.wrap(int128(uint128(Tokens.unwrap(quoteFilled)) + uint128(vars.quoteTokensToTransfer)));
+                tradeInput.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(tradeInput.tokens)) - uint128(vars.tokensToTransfer)));
+                // if (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) >= block.timestamp) {
+                //     vars.tokensToTransfer = 0;
+                //     vars.quoteTokensToTransfer = 0;
+                //     if (tradeInput.buySell == BuySell.Buy) {
+                //         vars.makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
+                //         uint _availableTokens = availableTokens(tradeInput.base, order.maker);
+                //         if (_availableTokens > 0) {
+                //             // if (vars.makerTokensToFill > _availableTokens) {
+                //             //     vars.makerTokensToFill = _availableTokens;
+                //             // }
+                //             // if (uint128(Tokens.unwrap(tradeInput.tokens)) >= vars.makerTokensToFill) {
+                //             //     vars.tokensToTransfer = vars.makerTokensToFill;
+                //             //     vars.deleteOrder = true;
+                //             // } else {
+                //             //     vars.tokensToTransfer = uint(uint128(Tokens.unwrap(tradeInput.tokens)));
+                //             // }
+                //             // vars.quoteTokensToTransfer = baseToQuote(moreInfo.factors, vars.tokensToTransfer, bestMatchingPrice);
+                //             // if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
+                //             //     transferFrom(tradeInput.quote, moreInfo.taker, order.maker, vars.quoteTokensToTransfer);
+                //             //     transferFrom(tradeInput.base, order.maker, moreInfo.taker, vars.tokensToTransfer);
+                //             // }
+                //             // emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, vars.tokensToTransfer, vars.quoteTokensToTransfer, block.timestamp));
+                //         } else {
+                //             vars.deleteOrder = true;
+                //         }
+                //     } else {
+                //         emit Debug("bestMatchingPrice", uint256(Price.unwrap(bestMatchingPrice)));
+                //         vars.makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
+                //         emit Debug("vars.makerTokensToFill", vars.makerTokensToFill);
+                //         uint availableQuoteTokens = availableTokens(tradeInput.quote, order.maker);
+                //         emit Debug("availableQuoteTokens", availableQuoteTokens);
+                //         if (availableQuoteTokens > 0) {
+                //             uint availableQuoteTokensInBaseTokens = quoteToBase(moreInfo.factors, availableQuoteTokens, bestMatchingPrice);
+                //             emit Debug("availableQuoteTokensInBaseTokens", availableQuoteTokensInBaseTokens);
+                //
+                //             if (vars.makerTokensToFill > availableQuoteTokensInBaseTokens) {
+                //                 vars.makerTokensToFill = availableQuoteTokensInBaseTokens;
+                //             } else {
+                //                 availableQuoteTokens = baseToQuote(moreInfo.factors, vars.makerTokensToFill, bestMatchingPrice);
+                //             }
+                //
+                //             if (uint128(Tokens.unwrap(tradeInput.tokens)) >= vars.makerTokensToFill) {
+                //                 vars.tokensToTransfer = vars.makerTokensToFill;
+                //                 vars.quoteTokensToTransfer = availableQuoteTokens;
+                //                 vars.deleteOrder = true;
+                //             } else {
+                //                 vars.tokensToTransfer = uint(uint128(Tokens.unwrap(tradeInput.tokens)));
+                //                 vars.quoteTokensToTransfer = baseToQuote(moreInfo.factors, vars.tokensToTransfer, bestMatchingPrice);
+                //             }
+                //
+                //             if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
+                //                 transferFrom(tradeInput.base, moreInfo.taker, order.maker, vars.tokensToTransfer);
+                //                 transferFrom(tradeInput.quote, order.maker, moreInfo.taker, vars.quoteTokensToTransfer);
+                //             }
+                //             emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, vars.tokensToTransfer, vars.quoteTokensToTransfer, block.timestamp));
+                //         } else {
+                //             vars.deleteOrder = true;
+                //         }
+                //     }
+                //     order.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(order.tokens)) - uint128(vars.tokensToTransfer)));
+                //     filled = Tokens.wrap(int128(uint128(Tokens.unwrap(filled)) + uint128(vars.tokensToTransfer)));
+                //     quoteFilled = Tokens.wrap(int128(uint128(Tokens.unwrap(quoteFilled)) + uint128(vars.quoteTokensToTransfer)));
+                //     tradeInput.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(tradeInput.tokens)) - uint128(vars.tokensToTransfer)));
+                // } else {
+                //     vars.deleteOrder = true;
+                // }
                 if (vars.deleteOrder) {
                     OrderKey temp = bestMatchingOrderKey;
                     bestMatchingOrderKey = order.next;
