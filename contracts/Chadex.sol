@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 
 // ----------------------------------------------------------------------------
-// Dexz v 0.8.9a-testing
+// Chadex v 0.8.9a-testing
 //
 // Deployed to Sepolia
 //
@@ -17,7 +17,7 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 //   * ?oracle
 //   * ?Optional backend services
 //
-// https://github.com/bokkypoobah/Dexz
+// https://github.com/bokkypoobah/Chadex
 //
 // SPDX-License-Identifier: MIT
 //
@@ -79,7 +79,7 @@ contract ReentrancyGuard {
 }
 
 
-contract DexzBase {
+contract ChadexBase {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
     struct Factors {
@@ -287,7 +287,7 @@ contract DexzBase {
 }
 
 
-contract Dexz is DexzBase, ReentrancyGuard {
+contract Chadex is ChadexBase, ReentrancyGuard {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
     struct TradeEvent {

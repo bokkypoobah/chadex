@@ -19,7 +19,7 @@ const Action = {
 
 let data;
 
-describe("Dexz", function () {
+describe("Chadex", function () {
   const DETAILS = 1;
 
   beforeEach(async function () {
@@ -27,11 +27,11 @@ describe("Dexz", function () {
     console.log("      beforeEach");
     const Token  = await ethers.getContractFactory("Token");
     const Weth  = await ethers.getContractFactory("WETH9");
-    const Dexz  = await ethers.getContractFactory("Dexz");
+    const Chadex  = await ethers.getContractFactory("Chadex");
     data = new Data();
     await data.init();
 
-    console.log("        --- Setup Tokens and Dexz Contracts. Assuming gasPrice: " + ethers.utils.formatUnits(data.gasPrice, "gwei") + " gwei, ethUsd: " + ethers.utils.formatUnits(data.ethUsd, 18) + " ---");
+    console.log("        --- Setup Tokens and Chadex Contracts. Assuming gasPrice: " + ethers.utils.formatUnits(data.gasPrice, "gwei") + " gwei, ethUsd: " + ethers.utils.formatUnits(data.ethUsd, 18) + " ---");
 
     const token0 = await Token.deploy("TOK0", "Token0", 18, ethers.utils.parseUnits("400", 18));
     await token0.deployed();
@@ -60,14 +60,14 @@ describe("Dexz", function () {
     }
     console.log("        WETH deployed");
 
-    const dexz = await Dexz.deploy();
-    await dexz.deployed();
-    await data.setDexz(dexz);
-    const dexzReceipt = await data.dexz.deployTransaction.wait();
+    const chadex = await Chadex.deploy();
+    await chadex.deployed();
+    await data.setChadex(chadex);
+    const chadexReceipt = await data.chadex.deployTransaction.wait();
     if (DETAILS > 0) {
-      await data.printEvents("Deployed Dexz", dexzReceipt);
+      await data.printEvents("Deployed Chadex", chadexReceipt);
     }
-    console.log("        Dexz deployed");
+    console.log("        Chadex deployed");
 
     const setup1 = [];
     const amount0 = ethers.utils.parseUnits("100", data.decimals0);
@@ -109,40 +109,40 @@ describe("Dexz", function () {
     const approveAmount1 = ethers.utils.parseUnits("10", data.decimals1);
     const approveAmountWeth = ethers.utils.parseUnits("2.69", data.decimalsWeth);
 
-    const approve00Tx = await data.token0.connect(data.user0Signer).approve(data.dexz.address, approveAmount0);
-    const approve10Tx = await data.token1.connect(data.user0Signer).approve(data.dexz.address, approveAmount1);
-    const approve20Tx = await data.weth.connect(data.user0Signer).approve(data.dexz.address, approveAmountWeth);
+    const approve00Tx = await data.token0.connect(data.user0Signer).approve(data.chadex.address, approveAmount0);
+    const approve10Tx = await data.token1.connect(data.user0Signer).approve(data.chadex.address, approveAmount1);
+    const approve20Tx = await data.weth.connect(data.user0Signer).approve(data.chadex.address, approveAmountWeth);
 
-    const approve01Tx = await data.token0.connect(data.user1Signer).approve(data.dexz.address, approveAmount0);
-    const approve11Tx = await data.token1.connect(data.user1Signer).approve(data.dexz.address, approveAmount1);
-    const approve21Tx = await data.weth.connect(data.user1Signer).approve(data.dexz.address, approveAmountWeth);
+    const approve01Tx = await data.token0.connect(data.user1Signer).approve(data.chadex.address, approveAmount0);
+    const approve11Tx = await data.token1.connect(data.user1Signer).approve(data.chadex.address, approveAmount1);
+    const approve21Tx = await data.weth.connect(data.user1Signer).approve(data.chadex.address, approveAmountWeth);
 
-    const approve02Tx = await data.token0.connect(data.user2Signer).approve(data.dexz.address, approveAmount0);
-    const approve12Tx = await data.token1.connect(data.user2Signer).approve(data.dexz.address, approveAmount1);
-    const approve22Tx = await data.weth.connect(data.user2Signer).approve(data.dexz.address, approveAmountWeth);
+    const approve02Tx = await data.token0.connect(data.user2Signer).approve(data.chadex.address, approveAmount0);
+    const approve12Tx = await data.token1.connect(data.user2Signer).approve(data.chadex.address, approveAmount1);
+    const approve22Tx = await data.weth.connect(data.user2Signer).approve(data.chadex.address, approveAmountWeth);
 
-    const approve03Tx = await data.token0.connect(data.user3Signer).approve(data.dexz.address, approveAmount0);
-    const approve13Tx = await data.token1.connect(data.user3Signer).approve(data.dexz.address, approveAmount1);
-    const approve23Tx = await data.weth.connect(data.user3Signer).approve(data.dexz.address, approveAmountWeth);
+    const approve03Tx = await data.token0.connect(data.user3Signer).approve(data.chadex.address, approveAmount0);
+    const approve13Tx = await data.token1.connect(data.user3Signer).approve(data.chadex.address, approveAmount1);
+    const approve23Tx = await data.weth.connect(data.user3Signer).approve(data.chadex.address, approveAmountWeth);
 
-    await data.printEvents("user0->token0.approve(dexz, " + ethers.utils.formatUnits(approveAmount0, data.decimals0) + ")", await approve00Tx.wait());
-    await data.printEvents("user0->token1.approve(dexz, " + ethers.utils.formatUnits(approveAmount1, data.decimals1) + ")", await approve10Tx.wait());
-    await data.printEvents("user0->weth.approve(dexz, " + ethers.utils.formatUnits(approveAmountWeth, data.decimalsWeth) + ")", await approve20Tx.wait());
-    await data.printEvents("user1->token0.approve(dexz, " + ethers.utils.formatUnits(approveAmount0, data.decimals0) + ")", await approve01Tx.wait());
-    await data.printEvents("user1->token1.approve(dexz, " + ethers.utils.formatUnits(approveAmount1, data.decimals1) + ")", await approve11Tx.wait());
-    await data.printEvents("user1->weth.approve(dexz, " + ethers.utils.formatUnits(approveAmountWeth, data.decimalsWeth) + ")", await approve21Tx.wait());
+    await data.printEvents("user0->token0.approve(chadex, " + ethers.utils.formatUnits(approveAmount0, data.decimals0) + ")", await approve00Tx.wait());
+    await data.printEvents("user0->token1.approve(chadex, " + ethers.utils.formatUnits(approveAmount1, data.decimals1) + ")", await approve10Tx.wait());
+    await data.printEvents("user0->weth.approve(chadex, " + ethers.utils.formatUnits(approveAmountWeth, data.decimalsWeth) + ")", await approve20Tx.wait());
+    await data.printEvents("user1->token0.approve(chadex, " + ethers.utils.formatUnits(approveAmount0, data.decimals0) + ")", await approve01Tx.wait());
+    await data.printEvents("user1->token1.approve(chadex, " + ethers.utils.formatUnits(approveAmount1, data.decimals1) + ")", await approve11Tx.wait());
+    await data.printEvents("user1->weth.approve(chadex, " + ethers.utils.formatUnits(approveAmountWeth, data.decimalsWeth) + ")", await approve21Tx.wait());
 
-    await data.printEvents("user2->token0.approve(dexz, " + ethers.utils.formatUnits(approveAmount0, data.decimals0) + ")", await approve02Tx.wait());
-    await data.printEvents("user2->token1.approve(dexz, " + ethers.utils.formatUnits(approveAmount1, data.decimals1) + ")", await approve12Tx.wait());
-    await data.printEvents("user2->weth.approve(dexz, " + ethers.utils.formatUnits(approveAmountWeth, data.decimalsWeth) + ")", await approve22Tx.wait());
+    await data.printEvents("user2->token0.approve(chadex, " + ethers.utils.formatUnits(approveAmount0, data.decimals0) + ")", await approve02Tx.wait());
+    await data.printEvents("user2->token1.approve(chadex, " + ethers.utils.formatUnits(approveAmount1, data.decimals1) + ")", await approve12Tx.wait());
+    await data.printEvents("user2->weth.approve(chadex, " + ethers.utils.formatUnits(approveAmountWeth, data.decimalsWeth) + ")", await approve22Tx.wait());
 
-    await data.printEvents("user3->token0.approve(dexz, " + ethers.utils.formatUnits(approveAmount0, data.decimals0) + ")", await approve03Tx.wait());
-    await data.printEvents("user3->token1.approve(dexz, " + ethers.utils.formatUnits(approveAmount1, data.decimals1) + ")", await approve13Tx.wait());
-    await data.printEvents("user3->weth.approve(dexz, " + ethers.utils.formatUnits(approveAmountWeth, data.decimalsWeth) + ")", await approve23Tx.wait());
+    await data.printEvents("user3->token0.approve(chadex, " + ethers.utils.formatUnits(approveAmount0, data.decimals0) + ")", await approve03Tx.wait());
+    await data.printEvents("user3->token1.approve(chadex, " + ethers.utils.formatUnits(approveAmount1, data.decimals1) + ")", await approve13Tx.wait());
+    await data.printEvents("user3->weth.approve(chadex, " + ethers.utils.formatUnits(approveAmountWeth, data.decimalsWeth) + ")", await approve23Tx.wait());
 
     //   await data.printState("user0 approved user1 to transfer " + approveAmount + " umswaps");
 
-    await data.printState("Setup Completed. Dexz bytecode ~" + JSON.stringify(data.dexz.deployTransaction.data.length/2, null, 2));
+    await data.printState("Setup Completed. Chadex bytecode ~" + JSON.stringify(data.chadex.deployTransaction.data.length/2, null, 2));
   });
 
   it("00. Test 00", async function () {
@@ -170,14 +170,14 @@ describe("Dexz", function () {
     ];
     console.log("        Executing: " + JSON.stringify(actionsA, null, 2));
 
-    const execute0aTx = await data.dexz.connect(data.user0Signer).execute(actionsA);
-    await data.printEvents("user0->dexz.execute(actionsA)", await execute0aTx.wait());
+    const execute0aTx = await data.chadex.connect(data.user0Signer).execute(actionsA);
+    await data.printEvents("user0->chadex.execute(actionsA)", await execute0aTx.wait());
 
-    const execute1aTx = await data.dexz.connect(data.user1Signer).execute(actionsA);
-    await data.printEvents("user1->dexz.execute(actionsA)", await execute1aTx.wait());
+    const execute1aTx = await data.chadex.connect(data.user1Signer).execute(actionsA);
+    await data.printEvents("user1->chadex.execute(actionsA)", await execute1aTx.wait());
 
-    const execute1bTx = await data.dexz.connect(data.user2Signer).execute(actionsA);
-    await data.printEvents("user2->dexz.execute(actionsA)", await execute1bTx.wait());
+    const execute1bTx = await data.chadex.connect(data.user2Signer).execute(actionsA);
+    await data.printEvents("user2->chadex.execute(actionsA)", await execute1bTx.wait());
 
     await data.printState("After Adding Orders");
 
@@ -188,8 +188,8 @@ describe("Dexz", function () {
       // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB1.toString() },
     ];
     console.log("        Executing: " + JSON.stringify(actionsB1, null, 2));
-    const executeB1Tx = await data.dexz.connect(data.user3Signer).execute(actionsB1);
-    await data.printEvents("user3->dexz.execute(actions)", await executeB1Tx.wait());
+    const executeB1Tx = await data.chadex.connect(data.user3Signer).execute(actionsB1);
+    await data.printEvents("user3->chadex.execute(actions)", await executeB1Tx.wait());
 
     // const baseTokensB2 = ethers.utils.parseUnits("6.9", data.decimals0);
     // const actionsB2 = [
@@ -197,20 +197,20 @@ describe("Dexz", function () {
     //   { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB2.toString() },
     // ];
     // console.log("        Executing: " + JSON.stringify(actionsB2, null, 2));
-    // const executeB2Tx = await data.dexz.connect(data.user3Signer).execute(actionsB2);
-    // await data.printEvents("user3->dexz.execute(actions)", await executeB2Tx.wait());
+    // const executeB2Tx = await data.chadex.connect(data.user3Signer).execute(actionsB2);
+    // await data.printEvents("user3->chadex.execute(actions)", await executeB2Tx.wait());
 
     await data.printState("After Executing Against Orders");
 
-    const sendMessageTx = await data.dexz.connect(data.user3Signer).sendMessage(ZERO_ADDRESS, PAIRKEY_NULL, ORDERKEY_SENTINEL, "Hello", "World!");
-    await data.printEvents("user3->dexz.sendMessage(blah)", await sendMessageTx.wait());
+    const sendMessageTx = await data.chadex.connect(data.user3Signer).sendMessage(ZERO_ADDRESS, PAIRKEY_NULL, ORDERKEY_SENTINEL, "Hello", "World!");
+    await data.printEvents("user3->chadex.sendMessage(blah)", await sendMessageTx.wait());
 
     // function sendMessage(address to, bytes32 pairKey, bytes32 orderKey, string calldata topic, string calldata text) public {
 
-    // const tradeEvents = await data.dexz.getTradeEvents(10, 0);
+    // const tradeEvents = await data.chadex.getTradeEvents(10, 0);
     // console.log("tradeEvents: " + JSON.stringify(tradeEvents, null, 2));
 
-    // const pairs = await data.dexz.getPairs(2, 0);
+    // const pairs = await data.chadex.getPairs(2, 0);
     // console.log("pairs: " + JSON.stringify(pairs, null, 2));
     // struct PairTokenResult {
     //     Token token;
@@ -235,8 +235,8 @@ describe("Dexz", function () {
     //   { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 12).toString(), targetPrice: ethers.utils.parseUnits(price1, 12).toString(), expiry: expiry, tokens: baseTokensB1.toString() },
     // ];
     // console.log("        Executing: " + JSON.stringify(actionsB1, null, 2));
-    // const executeB1Tx = await data.dexz.connect(data.user2Signer).execute(actionsB1);
-    // await data.printEvents("user2->dexz.execute(actions)", await executeB1Tx.wait());
+    // const executeB1Tx = await data.chadex.connect(data.user2Signer).execute(actionsB1);
+    // await data.printEvents("user2->chadex.execute(actions)", await executeB1Tx.wait());
     // await data.printState("After Executing Against Orders");
 
     // const baseTokensC = ethers.utils.parseUnits("-1", data.decimals0);
@@ -244,8 +244,8 @@ describe("Dexz", function () {
     //   { action: Action.RemoveOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 12).toString(), targetPrice: ethers.utils.parseUnits(price1, 12).toString(), expiry: expiry, tokens: baseTokensC.toString() },
     // ];
     // console.log("        Executing: " + JSON.stringify(actionsC, null, 2));
-    // const executeCTx = await data.dexz.connect(data.user2Signer).execute(actionsC);
-    // await data.printEvents("user2->dexz.execute(actions)", await executeCTx.wait());
+    // const executeCTx = await data.chadex.connect(data.user2Signer).execute(actionsC);
+    // await data.printEvents("user2->chadex.execute(actions)", await executeCTx.wait());
     // await data.printState("After Executing Against Orders");
 
     // const newExpiry = parseInt(new Date()/1000) + 24*60*60;
@@ -254,24 +254,24 @@ describe("Dexz", function () {
     //   { action: Action.UpdateExpiryAndTokens, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 12).toString(), targetPrice: ethers.utils.parseUnits(price1, 12).toString(), expiry: newExpiry, tokens: baseTokensD.toString() },
     // ];
     // console.log("        Executing: " + JSON.stringify(actionsD, null, 2));
-    // const executeDTx = await data.dexz.connect(data.user0Signer).execute(actionsD);
-    // await data.printEvents("user0->dexz.execute(actions)", await executeDTx.wait());
+    // const executeDTx = await data.chadex.connect(data.user0Signer).execute(actionsD);
+    // await data.printEvents("user0->chadex.execute(actions)", await executeDTx.wait());
     // await data.printState("After Executing Against Orders");
 
 
     // // Execute against orders
     // const sellBaseTokens = ethers.utils.parseUnits("1", data.decimals0);
-    // const trade4Tx = await data.dexz.connect(data.user3Signer).trade(Action.FillAnyAndAddOrder, BuySell.Buy, data.token0.address, data.weth.address, ethers.utils.parseUnits(price1, 12), expiry, sellBaseTokens, []);
-    // await data.printEvents("user3->dexz.trade(FillAnyAndAddOrder, BUY, token0, WETH, " + price1 + ", expiry, sellBaseTokens, [])", await trade4Tx.wait());
+    // const trade4Tx = await data.chadex.connect(data.user3Signer).trade(Action.FillAnyAndAddOrder, BuySell.Buy, data.token0.address, data.weth.address, ethers.utils.parseUnits(price1, 12), expiry, sellBaseTokens, []);
+    // await data.printEvents("user3->chadex.trade(FillAnyAndAddOrder, BUY, token0, WETH, " + price1 + ", expiry, sellBaseTokens, [])", await trade4Tx.wait());
     // await data.printState("After Executing Against Orders");
 
     // // Delete orders
-    const dexzData = await data.getDexzData();
+    const chadexData = await data.getChadexData();
     console.log();
     // const pairKeys = [];
     // const buySells = [];
     // const orders = [];
-    // for (const [pairKey, pair] of Object.entries(dexzData)) {
+    // for (const [pairKey, pair] of Object.entries(chadexData)) {
     //   console.log("          Pair " + pairKey + " " + data.getShortAccountName(pair.baseToken) + " " + data.getShortAccountName(pair.quoteToken) + " " + pair.multiplier + " " + pair.divisor + " " + pair.baseDecimals + " " + pair.quoteDecimals);
     //   for (let buySell = 0; buySell < 2; buySell++) {
     //     const myOrders = pair.orders[buySell].filter(e => e.maker == data.user1).map(e => e.orderKey);
@@ -285,8 +285,8 @@ describe("Dexz", function () {
     // console.log("          pairKeys: " + JSON.stringify(pairKeys));
     // console.log("          buySells: " + JSON.stringify(buySells));
     // console.log("          orders: " + JSON.stringify(orders));
-    // const removeOrders1Tx = await data.dexz.connect(data.user1Signer).removeOrders(pairKeys, buySells, orders);
-    // await data.printEvents("user1->dexz.removeOrders(pairKeys, buySells, orders)", await removeOrders1Tx.wait());
+    // const removeOrders1Tx = await data.chadex.connect(data.user1Signer).removeOrders(pairKeys, buySells, orders);
+    // await data.printEvents("user1->chadex.removeOrders(pairKeys, buySells, orders)", await removeOrders1Tx.wait());
     //
     // await data.printState("After Removing Orders");
   });

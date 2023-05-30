@@ -27,7 +27,7 @@ class Data {
     this.decimalsWeth = null;
     this.decimals = {};
 
-    this.dexz = null;
+    this.chadex = null;
 
     this.gasPrice = ethers.utils.parseUnits("40", "gwei");
     this.ethUsd = ethers.utils.parseUnits("2000.00", 18);
@@ -170,18 +170,18 @@ class Data {
     this.decimals[weth.address] = this.decimalsWeth;
     this.addContract(weth, "WETH");
   }
-  async setDexz(dexz) {
-    this.dexz = dexz;
-    this.addContract(dexz, "Dexz");
+  async setChadex(chadex) {
+    this.chadex = chadex;
+    this.addContract(chadex, "Chadex");
   }
 
-  async getDexzData() {
+  async getChadexData() {
     const pairs = {};
     let now = new Date();
     let row = 0;
-    const pairsLength = parseInt(await this.dexz.pairsLength());
+    const pairsLength = parseInt(await this.chadex.pairsLength());
     for (let j = 0; j < pairsLength; j++) {
-      const info = await this.dexz.pair(j);
+      const info = await this.chadex.pair(j);
       // console.log("info: " + JSON.stringify(info));
       const [pairKey, baseToken, quoteToken, factors] = info;
       const baseDecimals = this.decimals[baseToken];
@@ -192,7 +192,7 @@ class Data {
         let firstOrderKey = ORDERKEY_SENTINEL;
         const ORDERSIZE = 4;
         orders[buySell] = [];
-        let results = await this.dexz.getOrders(pairKey, buySell, ORDERSIZE, price, firstOrderKey);
+        let results = await this.chadex.getOrders(pairKey, buySell, ORDERSIZE, price, firstOrderKey);
         // console.log("results: " + JSON.stringify(results, null, 2));
         while (parseInt(results[0][0]) != 0) {
 
@@ -202,7 +202,7 @@ class Data {
             price = results[k][0];
             firstOrderKey = results[k][2];
           }
-          results = await this.dexz.getOrders(pairKey, buySell, ORDERSIZE, price, firstOrderKey);
+          results = await this.chadex.getOrders(pairKey, buySell, ORDERSIZE, price, firstOrderKey);
         }
       }
       pairs[pairKey] = { baseToken, quoteToken, factors, baseDecimals, quoteDecimals, orders };
@@ -215,8 +215,8 @@ class Data {
     console.log("          Account                                   ETH " + this.padLeft(await this.token0.symbol() + "[" + this.decimals0 + "]", 24) + " " + this.padLeft(await this.token1.symbol() + "[" + this.decimals1 + "]", 24) + " " + this.padLeft(await this.weth.symbol() + "[" + this.decimalsWeth + "]", 24) + " Blah");
     console.log("          -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------");
     const checkAccounts = [this.deployer, this.user0, this.user1, this.user2, this.user3/*, this.feeAccount, this.uiFeeAccount*/];
-    if (this.dexz) {
-      checkAccounts.push(this.dexz.address);
+    if (this.chadex) {
+      checkAccounts.push(this.chadex.address);
     }
     for (let i = 0; i < checkAccounts.length; i++) {
       const balance = await ethers.provider.getBalance(checkAccounts[i]);
@@ -227,12 +227,12 @@ class Data {
     }
     console.log();
 
-    if (this.dexz) {
-      const pairsLength = parseInt(await this.dexz.pairsLength());
-      console.log("          Dexz: " + this.getShortAccountName(this.dexz.address));
+    if (this.chadex) {
+      const pairsLength = parseInt(await this.chadex.pairsLength());
+      console.log("          Chadex: " + this.getShortAccountName(this.chadex.address));
       const pairInfos = [];
       for (let j = 0; j < pairsLength; j++) {
-        const info = await this.dexz.pair(j);
+        const info = await this.chadex.pair(j);
         // console.log("info: " + JSON.stringify(info));
         pairInfos.push({ pairKey: info[0], baseToken: info[1], quoteToken: info[2], factors: info[3] })
       }
@@ -251,7 +251,7 @@ class Data {
           const ORDERSIZE = 5;
           const baseDecimals = this.decimals[pair.baseToken];
           const quoteDecimals = this.decimals[pair.quoteToken];
-          let results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
+          let results = await this.chadex.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
           while (parseInt(results[0][0]) != 0) {
             // console.log("            * --- Start price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
             for (let k = 0; k < results.length && parseInt(results[k][0]) != 0; k++) {
@@ -272,24 +272,24 @@ class Data {
               firstOrderKey = results[k][2];
             }
             // console.log("            * --- End price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
-            results = await this.dexz.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
+            results = await this.chadex.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
           }
           console.log();
 
-          price = await this.dexz.getBestPrice(pair.pairKey, buySell);
+          price = await this.chadex.getBestPrice(pair.pairKey, buySell);
           while (price != 0) {
-            var orderQueue = await this.dexz.getOrderQueue(pair.pairKey, buySell, price);
+            var orderQueue = await this.chadex.getOrderQueue(pair.pairKey, buySell, price);
             console.log("            price: " + ethers.utils.formatUnits(price, 12) + " head=" + orderQueue[0].substring(0, 10) + " tail=" + orderQueue[1].substring(0, 10));
             let orderKey = orderQueue[0];
             while (orderKey != 0) {
-              let order = await this.dexz.getOrder(orderKey);
+              let order = await this.chadex.getOrder(orderKey);
               var minutes = (order[2] - new Date() / 1000) / 60;
               console.log("              Order key=" + orderKey.substring(0, 10) + " next=" + order[0].substring(0, 10) +
                 " maker=" + this.getShortAccountName(order[1]) +
                 " expiry=" + minutes.toFixed(2) + "s tokens=" + ethers.utils.formatUnits(order[3], pair.baseDecimals));
               orderKey = order[0];
             }
-            price = await this.dexz.getNextBestPrice(pair.pairKey, buySell, price);
+            price = await this.chadex.getNextBestPrice(pair.pairKey, buySell, price);
           }
           console.log();
         }
@@ -311,8 +311,8 @@ class Data {
       // console.log("            --- ----- ---------- ---------- ---------- ------------ ------------ ---- --------------- --------------------- ---------------------");
       console.log("              # Block  Timestamp Pair Key   Taker        B/S            Price                   Filled      Quote Tokens Filled")
       console.log("            --- ----- ---------- ---------- ------------ ---- --------------- ------------------------ ------------------------");
-      const tradeLength = await this.dexz.tradesLength();
-      const tradeEvents = await this.dexz.getTradeEvents(parseInt(tradeLength) + 1, 0); // Adding 1 to show empty record at end
+      const tradeLength = await this.chadex.tradesLength();
+      const tradeEvents = await this.chadex.getTradeEvents(parseInt(tradeLength) + 1, 0); // Adding 1 to show empty record at end
       for (let i = 0; i < tradeEvents.length && tradeEvents[i][0] != 0; i++) {
         const [pairKey, /*orderKey, */taker, /*maker, */buySell, price, filled, quoteFilled, blockNumber, timestamp] = tradeEvents[i];
         // var minutes = (timestamp - (now / 1000)) / 60;
@@ -345,7 +345,7 @@ class Data {
       //     BestOrderResult bestBuyOrder;
       //     BestOrderResult bestSellOrder;
       // }
-      const pairs = await this.dexz.getPairs(2, 0);
+      const pairs = await this.chadex.getPairs(2, 0);
       for (let i = 0; i < pairs.length && pairs[i][0] != 0; i++) {
         const [pairKey, base, quote, factors, bestBuyOrder, bestSellOrder] = pairs[i];
         console.log("            pairKey: " + pairKey + ", base=" + JSON.stringify(base) + ", quote=" + JSON.stringify(quote) +
