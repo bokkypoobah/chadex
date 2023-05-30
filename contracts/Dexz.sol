@@ -310,7 +310,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
             TradeInput memory tradeInput = tradeInputs[i];
             MoreInfo memory moreInfo = _getMoreInfo(tradeInput, Account.wrap(msg.sender));
             if (uint(tradeInput.action) <= uint(Action.FillAnyAndAddOrder)) {
-                if (Tokens.unwrap(tradeInput.tokens) < 0) {
+                if (Tokens.unwrap(tradeInput.tokens) <= 0) {
                     revert OnlyPositiveTokensAccepted(tradeInput.tokens);
                 }
                 _trade(tradeInput, moreInfo);
@@ -349,7 +349,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
     }
 
     function _checkTakerAvailableTokens(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal view {
-        // TODO: Check somewhere that tokens > 0
         if (tradeInput.buySell == BuySell.Buy) {
             uint availableTokens = availableTokens(tradeInput.quote, moreInfo.taker);
             uint quoteTokens = baseToQuote(moreInfo.factors, uint(uint128(Tokens.unwrap(tradeInput.tokens))), tradeInput.price);
@@ -442,7 +441,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
         if (!tradeInput.skipCheck) {
             _checkTakerAvailableTokens(tradeInput, moreInfo);
         }
-
         Price bestMatchingPrice = getMatchingBestPrice(moreInfo);
         while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
                ((tradeInput.buySell == BuySell.Buy && Price.unwrap(bestMatchingPrice) <= Price.unwrap(tradeInput.price)) ||
@@ -490,7 +488,6 @@ contract Dexz is DexzBase, ReentrancyGuard {
             }
         }
         if (Tokens.unwrap(tradeInput.tokens) > 0 && (tradeInput.action == Action.FillAnyAndAddOrder)) {
-            // TODO ? require(moreInfo.expiry > block.timestamp);
             orderKey = _addOrder(tradeInput, moreInfo);
             tokensOnOrder = tradeInput.tokens;
         }
