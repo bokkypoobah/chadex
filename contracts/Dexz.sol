@@ -373,7 +373,7 @@ contract Dexz is DexzBase, ReentrancyGuard {
                         transferFrom(tradeInput.base, order.maker, moreInfo.taker, tokensToTransfer);
                     }
                     emit Trade(TradeResult(moreInfo.pairKey, orderKey, moreInfo.taker, order.maker, tradeInput.buySell, price, tokensToTransfer, quoteTokensToTransfer, block.timestamp));
-                    trades.push(TradeEvent(moreInfo.pairKey, orderKey, moreInfo.taker, order.maker, tradeInput.buySell, price, Tokens.wrap(int128(uint128(tokensToTransfer))), Tokens.wrap(int128(uint128(quoteTokensToTransfer))), uint48(block.number), uint48(block.timestamp)));
+                    // trades.push(TradeEvent(moreInfo.pairKey, orderKey, moreInfo.taker, order.maker, tradeInput.buySell, price, Tokens.wrap(int128(uint128(tokensToTransfer))), Tokens.wrap(int128(uint128(quoteTokensToTransfer))), uint48(block.number), uint48(block.timestamp)));
                 } else {
                     deleteOrder = true;
                 }
@@ -399,7 +399,9 @@ contract Dexz is DexzBase, ReentrancyGuard {
                         transferFrom(tradeInput.quote, order.maker, moreInfo.taker, quoteTokensToTransfer);
                     }
                     emit Trade(TradeResult(moreInfo.pairKey, orderKey, moreInfo.taker, order.maker, tradeInput.buySell, price, tokensToTransfer, quoteTokensToTransfer, block.timestamp));
-                    trades.push(TradeEvent(moreInfo.pairKey, orderKey, moreInfo.taker, order.maker, tradeInput.buySell, price, Tokens.wrap(int128(uint128(tokensToTransfer))), Tokens.wrap(int128(uint128(quoteTokensToTransfer))), uint48(block.number), uint48(block.timestamp)));
+                    // trades.push(TradeEvent(moreInfo.pairKey, orderKey, moreInfo.taker, order.maker, tradeInput.buySell, price, Tokens.wrap(int128(uint128(tokensToTransfer))), Tokens.wrap(int128(uint128(quoteTokensToTransfer))), uint48(block.number), uint48(block.timestamp)));
+                } else {
+                    deleteOrder = true;
                 }
             }
         }
@@ -480,15 +482,15 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 }
             }
             emit TradeSummary(moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled, tokensOnOrder, block.timestamp);
-            // trades.push(TradeEvent(moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled, uint48(block.number), uint48(block.timestamp)));
+            trades.push(TradeEvent(moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled, uint48(block.number), uint48(block.timestamp)));
         }
     }
 
     struct TradeEvent {
         PairKey pairKey; // bytes32
-        OrderKey orderKey;
+        // OrderKey orderKey;
         Account taker; // address
-        Account maker; // address
+        // Account maker; // address
         BuySell buySell; // uint8
         Price price; // uint128
         Tokens filled; // int128
