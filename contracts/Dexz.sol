@@ -330,17 +330,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
             uint8 baseDecimals = IERC20(Token.unwrap(tradeInput.base)).decimals();
             uint8 quoteDecimals = IERC20(Token.unwrap(tradeInput.quote)).decimals();
             // TODO Permit ERC-20 token decimals from 0 to 24
-            // / 10^0 to / 10^24
-            if (baseDecimals >= quoteDecimals) {
-                factors.multiplier = Factor.wrap(baseDecimals - quoteDecimals);
-                factors.divisor = Factor.wrap(0);
-            } else {
-                factors.multiplier = Factor.wrap(0);
-                factors.divisor = Factor.wrap(quoteDecimals - baseDecimals);
-            }
+            factors = baseDecimals >= quoteDecimals ? Factors(Factor.wrap(baseDecimals - quoteDecimals), Factor.wrap(0)) : Factors(Factor.wrap(0), Factor.wrap(quoteDecimals - baseDecimals));
             pairs[pairKey] = Pair(tradeInput.base, tradeInput.quote, factors);
             pairKeys.push(pairKey);
-            emit PairAdded(pairKey, Account.wrap(msg.sender), tradeInput.base, tradeInput.quote, baseDecimals, quoteDecimals, factors, block.timestamp);
+            emit PairAdded(pairKey, taker, tradeInput.base, tradeInput.quote, baseDecimals, quoteDecimals, factors, block.timestamp);
         } else {
             factors.multiplier = pair.factors.multiplier;
             factors.divisor = pair.factors.divisor;
