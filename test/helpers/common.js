@@ -296,7 +296,9 @@ class Data {
 
       // struct TradeEvent {
       //     PairKey pairKey; // bytes32
+      //     OrderKey orderKey;
       //     Account taker; // address
+      //     Account maker; // address
       //     BuySell buySell; // uint8
       //     Price price; // uint128
       //     Tokens filled; // int128
@@ -304,15 +306,16 @@ class Data {
       //     uint48 blockNumber; // 2^48 = 281,474,976,710,656
       //     uint48 timestamp; // 2^48 = 281,474,976,710,656
       // }
-      console.log("              # Block  Timestamp Pair Key   Taker        B/S            Price                Filled   Quote Tokens Filled")
-      console.log("            --- ----- ---------- ---------- ------------ ---- --------------- --------------------- ---------------------");
+      console.log("              # Block  Timestamp Pair Key   Order Key  Taker        Maker        B/S            Price                Filled   Quote Tokens Filled")
+      console.log("            --- ----- ---------- ---------- ---------- ------------ ------------ ---- --------------- --------------------- ---------------------");
       const tradeLength = await this.dexz.tradesLength();
       const tradeEvents = await this.dexz.getTradeEvents(parseInt(tradeLength) + 1, 0); // Adding 1 to show empty record at end
       for (let i = 0; i < tradeEvents.length && tradeEvents[i][0] != 0; i++) {
-        const [pairKey, taker, buySell, price, filled, quoteFilled, blockNumber, timestamp] = tradeEvents[i];
+        const [pairKey, orderKey, taker, maker, buySell, price, filled, quoteFilled, blockNumber, timestamp] = tradeEvents[i];
         // var minutes = (timestamp - (now / 1000)) / 60;
         console.log("              " + i + " " + this.padLeft(blockNumber, 5) + " " + timestamp + " " +
-          pairKey.substring(0, 10) + " " + this.getShortAccountName(taker) + (buySell == 1 ? " Buy  " : " Sell ") + " " +
+          pairKey.substring(0, 10) + " " + orderKey.substring(0, 10) + " " +
+          this.getShortAccountName(taker) + " " + this.getShortAccountName(maker) + (buySell == 1 ? " Buy  " : " Sell ") + " " +
           this.padLeft(ethers.utils.formatUnits(price, 12), 14) + " " +
           this.padLeft(ethers.utils.formatUnits(filled, 18), 21) + " " +
           this.padLeft(ethers.utils.formatUnits(quoteFilled, 18), 21));
