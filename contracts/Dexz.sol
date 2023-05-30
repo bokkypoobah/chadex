@@ -345,6 +345,8 @@ contract Dexz is DexzBase, ReentrancyGuard {
         uint quoteTokensToTransfer;
     }
 
+    event Debug(string name, uint value);
+
     function _trade(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (Tokens filled, Tokens quoteFilled, Tokens tokensOnOrder, OrderKey orderKey) {
         if (Price.unwrap(tradeInput.price) < Price.unwrap(PRICE_MIN) || Price.unwrap(tradeInput.price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice(tradeInput.price, PRICE_MAX);
@@ -366,10 +368,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
                 StackTooDeepWorkaround memory stdw;
                 stdw.deleteOrder = false;
                 if (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) >= block.timestamp) {
-                    stdw.makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
                     stdw.tokensToTransfer = 0;
                     stdw.quoteTokensToTransfer = 0;
                     if (tradeInput.buySell == BuySell.Buy) {
+                        stdw.makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
                         uint _availableTokens = availableTokens(tradeInput.base, order.maker);
                         if (_availableTokens > 0) {
                             if (stdw.makerTokensToFill > _availableTokens) {
@@ -382,9 +384,9 @@ contract Dexz is DexzBase, ReentrancyGuard {
                                 stdw.tokensToTransfer = uint(uint128(Tokens.unwrap(tradeInput.tokens)));
                             }
                             stdw.quoteTokensToTransfer = baseToQuote(moreInfo.factors, stdw.tokensToTransfer, bestMatchingPrice);
-                            if (Account.unwrap(order.maker) != msg.sender) {
-                                transferFrom(tradeInput.quote, Account.wrap(msg.sender), order.maker, stdw.quoteTokensToTransfer);
-                                transferFrom(tradeInput.base, order.maker, Account.wrap(msg.sender), stdw.tokensToTransfer);
+                            if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
+                                transferFrom(tradeInput.quote, moreInfo.taker, order.maker, stdw.quoteTokensToTransfer);
+                                transferFrom(tradeInput.base, order.maker, moreInfo.taker, stdw.tokensToTransfer);
                             }
                             // emit Trade(moreInfo.pairKey, bestMatchingOrderKey, tradeInput.buySell, moreInfo.taker, order.maker, stdw.tokensToTransfer, stdw.quoteTokensToTransfer, bestMatchingPrice);
                             emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, stdw.tokensToTransfer, stdw.quoteTokensToTransfer, block.timestamp));
@@ -392,14 +394,21 @@ contract Dexz is DexzBase, ReentrancyGuard {
                             stdw.deleteOrder = true;
                         }
                     } else {
+                        emit Debug("bestMatchingPrice", uint256(Price.unwrap(bestMatchingPrice)));
+                        stdw.makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
+                        emit Debug("stdw.makerTokensToFill", stdw.makerTokensToFill);
                         uint availableQuoteTokens = availableTokens(tradeInput.quote, order.maker);
+                        emit Debug("availableQuoteTokens", availableQuoteTokens);
                         if (availableQuoteTokens > 0) {
                             uint availableQuoteTokensInBaseTokens = quoteToBase(moreInfo.factors, availableQuoteTokens, bestMatchingPrice);
+                            emit Debug("availableQuoteTokensInBaseTokens", availableQuoteTokensInBaseTokens);
+
                             if (stdw.makerTokensToFill > availableQuoteTokensInBaseTokens) {
                                 stdw.makerTokensToFill = availableQuoteTokensInBaseTokens;
                             } else {
                                 availableQuoteTokens = baseToQuote(moreInfo.factors, stdw.makerTokensToFill, bestMatchingPrice);
                             }
+
                             if (uint128(Tokens.unwrap(tradeInput.tokens)) >= stdw.makerTokensToFill) {
                                 stdw.tokensToTransfer = stdw.makerTokensToFill;
                                 stdw.quoteTokensToTransfer = availableQuoteTokens;
@@ -408,9 +417,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
                                 stdw.tokensToTransfer = uint(uint128(Tokens.unwrap(tradeInput.tokens)));
                                 stdw.quoteTokensToTransfer = baseToQuote(moreInfo.factors, stdw.tokensToTransfer, bestMatchingPrice);
                             }
-                            if (Account.unwrap(order.maker) != msg.sender) {
-                                transferFrom(tradeInput.base, Account.wrap(msg.sender), order.maker, stdw.tokensToTransfer);
-                                transferFrom(tradeInput.quote, order.maker, Account.wrap(msg.sender), stdw.quoteTokensToTransfer);
+
+                            if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
+                                transferFrom(tradeInput.base, moreInfo.taker, order.maker, stdw.tokensToTransfer);
+                                transferFrom(tradeInput.quote, order.maker, moreInfo.taker, stdw.quoteTokensToTransfer);
                             }
                             emit Trade(TradeResult(moreInfo.pairKey, bestMatchingOrderKey, moreInfo.taker, order.maker, tradeInput.buySell, bestMatchingPrice, stdw.tokensToTransfer, stdw.quoteTokensToTransfer, block.timestamp));
                         } else {

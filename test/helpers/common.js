@@ -240,7 +240,7 @@ class Data {
       let row = 0;
       for (let j = 0; j < pairInfos.length; j++) {
         const pair = pairInfos[j];
-        console.log("          ----- Pair " + pair.pairKey + " " + this.getShortAccountName(pair.baseToken) + "/" + this.getShortAccountName(pair.quoteToken) + " " + pair.multiplier + " " + pair.divisor + " -----");
+        console.log("          ----- Pair " + pair.pairKey + " " + this.getShortAccountName(pair.baseToken) + "/" + this.getShortAccountName(pair.quoteToken) + " " + pair.factors[0] + " " + pair.factors[1] + " -----");
         for (let buySell = 0; buySell < 2; buySell++) {
           console.log("              #     " + (buySell == 0 ? " BUY" : "SELL") +" Price OrderKey   Next       Maker         Expiry(s)                Tokens         AvailableBase        AvailableQuote")
           console.log("            --- -------------- ---------- ---------- ------------ ---------- --------------------- --------------------- ---------------------");
