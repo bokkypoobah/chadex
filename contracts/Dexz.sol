@@ -113,7 +113,7 @@ contract DexzBase {
         Price targetPrice;
         Unixtime expiry;
         Tokens tokens;
-        // TODO bool _checkTakerAvailableTokens
+        bool skipCheck;
     }
     struct MoreInfo {
         Account taker;
@@ -160,8 +160,8 @@ contract DexzBase {
     error CannotInsertDuplicateOrder(OrderKey orderKey);
     error TransferFromFailedApproval(Token token, Account from, Account to, uint _tokens, uint _approved);
     error TransferFromFailed(Token token, Account from, Account to, uint _tokens);
-    error InsufficientTokenBalanceOrAllowance(Token base, Tokens tokens, Tokens availableTokens);
-    error InsufficientQuoteTokenBalanceOrAllowance(Token quote, Tokens quoteTokens, Tokens availableTokens);
+    error InsufficientTokenBalanceOrAllowance(Token token, Account tokenOwner, Tokens tokens, Tokens availableTokens);
+    error InsufficientQuoteTokenBalanceOrAllowance(Token token, Account tokenOwner, Tokens quoteTokens, Tokens availableTokens);
     error UnableToFillOrder(Tokens unfilled);
     error UnableToBuyBelowTargetPrice(Price price, Price targetPrice);
     error UnableToSellAboveTargetPrice(Price price, Price targetPrice);
@@ -255,13 +255,13 @@ contract DexzBase {
     //   price = multiplier * quoteTokens / baseTokens / divisor
 
     function baseToQuote(Factors memory factors, uint tokens, Price price) pure internal returns (uint quoteTokens) {
-        quoteTokens = uint128((10 ** Factor.unwrap(factors.divisor)) * tokens * uint(Price.unwrap(price)) / (10 ** Factor.unwrap(factors.multiplier)));
+        quoteTokens = uint128((10 ** Factor.unwrap(factors.divisor)) * tokens * uint(Price.unwrap(price)) / (10 ** (Factor.unwrap(factors.multiplier) + PRICE_DECIMALS)));
     }
     function quoteToBase(Factors memory factors, uint quoteTokens, Price price) pure internal returns (uint tokens) {
-        tokens = (10 ** Factor.unwrap(factors.multiplier)) * quoteTokens / uint(Price.unwrap(price)) / (10 ** Factor.unwrap(factors.divisor));
+        tokens = (10 ** (Factor.unwrap(factors.multiplier) + PRICE_DECIMALS)) * quoteTokens / uint(Price.unwrap(price)) / (10 ** Factor.unwrap(factors.divisor));
     }
     function baseAndQuoteToPrice(Factors memory factors, uint tokens, uint quoteTokens) pure internal returns (Price price) {
-        price = Price.wrap(uint128((10 ** Factor.unwrap(factors.multiplier)) * quoteTokens / tokens / (10 ** Factor.unwrap(factors.divisor))));
+        price = Price.wrap(uint128((10 ** (Factor.unwrap(factors.multiplier) + PRICE_DECIMALS)) * quoteTokens / tokens / (10 ** Factor.unwrap(factors.divisor))));
     }
     function availableTokens(Token token, Account wallet) internal view returns (uint tokens) {
         uint allowance = IERC20(Token.unwrap(token)).allowance(Account.unwrap(wallet), address(this));
@@ -307,10 +307,10 @@ contract Dexz is DexzBase, ReentrancyGuard {
             // TODO Permit ERC-20 token decimals from 0 to 24
             // / 10^0 to / 10^24
             if (baseDecimals >= quoteDecimals) {
-                factors.multiplier = Factor.wrap(baseDecimals - quoteDecimals + PRICE_DECIMALS);
+                factors.multiplier = Factor.wrap(baseDecimals - quoteDecimals);
                 factors.divisor = Factor.wrap(0);
             } else {
-                factors.multiplier = Factor.wrap(PRICE_DECIMALS);
+                factors.multiplier = Factor.wrap(0);
                 factors.divisor = Factor.wrap(quoteDecimals - baseDecimals);
             }
             pairs[pairKey] = Pair(tradeInput.base, tradeInput.quote, factors);
@@ -329,12 +329,12 @@ contract Dexz is DexzBase, ReentrancyGuard {
             uint availableTokens = availableTokens(tradeInput.quote, moreInfo.taker);
             uint quoteTokens = baseToQuote(moreInfo.factors, uint(uint128(Tokens.unwrap(tradeInput.tokens))), tradeInput.price);
             if (availableTokens < quoteTokens) {
-                revert InsufficientQuoteTokenBalanceOrAllowance(tradeInput.quote, Tokens.wrap(int128(uint128(quoteTokens))), Tokens.wrap(int128(uint128(availableTokens))));
+                revert InsufficientQuoteTokenBalanceOrAllowance(tradeInput.quote, moreInfo.taker, Tokens.wrap(int128(uint128(quoteTokens))), Tokens.wrap(int128(uint128(availableTokens))));
             }
         } else {
             uint availableTokens = availableTokens(tradeInput.base, moreInfo.taker);
             if (availableTokens < uint(uint128(Tokens.unwrap(tradeInput.tokens)))) {
-                revert InsufficientTokenBalanceOrAllowance(tradeInput.base, tradeInput.tokens, Tokens.wrap(int128(uint128(availableTokens))));
+                revert InsufficientTokenBalanceOrAllowance(tradeInput.base, moreInfo.taker, tradeInput.tokens, Tokens.wrap(int128(uint128(availableTokens))));
             }
         }
     }
@@ -415,7 +415,9 @@ contract Dexz is DexzBase, ReentrancyGuard {
         if (Tokens.unwrap(tradeInput.tokens) > Tokens.unwrap(TOKENS_MAX)) {
             revert InvalidTokens(tradeInput.tokens, TOKENS_MAX);
         }
-        // TODO - Decide whether to have this check _checkTakerAvailableTokens(tradeInput, moreInfo);
+        if (!tradeInput.skipCheck) {
+            _checkTakerAvailableTokens(tradeInput, moreInfo);
+        }
 
         Price bestMatchingPrice = getMatchingBestPrice(moreInfo);
         while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
