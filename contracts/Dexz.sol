@@ -8,10 +8,8 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 // Deployed to Sepolia
 //
 // TODO:
-//   * Decide on checks for taker's balances
 //   * Check limits for Tokens(uint128) x Price(uint64) and conversions
 //   * Check cost of taking vs making expired or dummy orders
-//   * Check remainder from divisions
 //   * Serverless UI
 //   * ?Move updated orders to the end of the queue
 //   * ?computeTrade
@@ -25,7 +23,7 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 //
 // If you earn fees using your deployment of this code, or derivatives of this
 // code, please send a proportionate amount to bokkypoobah.eth .
-// Don't be stingy!
+// Don't be stingy! Donations welcome!
 //
 // Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2023
 // ----------------------------------------------------------------------------
@@ -161,7 +159,6 @@ contract DexzBase {
     error InvalidPrice(Price price, Price priceMax);
     error InvalidTokens(Tokens tokens, Tokens tokensMax);
     error CannotInsertDuplicateOrder(OrderKey orderKey);
-    error TransferFromFailedApproval(Token token, Account from, Account to, uint _tokens, uint _approved);
     error TransferFromFailed(Token token, Account from, Account to, uint _tokens);
     error InsufficientTokenBalanceOrAllowance(Token token, Account tokenOwner, Tokens tokens, Tokens availableTokens);
     error InsufficientQuoteTokenBalanceOrAllowance(Token token, Account tokenOwner, Tokens quoteTokens, Tokens availableTokens);
@@ -455,12 +452,12 @@ contract Dexz is DexzBase, ReentrancyGuard {
             OrderKey bestMatchingOrderKey = orderQueue.head;
             while (isNotSentinel(bestMatchingOrderKey)) {
                 Order storage order = orders[bestMatchingOrderKey];
-                HandleOrderResults memory vars = _handleOrder(tradeInput, moreInfo, bestMatchingPrice, bestMatchingOrderKey, order);
-                order.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(order.tokens)) - uint128(vars.tokensToTransfer)));
-                filled = Tokens.wrap(int128(uint128(Tokens.unwrap(filled)) + uint128(vars.tokensToTransfer)));
-                quoteFilled = Tokens.wrap(int128(uint128(Tokens.unwrap(quoteFilled)) + uint128(vars.quoteTokensToTransfer)));
-                tradeInput.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(tradeInput.tokens)) - uint128(vars.tokensToTransfer)));
-                if (vars.deleteOrder) {
+                HandleOrderResults memory results = _handleOrder(tradeInput, moreInfo, bestMatchingPrice, bestMatchingOrderKey, order);
+                order.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(order.tokens)) - uint128(results.tokensToTransfer)));
+                filled = Tokens.wrap(int128(uint128(Tokens.unwrap(filled)) + uint128(results.tokensToTransfer)));
+                quoteFilled = Tokens.wrap(int128(uint128(Tokens.unwrap(quoteFilled)) + uint128(results.quoteTokensToTransfer)));
+                tradeInput.tokens = Tokens.wrap(int128(uint128(Tokens.unwrap(tradeInput.tokens)) - uint128(results.tokensToTransfer)));
+                if (results.deleteOrder) {
                     OrderKey temp = bestMatchingOrderKey;
                     bestMatchingOrderKey = order.next;
                     orderQueue.head = order.next;
