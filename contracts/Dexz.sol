@@ -283,15 +283,16 @@ contract Dexz is DexzBase, ReentrancyGuard {
     function execute(TradeInput[] calldata tradeInputs) public {
         for (uint i = 0; i < tradeInputs.length; i = onePlus(i)) {
             TradeInput memory tradeInput = tradeInputs[i];
+            MoreInfo memory moreInfo = _getMoreInfo(tradeInput, Account.wrap(msg.sender));
             if (uint(tradeInput.action) <= uint(Action.FillAnyAndAddOrder)) {
                 if (Tokens.unwrap(tradeInput.tokens) < 0) {
                     revert OnlyPositiveTokensAccepted(tradeInput.tokens);
                 }
-                _trade(tradeInput, _getMoreInfo(tradeInput, Account.wrap(msg.sender)));
+                _trade(tradeInput, moreInfo);
             } else if (tradeInput.action == Action.RemoveOrder) {
-                _removeOrder(tradeInput, _getMoreInfo(tradeInput, Account.wrap(msg.sender)));
+                _removeOrder(tradeInput, moreInfo);
             } else if (tradeInput.action == Action.UpdateExpiryAndTokens) {
-                _updateExpiryAndTokens(tradeInput, _getMoreInfo(tradeInput, Account.wrap(msg.sender)));
+                _updateExpiryAndTokens(tradeInput, moreInfo);
             }
         }
     }
@@ -325,13 +326,13 @@ contract Dexz is DexzBase, ReentrancyGuard {
     function _checkTakerAvailableTokens(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal view {
         // TODO: Check somewhere that tokens > 0
         if (tradeInput.buySell == BuySell.Buy) {
-            uint availableTokens = availableTokens(tradeInput.quote, Account.wrap(msg.sender));
+            uint availableTokens = availableTokens(tradeInput.quote, moreInfo.taker);
             uint quoteTokens = baseToQuote(moreInfo.factors, uint(uint128(Tokens.unwrap(tradeInput.tokens))), tradeInput.price);
             if (availableTokens < quoteTokens) {
                 revert InsufficientQuoteTokenBalanceOrAllowance(tradeInput.quote, Tokens.wrap(int128(uint128(quoteTokens))), Tokens.wrap(int128(uint128(availableTokens))));
             }
         } else {
-            uint availableTokens = availableTokens(tradeInput.base, Account.wrap(msg.sender));
+            uint availableTokens = availableTokens(tradeInput.base, moreInfo.taker);
             if (availableTokens < uint(uint128(Tokens.unwrap(tradeInput.tokens)))) {
                 revert InsufficientTokenBalanceOrAllowance(tradeInput.base, tradeInput.tokens, Tokens.wrap(int128(uint128(availableTokens))));
             }
