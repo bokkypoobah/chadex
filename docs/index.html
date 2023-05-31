@@ -51,11 +51,12 @@
             <em v-b-popover.hover.bottom="'gm gm gm'">chadex</em>
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
-            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings()" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'View/sync Pairs'">Pairs</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings()" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'View/sync Pair'">Pair</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View/edit ERC-20 tokens'">Tokens</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings()" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Execute raw Dexz transactions'">Raw</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings()" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'View info'">Info</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings()" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Welcome screen with info'">Home</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings()" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'View/sync Pairs'">Pairs</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View/sync Pair'">Pair</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings()" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'View/edit ERC-20 tokens'">Tokens</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings()" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'Execute raw Dexz transactions'">Raw</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings()" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'View info'">Info</b-nav-item>
             <!-- <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings()" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'View/edit my accounts'">Accounts</b-nav-item> -->
             <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="processIt('connect')" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
@@ -141,8 +142,17 @@
             </b-form-group>
           </b-modal>
 
-          <!-- 0:PAIRS -->
+          <!-- 0:Home -->
           <b-card v-if="coinbase && settings.tabIndex == 0" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
+            <template #header>
+              Home
+            </template>
+            <b-card-text class="m-0 p-0">
+            </b-card-text>
+          </b-card>
+
+          <!-- 1:PAIRS -->
+          <b-card v-if="coinbase && settings.tabIndex == 1" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
               Pairs
             </template>
@@ -186,8 +196,8 @@
             </b-card-text>
           </b-card>
 
-          <!-- 1:PAIR -->
-          <b-card v-if="coinbase && settings.tabIndex == 1" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
+          <!-- 2:PAIR -->
+          <b-card v-if="coinbase && settings.tabIndex == 2" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
               Pair
               <!-- <div class="d-flex flex-wrap m-0 p-0">
@@ -320,8 +330,8 @@
             </b-card-text>
           </b-card>
 
-          <!-- 2:TOKENS -->
-          <b-card v-if="coinbase && settings.tabIndex == 2" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
+          <!-- 3:TOKENS -->
+          <b-card v-if="coinbase && settings.tabIndex == 3" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
               ERC-20 Tokens
             </template>
@@ -456,8 +466,8 @@
 
           </b-card>
 
-          <!-- 3:RAW -->
-          <b-card v-if="coinbase && settings.tabIndex == 3" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
+          <!-- 4:RAW -->
+          <b-card v-if="coinbase && settings.tabIndex == 4" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
               Raw Interface
             </template>
@@ -511,8 +521,8 @@
             </b-card-text>
           </b-card>
 
-          <!-- 4:INFO -->
-          <b-card v-if="coinbase && settings.tabIndex == 4" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
+          <!-- 5:INFO -->
+          <b-card v-if="coinbase && settings.tabIndex == 5" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
               Info
             </template>

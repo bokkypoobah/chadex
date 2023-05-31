@@ -1,5 +1,12 @@
 # chadex
 
+<b>chadex</b> is a non-custodial peer-to-peer ERC-20/ERC-20 decentralised exchange protocol.
+
+
+* Users permit the chadex smart contract to perform ERC-20 token transfers
+* Users express their desire to exchange ERC-20 tokens to other ERC-20 tokens by adding orders to the exchange
+* If the prices match between users, the exchange takes place. 
+
 Fully on-chain ERC-20/ERC-20 DEX using Red-Black Trees and queues for sorted orderbook executions.
 
 Status: Work in progress
