@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Dexz</title>
+    <title>Chadex</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <meta name="description" content="chadex (c) Bok Consulting Pty Ltd 2023" />
+    <meta name="description" content="Chadex (c) Bok Consulting Pty Ltd 2023" />
     <meta name="author" content="BokkyPooBah" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@BokkyPooBah" />
@@ -55,7 +55,7 @@
             <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings()" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'View/sync Pairs'">Pairs</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View/sync Pair'">Pair</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings()" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'View/edit ERC-20 tokens'">Tokens</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings()" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'Execute raw Dexz transactions'">Raw</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings()" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'Execute raw Chadex transactions'">Raw</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings()" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'View info'">Info</b-nav-item>
             <!-- <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings()" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'View/edit my accounts'">Accounts</b-nav-item> -->
             <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
@@ -342,7 +342,7 @@
               <div class="mt-0 flex-grow-1">
               </div>
               <div v-if="!sync.section" class="mt-0 pr-1">
-                <b-button size="sm" @click="syncTokens()" variant="primary" v-b-popover.hover.top="'Sync token allowance to Dexz, balances and total supplies'">Sync</b-button>
+                <b-button size="sm" @click="syncTokens()" variant="primary" v-b-popover.hover.top="'Sync token allowance to Chadex, balances and total supplies'">Sync</b-button>
               </div>
               <div class="mt-1" style="width: 250px;">
                 <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
@@ -372,7 +372,7 @@
               </div>
             </div>
 
-            <b-modal id="allowance-modal-prevent-closing" ref="modal" title="Change Allowance To Dexz" @show="allowanceFormResetModal" @hidden="allowanceFormResetModal" @ok="allowanceFormHandleOk">
+            <b-modal id="allowance-modal-prevent-closing" ref="modal" title="Change Allowance To Chadex" @show="allowanceFormResetModal" @hidden="allowanceFormResetModal" @ok="allowanceFormHandleOk">
               <form ref="allowanceForm" @submit.stop.prevent="allowanceFormHandleSubmit">
                 <b-form-group label="Amount" label-for="allowance-amount" :state="allowanceAmountState" invalid-feedback="Please enter a valid amount">
                   <b-form-input id="allowance-amount" v-model="allowanceFormData.amount" :state="allowanceAmountState" required placeholder="0.12345"></b-form-input>
@@ -474,7 +474,7 @@
             <b-card-text class="m-0 p-0">
               <b-card no-body no-header bg-variant="light" class="m-1 p-1 w-75">
                 <b-card-body class="m-1 p-1">
-                  <b-form-group label-cols-lg="2" label="Dexz Execute" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
+                  <b-form-group label-cols-lg="2" label="Chadex Execute" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
                     <b-form-group label="Action:" label-for="raw-action" label-size="sm" label-cols-sm="2" label-align-sm="right" description="'0' fill, '1' fill or kill, '2' fill & add order, '3' remove order, '4' update expiry and tokens" class="mx-0 my-1 p-0">
                       <b-form-input type="text" size="sm" id="raw-action" v-model.trim="raw.action" placeholder="'0' to '4'" class="w-25"></b-form-input>
                     </b-form-group>
@@ -529,10 +529,10 @@
             <b-card-text class="m-0 p-0">
               <b-card no-body no-header bg-variant="light" class="m-1 p-1 w-75">
                 <b-card-body class="m-1 p-1">
-                  <b-form-group label-cols-lg="2" label="Dexz Info" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
-                    <b-form-group label="Address:" label-for="info-dexzaddress" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-link id="info-dexzaddress" :href="'https://sepolia.etherscan.io/address/' + dexzAddress + '#code'" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                        {{ dexzAddress }}
+                  <b-form-group label-cols-lg="2" label="Chadex Info" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
+                    <b-form-group label="Address:" label-for="info-chadexaddress" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-link id="info-chadexaddress" :href="'https://sepolia.etherscan.io/address/' + chadexAddress + '#code'" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                        {{ chadexAddress }}
                       </b-link>
                     </b-form-group>
                   </b-form-group>
@@ -1270,7 +1270,7 @@
             34: "U3Collect",
           },
           db: {
-            name: "dexzdata089g",
+            name: "chadexdata089g",
             version: 1,
             schemaDefinition: {
               cache: '&objectName',
@@ -1281,8 +1281,8 @@
 
         // --- COMPUTED ---
         computed: {
-          dexzAddress() {
-            return DEXZADDRESS_SEPOLIA;
+          chadexAddress() {
+            return CHADEXZADDRESS_SEPOLIA;
           },
           pairsOptions() {
             const results = [ { value: null, text: '(select)' } ];
@@ -2086,12 +2086,13 @@
             const addresses = Object.keys(this.settings.tokens);
             this.sync.completed = 0;
             this.sync.section = "Pairs";
-            const dexzContract = new ethers.Contract(DEXZADDRESS_SEPOLIA, DEXZABI, provider);
-            const pairsLength = parseInt(ethers.BigNumber.from(await dexzContract.pairsLength()).toString());
+            const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, provider);
+            const pairsLength = parseInt(ethers.BigNumber.from(await chadexContract.pairsLength()).toString());
+            console.log("pairsLength: " + pairsLength);
             // if (pairsLength > Object.keys(this.pairs).length) {
               this.sync.total = pairsLength;
               for (let i = 0; i < pairsLength; i++) {
-                const [pairKey, baseAddress, quoteAddress, multiplier, divisor] = await dexzContract.pair(i);
+                const [pairKey, baseAddress, quoteAddress, multiplier, divisor] = await chadexContract.pair(i);
                 if (!(pairKey in this.pairs)) {
                   const base = await this.getERC20TokenDetails({ provider }, baseAddress);
                   const quote = await this.getERC20TokenDetails({ provider }, quoteAddress);
@@ -2105,7 +2106,7 @@
                 this.sync.completed++;
               }
               console.log("JSON.stringify(this.pairs): " + JSON.stringify(this.pairs));
-              localStorage.dexzPairsV1 = JSON.stringify(this.pairs);
+              localStorage.chadexPairsV1 = JSON.stringify(this.pairs);
             // }
             console.log("this.settings.pairTable.selectedPair: " + this.settings.pairTable.selectedPair);
             if (section == "pair" && this.settings.pairTable.selectedPair in this.pairs) {
@@ -2115,15 +2116,14 @@
                 Vue.set(this.pair, this.settings.pairTable.selectedPair, {});
               }
               for (let i = 0; i < 2; i++) {
-                const orders = await dexzContract.getOrders(this.settings.pairTable.selectedPair, i, 1000, 0, ORDERKEY_SENTINEL);
+                const orders = await chadexContract.getOrders(this.settings.pairTable.selectedPair, i, 1000, 0, ORDERKEY_SENTINEL);
+                console.log("orders: " + JSON.stringify(orders, null, 2));
                 const records = [];
                 for (let j = 0; j < orders.length; j++) {
-                  const [price, orderKey, nextOrderKey, maker, expiry, tokens, filled, availableBase, availableQuote] = orders[j];
+                  const [price, orderKey, nextOrderKey, maker, expiry, tokens, availableBase, availableQuote] = orders[j];
                   if (price == 0) {
                     break;
                   }
-                  // console.log(price + " " + orderKey.substring(0, 10) + " " + nextOrderKey.substring(0, 10) + " " +
-                  //   maker.substring(0, 10) + " " + expiry + " " + ethers.utils.formatEther(tokens) + " " + ethers.utils.formatEther(filled));
                   records.push({
                     price: ethers.BigNumber.from(price).toString(),
                     orderKey,
@@ -2131,7 +2131,6 @@
                     maker,
                     expiry: parseInt(expiry),
                     tokens: ethers.BigNumber.from(tokens).toString(),
-                    filled: ethers.BigNumber.from(filled).toString(),
                     availableBase: ethers.BigNumber.from(availableBase).toString(),
                     availableQuote: ethers.BigNumber.from(availableQuote).toString(),
                   });
@@ -2147,7 +2146,7 @@
               const startBlock = 0; // UMSWAPFACTORYDEPLOYMENTBLOCK;
               const endBlock = blockNumber;
               const filter = {
-                address: DEXZADDRESS_SEPOLIA,
+                address: CHADEXADDRESS_SEPOLIA,
                 fromBlock: startBlock,
                 toBlock: endBlock,
                 topics: [
@@ -2164,7 +2163,7 @@
               const records = [];
               const eventLogs = await provider.getLogs(filter);
               for (const event of eventLogs) {
-                const logData = dexzContract.interface.parseLog(event);
+                const logData = chadexContract.interface.parseLog(event);
                 console.log(logData.eventFragment.name + ": " + JSON.stringify(event));
                 const txHash = event.transactionHash;
                 const blockNumber = event.blockNumber;
@@ -2172,7 +2171,8 @@
                 const logIndex = event.logIndex;
                 let record = null;
                 if (logData.eventFragment.name == "PairAdded") {
-                  const [pairKey, maker, base, quote, baseDecimals, quoteDecimals, multiplier, divisor, timestamp] = logData.args;
+                  const [pairKey, maker, base, quote, baseDecimals, quoteDecimals, factors, timestamp] = logData.args;
+                  const [multiplier, divisor] = factors;
                   record = { action: "pairadded", pairKey, maker, base, quote, baseDecimals, quoteDecimals, multiplier, divisor, timestamp: parseInt(timestamp) };
                 } else if (logData.eventFragment.name == "OrderAdded") {
                   const [pairKey, orderKey, maker, buySell, price, expiry, tokens, quoteTokens, timestamp] = logData.args;
@@ -2184,9 +2184,9 @@
                   const pair = this.pairs[pairKey];
                   record = { action: "trade", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, taker, maker, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), timestamp: parseInt(timestamp) };
                 } else if (logData.eventFragment.name == "TradeSummary") {
-                  const [pairKey, taker, buySell, price, filled, quoteTokensFilled, tokensOnOrder, timestamp] = logData.args;
+                  const [pairKey, taker, buySell, price, tokens, quoteTokens, tokensOnOrder, timestamp] = logData.args;
                   const pair = this.pairs[pairKey];
-                  record = { action: "tradesummary", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, taker, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(filled).toString(), quoteTokens: ethers.BigNumber.from(quoteTokensFilled).toString(), tokensOnOrder: ethers.BigNumber.from(tokensOnOrder).toString(), timestamp: parseInt(timestamp) };
+                  record = { action: "tradesummary", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, taker, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), tokensOnOrder: ethers.BigNumber.from(tokensOnOrder).toString(), timestamp: parseInt(timestamp) };
                 }
                 // event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, Tokens filled);
                 // event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens);
@@ -2196,7 +2196,7 @@
               }
               Vue.set(this.pair[this.settings.pairTable.selectedPair], 'history', records);
               console.log("this.pair: " + JSON.stringify(this.pair, null, 2));
-              localStorage.dexzPairV1 = JSON.stringify(this.pair);
+              localStorage.chadexPairV1 = JSON.stringify(this.pair);
             }
 
             this.sync.section = null;
@@ -2213,7 +2213,7 @@
               const erc20 = new ethers.Contract(address, ERC20ABI, provider);
               let allowance = null, balance = null, totalSupply = null;
               try {
-                allowance = ethers.BigNumber.from(await erc20.allowance(this.coinbase, DEXZADDRESS_SEPOLIA)).toString();
+                allowance = ethers.BigNumber.from(await erc20.allowance(this.coinbase, CHADEXADDRESS_SEPOLIA)).toString();
               } catch (e) {
                 console.log("syncTokens ERROR - allowance - token: " + address + ", message: " + e.message);
               }
@@ -2296,7 +2296,7 @@
             const erc20Contract = new ethers.Contract(this.allowanceFormData.token, ERC20ABI, provider);
             const erc20ContractWithSigner = erc20Contract.connect(provider.getSigner());
             try {
-              const tx = await erc20ContractWithSigner.approve(DEXZADDRESS_SEPOLIA, ethers.utils.parseUnits(this.allowanceFormData.amount, this.allowanceFormData.decimals).toString() );
+              const tx = await erc20ContractWithSigner.approve(CHADEXADDRESS_SEPOLIA, ethers.utils.parseUnits(this.allowanceFormData.amount, this.allowanceFormData.decimals).toString() );
               console.log("tx: " + JSON.stringify(tx));
             } catch (e) {
               console.log("allowanceFormHandleSubmit error: " + JSON.stringify(e));
@@ -2354,7 +2354,7 @@
             this.saveSettings();
           },
           saveSettings() {
-            localStorage.dexzSettings = JSON.stringify(this.settings);
+            localStorage.chadexSettings = JSON.stringify(this.settings);
             // console.log("saveSettings: " + JSON.stringify(this.settings));
           },
           filterChanged(dataType, option) {
@@ -2490,10 +2490,10 @@
           async executeRaw() {
             console.log("executeRaw(): " + JSON.stringify(this.raw, null, 2));
             const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const dexzContract = new ethers.Contract(DEXZADDRESS_SEPOLIA, DEXZABI, provider);
+            const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, provider);
             const erc20 = new ethers.Contract(this.raw.base, ERC20ABI, provider);
             const baseDecimals = parseInt(ethers.BigNumber.from(await erc20.decimals()).toString());
-            const dexzContractWithSigner = dexzContract.connect(provider.getSigner());
+            const chadexContractWithSigner = chadexContract.connect(provider.getSigner());
             const action = {
               action: this.raw.action,
               base: this.raw.base,
@@ -2503,11 +2503,12 @@
               targetPrice: ethers.utils.parseUnits(this.raw.targetPrice, 12).toString(),
               expiry: this.raw.expiry,
               tokens: ethers.utils.parseUnits(this.raw.tokens, baseDecimals).toString(),
+              skipCheck: false,
             };
             // console.log("this.raw: " + JSON.stringify(this.raw, null, 2));
             // console.log("action: " + JSON.stringify(action, null, 2));
             try {
-              const tx = await dexzContractWithSigner.execute([action]);
+              const tx = await chadexContractWithSigner.execute([action]);
               console.log("tx: " + JSON.stringify(tx));
             } catch (e) {
               console.log("executeRaw error: " + JSON.stringify(e));
@@ -3933,10 +3934,10 @@
               const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
               const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS_SEPOLIA, ERC721HELPERABI, provider);
               this.coinbase = await signer.getAddress();
-              localStorage.dexzCoinbase = this.coinbase;
+              localStorage.chadexCoinbase = this.coinbase;
               const network = await provider.getNetwork();
               console.log("network: " + JSON.stringify(network));
-              localStorage.dexzChainId = network.chainId;
+              localStorage.chadexChainId = network.chainId;
               this.chainId = network.chainId;
               const block = await provider.getBlock("latest");
               const blockNumber = block.number;
@@ -4169,21 +4170,21 @@
 
         // --- MOUNTED ---
         mounted() {
-          if ('dexzCoinbase' in localStorage) {
-            this.coinbase = localStorage.dexzCoinbase;
+          if ('chadexCoinbase' in localStorage) {
+            this.coinbase = localStorage.chadexCoinbase;
           }
-          if ('dexzChainId' in localStorage) {
-            this.chainId = localStorage.dexzChainId;
+          if ('chadexChainId' in localStorage) {
+            this.chainId = localStorage.chadexChainId;
           }
-          if ('dexzPairsV1' in localStorage) {
-            this.pairs = JSON.parse(localStorage.dexzPairsV1);
+          if ('chadexPairsV1' in localStorage) {
+            this.pairs = JSON.parse(localStorage.chadexPairsV1);
           }
-          if ('dexzPairV1' in localStorage) {
-            this.pair = JSON.parse(localStorage.dexzPairV1);
+          if ('chadexPairV1' in localStorage) {
+            this.pair = JSON.parse(localStorage.chadexPairV1);
             console.log("this.pair: " + JSON.stringify(this.pair, null, 2));
           }
-          if ('dexzSettings' in localStorage) {
-            const tempSettings = JSON.parse(localStorage.dexzSettings);
+          if ('chadexSettings' in localStorage) {
+            const tempSettings = JSON.parse(localStorage.chadexSettings);
             if ('version' in tempSettings && tempSettings.version == this.settings.version) {
               this.settings = tempSettings;
               if (this.settings.tokensTable.currentPage > 1) {
