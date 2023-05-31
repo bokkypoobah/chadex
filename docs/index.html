@@ -321,10 +321,14 @@
                   {{ formatERC20(data.item.price, 12) }}
                 </template>
                 <template #cell(tokens)="data">
-                  {{ formatERC20(data.item.tokens, data.item.baseDecimals) }}
+                  <div v-if="data.item.tokens">
+                    {{ (data.item.buySell == 0 ? '' : '-') + formatERC20(data.item.tokens, data.item.baseDecimals) }}
+                  </div>
                 </template>
                 <template #cell(quoteTokens)="data">
-                  {{ formatERC20(data.item.quoteTokens, data.item.quoteDecimals) }}
+                  <div v-if="data.item.quoteTokens">
+                    {{ (data.item.buySell != 0 ? '' : '-') + formatERC20(data.item.quoteTokens, data.item.quoteDecimals) }}
+                  </div>
                 </template>
               </b-table>
             </b-card-text>
@@ -2092,6 +2096,30 @@
             // if (pairsLength > Object.keys(this.pairs).length) {
               this.sync.total = pairsLength;
               for (let i = 0; i < pairsLength; i++) {
+                // const results = await chadexContract.getPair(i);
+                // console.log("results: " + JSON.stringify(results, null, 2));
+
+                {
+                  const [pairKey, base, quote, factors, bestBuyOrder, bestSellOrder] = await chadexContract.getPair(i);
+                  console.log("pairKey: " + pairKey + ", base: " + JSON.stringify(base) + ", quote: " + JSON.stringify(quote) +
+                    ", factors: " + JSON.stringify(factors) + ", bestBuyOrder: " + JSON.stringify(bestBuyOrder) + ", bestSellOrder: " + JSON.stringify(bestSellOrder));
+                }
+
+                // struct PairTokenResult {
+                //     Token token;
+                //     uint8 decimals;
+                // }
+                // struct PairResult {
+                //     PairKey pairKey;
+                //     PairTokenResult base;
+                //     PairTokenResult quote;
+                //     Factors factors;
+                //     BestOrderResult bestBuyOrder;
+                //     BestOrderResult bestSellOrder;
+                // }
+
+
+
                 const [pairKey, baseAddress, quoteAddress, multiplier, divisor] = await chadexContract.pair(i);
                 if (!(pairKey in this.pairs)) {
                   const base = await this.getERC20TokenDetails({ provider }, baseAddress);
@@ -2105,7 +2133,7 @@
                 }
                 this.sync.completed++;
               }
-              console.log("JSON.stringify(this.pairs): " + JSON.stringify(this.pairs));
+              console.log("this.pairs: " + JSON.stringify(this.pairs));
               localStorage.chadexPairsV1 = JSON.stringify(this.pairs);
             // }
             console.log("this.settings.pairTable.selectedPair: " + this.settings.pairTable.selectedPair);
@@ -2182,7 +2210,7 @@
                   const [tradeInfo] = logData.args;
                   const [pairKey, orderKey, taker, maker, buySell, price, tokens, quoteTokens, timestamp] = tradeInfo;
                   const pair = this.pairs[pairKey];
-                  record = { action: "trade", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, taker, maker, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), timestamp: parseInt(timestamp) };
+                  record = { action: "trade", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, taker, maker, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), timestamp: parseInt(timestamp) };
                 } else if (logData.eventFragment.name == "TradeSummary") {
                   const [pairKey, taker, buySell, price, tokens, quoteTokens, tokensOnOrder, timestamp] = logData.args;
                   const pair = this.pairs[pairKey];
