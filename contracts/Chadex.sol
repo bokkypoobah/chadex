@@ -100,7 +100,6 @@ contract ChadexBase {
         Account maker;
         Unixtime expiry;
         Tokens tokens;
-        // Tokens filled; // TODO: Remove
     }
     struct TradeInput {
         Action action;
@@ -171,6 +170,7 @@ contract ChadexBase {
     error InvalidMessageText(uint maxLength);
     error CalculatedBaseTokensOverflow(uint baseTokens, uint max);
     error CalculatedQuoteTokensOverflow(uint quoteTokens, uint max);
+    error InvalidTokenDecimals(uint8 decimals, uint8 max);
 
     function pair(uint i) public view returns (PairKey pairKey, Token base, Token quote, Factors memory factors) {
         pairKey = pairKeys[i];
@@ -329,7 +329,12 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         if (Token.unwrap(pair.base) == address(0)) {
             uint8 baseDecimals = IERC20(Token.unwrap(tradeInput.base)).decimals();
             uint8 quoteDecimals = IERC20(Token.unwrap(tradeInput.quote)).decimals();
-            // TODO Permit ERC-20 token decimals from 0 to 24
+            if (baseDecimals > 24) {
+                revert InvalidTokenDecimals(baseDecimals, 24);
+            }
+            if (quoteDecimals > 24) {
+                revert InvalidTokenDecimals(quoteDecimals, 24);
+            }
             factors = baseDecimals >= quoteDecimals ? Factors(Factor.wrap(baseDecimals - quoteDecimals), Factor.wrap(0)) : Factors(Factor.wrap(0), Factor.wrap(quoteDecimals - baseDecimals));
             pairs[pairKey] = Pair(tradeInput.base, tradeInput.quote, factors);
             pairKeys.push(pairKey);
