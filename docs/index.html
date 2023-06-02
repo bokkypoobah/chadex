@@ -2854,7 +2854,6 @@
             let newChadexEvents = 0;
             // const newBlocks = {};
             // const newAccounts = {};
-            const chadexEvents = {};
 
             let indexToAddress = [];
             let addressToIndex = {};
@@ -2885,6 +2884,12 @@
             if (tokensDataItems.length == 1) {
               tokens = tokensDataItems[0].object;
               console.log("tokens: " + JSON.stringify(tokens));
+            }
+            let chadexEvents = {};
+            const chadexEventsDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_chadexEvents").toArray();
+            if (chadexEventsDataItems.length == 1) {
+              chadexEvents = chadexEventsDataItems[0].object;
+              console.log("chadexEvents: " + JSON.stringify(chadexEvents));
             }
 
             for (const address of [CHADEXADDRESS_SEPOLIA, this.coinbase]) {
@@ -2918,10 +2923,6 @@
                       if (logData.eventFragment.name == "PairAdded") {
                         const [pairKey, maker, base, quote, baseDecimals, quoteDecimals, factors, timestamp] = logData.args;
                         const [multiplier, divisor] = factors;
-
-                        // const pairToIndex = {};
-                        // const indexToPair = [];
-
                         if (!(pairKey in pairToIndex)) {
                           for (const address of [base, quote]) {
                             if (!(address in addressToIndex)) {
@@ -2932,43 +2933,32 @@
                             if (!(addressIndex in tokens)) {
                               const details = await this.getERC20TokenDetails(context, address);
                               // console.log("token " + address + " => " + JSON.stringify(details));
-                              tokens[addressIndex] = [
-                                details.symbol,
-                                details.name,
-                                details.decimals,
-                                details.totalSupply,
-                              ];
+                              tokens[addressIndex] = [ details.symbol, details.name, details.decimals, details.totalSupply ];
                             }
                           }
                           const baseIndex = addressToIndex[base];
                           const quoteIndex = addressToIndex[quote];
                           pairToIndex[pairKey] = indexToPair.length;
-                          indexToPair.push([
-                            baseIndex,
-                            baseDecimals,
-                            quoteIndex,
-                            quoteDecimals,
-                            factors[0],
-                            factors[1],
-                            parseInt(timestamp),
-                          ]);
+                          indexToPair.push([ baseIndex, baseDecimals, quoteIndex, quoteDecimals, factors[0], factors[1], parseInt(timestamp) ]);
                         }
-
                         if (!(maker in addressToIndex)) {
                           addressToIndex[maker] = indexToAddress.length;
                           indexToAddress.push(maker);
                         }
+                        const pairIndex = pairToIndex[pairKey];
+                        const baseIndex = addressToIndex[base];
+                        const quoteIndex = addressToIndex[quote];
                         const makerIndex = addressToIndex[maker];
-                        record = { action: "pairadded", pairKey, makerIndex, maker, base, quote, baseDecimals, quoteDecimals, multiplier, divisor, timestamp: parseInt(timestamp) };
+                        record = [ "pairadded", pairIndex, makerIndex, baseIndex, quoteIndex, parseInt(timestamp) ];
                       } else if (logData.eventFragment.name == "OrderAdded") {
                         const [pairKey, orderKey, maker, buySell, price, expiry, tokens, quoteTokens, timestamp] = logData.args;
-                        const pair = this.pairs[pairKey];
+                        const pairIndex = pairToIndex[pairKey];
                         if (!(maker in addressToIndex)) {
                           addressToIndex[maker] = indexToAddress.length;
                           indexToAddress.push(maker);
                         }
                         const makerIndex = addressToIndex[maker];
-                        record = { action: "orderadded", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, makerIndex, maker, buySell, price: ethers.BigNumber.from(price).toString(), expiry: parseInt(expiry), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), timestamp: parseInt(timestamp) };
+                        record = [ "orderadded", pairIndex, orderKey, makerIndex, buySell, ethers.BigNumber.from(price).toString(), parseInt(expiry), ethers.BigNumber.from(tokens).toString(), ethers.BigNumber.from(quoteTokens).toString(), parseInt(timestamp) ];
                       } else if (logData.eventFragment.name == "OrderRemoved") {
                         // TODO event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, uint timestamp);
                       } else if (logData.eventFragment.name == "OrderUpdated") {
@@ -2976,7 +2966,7 @@
                       } else if (logData.eventFragment.name == "Trade") {
                         const [tradeInfo] = logData.args;
                         const [pairKey, orderKey, taker, maker, buySell, price, tokens, quoteTokens, timestamp] = tradeInfo;
-                        const pair = this.pairs[pairKey];
+                        const pairIndex = pairToIndex[pairKey];
                         for (const address of [taker, maker]) {
                           if (!(address in addressToIndex)) {
                             addressToIndex[address] = indexToAddress.length;
@@ -2985,16 +2975,16 @@
                         }
                         const takerIndex = addressToIndex[taker];
                         const makerIndex = addressToIndex[maker];
-                        record = { action: "trade", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, takerIndex, taker, makerIndex, maker, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), timestamp: parseInt(timestamp) };
+                        record = { action: "trade", pairIndex, orderKey, takerIndex, makerIndex, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), timestamp: parseInt(timestamp) };
                       } else if (logData.eventFragment.name == "TradeSummary") {
                         const [pairKey, taker, buySell, price, tokens, quoteTokens, tokensOnOrder, timestamp] = logData.args;
-                        const pair = this.pairs[pairKey];
+                        const pairIndex = pairToIndex[pairKey];
                         if (!(taker in addressToIndex)) {
                           addressToIndex[taker] = indexToAddress.length;
                           indexToAddress.push(taker);
                         }
                         const takerIndex = addressToIndex[taker];
-                        record = { action: "tradesummary", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, takerIndex, taker, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), tokensOnOrder: ethers.BigNumber.from(tokensOnOrder).toString(), timestamp: parseInt(timestamp) };
+                        record = { action: "tradesummary", pairIndex, takerIndex, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), tokensOnOrder: ethers.BigNumber.from(tokensOnOrder).toString(), timestamp: parseInt(timestamp) };
                       } else if (logData.eventFragment.name == "Message") {
                         // TODO event Message(address indexed from, address indexed to, bytes32 indexed pairKey, bytes32 orderKey, string topic, string text, uint timestamp);
                       }
@@ -3019,62 +3009,6 @@
                     }
                   }
                 }
-
-                // const logs = await context.provider.getLogs({ address: CHADEXADDRESS_SEPOLIA, fromBlock, toBlock, topics: transferTopics });
-                // for (const event of logs) {
-                //   if (!event.removed) {
-                //     const [eventBlockNumber, eventTransactionIndex, eventLogIndex] = [parseInt(event.blockNumber), parseInt(event.transactionIndex), parseInt(event.logIndex)];
-                //     let from, to, tokens;
-                //     if (event.topics.length == 4) {
-                //       from = ethers.utils.getAddress('0x' + event.topics[1].substring(26));
-                //       to = ethers.utils.getAddress('0x' + event.topics[2].substring(26));
-                //       tokens = ethers.BigNumber.from(event.topics[3]).toString();
-                //     } else if (event.topics.length == 3) {
-                //       from = ethers.utils.getAddress('0x' + event.topics[1].substring(26));
-                //       to = ethers.utils.getAddress('0x' + event.topics[2].substring(26));
-                //       tokens = ethers.BigNumber.from(event.data).toString();
-                //     } else if (event.topics.length == 1) {
-                //       from = ethers.utils.getAddress('0x' + event.data.substring(26, 66));
-                //       to = ethers.utils.getAddress('0x' + event.data.substring(90, 130));
-                //       tokens = ethers.BigNumber.from('0x' + event.data.substring(130, 193)).toString();
-                //     }
-                //     if (!(eventBlockNumber in this.blockTimestamps) && !(eventBlockNumber in newBlocks)) {
-                //       newBlocks[eventBlockNumber] = null;
-                //     }
-                //     if (!(from in this.indexToName) && !(from in newAccounts)) {
-                //       newAccounts[from] = null;
-                //     }
-                //     if (!(to in this.indexToName) && !(to in newAccounts)) {
-                //       newAccounts[to] = null;
-                //     }
-                //
-                //     for (const address of [from, to]) {
-                //       if (!(address in addressToIndex)) {
-                //         const index = indexToAddress.length;
-                //         addressToIndex[address] = index;
-                //         indexToAddress.push(address);
-                //       }
-                //     }
-                //     const fromIndex = addressToIndex[from];
-                //     const toIndex = addressToIndex[to];
-                //
-                //     if (!(eventBlockNumber in transfers)) {
-                //       transfers[eventBlockNumber] = {};
-                //     }
-                //     if (!(event.transactionIndex in transfers[eventBlockNumber])) {
-                //       transfers[eventBlockNumber][eventTransactionIndex] = {};
-                //     }
-                //     if (!(event.transactionHash in transfers[eventBlockNumber][eventTransactionIndex])) {
-                //       transfers[eventBlockNumber][eventTransactionIndex][event.transactionHash] = {};
-                //     }
-                //     if (!(event.logIndex in transfers[eventBlockNumber][eventTransactionIndex][event.transactionHash])) {
-                //       transfers[eventBlockNumber][eventTransactionIndex][event.transactionHash][eventLogIndex] = [ fromIndex, toIndex, tokens ];
-                //       newTransfers++;
-                //     }
-                //   }
-                //   count++;
-                // }
-                // this.sync.completed = count;
                 console.log(moment().format("HH:mm:ss") + " syncChadex #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newChadexEvents: " + newChadexEvents);
                 fromBlock = toBlock;
               } catch (e) {
@@ -3085,13 +3019,13 @@
               // done = true; // TODO
             } while (!done && !this.sync.halt);
 
-            console.log("chadexEvents: " + JSON.stringify(chadexEvents, null, 2));
+            // console.log("chadexEvents: " + JSON.stringify(chadexEvents, null, 2));
             // console.log("pairs: " + JSON.stringify(pairs, null, 2));
-            console.log("tokens: " + JSON.stringify(tokens));
-            console.log("addressToIndex: " + JSON.stringify(addressToIndex));
-            console.log("indexToAddress: " + JSON.stringify(indexToAddress));
-            console.log("pairToIndex: " + JSON.stringify(pairToIndex));
-            console.log("indexToPair: " + JSON.stringify(indexToPair));
+            // console.log("tokens: " + JSON.stringify(tokens));
+            // console.log("addressToIndex: " + JSON.stringify(addressToIndex));
+            // console.log("indexToAddress: " + JSON.stringify(indexToAddress));
+            // console.log("pairToIndex: " + JSON.stringify(pairToIndex));
+            // console.log("indexToPair: " + JSON.stringify(indexToPair));
 
             Vue.set(this, "addressToIndex", addressToIndex);
             Vue.set(this, "indexToAddress", indexToAddress);
@@ -3112,6 +3046,10 @@
               console.log("error: " + error);
             });
             await context.db.cache.put({ objectName: this.chainId + "_tokens", object: tokens }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            await context.db.cache.put({ objectName: this.chainId + "_chadexEvents", object: chadexEvents }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
             });
