@@ -2895,11 +2895,11 @@
                               tempAddressToIndex[address] = tempIndexToAddress.length;
                               tempIndexToAddress.push(address);
                             }
-
-                            if (!(address in tokens)) {
+                            const addressIndex = tempAddressToIndex[address];
+                            if (!(addressIndex in tokens)) {
                               const details = await this.getERC20TokenDetails(context, address);
-                              console.log("token " + address + " => " + JSON.stringify(details));
-                              tokens[address] = details;
+                              // console.log("token " + address + " => " + JSON.stringify(details));
+                              tokens[details.addressIndex] = details;
                             }
                           }
                           const baseIndex = tempAddressToIndex[base];
