@@ -2853,6 +2853,7 @@
             // const newBlocks = {};
             // const newAccounts = {};
             const chadexEvents = {};
+            const pairs = {};
 
             const tempAddressToIndex = this.addressToIndex;
             const tempIndexToAddress = this.indexToAddress;
@@ -2887,6 +2888,27 @@
                       if (logData.eventFragment.name == "PairAdded") {
                         const [pairKey, maker, base, quote, baseDecimals, quoteDecimals, factors, timestamp] = logData.args;
                         const [multiplier, divisor] = factors;
+                        if (!(pairKey in pairs)) {
+                          for (const address of [base, quote]) {
+                            if (!(address in tempAddressToIndex)) {
+                              tempAddressToIndex[address] = tempIndexToAddress.length;
+                              tempIndexToAddress.push(address);
+                            }
+                          }
+                          const baseIndex = tempAddressToIndex[base];
+                          const quoteIndex = tempAddressToIndex[quote];
+                          pairs[pairKey] = {
+                            baseIndex,
+                            base,
+                            baseDecimals,
+                            quoteIndex,
+                            quote,
+                            quoteDecimals,
+                            factors,
+                            timestamp: parseInt(timestamp),
+                          };
+                        }
+
                         if (!(maker in tempAddressToIndex)) {
                           tempAddressToIndex[maker] = tempIndexToAddress.length;
                           tempIndexToAddress.push(maker);
@@ -3019,6 +3041,7 @@
             } while (!done && !this.sync.halt);
 
             console.log("chadexEvents: " + JSON.stringify(chadexEvents, null, 2));
+            console.log("pairs: " + JSON.stringify(pairs, null, 2));
 
             Vue.set(this, "addressToIndex", tempAddressToIndex);
             Vue.set(this, "indexToAddress", tempIndexToAddress);
