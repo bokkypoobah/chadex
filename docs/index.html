@@ -2992,8 +2992,7 @@
                       if (record) {
                         const confirmations = context.latestBlockNumber - blockNumber;
                         if (!(blockNumber in chadexEvents)) {
-                          // TODO: Delete confirmations when tested OK
-                          chadexEvents[blockNumber] = confirmations < CONFIRMATIONS ? { unconfirmed: true, confirmations } : { confirmations };
+                          chadexEvents[blockNumber] = confirmations < CONFIRMATIONS ? { unconfirmed: true } : {};
                         }
                         if (!(transactionIndex in chadexEvents[blockNumber])) {
                           chadexEvents[blockNumber][transactionIndex] = {};
