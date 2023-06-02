@@ -2834,26 +2834,14 @@
           },
 
           async syncChadex(context) {
-            const CONFIRMATIONS = 1780;
+            const CONFIRMATIONS = 20;
             console.log("syncChadex - latestBlockNumber: " + context.latestBlockNumber);
-            // console.log("syncChadex: " + JSON.stringify(context));
-            // this.sync.completed = 0;
-            // this.sync.total = null;
-            // this.sync.section = context.symbol + ' Txs';
-            // const dataObject = await context.db.cache.where("objectName").equals(context.address + "_transfers").toArray();
-            // const transfers = dataObject.length == 1 ? dataObject[0].object : {};
-            // const blockNumbers = Object.keys(transfers).sort((a, b) => { return b - a });
-            // const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: 0;
             const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, context.provider);
-            const startBlock = 0;
             let batchSize = 100000000;
             const BATCHREDUCTIONFACTOR = 0.50;
             let done = false;
-            let fromBlock = startBlock;
             let count = 0;
             let newChadexEvents = 0;
-            // const newBlocks = {};
-            // const newAccounts = {};
 
             let indexToAddress = [];
             let addressToIndex = {};
@@ -2889,8 +2877,19 @@
             const chadexEventsDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_chadexEvents").toArray();
             if (chadexEventsDataItems.length == 1) {
               chadexEvents = chadexEventsDataItems[0].object;
-              console.log("chadexEvents: " + JSON.stringify(chadexEvents));
+              // console.log("chadexEvents: " + JSON.stringify(chadexEvents));
+              Object.keys(chadexEvents).forEach(function (key) {
+                if ('unconfirmed' in chadexEvents[key]) {
+                  console.log("DELETING: " + key + " => " + JSON.stringify(chadexEvents[key]));
+                  delete chadexEvents[key];
+                }
+              });
             }
+            console.log("chadexEvents: " + JSON.stringify(chadexEvents));
+            const blockNumbers = Object.keys(chadexEvents).sort((a, b) => { return b - a });
+            // console.log("blockNumbers: " + JSON.stringify(blockNumbers));
+            const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: 0;
+            console.log("startBlock: " + startBlock);
 
             for (const address of [CHADEXADDRESS_SEPOLIA, this.coinbase]) {
               if (!(address in addressToIndex)) {
@@ -2900,6 +2899,8 @@
             }
             const chadexAddressIndex = addressToIndex[CHADEXADDRESS_SEPOLIA];
             const coinbaseIndex = addressToIndex[this.coinbase];
+
+            let fromBlock = startBlock;
 
             do {
               if (batchSize > 1000 && parseInt(fromBlock) + batchSize > context.latestBlockNumber) {
