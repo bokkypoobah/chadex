@@ -948,8 +948,8 @@
                 <b-link v-if="blockNumber" :href="'https://sepolia.etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="'Latest block'" target="_blank">
                   {{ '#' + commify(blockNumber) }}
                 </b-link>
-                <b-link v-if="blockNumber" :href="'https://sepolia.etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="'Latest block timestamp'" target="_blank">
-                  {{ formatTimestamp(timestamp) }}
+                <b-link v-if="blockNumber" :href="'https://sepolia.etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="formatTimestamp(timestamp)" target="_blank">
+                  {{ formatTimeDiff(timestamp) }}
                 </b-link>
               </font>
             </div>
@@ -3863,6 +3863,13 @@
             } catch (err) {
             }
             return e.toString();
+          },
+          formatTimeDiff(unixtime) {
+            if (!unixtime) {
+              return "";
+            } else {
+              return moment.unix(unixtime).fromNow();
+            }
           },
           formatExpiry(unixtime) {
             if (!unixtime) {
