@@ -214,7 +214,7 @@
             <b-card-text class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
                 <div class="mt-0 pr-1">
-                  <b-form-select size="sm" v-model="settings.pairTable.selectedPair" @change="saveSettings()" :options="pairsOptions"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.pairTable.selectedPair" @change="saveSettings(); syncAll();" :options="pairsOptions"></b-form-select>
                 </div>
                 <!-- <div class="mt-0 pr-1">
                   <b-form-input type="text" size="sm" v-model.trim="settings.pairsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Base or quote symbol and name filter'" placeholder="🔍 sym/name regex" style="min-width: 8.0rem;"></b-form-input>
@@ -2679,6 +2679,7 @@
             if (this.chainId == CHAINID_SEPOLIA) {
               await this.syncChadexEvents(context);
               await this.syncChadexPairs(context);
+              await this.syncChadexPair(context);
             }
             // for (const [address, coinInfo] of Object.entries(this.settings.tokens)) {
             //   if (coinInfo.sync && !this.sync.halt) {
@@ -3084,6 +3085,17 @@
               const [sellPrice, sellOrderKey, sellNextOrderKey, sellMaker, sellExpiry, sellTokens, sellAvailableBase, sellAvailableQuote] = bestSellOrder;
               const sellMakerIndex = this.addressToIndex[sellMaker];
               console.log("sellPrice: " + ethers.BigNumber.from(sellPrice).toString() + ", sellMakerIndex: " + sellMakerIndex + ", sellExpiry: " + parseInt(sellExpiry) + ", sellTokens: " + ethers.BigNumber.from(sellTokens).toString() + ", sellAvailableBase: " + ethers.BigNumber.from(sellAvailableBase).toString() + ", sellAvailableQuote: " + ethers.BigNumber.from(sellAvailableQuote).toString());
+            }
+          },
+
+          async syncChadexPair(context) {
+            console.log("syncChadexPair - latestBlockNumber: " + context.latestBlockNumber);
+            console.log("this.settings.pairTable.selectedPair: " + this.settings.pairTable.selectedPair);
+            console.log("this.pairToIndex: " + JSON.stringify(this.pairToIndex, null, 2));
+            console.log("this.indexToPair: " + JSON.stringify(this.indexToPair, null, 2));
+            if (this.settings.pairTable.selectedPair in this.pairToIndex) {
+              const pairIndex = this.pairToIndex[this.settings.pairTable.selectedPair];
+              console.log("pairIndex: " + pairIndex);
             }
           },
 
