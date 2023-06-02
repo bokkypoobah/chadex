@@ -1140,6 +1140,10 @@
 
           addressToIndex: {},
           indexToAddress: [],
+
+          pairToIndex: {},
+          indexToPair: [],
+
           indexToName: {},
           indexToSymbols: {},
           indexToDecimals: {},
@@ -4605,17 +4609,26 @@
             if (indexToNameDataItems.length == 1) {
               this.indexToName = indexToNameDataItems[0].object;
             }
-            const indexToAddressDataItems = await db0.cache.where("objectName").equals('indexToAddress').toArray();
-            // console.log("indexToAddressDataItems.length: " + indexToAddressDataItems.length);
+
+            const indexToAddressDataItems = await db0.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
             if (indexToAddressDataItems.length == 1) {
               this.indexToAddress = indexToAddressDataItems[0].object;
               console.log("indexToAddress: " + JSON.stringify(this.indexToAddress));
             }
-            const addressToIndexDataItems = await db0.cache.where("objectName").equals('addressToIndex').toArray();
-            // console.log("addressToIndexDataItems.length: " + addressToIndexDataItems.length);
+            const addressToIndexDataItems = await db0.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
             if (addressToIndexDataItems.length == 1) {
               this.addressToIndex = addressToIndexDataItems[0].object;
               console.log("addressToIndex: " + JSON.stringify(this.addressToIndex));
+            }
+            const indexToPairDataItems = await db0.cache.where("objectName").equals(this.chainId + "_indexToPair").toArray();
+            if (indexToPairDataItems.length == 1) {
+              this.indexToPair = indexToPairDataItems[0].object;
+              console.log("indexToPair: " + JSON.stringify(this.indexToPair));
+            }
+            const pairToIndexDataItems = await db0.cache.where("objectName").equals(this.chainId + "_pairToIndex").toArray();
+            if (pairToIndexDataItems.length == 1) {
+              this.pairToIndex = pairToIndexDataItems[0].object;
+              console.log("pairToIndex: " + JSON.stringify(this.pairToIndex));
             }
 
             db0.close();
