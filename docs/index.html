@@ -3002,7 +3002,7 @@
                           chadexEvents[blockNumber][transactionIndex][txHash] = {};
                         }
                         if (!(logIndex in chadexEvents[blockNumber][transactionIndex][txHash])) {
-                          chadexEvents[blockNumber][transactionIndex][txHash][logIndex] = { record };
+                          chadexEvents[blockNumber][transactionIndex][txHash][logIndex] = record;
                           newChadexEvents++;
                         }
                       }
