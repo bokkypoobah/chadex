@@ -2861,16 +2861,16 @@
 
             const tokens = {};
 
-            const tempAddressToIndex = this.addressToIndex;
-            const tempIndexToAddress = this.indexToAddress;
+            const addressToIndex = {};
+            const indexToAddress = [];
             for (const address of [CHADEXADDRESS_SEPOLIA, this.coinbase]) {
-              if (!(address in tempAddressToIndex)) {
-                tempAddressToIndex[address] = tempIndexToAddress.length;
-                tempIndexToAddress.push(address);
+              if (!(address in addressToIndex)) {
+                addressToIndex[address] = indexToAddress.length;
+                indexToAddress.push(address);
               }
             }
-            const chadexAddressIndex = tempAddressToIndex[CHADEXADDRESS_SEPOLIA];
-            const coinbaseIndex = tempAddressToIndex[this.coinbase];
+            const chadexAddressIndex = addressToIndex[CHADEXADDRESS_SEPOLIA];
+            const coinbaseIndex = addressToIndex[this.coinbase];
 
             do {
               if (batchSize > 1000 && parseInt(fromBlock) + batchSize > context.latestBlockNumber) {
@@ -2900,11 +2900,11 @@
 
                         if (!(pairKey in pairToIndex)) {
                           for (const address of [base, quote]) {
-                            if (!(address in tempAddressToIndex)) {
-                              tempAddressToIndex[address] = tempIndexToAddress.length;
-                              tempIndexToAddress.push(address);
+                            if (!(address in addressToIndex)) {
+                              addressToIndex[address] = indexToAddress.length;
+                              indexToAddress.push(address);
                             }
-                            const addressIndex = tempAddressToIndex[address];
+                            const addressIndex = addressToIndex[address];
                             if (!(addressIndex in tokens)) {
                               const details = await this.getERC20TokenDetails(context, address);
                               // console.log("token " + address + " => " + JSON.stringify(details));
@@ -2916,8 +2916,8 @@
                               ];
                             }
                           }
-                          const baseIndex = tempAddressToIndex[base];
-                          const quoteIndex = tempAddressToIndex[quote];
+                          const baseIndex = addressToIndex[base];
+                          const quoteIndex = addressToIndex[quote];
                           pairToIndex[pairKey] = indexToPair.length;
                           indexToPair.push([
                             baseIndex,
@@ -2930,20 +2930,20 @@
                           ]);
                         }
 
-                        if (!(maker in tempAddressToIndex)) {
-                          tempAddressToIndex[maker] = tempIndexToAddress.length;
-                          tempIndexToAddress.push(maker);
+                        if (!(maker in addressToIndex)) {
+                          addressToIndex[maker] = indexToAddress.length;
+                          indexToAddress.push(maker);
                         }
-                        const makerIndex = tempAddressToIndex[maker];
+                        const makerIndex = addressToIndex[maker];
                         record = { action: "pairadded", pairKey, makerIndex, maker, base, quote, baseDecimals, quoteDecimals, multiplier, divisor, timestamp: parseInt(timestamp) };
                       } else if (logData.eventFragment.name == "OrderAdded") {
                         const [pairKey, orderKey, maker, buySell, price, expiry, tokens, quoteTokens, timestamp] = logData.args;
                         const pair = this.pairs[pairKey];
-                        if (!(maker in tempAddressToIndex)) {
-                          tempAddressToIndex[maker] = tempIndexToAddress.length;
-                          tempIndexToAddress.push(maker);
+                        if (!(maker in addressToIndex)) {
+                          addressToIndex[maker] = indexToAddress.length;
+                          indexToAddress.push(maker);
                         }
-                        const makerIndex = tempAddressToIndex[maker];
+                        const makerIndex = addressToIndex[maker];
                         record = { action: "orderadded", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, makerIndex, maker, buySell, price: ethers.BigNumber.from(price).toString(), expiry: parseInt(expiry), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), timestamp: parseInt(timestamp) };
                       } else if (logData.eventFragment.name == "OrderRemoved") {
                         // TODO event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, uint timestamp);
@@ -2954,22 +2954,22 @@
                         const [pairKey, orderKey, taker, maker, buySell, price, tokens, quoteTokens, timestamp] = tradeInfo;
                         const pair = this.pairs[pairKey];
                         for (const address of [taker, maker]) {
-                          if (!(address in tempAddressToIndex)) {
-                            tempAddressToIndex[address] = tempIndexToAddress.length;
-                            tempIndexToAddress.push(address);
+                          if (!(address in addressToIndex)) {
+                            addressToIndex[address] = indexToAddress.length;
+                            indexToAddress.push(address);
                           }
                         }
-                        const takerIndex = tempAddressToIndex[taker];
-                        const makerIndex = tempAddressToIndex[maker];
+                        const takerIndex = addressToIndex[taker];
+                        const makerIndex = addressToIndex[maker];
                         record = { action: "trade", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, takerIndex, taker, makerIndex, maker, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), timestamp: parseInt(timestamp) };
                       } else if (logData.eventFragment.name == "TradeSummary") {
                         const [pairKey, taker, buySell, price, tokens, quoteTokens, tokensOnOrder, timestamp] = logData.args;
                         const pair = this.pairs[pairKey];
-                        if (!(taker in tempAddressToIndex)) {
-                          tempAddressToIndex[taker] = tempIndexToAddress.length;
-                          tempIndexToAddress.push(taker);
+                        if (!(taker in addressToIndex)) {
+                          addressToIndex[taker] = indexToAddress.length;
+                          indexToAddress.push(taker);
                         }
-                        const takerIndex = tempAddressToIndex[taker];
+                        const takerIndex = addressToIndex[taker];
                         record = { action: "tradesummary", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, takerIndex, taker, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), tokensOnOrder: ethers.BigNumber.from(tokensOnOrder).toString(), timestamp: parseInt(timestamp) };
                       } else if (logData.eventFragment.name == "Message") {
                         // TODO event Message(address indexed from, address indexed to, bytes32 indexed pairKey, bytes32 orderKey, string topic, string text, uint timestamp);
@@ -3025,14 +3025,14 @@
                 //     }
                 //
                 //     for (const address of [from, to]) {
-                //       if (!(address in tempAddressToIndex)) {
-                //         const index = tempIndexToAddress.length;
-                //         tempAddressToIndex[address] = index;
-                //         tempIndexToAddress.push(address);
+                //       if (!(address in addressToIndex)) {
+                //         const index = indexToAddress.length;
+                //         addressToIndex[address] = index;
+                //         indexToAddress.push(address);
                 //       }
                 //     }
-                //     const fromIndex = tempAddressToIndex[from];
-                //     const toIndex = tempAddressToIndex[to];
+                //     const fromIndex = addressToIndex[from];
+                //     const toIndex = addressToIndex[to];
                 //
                 //     if (!(eventBlockNumber in transfers)) {
                 //       transfers[eventBlockNumber] = {};
@@ -3064,18 +3064,18 @@
             console.log("chadexEvents: " + JSON.stringify(chadexEvents, null, 2));
             // console.log("pairs: " + JSON.stringify(pairs, null, 2));
             console.log("tokens: " + JSON.stringify(tokens));
-            console.log("addressToIndex: " + JSON.stringify(tempAddressToIndex));
-            console.log("indexToAddress: " + JSON.stringify(tempIndexToAddress));
+            console.log("addressToIndex: " + JSON.stringify(addressToIndex));
+            console.log("indexToAddress: " + JSON.stringify(indexToAddress));
             console.log("pairToIndex: " + JSON.stringify(pairToIndex));
             console.log("indexToPair: " + JSON.stringify(indexToPair));
 
-            Vue.set(this, "addressToIndex", tempAddressToIndex);
-            Vue.set(this, "indexToAddress", tempIndexToAddress);
-            await context.db.cache.put({ objectName: this.chainId + "_indexToAddress", object: tempIndexToAddress }).then (function() {
+            Vue.set(this, "addressToIndex", addressToIndex);
+            Vue.set(this, "indexToAddress", indexToAddress);
+            await context.db.cache.put({ objectName: this.chainId + "_indexToAddress", object: indexToAddress }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
             });
-            await context.db.cache.put({ objectName: this.chainId + "_addressToIndex", object: tempAddressToIndex }).then (function() {
+            await context.db.cache.put({ objectName: this.chainId + "_addressToIndex", object: addressToIndex }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
             });
