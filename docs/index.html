@@ -2672,7 +2672,9 @@
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
             const context = { provider, latestBlockNumber, db };
-            await this.syncChadex(context);
+            if (this.chainId == CHAINID_SEPOLIA) {
+              await this.syncChadex(context);
+            }
             // for (const [address, coinInfo] of Object.entries(this.settings.tokens)) {
             //   if (coinInfo.sync && !this.sync.halt) {
             //     const context = { provider, confirmedBlockNumber, db, address, symbol: coinInfo.symbol };
@@ -2899,7 +2901,12 @@
                             if (!(addressIndex in tokens)) {
                               const details = await this.getERC20TokenDetails(context, address);
                               // console.log("token " + address + " => " + JSON.stringify(details));
-                              tokens[details.addressIndex] = details;
+                              tokens[details.addressIndex] = {
+                                symbol: details.symbol,
+                                name: details.name,
+                                decimals: details.decimals,
+                                totalSupply: details.totalSupply,
+                              };
                             }
                           }
                           const baseIndex = tempAddressToIndex[base];
