@@ -2855,7 +2855,10 @@
             // const newBlocks = {};
             // const newAccounts = {};
             const chadexEvents = {};
-            const pairs = {};
+
+            const pairToIndex = {};
+            const indexToPair = [];
+
             const tokens = {};
 
             const tempAddressToIndex = this.addressToIndex;
@@ -2891,7 +2894,11 @@
                       if (logData.eventFragment.name == "PairAdded") {
                         const [pairKey, maker, base, quote, baseDecimals, quoteDecimals, factors, timestamp] = logData.args;
                         const [multiplier, divisor] = factors;
-                        if (!(pairKey in pairs)) {
+
+                        // const pairToIndex = {};
+                        // const indexToPair = [];
+
+                        if (!(pairKey in pairToIndex)) {
                           for (const address of [base, quote]) {
                             if (!(address in tempAddressToIndex)) {
                               tempAddressToIndex[address] = tempIndexToAddress.length;
@@ -2901,26 +2908,26 @@
                             if (!(addressIndex in tokens)) {
                               const details = await this.getERC20TokenDetails(context, address);
                               // console.log("token " + address + " => " + JSON.stringify(details));
-                              tokens[details.addressIndex] = {
-                                symbol: details.symbol,
-                                name: details.name,
-                                decimals: details.decimals,
-                                totalSupply: details.totalSupply,
-                              };
+                              tokens[addressIndex] = [
+                                details.symbol,
+                                details.name,
+                                details.decimals,
+                                details.totalSupply,
+                              ];
                             }
                           }
                           const baseIndex = tempAddressToIndex[base];
                           const quoteIndex = tempAddressToIndex[quote];
-                          pairs[pairKey] = {
+                          pairToIndex[pairKey] = indexToPair.length;
+                          indexToPair.push([
                             baseIndex,
-                            // base,
                             baseDecimals,
                             quoteIndex,
-                            // quote,
                             quoteDecimals,
-                            factors,
-                            timestamp: parseInt(timestamp),
-                          };
+                            factors[0],
+                            factors[1],
+                            parseInt(timestamp),
+                          ]);
                         }
 
                         if (!(maker in tempAddressToIndex)) {
@@ -3055,8 +3062,12 @@
             } while (!done && !this.sync.halt);
 
             console.log("chadexEvents: " + JSON.stringify(chadexEvents, null, 2));
-            console.log("pairs: " + JSON.stringify(pairs, null, 2));
-            console.log("tokens: " + JSON.stringify(tokens, null, 2));
+            // console.log("pairs: " + JSON.stringify(pairs, null, 2));
+            console.log("tokens: " + JSON.stringify(tokens));
+            console.log("addressToIndex: " + JSON.stringify(tempAddressToIndex));
+            console.log("indexToAddress: " + JSON.stringify(tempIndexToAddress));
+            console.log("pairToIndex: " + JSON.stringify(pairToIndex));
+            console.log("indexToPair: " + JSON.stringify(indexToPair));
 
             Vue.set(this, "addressToIndex", tempAddressToIndex);
             Vue.set(this, "indexToAddress", tempIndexToAddress);
@@ -3068,7 +3079,15 @@
             }).catch(function(error) {
               console.log("error: " + error);
             });
-            await context.db.cache.put({ objectName: this.chainId + "_pairs", object: pairs }).then (function() {
+            await context.db.cache.put({ objectName: this.chainId + "_indexToPair", object: indexToPair }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            await context.db.cache.put({ objectName: this.chainId + "_pairToIndex", object: pairToIndex }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            await context.db.cache.put({ objectName: this.chainId + "_tokens", object: tokens }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
             });
