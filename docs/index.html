@@ -2892,7 +2892,9 @@
 
                 const records = [];
                 const eventLogs = await context.provider.getLogs(filter);
-                console.log("eventLogs: " + JSON.stringify(eventLogs, null, 2));
+                if (eventLogs.length > 0) {
+                  console.log("eventLogs: " + JSON.stringify(eventLogs, null, 2));
+                }
 
                 // const logs = await context.provider.getLogs({ address: CHADEXADDRESS_SEPOLIA, fromBlock, toBlock, topics: transferTopics });
                 // for (const event of logs) {
@@ -2949,7 +2951,7 @@
                 //   count++;
                 // }
                 // this.sync.completed = count;
-                console.log(moment().format("HH:mm:ss") + " syncChadex #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newTransfers: " + "newTransfers");
+                console.log(moment().format("HH:mm:ss") + " syncChadex #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] events: " + eventLogs.length);
                 fromBlock = toBlock;
               } catch (e) {
                 console.log(e);
