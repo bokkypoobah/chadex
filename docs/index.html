@@ -2940,17 +2940,20 @@
                 done = fromBlock >= context.confirmedBlockNumber;
                 // done = true; // TODO
               } while (!done && !this.sync.halt);
+            }
 
-              Vue.set(this, "addressToIndex", tempAddressToIndex);
-              Vue.set(this, "indexToAddress", tempIndexToAddress);
-              await context.db.cache.put({ objectName: "indexToAddress", object: tempIndexToAddress }).then (function() {
-              }).catch(function(error) {
-                console.log("error: " + error);
-              });
-              await context.db.cache.put({ objectName: "addressToIndex", object: tempAddressToIndex }).then (function() {
-              }).catch(function(error) {
-                console.log("error: " + error);
-              });
+            Vue.set(this, "addressToIndex", tempAddressToIndex);
+            Vue.set(this, "indexToAddress", tempIndexToAddress);
+            await context.db.cache.put({ objectName: "indexToAddress", object: tempIndexToAddress }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            await context.db.cache.put({ objectName: "addressToIndex", object: tempAddressToIndex }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+
+            if (false) {
               await context.db.cache.put({ objectName: context.address + "_transfers", object: transfers }).then (function() {
               }).catch(function(error) {
                 console.log("error: " + error);
@@ -2960,6 +2963,7 @@
               await this.syncENSNames(context, Object.keys(newAccounts));
               await this.syncBlockTimestamps(context, Object.keys(newBlocks));
             }
+
           },
 
 
@@ -4497,13 +4501,13 @@
             // console.log("indexToAddressDataItems.length: " + indexToAddressDataItems.length);
             if (indexToAddressDataItems.length == 1) {
               this.indexToAddress = indexToAddressDataItems[0].object;
-              // console.log("indexToAddress: " + JSON.stringify(this.indexToAddress));
+              console.log("indexToAddress: " + JSON.stringify(this.indexToAddress));
             }
             const addressToIndexDataItems = await db0.cache.where("objectName").equals('addressToIndex').toArray();
             // console.log("addressToIndexDataItems.length: " + addressToIndexDataItems.length);
             if (addressToIndexDataItems.length == 1) {
               this.addressToIndex = addressToIndexDataItems[0].object;
-              // console.log("addressToIndex: " + JSON.stringify(this.addressToIndex));
+              console.log("addressToIndex: " + JSON.stringify(this.addressToIndex));
             }
 
             db0.close();
