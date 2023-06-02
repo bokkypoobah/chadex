@@ -59,7 +59,7 @@
             <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings()" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'View info'">Info</b-nav-item>
             <!-- <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings()" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'View/edit my accounts'">Accounts</b-nav-item> -->
             <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
-            <b-button size="sm" variant="outline-primary" class="ml-1" @click="processIt('connect')" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
+            <b-button size="sm" variant="outline-primary" class="ml-1" @click="processIt('connect'); syncAll();" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
         </b-navbar>
 
@@ -166,9 +166,6 @@
                 <div v-if="!sync.section" class="mt-0 pr-1">
                   <b-button size="sm" @click="syncPairs('pairs')" variant="primary" v-b-popover.hover.top="'Sync Pairs'">Sync</b-button>
                 </div>
-                <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncAll(0)" variant="primary" v-b-popover.hover.top="'Sync Pairs'">Sync (New)</b-button>
-                </div>
                 <div class="mt-1" style="width: 250px;">
                   <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
                     <b-progress-bar :value="sync.completed">
@@ -223,9 +220,6 @@
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
                   <b-button size="sm" @click="syncPairs('pair')" variant="primary" v-b-popover.hover.top="'Sync selected pair'">Sync</b-button>
-                </div>
-                <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncAll(0)" variant="primary" v-b-popover.hover.top="'Sync selected pair'">Sync (new)</b-button>
                 </div>
                 <div class="mt-1" style="width: 250px;">
                   <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
@@ -3090,12 +3084,22 @@
 
           async syncChadexPair(context) {
             console.log("syncChadexPair - latestBlockNumber: " + context.latestBlockNumber);
-            console.log("this.settings.pairTable.selectedPair: " + this.settings.pairTable.selectedPair);
-            console.log("this.pairToIndex: " + JSON.stringify(this.pairToIndex, null, 2));
-            console.log("this.indexToPair: " + JSON.stringify(this.indexToPair, null, 2));
+            const PRICE_EMPTY = 0;
+            const GET_ORDERS_BATCH_SIZE = 20;
+            // console.log("this.settings.pairTable.selectedPair: " + this.settings.pairTable.selectedPair);
+            // console.log("this.pairToIndex: " + JSON.stringify(this.pairToIndex, null, 2));
+            // console.log("this.indexToPair: " + JSON.stringify(this.indexToPair, null, 2));
+            const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, context.provider);
             if (this.settings.pairTable.selectedPair in this.pairToIndex) {
               const pairIndex = this.pairToIndex[this.settings.pairTable.selectedPair];
-              console.log("pairIndex: " + pairIndex);
+              // console.log("pairIndex: " + pairIndex);
+              for (let buySell = 0; buySell < 2; buySell++) {
+                let price = PRICE_EMPTY;
+                let firstOrderKey = ORDERKEY_SENTINEL;
+                // TODO: Cycle until desired # orders retrieved
+                const orders = await chadexContract.getOrders(this.settings.pairTable.selectedPair, buySell, GET_ORDERS_BATCH_SIZE, price, firstOrderKey);
+                console.log("orders: " + JSON.stringify(orders, null, 2));
+              }
             }
           },
 
