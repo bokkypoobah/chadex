@@ -17,7 +17,7 @@
     <script src="js/vue.js"></script>
     <script src="js/bootstrap-vue.min.js"></script>
     <script src="js/bootstrap-vue-icons.min.js"></script>
-    <script src="js/ethers-5.6.umd.min.js" type="application/javascript"></script>
+    <script src="js/ethers-5.7.umd.min.js" type="application/javascript"></script>
     <script src="js/moment.min.js"></script>
     <script src="js/dexie.js"></script>
     <script src="globals.js"></script>
@@ -927,10 +927,39 @@
           </b-card>
         </b-card>
         <b-card no-header body-class="m-0 p-0" class="m-0 p-0 border-0">
-          <b-card-text class="text-right">
-            gm, and enjoy! <i>chadex</i> &copy; Bok Consulting Pty Ltd 2023
-          </b-card-text>
-        </b-card no-header>
+          <div class="d-flex flex-wrap m-0 p-0">
+            <div v-if="false" class="mt-0 pr-1">
+              <b-form-input type="text" size="sm" v-model.trim="settings.tokensTable.tokenFilter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Token id and name filter'" placeholder="🔍 token id/name regex" style="min-width: 8.0rem;"></b-form-input>
+            </div>
+            <div v-if="false" class="mt-0 pr-1">
+              <b-form-input type="text" size="sm" v-model.trim="settings.tokensTable.collectionfilter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Collection name filter'" placeholder="🔍 collection name" style="min-width: 8.0rem;"></b-form-input>
+            </div>
+            <div v-if="false" class="mt-0 pr-1">
+              <b-button size="sm" :pressed.sync="settings.showAdditionalFilters" @click="saveSettings" variant="link" v-b-popover.hover.top="'Additional filters'"><span v-if="settings.showAdditionalFilters"><b-icon-funnel-fill shift-v="+1" font-scale="1.0"></b-icon-funnel-fill></span><span v-else><b-icon-funnel shift-v="+1" font-scale="1.0"></b-icon-funnel></span></b-button>
+            </div>
+            <div class="ml-0 mt-1 pl-1">
+              <font v-if="connected" size="-2">
+                <b-link v-if="coinbase" :href="'https://sepolia.etherscan.io/address/' + coinbase" v-b-popover.hover.bottom="'Coinbase'" target="_blank">
+                  {{ coinbase.substring(0, 10) }}
+                </b-link>
+                <b-link v-if="chainId" :href="'https://sepolia.etherscan.io/'" v-b-popover.hover.bottom="'Network'" target="_blank">
+                  {{ chainId == '11155111' ? 'Sepolia' : 'Unsupported' }}
+                </b-link>
+                <b-link v-if="blockNumber" :href="'https://sepolia.etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="'Latest block'" target="_blank">
+                  {{ '#' + commify(blockNumber) }}
+                </b-link>
+                <b-link v-if="blockNumber" :href="'https://sepolia.etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="'Latest block timestamp'" target="_blank">
+                  {{ formatTimestamp(timestamp) }}
+                </b-link>
+              </font>
+            </div>
+            <div class="mt-0 flex-grow-1">
+            </div>
+            <div class="mt-0 pl-1 pr-1">
+              gm, and enjoy! <i>chadex</i> &copy; Bok Consulting Pty Ltd 2023
+            </div>
+          </div>
+        </b-card>
       </b-container>
     </div>
 
@@ -939,8 +968,12 @@
         el: '#app',
         // --- DATA ---
         data: {
-          coinbase: null,
+          connected: false,
           chainId: null,
+          coinbase: null,
+          blockNumber: null,
+          timestamp: null,
+
           settings: {
             tabIndex: 0,
             showAdditionalFilters: false,
@@ -1426,7 +1459,7 @@
           filteredPairs() {
             const results = [];
             const filterRegex = this.settings.pairsTable.filter && this.settings.pairsTable.filter.length > 0 ? new RegExp(this.settings.pairsTable.filter, 'i') : null;
-            console.log("filterRegex: " + JSON.stringify(filterRegex));
+            // console.log("filterRegex: " + JSON.stringify(filterRegex));
             for (const [pairKey, pair] of Object.entries(this.pairs)) {
               // console.log("filteredPairs - pairKey: " + pairKey + ", pair: " + JSON.stringify(pair, null, 2));
               let include = true;
@@ -1453,7 +1486,7 @@
             return this.filteredSortedPairs.slice((this.settings.pairsTable.currentPage - 1) * this.settings.pairsTable.pageSize, this.settings.pairsTable.currentPage * this.settings.pairsTable.pageSize);
           },
           filteredPairBuyOrders() {
-            console.log("filteredPairBuyOrders");
+            // console.log("filteredPairBuyOrders");
             const results = [];
             if (this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
@@ -1475,7 +1508,7 @@
             return results;
           },
           filteredPairSellOrders() {
-            console.log("filteredPairSellOrders");
+            // console.log("filteredPairSellOrders");
             const results = [];
             if (this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
@@ -1497,7 +1530,7 @@
             return results;
           },
           filteredPairHistory() {
-            console.log("filteredPairHistory");
+            // console.log("filteredPairHistory");
             const results = [];
             if (this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
@@ -1521,7 +1554,7 @@
                 });
               }
             }
-            console.log("filteredPairHistory: " + JSON.stringify(results, null, 2));
+            // console.log("filteredPairHistory: " + JSON.stringify(results, null, 2));
             return results;
           },
           filteredSortedPairBuyOrders() {
@@ -3586,7 +3619,7 @@
             let count = 0;
             for (const [coinAddress, coinInfo] of Object.entries(this.settings.tokens)) {
               if (coinInfo.include) {
-                console.log(moment().format("HH:mm:ss") + " loadCurrentData: " + coinAddress + " " + coinInfo.symbol + " " + coinInfo.name);
+                // console.log(moment().format("HH:mm:ss") + " loadCurrentData: " + coinAddress + " " + coinInfo.symbol + " " + coinInfo.name);
                 const tokenIndex = this.addressToIndex[coinAddress];
                 if (!(tokenIndex in indexToSymbols)) {
                   indexToSymbols[tokenIndex] = coinInfo.symbol;
@@ -3946,6 +3979,60 @@
               document.getSelection().addRange(selected);
             }
           },
+          async connectToWeb3() {
+            console.log("connectToWeb3");
+            if (!window.ethereum) {
+              this.connected = false;
+            } else {
+              try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                this.connected = window.ethereum.isConnected();
+              } catch (e) {
+                console.log("window.ethereum.request error: " + e.message);
+                this.connected = false;
+              }
+            }
+            console.log("connectToWeb3 - connected: " + this.connected);
+            if (!this.connected) {
+              alert("Please use the https://metamask.io addon with Firefox, Chromium, Opera or Chrome, or any other other web3 browser, for web3 data retrieval. And refresh!");
+            } else {
+              const t = this;
+
+              console.log("connectToWeb3 - installing listeners");
+              function handleChainChanged(_chainId) {
+                t.chainId = _chainId;
+                console.log("this.chainId: " + t.chainId);
+                alert('Ethereum chain has changed - reloading this page.')
+                window.location.reload();
+              }
+              window.ethereum.on('chainChanged', handleChainChanged);
+
+              const provider = new ethers.providers.Web3Provider(window.ethereum);
+              async function handleAccountsChanged(accounts) {
+                console.log("handleAccountsChanged: " + JSON.stringify(accounts));
+                const signer = provider.getSigner();
+                t.coinbase = await signer.getAddress();
+                console.log("this.coinbase: " + t.coinbase);
+              }
+              window.ethereum.on('accountsChanged', handleAccountsChanged);
+
+              async function handleNewBlock(blockNumber) {
+                console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + JSON.stringify(blockNumber));
+                const block = await provider.getBlock();
+                t.blockNumber = blockNumber;
+                t.timestamp = block.timestamp;
+              }
+              provider.on("block", handleNewBlock);
+
+
+              const signer = provider.getSigner();
+              this.coinbase = await signer.getAddress();
+              const network = await provider.getNetwork();
+              console.log("network: " + JSON.stringify(network));
+              this.chainId = network.chainId;
+              console.log("this.chainId: " + this.chainId);
+            }
+          },
           // async processIt(action, parameters = null) {
           //   console.log("processIt - action: " + action + ", parameters: " + parameters);
           // },
@@ -3980,9 +4067,13 @@
               const blockNumber = block.number;
               const timestamp = block.timestamp;
 
+              provider.off("block");
+              // provider.removeAllListeners("block");
               provider.on("block", async (n) => {
                 console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + JSON.stringify(n));
               });
+              const listenerCount = provider.listenerCount("block");
+              console.log("listenerCount: " + listenerCount);
 
               const ENSOWNERBATCHSIZE = 100; // 500 fails occassionally
 
@@ -4212,18 +4303,27 @@
 
         // --- MOUNTED ---
         mounted() {
-          if ('chadexCoinbase' in localStorage) {
-            this.coinbase = localStorage.chadexCoinbase;
-          }
-          if ('chadexChainId' in localStorage) {
-            this.chainId = localStorage.chadexChainId;
-          }
+          // if ('chadexConnectV1' in localStorage) {
+          //   this.connect = localStorage.chadexConnectV1;;
+          // }
+          (async() => {
+            console.log("mounted - Before connectToWeb3");
+            await this.connectToWeb3();
+            console.log("mounted - After connectToWeb3");
+          })();
+
+          // if ('chadexCoinbase' in localStorage) {
+          //   this.coinbase = localStorage.chadexCoinbase;
+          // }
+          // if ('chadexChainId' in localStorage) {
+          //   this.chainId = localStorage.chadexChainId;
+          // }
           if ('chadexPairsV1' in localStorage) {
             this.pairs = JSON.parse(localStorage.chadexPairsV1);
           }
           if ('chadexPairV1' in localStorage) {
             this.pair = JSON.parse(localStorage.chadexPairV1);
-            console.log("this.pair: " + JSON.stringify(this.pair, null, 2));
+            // console.log("this.pair: " + JSON.stringify(this.pair, null, 2));
           }
           if ('chadexSettings' in localStorage) {
             const tempSettings = JSON.parse(localStorage.chadexSettings);
@@ -4235,6 +4335,10 @@
             }
           }
           (async() => {
+            // console.log("mounted - Before connectToWeb3");
+            // await this.connectToWeb3();
+            // console.log("mounted - After connectToWeb3");
+            //
             const db0 = new Dexie(this.db.name);
             db0.version(this.db.version).stores(this.db.schemaDefinition);
             const blockTimestampsDataItems = await db0.cache.where("objectName").equals('blockTimestamps').toArray();
