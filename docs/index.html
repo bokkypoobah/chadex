@@ -2858,15 +2858,12 @@
             const tempIndexToAddress = this.indexToAddress;
             for (const address of [CHADEXADDRESS_SEPOLIA, this.coinbase]) {
               if (!(address in tempAddressToIndex)) {
-                const index = tempIndexToAddress.length;
-                tempAddressToIndex[address] = index;
+                tempAddressToIndex[address] = tempIndexToAddress.length;
                 tempIndexToAddress.push(address);
               }
             }
             const chadexAddressIndex = tempAddressToIndex[CHADEXADDRESS_SEPOLIA];
             const coinbaseIndex = tempAddressToIndex[this.coinbase];
-            // console.log("chadexAddressIndex: " + chadexAddressIndex + " => " + tempIndexToAddress[chadexAddressIndex]);
-            // console.log("coinbaseIndex: " + coinbaseIndex + " => " + tempIndexToAddress[coinbaseIndex]);
 
             do {
               if (batchSize > 1000 && parseInt(fromBlock) + batchSize > context.latestBlockNumber) {
@@ -2874,7 +2871,6 @@
               }
               batchSize = (batchSize > 10) ? batchSize: 10; // avoid divide by 0
               let toBlock = (parseInt(fromBlock) + batchSize < context.latestBlockNumber) ? (parseInt(fromBlock) + batchSize) : context.latestBlockNumber;
-              // const transferTopics = [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', null, null ];
               try {
                 const records = [];
                 const filter = { address: CHADEXADDRESS_SEPOLIA, fromBlock, toBlock, topics: [null, null, null] };
@@ -2891,11 +2887,21 @@
                       if (logData.eventFragment.name == "PairAdded") {
                         const [pairKey, maker, base, quote, baseDecimals, quoteDecimals, factors, timestamp] = logData.args;
                         const [multiplier, divisor] = factors;
-                        record = { action: "pairadded", pairKey, maker, base, quote, baseDecimals, quoteDecimals, multiplier, divisor, timestamp: parseInt(timestamp) };
+                        if (!(maker in tempAddressToIndex)) {
+                          tempAddressToIndex[maker] = tempIndexToAddress.length;
+                          tempIndexToAddress.push(maker);
+                        }
+                        const makerIndex = tempAddressToIndex[maker];
+                        record = { action: "pairadded", pairKey, makerIndex, maker, base, quote, baseDecimals, quoteDecimals, multiplier, divisor, timestamp: parseInt(timestamp) };
                       } else if (logData.eventFragment.name == "OrderAdded") {
                         const [pairKey, orderKey, maker, buySell, price, expiry, tokens, quoteTokens, timestamp] = logData.args;
                         const pair = this.pairs[pairKey];
-                        record = { action: "orderadded", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, maker, buySell, price: ethers.BigNumber.from(price).toString(), expiry: parseInt(expiry), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), timestamp: parseInt(timestamp) };
+                        if (!(maker in tempAddressToIndex)) {
+                          tempAddressToIndex[maker] = tempIndexToAddress.length;
+                          tempIndexToAddress.push(maker);
+                        }
+                        const makerIndex = tempAddressToIndex[maker];
+                        record = { action: "orderadded", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, makerIndex, maker, buySell, price: ethers.BigNumber.from(price).toString(), expiry: parseInt(expiry), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), timestamp: parseInt(timestamp) };
                       } else if (logData.eventFragment.name == "OrderRemoved") {
                         // TODO event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, uint timestamp);
                       } else if (logData.eventFragment.name == "OrderUpdated") {
@@ -2904,11 +2910,24 @@
                         const [tradeInfo] = logData.args;
                         const [pairKey, orderKey, taker, maker, buySell, price, tokens, quoteTokens, timestamp] = tradeInfo;
                         const pair = this.pairs[pairKey];
-                        record = { action: "trade", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, taker, maker, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), timestamp: parseInt(timestamp) };
+                        for (const address of [taker, maker]) {
+                          if (!(address in tempAddressToIndex)) {
+                            tempAddressToIndex[address] = tempIndexToAddress.length;
+                            tempIndexToAddress.push(address);
+                          }
+                        }
+                        const takerIndex = tempAddressToIndex[taker];
+                        const makerIndex = tempAddressToIndex[maker];
+                        record = { action: "trade", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, takerIndex, taker, makerIndex, maker, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), timestamp: parseInt(timestamp) };
                       } else if (logData.eventFragment.name == "TradeSummary") {
                         const [pairKey, taker, buySell, price, tokens, quoteTokens, tokensOnOrder, timestamp] = logData.args;
                         const pair = this.pairs[pairKey];
-                        record = { action: "tradesummary", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, taker, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), tokensOnOrder: ethers.BigNumber.from(tokensOnOrder).toString(), timestamp: parseInt(timestamp) };
+                        if (!(taker in tempAddressToIndex)) {
+                          tempAddressToIndex[taker] = tempIndexToAddress.length;
+                          tempIndexToAddress.push(taker);
+                        }
+                        const takerIndex = tempAddressToIndex[taker];
+                        record = { action: "tradesummary", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, takerIndex, taker, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), tokensOnOrder: ethers.BigNumber.from(tokensOnOrder).toString(), timestamp: parseInt(timestamp) };
                       } else if (logData.eventFragment.name == "Message") {
                         // TODO event Message(address indexed from, address indexed to, bytes32 indexed pairKey, bytes32 orderKey, string topic, string text, uint timestamp);
                       }
@@ -2918,6 +2937,7 @@
                         if (!(blockNumber in chadexEvents)) {
                           chadexEvents[blockNumber] = confirmations < CONFIRMATIONS ? { unconfirmed: true } : {};
                         }
+                        // TODO: Handle confirmed?
                         if (!(transactionIndex in chadexEvents[blockNumber])) {
                           chadexEvents[blockNumber][transactionIndex] = {};
                         }
