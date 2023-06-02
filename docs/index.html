@@ -2678,7 +2678,7 @@
             const context = { provider, latestBlockNumber, db };
             if (this.chainId == CHAINID_SEPOLIA) {
               await this.syncChadexEvents(context);
-              await this.syncChadexState(context);
+              await this.syncChadexPairs(context);
             }
             // for (const [address, coinInfo] of Object.entries(this.settings.tokens)) {
             //   if (coinInfo.sync && !this.sync.halt) {
@@ -3065,10 +3065,9 @@
             // await this.syncBlockTimestamps(context, Object.keys(newBlocks));
           },
 
-          async syncChadexState(context) {
-            console.log("syncChadexState - latestBlockNumber: " + context.latestBlockNumber);
+          async syncChadexPairs(context) {
+            console.log("syncChadexPairs - latestBlockNumber: " + context.latestBlockNumber);
             const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, context.provider);
-
             const GET_PAIRS_BATCH_SIZE = 20;
             const GET_PAIRS_OFFSET = 0; // TODO: Create loop to collect > batch size
             const pairs = await chadexContract.getPairs(GET_PAIRS_BATCH_SIZE, GET_PAIRS_OFFSET);
@@ -3079,29 +3078,12 @@
               const pairIndex = this.pairToIndex[pairKey];
               const baseIndex = this.addressToIndex[baseAddress];
               const quoteIndex = this.addressToIndex[quoteAddress];
-
-              // console.log("pairKey: " + pairKey + ", pairIndex: " + pairIndex + ", baseIndex: " + baseIndex + ", quoteIndex: " + quoteIndex +
-              //   ", bestBuyOrder=" + JSON.stringify(bestBuyOrder) + ", bestSellOrder=" + JSON.stringify(bestSellOrder));
-              //
               const [buyPrice, buyOrderKey, buyNextOrderKey, buyMaker, buyExpiry, buyTokens, buyAvailableBase, buyAvailableQuote] = bestBuyOrder;
               const buyMakerIndex = this.addressToIndex[buyMaker];
               console.log("buyPrice: " + ethers.BigNumber.from(buyPrice).toString() + ", buyMakerIndex: " + buyMakerIndex + ", buyExpiry: " + parseInt(buyExpiry) + ", buyTokens: " + ethers.BigNumber.from(buyTokens).toString() + ", buyAvailableBase: " + ethers.BigNumber.from(buyAvailableBase).toString() + ", buyAvailableQuote: " + ethers.BigNumber.from(buyAvailableQuote).toString());
-
               const [sellPrice, sellOrderKey, sellNextOrderKey, sellMaker, sellExpiry, sellTokens, sellAvailableBase, sellAvailableQuote] = bestSellOrder;
               const sellMakerIndex = this.addressToIndex[sellMaker];
               console.log("sellPrice: " + ethers.BigNumber.from(sellPrice).toString() + ", sellMakerIndex: " + sellMakerIndex + ", sellExpiry: " + parseInt(sellExpiry) + ", sellTokens: " + ethers.BigNumber.from(sellTokens).toString() + ", sellAvailableBase: " + ethers.BigNumber.from(sellAvailableBase).toString() + ", sellAvailableQuote: " + ethers.BigNumber.from(sellAvailableQuote).toString());
-
-                // struct BestOrderResult {
-                //     Price price;
-                //     OrderKey orderKey;
-                //     OrderKey nextOrderKey;
-                //     Account maker;
-                //     Unixtime expiry;
-                //     Tokens tokens;
-                //     Tokens availableBase;
-                //     Tokens availableQuote;
-                // }
-
             }
           },
 
