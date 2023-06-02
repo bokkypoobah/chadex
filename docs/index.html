@@ -2991,11 +2991,10 @@
                       }
                       if (record) {
                         const confirmations = context.latestBlockNumber - blockNumber;
-                        // console.log("record: " + confirmations + " " + JSON.stringify(record, null, 2));
                         if (!(blockNumber in chadexEvents)) {
+                          // TODO: Delete confirmations when tested OK
                           chadexEvents[blockNumber] = confirmations < CONFIRMATIONS ? { unconfirmed: true, confirmations } : { confirmations };
                         }
-                        // TODO: Handle confirmed?
                         if (!(transactionIndex in chadexEvents[blockNumber])) {
                           chadexEvents[blockNumber][transactionIndex] = {};
                         }
@@ -3020,7 +3019,7 @@
               // done = true; // TODO
             } while (!done && !this.sync.halt);
 
-            // console.log("chadexEvents: " + JSON.stringify(chadexEvents, null, 2));
+            console.log("chadexEvents: " + JSON.stringify(chadexEvents, null, 2));
             // console.log("pairs: " + JSON.stringify(pairs, null, 2));
             // console.log("tokens: " + JSON.stringify(tokens));
             // console.log("addressToIndex: " + JSON.stringify(addressToIndex));
