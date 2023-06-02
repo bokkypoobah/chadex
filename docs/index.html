@@ -2851,7 +2851,6 @@
             // const newBlocks = {};
             // const newAccounts = {};
 
-
             const tempAddressToIndex = this.addressToIndex;
             const tempIndexToAddress = this.indexToAddress;
             for (const address of [CHADEXADDRESS_SEPOLIA, this.coinbase]) {
@@ -2863,84 +2862,102 @@
             }
             const chadexAddressIndex = tempAddressToIndex[CHADEXADDRESS_SEPOLIA];
             const coinbaseIndex = tempAddressToIndex[this.coinbase];
+            // console.log("chadexAddressIndex: " + chadexAddressIndex + " => " + tempIndexToAddress[chadexAddressIndex]);
+            // console.log("coinbaseIndex: " + coinbaseIndex + " => " + tempIndexToAddress[coinbaseIndex]);
 
-            console.log("chadexAddressIndex: " + chadexAddressIndex + " => " + tempIndexToAddress[chadexAddressIndex]);
-            console.log("coinbaseIndex: " + coinbaseIndex + " => " + tempIndexToAddress[coinbaseIndex]);
+            do {
+              if (batchSize > 1000 && parseInt(fromBlock) + batchSize > context.latestBlockNumber) {
+                batchSize = parseInt((context.latestBlockNumber - fromBlock) * 0.75);
+              }
+              batchSize = (batchSize > 10) ? batchSize: 10; // avoid divide by 0
+              let toBlock = (parseInt(fromBlock) + batchSize < context.latestBlockNumber) ? (parseInt(fromBlock) + batchSize) : context.latestBlockNumber;
+              // const transferTopics = [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', null, null ];
+              try {
 
-            if (false) {
-              do {
-                if (batchSize > 1000 && parseInt(fromBlock) + batchSize > context.confirmedBlockNumber) {
-                  batchSize = parseInt((context.confirmedBlockNumber - fromBlock) * 0.75);
-                }
-                batchSize = (batchSize > 10) ? batchSize: 10; // avoid divide by 0
-                let toBlock = (parseInt(fromBlock) + batchSize < context.confirmedBlockNumber) ? (parseInt(fromBlock) + batchSize) : context.confirmedBlockNumber;
-                const transferTopics = [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', null, null ];
-                try {
-                  const logs = await context.provider.getLogs({ address: context.address, fromBlock, toBlock, topics: transferTopics });
-                  for (const event of logs) {
-                    if (!event.removed) {
-                      const [eventBlockNumber, eventTransactionIndex, eventLogIndex] = [parseInt(event.blockNumber), parseInt(event.transactionIndex), parseInt(event.logIndex)];
-                      let from, to, tokens;
-                      if (event.topics.length == 4) {
-                        from = ethers.utils.getAddress('0x' + event.topics[1].substring(26));
-                        to = ethers.utils.getAddress('0x' + event.topics[2].substring(26));
-                        tokens = ethers.BigNumber.from(event.topics[3]).toString();
-                      } else if (event.topics.length == 3) {
-                        from = ethers.utils.getAddress('0x' + event.topics[1].substring(26));
-                        to = ethers.utils.getAddress('0x' + event.topics[2].substring(26));
-                        tokens = ethers.BigNumber.from(event.data).toString();
-                      } else if (event.topics.length == 1) {
-                        from = ethers.utils.getAddress('0x' + event.data.substring(26, 66));
-                        to = ethers.utils.getAddress('0x' + event.data.substring(90, 130));
-                        tokens = ethers.BigNumber.from('0x' + event.data.substring(130, 193)).toString();
-                      }
-                      if (!(eventBlockNumber in this.blockTimestamps) && !(eventBlockNumber in newBlocks)) {
-                        newBlocks[eventBlockNumber] = null;
-                      }
-                      if (!(from in this.indexToName) && !(from in newAccounts)) {
-                        newAccounts[from] = null;
-                      }
-                      if (!(to in this.indexToName) && !(to in newAccounts)) {
-                        newAccounts[to] = null;
-                      }
 
-                      for (const address of [from, to]) {
-                        if (!(address in tempAddressToIndex)) {
-                          const index = tempIndexToAddress.length;
-                          tempAddressToIndex[address] = index;
-                          tempIndexToAddress.push(address);
-                        }
-                      }
-                      const fromIndex = tempAddressToIndex[from];
-                      const toIndex = tempAddressToIndex[to];
+                const filter = {
+                  address: CHADEXADDRESS_SEPOLIA,
+                  fromBlock,
+                  toBlock,
+                  topics: [
+                    null,
+                    // [
+                    //   '0x077e1cf6babf9ad326aba5f77f1dc9829deb8eb27be7e883108bb3837ad0214e', // NewUmswap (index_topic_1 address creator, uint256 timestamp, index_topic_2 address umswap, index_topic_3 address collection, string name, uint256[] tokenIds)
+                    //   '0xecf7cba0a43f1cd8521a490776b3d7ce17c6521eb4e164acede254de0551ba7f', // Message (index_topic_1 address from, uint256 timestamp, index_topic_2 address to, index_topic_3 address umswapOrCollection, string topic, string message)
+                    // ],
+                    null,
+                    null,
+                  ],
+                };
 
-                      if (!(eventBlockNumber in transfers)) {
-                        transfers[eventBlockNumber] = {};
-                      }
-                      if (!(event.transactionIndex in transfers[eventBlockNumber])) {
-                        transfers[eventBlockNumber][eventTransactionIndex] = {};
-                      }
-                      if (!(event.transactionHash in transfers[eventBlockNumber][eventTransactionIndex])) {
-                        transfers[eventBlockNumber][eventTransactionIndex][event.transactionHash] = {};
-                      }
-                      if (!(event.logIndex in transfers[eventBlockNumber][eventTransactionIndex][event.transactionHash])) {
-                        transfers[eventBlockNumber][eventTransactionIndex][event.transactionHash][eventLogIndex] = [ fromIndex, toIndex, tokens ];
-                        newTransfers++;
-                      }
-                    }
-                    count++;
-                  }
-                  this.sync.completed = count;
-                  console.log(moment().format("HH:mm:ss") + " syncCoinTransfers " + context.address.substring(0, 10) + " " + context.symbol + " #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newTransfers: " + newTransfers);
-                  fromBlock = toBlock;
-                } catch (e) {
-                  console.log(e);
-                  batchSize = parseInt(batchSize * BATCHREDUCTIONFACTOR);
-                }
-                done = fromBlock >= context.confirmedBlockNumber;
-                // done = true; // TODO
-              } while (!done && !this.sync.halt);
-            }
+                const records = [];
+                const eventLogs = await context.provider.getLogs(filter);
+                console.log("eventLogs: " + JSON.stringify(eventLogs, null, 2));
+
+                // const logs = await context.provider.getLogs({ address: CHADEXADDRESS_SEPOLIA, fromBlock, toBlock, topics: transferTopics });
+                // for (const event of logs) {
+                //   if (!event.removed) {
+                //     const [eventBlockNumber, eventTransactionIndex, eventLogIndex] = [parseInt(event.blockNumber), parseInt(event.transactionIndex), parseInt(event.logIndex)];
+                //     let from, to, tokens;
+                //     if (event.topics.length == 4) {
+                //       from = ethers.utils.getAddress('0x' + event.topics[1].substring(26));
+                //       to = ethers.utils.getAddress('0x' + event.topics[2].substring(26));
+                //       tokens = ethers.BigNumber.from(event.topics[3]).toString();
+                //     } else if (event.topics.length == 3) {
+                //       from = ethers.utils.getAddress('0x' + event.topics[1].substring(26));
+                //       to = ethers.utils.getAddress('0x' + event.topics[2].substring(26));
+                //       tokens = ethers.BigNumber.from(event.data).toString();
+                //     } else if (event.topics.length == 1) {
+                //       from = ethers.utils.getAddress('0x' + event.data.substring(26, 66));
+                //       to = ethers.utils.getAddress('0x' + event.data.substring(90, 130));
+                //       tokens = ethers.BigNumber.from('0x' + event.data.substring(130, 193)).toString();
+                //     }
+                //     if (!(eventBlockNumber in this.blockTimestamps) && !(eventBlockNumber in newBlocks)) {
+                //       newBlocks[eventBlockNumber] = null;
+                //     }
+                //     if (!(from in this.indexToName) && !(from in newAccounts)) {
+                //       newAccounts[from] = null;
+                //     }
+                //     if (!(to in this.indexToName) && !(to in newAccounts)) {
+                //       newAccounts[to] = null;
+                //     }
+                //
+                //     for (const address of [from, to]) {
+                //       if (!(address in tempAddressToIndex)) {
+                //         const index = tempIndexToAddress.length;
+                //         tempAddressToIndex[address] = index;
+                //         tempIndexToAddress.push(address);
+                //       }
+                //     }
+                //     const fromIndex = tempAddressToIndex[from];
+                //     const toIndex = tempAddressToIndex[to];
+                //
+                //     if (!(eventBlockNumber in transfers)) {
+                //       transfers[eventBlockNumber] = {};
+                //     }
+                //     if (!(event.transactionIndex in transfers[eventBlockNumber])) {
+                //       transfers[eventBlockNumber][eventTransactionIndex] = {};
+                //     }
+                //     if (!(event.transactionHash in transfers[eventBlockNumber][eventTransactionIndex])) {
+                //       transfers[eventBlockNumber][eventTransactionIndex][event.transactionHash] = {};
+                //     }
+                //     if (!(event.logIndex in transfers[eventBlockNumber][eventTransactionIndex][event.transactionHash])) {
+                //       transfers[eventBlockNumber][eventTransactionIndex][event.transactionHash][eventLogIndex] = [ fromIndex, toIndex, tokens ];
+                //       newTransfers++;
+                //     }
+                //   }
+                //   count++;
+                // }
+                // this.sync.completed = count;
+                console.log(moment().format("HH:mm:ss") + " syncChadex #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newTransfers: " + "newTransfers");
+                fromBlock = toBlock;
+              } catch (e) {
+                console.log(e);
+                batchSize = parseInt(batchSize * BATCHREDUCTIONFACTOR);
+              }
+              done = fromBlock >= context.latestBlockNumber;
+              // done = true; // TODO
+            } while (!done && !this.sync.halt);
 
             Vue.set(this, "addressToIndex", tempAddressToIndex);
             Vue.set(this, "indexToAddress", tempIndexToAddress);
@@ -4145,7 +4162,6 @@
               alert("Please use the https://metamask.io addon with Firefox, Chromium, Opera or Chrome, or any other other web3 browser, for web3 data retrieval. And refresh!");
             } else {
               const t = this;
-
               console.log("connectToWeb3 - installing listeners");
               function handleChainChanged(_chainId) {
                 t.chainId = _chainId;
@@ -4154,16 +4170,13 @@
                 window.location.reload();
               }
               window.ethereum.on('chainChanged', handleChainChanged);
-
               const provider = new ethers.providers.Web3Provider(window.ethereum);
               async function handleAccountsChanged(accounts) {
-                console.log("handleAccountsChanged: " + JSON.stringify(accounts));
                 const signer = provider.getSigner();
                 t.coinbase = await signer.getAddress();
-                console.log("this.coinbase: " + t.coinbase);
+                console.log("handleAccountsChanged: " + t.coinbase);
               }
               window.ethereum.on('accountsChanged', handleAccountsChanged);
-
               async function handleNewBlock(blockNumber) {
                 console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + JSON.stringify(blockNumber));
                 const block = await provider.getBlock();
@@ -4172,18 +4185,14 @@
                 await t.syncAll(blockNumber);
               }
               provider.on("block", handleNewBlock);
-
               const signer = provider.getSigner();
               this.coinbase = await signer.getAddress();
               const network = await provider.getNetwork();
-              console.log("network: " + JSON.stringify(network));
               this.chainId = network.chainId;
               console.log("this.chainId: " + this.chainId);
             }
           },
-          // async processIt(action, parameters = null) {
-          //   console.log("processIt - action: " + action + ", parameters: " + parameters);
-          // },
+          // TODO: Delete
           async processIt(action, parameters = null) {
             console.log("processIt - action: " + action + ", parameters: " + parameters);
             let connected = true;
