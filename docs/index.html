@@ -2832,7 +2832,7 @@
           },
 
           async syncChadex(context) {
-            const CONFIRMATIONS = 1730;
+            const CONFIRMATIONS = 1780;
             console.log("syncChadex - latestBlockNumber: " + context.latestBlockNumber);
             // console.log("syncChadex: " + JSON.stringify(context));
             // this.sync.completed = 0;
@@ -2935,7 +2935,7 @@
                         const confirmations = context.latestBlockNumber - blockNumber;
                         // console.log("record: " + confirmations + " " + JSON.stringify(record, null, 2));
                         if (!(blockNumber in chadexEvents)) {
-                          chadexEvents[blockNumber] = confirmations < CONFIRMATIONS ? { unconfirmed: true } : {};
+                          chadexEvents[blockNumber] = confirmations < CONFIRMATIONS ? { unconfirmed: true, confirmations } : { confirmations };
                         }
                         // TODO: Handle confirmed?
                         if (!(transactionIndex in chadexEvents[blockNumber])) {
@@ -2945,7 +2945,7 @@
                           chadexEvents[blockNumber][transactionIndex][txHash] = {};
                         }
                         if (!(logIndex in chadexEvents[blockNumber][transactionIndex][txHash])) {
-                          chadexEvents[blockNumber][transactionIndex][txHash][logIndex] = record;
+                          chadexEvents[blockNumber][transactionIndex][txHash][logIndex] = { record };
                           newChadexEvents++;
                         }
                       }
