@@ -3085,19 +3085,28 @@
           async syncChadexPair(context) {
             console.log("syncChadexPair - latestBlockNumber: " + context.latestBlockNumber);
             const PRICE_EMPTY = 0;
-            const GET_ORDERS_BATCH_SIZE = 20;
-            // console.log("this.settings.pairTable.selectedPair: " + this.settings.pairTable.selectedPair);
-            // console.log("this.pairToIndex: " + JSON.stringify(this.pairToIndex, null, 2));
-            // console.log("this.indexToPair: " + JSON.stringify(this.indexToPair, null, 2));
+            const GET_ORDERS_BATCH_SIZE = 10;
             const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, context.provider);
             if (this.settings.pairTable.selectedPair in this.pairToIndex) {
               const pairIndex = this.pairToIndex[this.settings.pairTable.selectedPair];
               // console.log("pairIndex: " + pairIndex);
+              const orders = {};
               for (let buySell = 0; buySell < 2; buySell++) {
                 let price = PRICE_EMPTY;
                 let firstOrderKey = ORDERKEY_SENTINEL;
-                // TODO: Cycle until desired # orders retrieved
-                const orders = await chadexContract.getOrders(this.settings.pairTable.selectedPair, buySell, GET_ORDERS_BATCH_SIZE, price, firstOrderKey);
+                orders[buySell] = [];
+                let results = await chadexContract.getOrders(this.settings.pairTable.selectedPair, buySell, GET_ORDERS_BATCH_SIZE, price, firstOrderKey);
+                // console.log("results: " + JSON.stringify(results, null, 2));
+                while (parseInt(results[0][0]) != 0) {
+                  for (let k = 0; k < results.length && parseInt(results[k][0]) != 0; k++) {
+                    // console.log(JSON.stringify(results[k]));
+                    const makerIndex = this.addressToIndex[results[k][3]];
+                    orders[buySell].push({ price: parseInt(results[k][0]), orderKey: results[k][1], nextOrderKey: results[k][2], makerIndex, expiry: parseInt(results[k][4]), tokens: results[k][5].toString(), availableBase: results[k][6].toString(), availableQuote: results[k][7].toString() })
+                    price = results[k][0];
+                    firstOrderKey = results[k][2];
+                  }
+                  results = await chadexContract.getOrders(this.settings.pairTable.selectedPair, buySell, GET_ORDERS_BATCH_SIZE, price, firstOrderKey);
+                }
                 console.log("orders: " + JSON.stringify(orders, null, 2));
               }
             }
