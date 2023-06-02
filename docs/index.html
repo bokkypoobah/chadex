@@ -2891,9 +2891,16 @@
                 };
 
                 const records = [];
+                const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, context.provider);
                 const eventLogs = await context.provider.getLogs(filter);
                 if (eventLogs.length > 0) {
-                  console.log("eventLogs: " + JSON.stringify(eventLogs, null, 2));
+                  // console.log("eventLogs: " + JSON.stringify(eventLogs, null, 2));
+                  for (const event of eventLogs) {
+                    if (!event.removed) {
+                      const logData = chadexContract.interface.parseLog(event);
+                      console.log("logData: " + JSON.stringify(logData, null, 2));
+                    }
+                  }
                 }
 
                 // const logs = await context.provider.getLogs({ address: CHADEXADDRESS_SEPOLIA, fromBlock, toBlock, topics: transferTopics });
