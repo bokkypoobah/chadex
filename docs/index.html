@@ -2975,7 +2975,7 @@
                         }
                         const takerIndex = addressToIndex[taker];
                         const makerIndex = addressToIndex[maker];
-                        record = { action: "trade", pairIndex, orderKey, takerIndex, makerIndex, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), timestamp: parseInt(timestamp) };
+                        record = [ "trade", pairIndex, orderKey, takerIndex, makerIndex, buySell, ethers.BigNumber.from(price).toString(), ethers.BigNumber.from(tokens).toString(), ethers.BigNumber.from(quoteTokens).toString(), parseInt(timestamp) ];
                       } else if (logData.eventFragment.name == "TradeSummary") {
                         const [pairKey, taker, buySell, price, tokens, quoteTokens, tokensOnOrder, timestamp] = logData.args;
                         const pairIndex = pairToIndex[pairKey];
@@ -2984,7 +2984,7 @@
                           indexToAddress.push(taker);
                         }
                         const takerIndex = addressToIndex[taker];
-                        record = { action: "tradesummary", pairIndex, takerIndex, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), tokensOnOrder: ethers.BigNumber.from(tokensOnOrder).toString(), timestamp: parseInt(timestamp) };
+                        record = [ "tradesummary", pairIndex, takerIndex, buySell, ethers.BigNumber.from(price).toString(), ethers.BigNumber.from(tokens).toString(), ethers.BigNumber.from(quoteTokens).toString(), ethers.BigNumber.from(tokensOnOrder).toString(), parseInt(timestamp) ];
                       } else if (logData.eventFragment.name == "Message") {
                         // TODO event Message(address indexed from, address indexed to, bytes32 indexed pairKey, bytes32 orderKey, string topic, string text, uint timestamp);
                       }
