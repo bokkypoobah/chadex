@@ -2898,7 +2898,40 @@
                   for (const event of eventLogs) {
                     if (!event.removed) {
                       const logData = chadexContract.interface.parseLog(event);
-                      console.log("logData: " + JSON.stringify(logData, null, 2));
+                      // console.log("logData: " + JSON.stringify(logData, null, 2));
+                      // console.log(logData.eventFragment.name + ": " + JSON.stringify(event));
+                      const txHash = event.transactionHash;
+                      const blockNumber = event.blockNumber;
+                      const transactionIndex = event.transactionIndex;
+                      const logIndex = event.logIndex;
+                      let record = null;
+                      if (logData.eventFragment.name == "PairAdded") {
+                        const [pairKey, maker, base, quote, baseDecimals, quoteDecimals, factors, timestamp] = logData.args;
+                        const [multiplier, divisor] = factors;
+                        record = { action: "pairadded", pairKey, maker, base, quote, baseDecimals, quoteDecimals, multiplier, divisor, timestamp: parseInt(timestamp) };
+                      } else if (logData.eventFragment.name == "OrderAdded") {
+                        const [pairKey, orderKey, maker, buySell, price, expiry, tokens, quoteTokens, timestamp] = logData.args;
+                        const pair = this.pairs[pairKey];
+                        record = { action: "orderadded", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, maker, buySell, price: ethers.BigNumber.from(price).toString(), expiry: parseInt(expiry), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), timestamp: parseInt(timestamp) };
+                      } else if (logData.eventFragment.name == "OrderRemoved") {
+                        // TODO event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, uint timestamp);
+                      } else if (logData.eventFragment.name == "OrderUpdated") {
+                        // TODO event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens, uint timestamp);
+                      } else if (logData.eventFragment.name == "Trade") {
+                        const [tradeInfo] = logData.args;
+                        const [pairKey, orderKey, taker, maker, buySell, price, tokens, quoteTokens, timestamp] = tradeInfo;
+                        const pair = this.pairs[pairKey];
+                        record = { action: "trade", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, orderKey, taker, maker, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), timestamp: parseInt(timestamp) };
+                      } else if (logData.eventFragment.name == "TradeSummary") {
+                        const [pairKey, taker, buySell, price, tokens, quoteTokens, tokensOnOrder, timestamp] = logData.args;
+                        const pair = this.pairs[pairKey];
+                        record = { action: "tradesummary", pairKey, base: pair.base.address, quote: pair.quote.address, baseDecimals: pair.base.decimals, quoteDecimals: pair.base.quoteDecimals, taker, buySell, price: ethers.BigNumber.from(price).toString(), tokens: ethers.BigNumber.from(tokens).toString(), quoteTokens: ethers.BigNumber.from(quoteTokens).toString(), tokensOnOrder: ethers.BigNumber.from(tokensOnOrder).toString(), timestamp: parseInt(timestamp) };
+                      } else if (logData.eventFragment.name == "Message") {
+                        // TODO event Message(address indexed from, address indexed to, bytes32 indexed pairKey, bytes32 orderKey, string topic, string text, uint timestamp);
+                      }
+                      if (record) {
+                        console.log("record: " + JSON.stringify(record, null, 2));
+                      }
                     }
                   }
                 }
