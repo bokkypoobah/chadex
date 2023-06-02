@@ -2832,6 +2832,7 @@
           },
 
           async syncChadex(context) {
+            const CONFIRMATIONS = 1730;
             console.log("syncChadex - latestBlockNumber: " + context.latestBlockNumber);
             // console.log("syncChadex: " + JSON.stringify(context));
             // this.sync.completed = 0;
@@ -2848,9 +2849,10 @@
             let done = false;
             let fromBlock = startBlock;
             let count = 0;
-            // let newTransfers = 0;
+            let newChadexEvents = 0;
             // const newBlocks = {};
             // const newAccounts = {};
+            const chadexEvents = {};
 
             const tempAddressToIndex = this.addressToIndex;
             const tempIndexToAddress = this.indexToAddress;
@@ -2878,12 +2880,9 @@
                 const filter = { address: CHADEXADDRESS_SEPOLIA, fromBlock, toBlock, topics: [null, null, null] };
                 const eventLogs = await context.provider.getLogs(filter);
                 if (eventLogs.length > 0) {
-                  // console.log("eventLogs: " + JSON.stringify(eventLogs, null, 2));
                   for (const event of eventLogs) {
                     if (!event.removed) {
                       const logData = chadexContract.interface.parseLog(event);
-                      // console.log("logData: " + JSON.stringify(logData, null, 2));
-                      // console.log(logData.eventFragment.name + ": " + JSON.stringify(event));
                       const txHash = event.transactionHash;
                       const blockNumber = event.blockNumber;
                       const transactionIndex = event.transactionIndex;
@@ -2914,7 +2913,21 @@
                         // TODO event Message(address indexed from, address indexed to, bytes32 indexed pairKey, bytes32 orderKey, string topic, string text, uint timestamp);
                       }
                       if (record) {
-                        console.log("record: " + JSON.stringify(record, null, 2));
+                        const confirmations = context.latestBlockNumber - blockNumber;
+                        // console.log("record: " + confirmations + " " + JSON.stringify(record, null, 2));
+                        if (!(blockNumber in chadexEvents)) {
+                          chadexEvents[blockNumber] = confirmations < CONFIRMATIONS ? { unconfirmed: true } : {};
+                        }
+                        if (!(transactionIndex in chadexEvents[blockNumber])) {
+                          chadexEvents[blockNumber][transactionIndex] = {};
+                        }
+                        if (!(txHash in chadexEvents[blockNumber][transactionIndex])) {
+                          chadexEvents[blockNumber][transactionIndex][txHash] = {};
+                        }
+                        if (!(logIndex in chadexEvents[blockNumber][transactionIndex][txHash])) {
+                          chadexEvents[blockNumber][transactionIndex][txHash][logIndex] = record;
+                          newChadexEvents++;
+                        }
                       }
                     }
                   }
@@ -2975,7 +2988,7 @@
                 //   count++;
                 // }
                 // this.sync.completed = count;
-                console.log(moment().format("HH:mm:ss") + " syncChadex #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] events: " + eventLogs.length);
+                console.log(moment().format("HH:mm:ss") + " syncChadex #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newChadexEvents: " + newChadexEvents);
                 fromBlock = toBlock;
               } catch (e) {
                 console.log(e);
@@ -2984,6 +2997,8 @@
               done = fromBlock >= context.latestBlockNumber;
               // done = true; // TODO
             } while (!done && !this.sync.halt);
+
+            console.log("chadexEvents: " + JSON.stringify(chadexEvents, null, 2));
 
             Vue.set(this, "addressToIndex", tempAddressToIndex);
             Vue.set(this, "indexToAddress", tempIndexToAddress);
