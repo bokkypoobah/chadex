@@ -2841,13 +2841,12 @@
             const GET_PAIRS_BATCH_SIZE = 20;
             const GET_PAIRS_OFFSET = 0; // TODO: Create loop to collect > batch size
             const pairs = await chadexContract.getPairs(GET_PAIRS_BATCH_SIZE, GET_PAIRS_OFFSET);
-            console.log("pairs: " + JSON.stringify(pairs, null, 2));
-            // for (let i = 0; i < pairs.length && pairs[i][0] != 0; i++) {
-            //   const [pairKey, base, quote, factors, bestBuyOrder, bestSellOrder] = pairs[i];
-            //   console.log("            pairKey: " + pairKey + ", base=" + JSON.stringify(base) + ", quote=" + JSON.stringify(quote) +
-            //     ", factors=" + factors +
-            //     ", bestBuyOrder=" + JSON.stringify(bestBuyOrder) + ", bestSellOrder=" + JSON.stringify(bestSellOrder));
-            // }
+            for (let i = 0; i < pairs.length && pairs[i][0] != 0; i++) {
+              const [pairKey, base, quote, factors, bestBuyOrder, bestSellOrder] = pairs[i];
+              console.log("pairKey: " + pairKey + ", base=" + JSON.stringify(base) + ", quote=" + JSON.stringify(quote) +
+                ", factors=" + factors +
+                ", bestBuyOrder=" + JSON.stringify(bestBuyOrder) + ", bestSellOrder=" + JSON.stringify(bestSellOrder));
+            }
 
           },
           async syncChadexEvents(context) {
