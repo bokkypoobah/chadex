@@ -296,9 +296,25 @@
                 <b-col class="ml-0 mr-0 pl-0 pr-1">
                   <b-card no-body no-header bg-variant="light" class="m-0 p-0 w-100">
                     <b-card-body class="m-1 p-1">
-                      <b-form-group label-cols-lg="3" :label="'Sell ' + (pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || '')" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
-                        Blah
-                        <!-- {{ pairs[settings.pairTable.selectedPair].base.symbol }} -->
+                      <b-form-group label-cols-lg="1" label="Sell" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
+                        <b-form-group :label="(pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Amount') + ' :'" label-for="raw-tokens" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
+                          <b-form-input type="text" size="sm" id="raw-tokens" v-model.trim="raw.tokens" placeholder="1.01234567891234567" class="w-50"></b-form-input>
+                        </b-form-group>
+                        <b-form-group label="Price:" label-for="raw-price" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Raw price with up to 12 whole-number and 11 decimal places" class="mx-0 my-1 p-0">
+                          <b-form-input type="text" size="sm" id="raw-price" v-model.trim="raw.price" placeholder="e.g. 0.69012345678" class="w-50"></b-form-input>
+                        </b-form-group>
+                        <b-form-group label="Target Price:" label-for="raw-targetprice" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Target price ONLY when filling orders (max for Buy, min for Sell, 0 to ignore)" class="mx-0 my-1 p-0">
+                          <b-form-input type="text" size="sm" id="raw-targetprice" v-model.trim="raw.targetPrice" placeholder="e.g. 0.69015" class="w-50"></b-form-input>
+                        </b-form-group>
+                        <b-form-group label="Expiry:" label-for="raw-expiry" label-size="sm" label-cols-sm="2" label-align-sm="right"  description="Unix time. '0' for no expiry" class="mx-0 my-1 p-0">
+                          <b-form-input type="text" size="sm" id="raw-expiry" v-model.trim="raw.expiry" placeholder="e.g. '1704027599' for 23:59:59 31/12/2023" class="w-25"></b-form-input>
+                        </b-form-group>
+                        <b-form-group label="Action:" label-for="raw-action" label-size="sm" label-cols-sm="2" label-align-sm="right" description="'0' fill, '1' fill or kill, '2' fill & add order, '3' remove order, '4' update expiry and tokens" class="mx-0 my-1 p-0">
+                          <b-form-input type="text" size="sm" id="raw-action" v-model.trim="raw.action" placeholder="'0' to '4'" class="w-25"></b-form-input>
+                        </b-form-group>
+                        <b-form-group label="" label-for="raw-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                          <b-button size="sm" :disabled="false" id="raw-submit" @click="executeRaw()" variant="warning">SELL</b-button>
+                        </b-form-group>
                       </b-form-group>
                     </b-card-body>
                   </b-card>
@@ -306,8 +322,25 @@
                 <b-col class="ml-0 mr-0 pl-1 pr-0">
                   <b-card no-body no-header bg-variant="light" class="m-0 p-0 w-100">
                     <b-card-body class="m-1 p-1">
-                      <b-form-group label-cols-lg="3" :label="'Buy ' + (pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || '')" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
-                        Blah
+                      <b-form-group label-cols-lg="1" label="Buy" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
+                        <b-form-group :label="(pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Amount') + ' :'" label-for="raw-tokens" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
+                          <b-form-input type="text" size="sm" id="raw-tokens" v-model.trim="raw.tokens" placeholder="1.01234567891234567" class="w-50"></b-form-input>
+                        </b-form-group>
+                        <b-form-group label="Price:" label-for="raw-price" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Raw price with up to 12 whole-number and 11 decimal places" class="mx-0 my-1 p-0">
+                          <b-form-input type="text" size="sm" id="raw-price" v-model.trim="raw.price" placeholder="e.g. 0.69012345678" class="w-50"></b-form-input>
+                        </b-form-group>
+                        <b-form-group label="Target Price:" label-for="raw-targetprice" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Target price ONLY when filling orders (max for Buy, min for Sell, 0 to ignore)" class="mx-0 my-1 p-0">
+                          <b-form-input type="text" size="sm" id="raw-targetprice" v-model.trim="raw.targetPrice" placeholder="e.g. 0.69015" class="w-50"></b-form-input>
+                        </b-form-group>
+                        <b-form-group label="Expiry:" label-for="raw-expiry" label-size="sm" label-cols-sm="2" label-align-sm="right"  description="Unix time. '0' for no expiry" class="mx-0 my-1 p-0">
+                          <b-form-input type="text" size="sm" id="raw-expiry" v-model.trim="raw.expiry" placeholder="e.g. '1704027599' for 23:59:59 31/12/2023" class="w-25"></b-form-input>
+                        </b-form-group>
+                        <b-form-group label="Action:" label-for="raw-action" label-size="sm" label-cols-sm="2" label-align-sm="right" description="'0' fill, '1' fill or kill, '2' fill & add order, '3' remove order, '4' update expiry and tokens" class="mx-0 my-1 p-0">
+                          <b-form-input type="text" size="sm" id="raw-action" v-model.trim="raw.action" placeholder="'0' to '4'" class="w-25"></b-form-input>
+                        </b-form-group>
+                        <b-form-group label="" label-for="raw-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                          <b-button size="sm" :disabled="false" id="raw-submit" @click="executeRaw()" variant="warning">BUY</b-button>
+                        </b-form-group>
                       </b-form-group>
                     </b-card-body>
                   </b-card>
