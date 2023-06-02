@@ -2673,7 +2673,8 @@
             db.version(this.db.version).stores(this.db.schemaDefinition);
             const context = { provider, latestBlockNumber, db };
             if (this.chainId == CHAINID_SEPOLIA) {
-              await this.syncChadex(context);
+              await this.syncChadexEvents(context);
+              await this.syncChadexState(context);
             }
             // for (const [address, coinInfo] of Object.entries(this.settings.tokens)) {
             //   if (coinInfo.sync && !this.sync.halt) {
@@ -2833,9 +2834,25 @@
             });
           },
 
-          async syncChadex(context) {
+          async syncChadexState(context) {
+            console.log("syncChadexState - latestBlockNumber: " + context.latestBlockNumber);
+            const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, context.provider);
+
+            const GET_PAIRS_BATCH_SIZE = 20;
+            const GET_PAIRS_OFFSET = 0; // TODO: Create loop to collect > batch size
+            const pairs = await chadexContract.getPairs(GET_PAIRS_BATCH_SIZE, GET_PAIRS_OFFSET);
+            console.log("pairs: " + JSON.stringify(pairs, null, 2));
+            // for (let i = 0; i < pairs.length && pairs[i][0] != 0; i++) {
+            //   const [pairKey, base, quote, factors, bestBuyOrder, bestSellOrder] = pairs[i];
+            //   console.log("            pairKey: " + pairKey + ", base=" + JSON.stringify(base) + ", quote=" + JSON.stringify(quote) +
+            //     ", factors=" + factors +
+            //     ", bestBuyOrder=" + JSON.stringify(bestBuyOrder) + ", bestSellOrder=" + JSON.stringify(bestSellOrder));
+            // }
+
+          },
+          async syncChadexEvents(context) {
             const CONFIRMATIONS = 20;
-            console.log("syncChadex - latestBlockNumber: " + context.latestBlockNumber);
+            console.log("syncChadexEvents - latestBlockNumber: " + context.latestBlockNumber);
             const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, context.provider);
             let batchSize = 100000000;
             const BATCHREDUCTIONFACTOR = 0.50;
@@ -3008,7 +3025,7 @@
                     }
                   }
                 }
-                console.log(moment().format("HH:mm:ss") + " syncChadex #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newChadexEvents: " + newChadexEvents);
+                console.log(moment().format("HH:mm:ss") + " syncChadexEvents #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newChadexEvents: " + newChadexEvents);
                 fromBlock = toBlock;
               } catch (e) {
                 console.log(e);
@@ -3018,7 +3035,7 @@
               // done = true; // TODO
             } while (!done && !this.sync.halt);
 
-            console.log("chadexEvents: " + JSON.stringify(chadexEvents, null, 2));
+            // console.log("chadexEvents: " + JSON.stringify(chadexEvents, null, 2));
             // console.log("pairs: " + JSON.stringify(pairs, null, 2));
             // console.log("tokens: " + JSON.stringify(tokens));
             // console.log("addressToIndex: " + JSON.stringify(addressToIndex));
