@@ -2913,10 +2913,10 @@
                           const quoteIndex = tempAddressToIndex[quote];
                           pairs[pairKey] = {
                             baseIndex,
-                            base,
+                            // base,
                             baseDecimals,
                             quoteIndex,
-                            quote,
+                            // quote,
                             quoteDecimals,
                             factors,
                             timestamp: parseInt(timestamp),
@@ -3060,11 +3060,15 @@
 
             Vue.set(this, "addressToIndex", tempAddressToIndex);
             Vue.set(this, "indexToAddress", tempIndexToAddress);
-            await context.db.cache.put({ objectName: "indexToAddress", object: tempIndexToAddress }).then (function() {
+            await context.db.cache.put({ objectName: this.chainId + "_indexToAddress", object: tempIndexToAddress }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
             });
-            await context.db.cache.put({ objectName: "addressToIndex", object: tempAddressToIndex }).then (function() {
+            await context.db.cache.put({ objectName: this.chainId + "_addressToIndex", object: tempAddressToIndex }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            await context.db.cache.put({ objectName: this.chainId + "_pairs", object: pairs }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
             });
