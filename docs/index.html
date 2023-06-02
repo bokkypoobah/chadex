@@ -2838,21 +2838,6 @@
             });
           },
 
-          async syncChadexState(context) {
-            console.log("syncChadexState - latestBlockNumber: " + context.latestBlockNumber);
-            const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, context.provider);
-
-            const GET_PAIRS_BATCH_SIZE = 20;
-            const GET_PAIRS_OFFSET = 0; // TODO: Create loop to collect > batch size
-            const pairs = await chadexContract.getPairs(GET_PAIRS_BATCH_SIZE, GET_PAIRS_OFFSET);
-            for (let i = 0; i < pairs.length && pairs[i][0] != 0; i++) {
-              const [pairKey, base, quote, factors, bestBuyOrder, bestSellOrder] = pairs[i];
-              console.log("pairKey: " + pairKey + ", base=" + JSON.stringify(base) + ", quote=" + JSON.stringify(quote) +
-                ", factors=" + factors +
-                ", bestBuyOrder=" + JSON.stringify(bestBuyOrder) + ", bestSellOrder=" + JSON.stringify(bestSellOrder));
-            }
-
-          },
           async syncChadexEvents(context) {
             const CONFIRMATIONS = 20;
             console.log("syncChadexEvents - latestBlockNumber: " + context.latestBlockNumber);
@@ -2862,7 +2847,6 @@
             let done = false;
             let count = 0;
             let newChadexEvents = 0;
-
             let indexToAddress = [];
             let addressToIndex = {};
             const indexToAddressDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
@@ -2910,7 +2894,6 @@
             // console.log("blockNumbers: " + JSON.stringify(blockNumbers));
             const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: 0;
             console.log("startBlock: " + startBlock);
-
             for (const address of [CHADEXADDRESS_SEPOLIA, this.coinbase]) {
               if (!(address in addressToIndex)) {
                 addressToIndex[address] = indexToAddress.length;
@@ -2919,9 +2902,7 @@
             }
             const chadexAddressIndex = addressToIndex[CHADEXADDRESS_SEPOLIA];
             const coinbaseIndex = addressToIndex[this.coinbase];
-
             let fromBlock = startBlock;
-
             do {
               if (batchSize > 1000 && parseInt(fromBlock) + batchSize > context.latestBlockNumber) {
                 batchSize = parseInt((context.latestBlockNumber - fromBlock) * 0.75);
@@ -3056,6 +3037,8 @@
             }).catch(function(error) {
               console.log("error: " + error);
             });
+            Vue.set(this, "pairToIndex", pairToIndex);
+            Vue.set(this, "indexToPair", indexToPair);
             await context.db.cache.put({ objectName: this.chainId + "_indexToPair", object: indexToPair }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
@@ -3073,19 +3056,29 @@
               console.log("error: " + error);
             });
 
-            if (false) {
-              await context.db.cache.put({ objectName: context.address + "_transfers", object: transfers }).then (function() {
-              }).catch(function(error) {
-                console.log("error: " + error);
-              });
-
-              newAccounts[this.coinbase] = null;
-              await this.syncENSNames(context, Object.keys(newAccounts));
-              await this.syncBlockTimestamps(context, Object.keys(newBlocks));
-            }
-
+            // await context.db.cache.put({ objectName: context.address + "_transfers", object: transfers }).then (function() {
+            // }).catch(function(error) {
+            //   console.log("error: " + error);
+            // });
+            // newAccounts[this.coinbase] = null;
+            // await this.syncENSNames(context, Object.keys(newAccounts));
+            // await this.syncBlockTimestamps(context, Object.keys(newBlocks));
           },
 
+          async syncChadexState(context) {
+            console.log("syncChadexState - latestBlockNumber: " + context.latestBlockNumber);
+            const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, context.provider);
+
+            const GET_PAIRS_BATCH_SIZE = 20;
+            const GET_PAIRS_OFFSET = 0; // TODO: Create loop to collect > batch size
+            const pairs = await chadexContract.getPairs(GET_PAIRS_BATCH_SIZE, GET_PAIRS_OFFSET);
+            for (let i = 0; i < pairs.length && pairs[i][0] != 0; i++) {
+              const [pairKey, base, quote, factors, bestBuyOrder, bestSellOrder] = pairs[i];
+              console.log("pairKey: " + pairKey + ", base=" + JSON.stringify(base) + ", quote=" + JSON.stringify(quote) +
+                ", factors=" + factors +
+                ", bestBuyOrder=" + JSON.stringify(bestBuyOrder) + ", bestSellOrder=" + JSON.stringify(bestSellOrder));
+            }
+          },
 
           async syncCoinTransfers(context) {
             this.sync.completed = 0;
