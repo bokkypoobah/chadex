@@ -2856,13 +2856,37 @@
             // const newAccounts = {};
             const chadexEvents = {};
 
-            const pairToIndex = {};
-            const indexToPair = [];
+            let indexToAddress = [];
+            let addressToIndex = {};
+            const indexToAddressDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
+            if (indexToAddressDataItems.length == 1) {
+              indexToAddress = indexToAddressDataItems[0].object;
+              console.log("indexToAddress: " + JSON.stringify(indexToAddress));
+            }
+            const addressToIndexDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
+            if (addressToIndexDataItems.length == 1) {
+              addressToIndex = addressToIndexDataItems[0].object;
+              console.log("addressToIndex: " + JSON.stringify(addressToIndex));
+            }
+            let indexToPair = [];
+            let pairToIndex = {};
+            const indexToPairDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_indexToPair").toArray();
+            if (indexToPairDataItems.length == 1) {
+              indexToPair = indexToPairDataItems[0].object;
+              console.log("indexToPair: " + JSON.stringify(indexToPair));
+            }
+            const pairToIndexDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_pairToIndex").toArray();
+            if (pairToIndexDataItems.length == 1) {
+              pairToIndex = pairToIndexDataItems[0].object;
+              console.log("pairToIndex: " + JSON.stringify(pairToIndex));
+            }
+            let tokens = {};
+            const tokensDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_tokens").toArray();
+            if (tokensDataItems.length == 1) {
+              tokens = tokensDataItems[0].object;
+              console.log("tokens: " + JSON.stringify(tokens));
+            }
 
-            const tokens = {};
-
-            const addressToIndex = {};
-            const indexToAddress = [];
             for (const address of [CHADEXADDRESS_SEPOLIA, this.coinbase]) {
               if (!(address in addressToIndex)) {
                 addressToIndex[address] = indexToAddress.length;
