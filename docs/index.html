@@ -1476,7 +1476,7 @@
           pairsOptions() {
             const results = [ { value: null, text: '(select)' } ];
             for (const item of this.filteredPairs) {
-              results.push({ value: item.pairKey, text: item.base.symbol + '/' + item.quote.symbol });
+              results.push({ value: item.pairKey, text: item.baseSymbol + '/' + item.quoteSymbol });
             }
             return results;
           },
