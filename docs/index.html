@@ -1541,14 +1541,27 @@
             // console.log("filterRegex: " + JSON.stringify(filterRegex));
 
             for (const pair of this.indexToPair) {
-              console.log("xx pair: " + JSON.stringify(pair, null, 2))
-
-              // const baseToken = this.tokens[]
+              console.log("pair: " + JSON.stringify(pair, null, 2))
+              const baseToken = this.tokens[pair.baseIndex];
+              const quoteToken = this.tokens[pair.quoteIndex];
+              results.push({
+                pairKey: pair.pairKey,
+                baseToken: this.indexToAddress[pair.baseIndex],
+                baseSymbol: baseToken.symbol,
+                baseDecimals: baseToken.decimals,
+                quoteToken: this.indexToAddress[pair.quoteIndex],
+                quoteSymbol: quoteToken.symbol,
+                quoteDecimals: quoteToken.decimals,
+                multiplier: pair.multiplier,
+                divisor: pair.divisor,
+                bestBuyOrder: pair.bestBuyOrder,
+                bestSellOrder: pair.bestSellOrder,
+              });
             }
 
 
             for (const [pairKey, pair] of Object.entries(this.pairs)) {
-              console.log("filteredPairs - pairKey: " + pairKey + ", pair: " + JSON.stringify(pair, null, 2));
+              // console.log("filteredPairs - pairKey: " + pairKey + ", pair: " + JSON.stringify(pair, null, 2));
               let include = true;
               if (filterRegex) {
                 if (!filterRegex.test(pair.base.symbol) && !filterRegex.test(pair.base.name) && !filterRegex.test(pair.quote.symbol) && !filterRegex.test(pair.quote.name)) {
@@ -1556,10 +1569,10 @@
                 }
               }
               if (include) {
-                results.push({
-                  pairKey,
-                  ...pair,
-                });
+                // results.push({
+                //   pairKey,
+                //   ...pair,
+                // });
               }
             }
             return results;
@@ -3113,6 +3126,7 @@
 
             Vue.set(this, "addressToIndex", addressToIndex);
             Vue.set(this, "indexToAddress", indexToAddress);
+            Vue.set(this, "tokens", tokens);
             await context.db.cache.put({ objectName: this.chainId + "_indexToAddress", object: indexToAddress }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
@@ -3190,7 +3204,7 @@
             }).catch(function(error) {
               console.log("error: " + error);
             });
-            console.log("Saved this.indexToPair: " + JSON.stringify(this.indexToPair, null, 2));
+            // console.log("this.indexToPair: " + JSON.stringify(this.indexToPair, null, 2));
           },
 
           async syncChadexPair(context) {
