@@ -192,6 +192,18 @@
                 </div>
               </div>
               <b-table small fixed striped responsive hover :fields="pairsFields" :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1">
+                <template #cell(baseSymbol)="data">
+                  {{ sanitise(data.item.baseSymbol) }}
+                </template>
+                <template #cell(baseName)="data">
+                  {{ sanitise(data.item.baseName) }}
+                </template>
+                <template #cell(quoteSymbol)="data">
+                  {{ sanitise(data.item.quoteSymbol) }}
+                </template>
+                <template #cell(quoteName)="data">
+                  {{ sanitise(data.item.quoteName) }}
+                </template>
                 <template #cell(bestBidAmount)="data">
                   <div v-if="data.item.bestBuyOrder.tokens > 0">
                     {{ formatERC20(data.item.bestBuyOrder.tokens, data.item.baseDecimals) }}
@@ -4260,6 +4272,9 @@
             }
             return null;
           },
+          sanitise(str) {
+            return str.replace(/[^a-z0-9 \.,_-💪]/gim,"_").trim();
+          },
           formatTimestamp(ts) {
             if (ts != null) {
               return moment.unix(ts).format("YYYY-MM-DD HH:mm:ss");
@@ -4782,6 +4797,13 @@
               this.addressToIndex = addressToIndexDataItems[0].object;
               console.log("addressToIndex: " + JSON.stringify(this.addressToIndex));
             }
+
+            const tokensDataItems = await db0.cache.where("objectName").equals(this.chainId + "_tokens").toArray();
+            if (tokensDataItems.length == 1) {
+              this.tokens = tokensDataItems[0].object;
+              console.log("tokens: " + JSON.stringify(this.tokens));
+            }
+
             const indexToPairDataItems = await db0.cache.where("objectName").equals(this.chainId + "_indexToPair").toArray();
             if (indexToPairDataItems.length == 1) {
               this.indexToPair = indexToPairDataItems[0].object;
