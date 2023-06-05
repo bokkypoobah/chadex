@@ -218,7 +218,7 @@
                   <b-form-select size="sm" v-model="settings.pairsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
                 </div>
               </div>
-              <b-table small fixed striped responsive hover :fields="pairsFields" :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1">
+              <b-table small fixed striped responsive hover selectable select-mode="single" @row-selected="pairsRowSelected" :fields="pairsFields" :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1">
                 <template #cell(baseSymbol)="data">
                   <b-link @click="showModalTokenDetails(data.item.baseIndex);">{{ sanitise(data.item.baseSymbol) }}</b-link>
                 </template>
@@ -1373,8 +1373,8 @@
             { key: 'bestOfferAmount', label: 'Amount', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           pairBuyOrdersFields: [
-            { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 25%;', tdClass: 'text-left' },
-            { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'tokens', label: 'Amount', sortable: false, thStyle: 'width: 30%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'price', label: 'Buy Price', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
           ],
@@ -2162,6 +2162,13 @@
 
         // --- METHODS ---
         methods: {
+          pairsRowSelected(items) {
+            console.log("pairsRowSelected: " + JSON.stringify(items));
+            const pairKey = items[0].pairKey;
+            this.settings.pairTable.selectedPair = pairKey;
+            this.settings.tabIndex = 2;
+            // this.selected = items
+          },
           checkCoinFormValidity() {
             const valid = this.$refs.coinForm.checkValidity()
             if (this.newCoinAddress && this.newCoinAddress.length > 0) {
