@@ -142,6 +142,33 @@
             </b-form-group>
           </b-modal>
 
+          <b-modal id="modal-token-details" hide-footer size="lg">
+            <template #modal-title>
+              ERC-20 Token {{ modalTokenDetails.address }}
+              <b-link size="sm" :href="'https://sepolia.etherscan.io/token/' + modalTokenDetails.address + '?a=' + coinbase" target="_blank" variant="link" class="m-0 p-0" v-b-popover.hover.top="'View in etherscan.io'">
+                <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
+              </b-link>
+            </template>
+            <b-form-group label="Symbol:" label-for="modal-token-details-symbol" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-token-details-symbol" :value="modalTokenDetails.symbol" class="w-50"></b-form-input>
+            </b-form-group>
+            <b-form-group label="Name:" label-for="modal-token-details-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-token-details-name" :value="sanitise(modalTokenDetails.name)" class="w-50"></b-form-input>
+            </b-form-group>
+            <b-form-group label="Decimals:" label-for="modal-token-details-decimals" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-token-details-decimals" :value="modalTokenDetails.decimals" class="w-50"></b-form-input>
+            </b-form-group>
+            <b-form-group label="Balance:" label-for="modal-token-details-balance" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Get some test tokens in the Tokens tab" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-token-details-balance" :value="formatERC20(modalTokenDetails.balance, modalTokenDetails.decimals)" class="w-50"></b-form-input>
+            </b-form-group>
+            <b-form-group label="Allowance:" label-for="modal-token-details-allowance" label-size="sm" label-cols-sm="3" label-align-sm="right"  description="Allowance to chadex smart contract. Update this in the Tokens tab" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-token-details-allowance" :value="formatERC20(modalTokenDetails.allowance, modalTokenDetails.decimals)" class="w-50"></b-form-input>
+            </b-form-group>
+            <b-form-group label="Total Supply:" label-for="modal-token-details-totalsupply" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-token-details-totalsupply" :value="formatERC20(modalTokenDetails.totalSupply, modalTokenDetails.decimals)" class="w-50"></b-form-input>
+            </b-form-group>
+          </b-modal>
+
           <!-- 0:Home -->
           <b-card v-if="coinbase && settings.tabIndex == 0" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
@@ -163,7 +190,7 @@
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <div v-if="!sync.section" class="mt-0 pr-1">
+                <div v-if="false && !sync.section" class="mt-0 pr-1">
                   <b-button size="sm" @click="syncPairs('pairs')" variant="primary" v-b-popover.hover.top="'Sync Pairs'">Sync</b-button>
                 </div>
                 <div class="mt-1" style="width: 250px;">
@@ -193,13 +220,13 @@
               </div>
               <b-table small fixed striped responsive hover :fields="pairsFields" :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1">
                 <template #cell(baseSymbol)="data">
-                  {{ sanitise(data.item.baseSymbol) }}
+                  <b-link @click="showModalTokenDetails(data.item.baseIndex);">{{ sanitise(data.item.baseSymbol) }}</b-link>
                 </template>
                 <template #cell(baseName)="data">
                   {{ sanitise(data.item.baseName) }}
                 </template>
                 <template #cell(quoteSymbol)="data">
-                  {{ sanitise(data.item.quoteSymbol) }}
+                  <b-link @click="showModalTokenDetails(data.item.quoteIndex);">{{ sanitise(data.item.quoteSymbol) }}</b-link>
                 </template>
                 <template #cell(quoteName)="data">
                   {{ sanitise(data.item.quoteName) }}
@@ -224,8 +251,6 @@
                     {{ formatERC20(data.item.bestSellOrder.tokens, 18) }}
                   </div>
                 </template>
-              </b-table>
-              <b-table small fixed striped responsive hover :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1">
               </b-table>
             </b-card-text>
           </b-card>
@@ -1241,6 +1266,15 @@
             token: null,
             collection: null,
           },
+          modalTokenDetails: {
+            tokenIndex: null,
+            symbol: null,
+            name: null,
+            decimals: null,
+            balance: null,
+            allowance: null,
+            totalSupply: null,
+          },
 
           addressToIndex: {},
           indexToAddress: [],
@@ -1335,8 +1369,8 @@
             { key: 'quoteName', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
             { key: 'bestBidAmount', label: 'Amount', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'bestBid', label: 'Best Bid', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'bestOffer', label: 'Best Offer', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'bestOfferAmount', label: 'Amount', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'bestOffer', label: 'Best Offer', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'bestOfferAmount', label: 'Amount', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           pairBuyOrdersFields: [
             { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 25%;', tdClass: 'text-left' },
@@ -1583,10 +1617,12 @@
               if (include) {
                 results.push({
                   pairKey: pair.pairKey,
+                  baseIndex: pair.baseIndex,
                   baseToken: this.indexToAddress[pair.baseIndex],
                   baseSymbol: baseToken.symbol || "",
                   baseName: baseToken.name || "",
                   baseDecimals: baseToken.decimals,
+                  quoteIndex: pair.quoteIndex,
                   quoteToken: this.indexToAddress[pair.quoteIndex],
                   quoteSymbol: quoteToken.symbol || "",
                   quoteName: quoteToken.name || "",
@@ -2636,6 +2672,29 @@
             console.log("tx: " + JSON.stringify(tx, null, 2));
             console.log("txReceipt: " + JSON.stringify(txReceipt, null, 2));
             console.log(JSON.stringify(this.modalDetails, null, 2));
+          },
+          async showModalTokenDetails(tokenIndex) {
+            console.log("showModalTokenDetails: " + tokenIndex);
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+            // console.log("showModalDetails: " + JSON.stringify(item));
+            // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
+            // console.log(url);
+            // const data = await fetch(url).then(response => response.json());
+            // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
+            this.$bvModal.show('modal-token-details');
+            this.modalTokenDetails.tokenIndex = tokenIndex;
+            const token = this.tokens[tokenIndex] || {};
+            console.log("this.tokens: " + JSON.stringify(this.tokens, null, 2));
+            this.modalTokenDetails.address = this.indexToAddress[tokenIndex] || "?";
+            this.modalTokenDetails.symbol = token.symbol || "?";
+            this.modalTokenDetails.name = token.name || "?";
+            this.modalTokenDetails.decimals = token.decimals || "?";
+            const erc20 = new ethers.Contract(this.modalTokenDetails.address, ERC20ABI, provider);
+            this.modalTokenDetails.balance = ethers.BigNumber.from(await erc20.balanceOf(this.coinbase)).toString();
+            this.modalTokenDetails.allowance = ethers.BigNumber.from(await erc20.allowance(this.coinbase, CHADEXADDRESS_SEPOLIA)).toString();
+            this.modalTokenDetails.totalSupply = ethers.BigNumber.from(await erc20.totalSupply()).toString() || "?";
+            console.log("balance: " + this.modalTokenDetails.balance);
           },
           toggleSyncAccounts(items) {
             let someFalse = false;
@@ -4272,8 +4331,12 @@
             }
             return null;
           },
-          sanitise(str) {
-            return str.replace(/[^a-z0-9 \.,_-💪]/gim,"_").trim();
+          sanitise(str, length = 32) {
+            let result = str && str.replace(/[^a-z0-9 \.,_-💪]/gim,"_").trim() || "(null)";
+            if (result && length > 0) {
+              result = result.substring(0, length);
+            }
+            return result;
           },
           formatTimestamp(ts) {
             if (ts != null) {
