@@ -1387,7 +1387,7 @@
             34: "U3Collect",
           },
           db: {
-            name: "chadexdata089g",
+            name: "chadexdata089h",
             version: 1,
             schemaDefinition: {
               cache: '&objectName',
@@ -2753,7 +2753,7 @@
             if (this.chainId == CHAINID_SEPOLIA) {
               await this.syncChadexEvents(context);
               await this.syncChadexPairs(context);
-              await this.syncChadexPair(context);
+              // await this.syncChadexPair(context);
             }
             // for (const [address, coinInfo] of Object.entries(this.settings.tokens)) {
             //   if (coinInfo.sync && !this.sync.halt) {
@@ -3001,6 +3001,7 @@
                         const [pairKey, maker, base, quote, baseDecimals, quoteDecimals, factors, timestamp] = logData.args;
                         const [multiplier, divisor] = factors;
                         if (!(pairKey in pairToIndex)) {
+                          console.log("DKLFJDSLKJFJSDKLFJKLDSJFLKDSJKFJLKSDJFKLJDSLJF")
                           for (const address of [base, quote]) {
                             if (!(address in addressToIndex)) {
                               addressToIndex[address] = indexToAddress.length;
@@ -3016,7 +3017,7 @@
                           const baseIndex = addressToIndex[base];
                           const quoteIndex = addressToIndex[quote];
                           pairToIndex[pairKey] = indexToPair.length;
-                          indexToPair.push([ baseIndex, baseDecimals, quoteIndex, quoteDecimals, factors[0], factors[1], parseInt(timestamp) ]);
+                          indexToPair.push({ pairKey, baseIndex, baseDecimals, quoteIndex, quoteDecimals, multiplier: factors[0], divisor: factors[1], timestamp: parseInt(timestamp), bestBuyOrder: {}, bestSellOrder: {} });
                         }
                         if (!(maker in addressToIndex)) {
                           addressToIndex[maker] = indexToAddress.length;
@@ -3151,15 +3152,37 @@
               const [baseAddress, baseDecimals] = base;
               const [quoteAddress, quoteDecimals] = quote;
               const pairIndex = this.pairToIndex[pairKey];
+              const pair = this.indexToPair[pairIndex];
               const baseIndex = this.addressToIndex[baseAddress];
               const quoteIndex = this.addressToIndex[quoteAddress];
               const [buyPrice, buyOrderKey, buyNextOrderKey, buyMaker, buyExpiry, buyTokens, buyAvailableBase, buyAvailableQuote] = bestBuyOrder;
               const buyMakerIndex = this.addressToIndex[buyMaker];
-              console.log("buyPrice: " + ethers.BigNumber.from(buyPrice).toString() + ", buyMakerIndex: " + buyMakerIndex + ", buyExpiry: " + parseInt(buyExpiry) + ", buyTokens: " + ethers.BigNumber.from(buyTokens).toString() + ", buyAvailableBase: " + ethers.BigNumber.from(buyAvailableBase).toString() + ", buyAvailableQuote: " + ethers.BigNumber.from(buyAvailableQuote).toString());
+              Vue.set(this.indexToPair[pairIndex], "bestBuyOrder", {
+                price: ethers.BigNumber.from(buyPrice).toString(),
+                orderKey: buyOrderKey,
+                nextOrderKey: buyNextOrderKey,
+                expiry: parseInt(buyExpiry),
+                tokens: ethers.BigNumber.from(buyTokens).toString(),
+                availableBase: ethers.BigNumber.from(buyAvailableBase).toString(),
+                availableQuote: ethers.BigNumber.from(buyAvailableQuote).toString(),
+              });
               const [sellPrice, sellOrderKey, sellNextOrderKey, sellMaker, sellExpiry, sellTokens, sellAvailableBase, sellAvailableQuote] = bestSellOrder;
               const sellMakerIndex = this.addressToIndex[sellMaker];
-              console.log("sellPrice: " + ethers.BigNumber.from(sellPrice).toString() + ", sellMakerIndex: " + sellMakerIndex + ", sellExpiry: " + parseInt(sellExpiry) + ", sellTokens: " + ethers.BigNumber.from(sellTokens).toString() + ", sellAvailableBase: " + ethers.BigNumber.from(sellAvailableBase).toString() + ", sellAvailableQuote: " + ethers.BigNumber.from(sellAvailableQuote).toString());
+              Vue.set(this.indexToPair[pairIndex], "bestSellOrder", {
+                price: ethers.BigNumber.from(sellPrice).toString(),
+                orderKey: sellOrderKey,
+                nextOrderKey: sellNextOrderKey,
+                expiry: parseInt(sellExpiry),
+                tokens: ethers.BigNumber.from(sellTokens).toString(),
+                availableBase: ethers.BigNumber.from(sellAvailableBase).toString(),
+                availableQuote: ethers.BigNumber.from(sellAvailableQuote).toString(),
+              });
             }
+            await context.db.cache.put({ objectName: this.chainId + "_indexToPair", object: this.indexToPair }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            console.log("Saved this.indexToPair: " + JSON.stringify(this.indexToPair, null, 2));
           },
 
           async syncChadexPair(context) {
@@ -3169,6 +3192,8 @@
             const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, context.provider);
             if (this.settings.pairTable.selectedPair in this.pairToIndex) {
               const pairIndex = this.pairToIndex[this.settings.pairTable.selectedPair];
+              // const pair = this.indexToPair[pairIndex];
+              // console.log("pair: " + JSON.stringify(pair, null, 2));
               // console.log("pairIndex: " + pairIndex);
               const orders = {};
               for (let buySell = 0; buySell < 2; buySell++) {
