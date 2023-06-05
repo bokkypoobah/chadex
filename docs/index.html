@@ -1531,11 +1531,15 @@
             return null;
           },
           filteredPairs() {
+            console.log("filteredPairs: ");
+            // Vue.set(this, "pairToIndex", pairToIndex);
+            // Vue.set(this, "indexToPair", indexToPair);
+
             const results = [];
             const filterRegex = this.settings.pairsTable.filter && this.settings.pairsTable.filter.length > 0 ? new RegExp(this.settings.pairsTable.filter, 'i') : null;
             // console.log("filterRegex: " + JSON.stringify(filterRegex));
             for (const [pairKey, pair] of Object.entries(this.pairs)) {
-              // console.log("filteredPairs - pairKey: " + pairKey + ", pair: " + JSON.stringify(pair, null, 2));
+              console.log("filteredPairs - pairKey: " + pairKey + ", pair: " + JSON.stringify(pair, null, 2));
               let include = true;
               if (filterRegex) {
                 if (!filterRegex.test(pair.base.symbol) && !filterRegex.test(pair.base.name) && !filterRegex.test(pair.quote.symbol) && !filterRegex.test(pair.quote.name)) {
@@ -3172,12 +3176,10 @@
                 let firstOrderKey = ORDERKEY_SENTINEL;
                 orders[buySell] = [];
                 let results = await chadexContract.getOrders(this.settings.pairTable.selectedPair, buySell, GET_ORDERS_BATCH_SIZE, price, firstOrderKey);
-                // console.log("results: " + JSON.stringify(results, null, 2));
                 while (parseInt(results[0][0]) != 0) {
                   for (let k = 0; k < results.length && parseInt(results[k][0]) != 0; k++) {
-                    // console.log(JSON.stringify(results[k]));
                     const makerIndex = this.addressToIndex[results[k][3]];
-                    orders[buySell].push({ price: parseInt(results[k][0]), orderKey: results[k][1], nextOrderKey: results[k][2], makerIndex, expiry: parseInt(results[k][4]), tokens: results[k][5].toString(), availableBase: results[k][6].toString(), availableQuote: results[k][7].toString() })
+                    orders[buySell].push({ price: results[k][0].toString(), orderKey: results[k][1], nextOrderKey: results[k][2], makerIndex, expiry: parseInt(results[k][4]), tokens: results[k][5].toString(), availableBase: results[k][6].toString(), availableQuote: results[k][7].toString() })
                     price = results[k][0];
                     firstOrderKey = results[k][2];
                   }
