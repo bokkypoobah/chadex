@@ -191,7 +191,28 @@
                   <b-form-select size="sm" v-model="settings.pairsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
                 </div>
               </div>
-              <!-- <b-table small fixed striped responsive hover :fields="pairsFields" :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1"> -->
+              <b-table small fixed striped responsive hover :fields="pairsFields" :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1">
+                <template #cell(bestBidAmount)="data">
+                  <div v-if="data.item.bestBuyOrder.tokens > 0">
+                    {{ formatERC20(data.item.bestBuyOrder.tokens, data.item.baseDecimals) }}
+                  </div>
+                </template>
+                <template #cell(bestBid)="data">
+                  <div v-if="data.item.bestBuyOrder.price > 0">
+                    {{ formatERC20(data.item.bestBuyOrder.price, 12) }}
+                  </div>
+                </template>
+                <template #cell(bestOffer)="data">
+                  <div v-if="data.item.bestSellOrder.price > 0">
+                    {{ formatERC20(data.item.bestSellOrder.price, 12, data.item.baseDecimals) }}
+                  </div>
+                </template>
+                <template #cell(bestOfferAmount)="data">
+                  <div v-if="data.item.bestSellOrder.tokens > 0">
+                    {{ formatERC20(data.item.bestSellOrder.tokens, 18) }}
+                  </div>
+                </template>
+              </b-table>
               <b-table small fixed striped responsive hover :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1">
               </b-table>
             </b-card-text>
@@ -1295,11 +1316,15 @@
             { value: 10000, text: '10k' },
           ],
           pairsFields: [
-            { key: 'pairKey', label: 'Pair Key', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-            { key: 'base.symbol', label: 'Base', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-            { key: 'base.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
-            { key: 'quote.symbol', label: 'Quote', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-            { key: 'quote.name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+            // { key: 'pairKey', label: 'Pair Key', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
+            { key: 'baseSymbol', label: 'Base', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+            { key: 'baseName', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+            { key: 'quoteSymbol', label: 'Quote', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+            { key: 'quoteName', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+            { key: 'bestBidAmount', label: 'Amount', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'bestBid', label: 'Best Bid', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'bestOffer', label: 'Best Offer', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'bestOfferAmount', label: 'Amount', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
           ],
           pairBuyOrdersFields: [
             { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 25%;', tdClass: 'text-left' },
@@ -1532,12 +1557,11 @@
             return null;
           },
           filteredPairs() {
-            console.log("filteredPairs: ");
             const results = [];
             const filterRegex = this.settings.pairsTable.filter && this.settings.pairsTable.filter.length > 0 ? new RegExp(this.settings.pairsTable.filter, 'i') : null;
             for (const pair of this.indexToPair) {
-              const baseToken = this.tokens[pair.baseIndex];
-              const quoteToken = this.tokens[pair.quoteIndex];
+              const baseToken = this.tokens[pair.baseIndex] || {};
+              const quoteToken = this.tokens[pair.quoteIndex] || {};
               let include = true;
               if (filterRegex) {
                 if (!filterRegex.test(baseToken.symbol) && !filterRegex.test(baseToken.name) && !filterRegex.test(quoteToken.symbol) && !filterRegex.test(quoteToken.name)) {
@@ -1548,12 +1572,12 @@
                 results.push({
                   pairKey: pair.pairKey,
                   baseToken: this.indexToAddress[pair.baseIndex],
-                  baseSymbol: baseToken.symbol,
-                  baseName: baseToken.name,
+                  baseSymbol: baseToken.symbol || "",
+                  baseName: baseToken.name || "",
                   baseDecimals: baseToken.decimals,
                   quoteToken: this.indexToAddress[pair.quoteIndex],
-                  quoteSymbol: quoteToken.symbol,
-                  quoteName: quoteToken.name,
+                  quoteSymbol: quoteToken.symbol || "",
+                  quoteName: quoteToken.name || "",
                   quoteDecimals: quoteToken.decimals,
                   multiplier: pair.multiplier,
                   divisor: pair.divisor,
@@ -1562,7 +1586,7 @@
                 });
               }
             }
-            console.log("results: " + JSON.stringify(results, null, 2))
+            console.log("filteredPairs: " + JSON.stringify(results, null, 2))
             return results;
           },
           filteredSortedPairs() {
