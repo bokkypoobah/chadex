@@ -293,42 +293,43 @@ class Data {
           }
           console.log();
         }
+
+        // struct TradeEvent {
+        //     OrderKey orderKey;
+        //     Account taker; // address
+        //     Account maker; // address
+        //     BuySell buySell; // uint8
+        //     Price price; // uint128
+        //     Tokens filled; // int128
+        //     Tokens quoteFilled; // int128
+        //     uint48 blockNumber; // 2^48 = 281,474,976,710,656
+        //     uint48 timestamp; // 2^48 = 281,474,976,710,656
+        // }
+        // console.log("              # Block  Timestamp Pair Key   Order Key  Taker        Maker        B/S            Price                Filled   Quote Tokens Filled")
+        // console.log("            --- ----- ---------- ---------- ---------- ------------ ------------ ---- --------------- --------------------- ---------------------");
+        console.log("              # Block  Timestamp Taker        B/S            Price                   Filled      Quote Tokens Filled")
+        console.log("            --- ----- ---------- ------------ ---- --------------- ------------------------ ------------------------");
+        const tradeLength = await this.chadex.tradesLength(pair.pairKey);
+        const tradeEvents = await this.chadex.getTradeEvents(pair.pairKey, parseInt(tradeLength) + 1, 0); // Adding 1 to show empty record at end
+        for (let i = 0; i < tradeEvents.length && tradeEvents[i][0] != 0; i++) {
+          const [/*pairKey, orderKey, */taker, /*maker, */buySell, price, filled, quoteFilled, blockNumber, timestamp] = tradeEvents[i];
+          // var minutes = (timestamp - (now / 1000)) / 60;
+          console.log("              " + i + " " + this.padLeft(blockNumber, 5) + " " + timestamp + " " +
+            // pairKey.substring(0, 10) + " " +
+            // orderKey.substring(0, 10) + " " +
+            this.getShortAccountName(taker) + " " +
+            // this.getShortAccountName(maker) + " " +
+            (buySell == 1 ? "Buy  " : "Sell ") + " " +
+            this.padLeft(ethers.utils.formatUnits(price, 12), 14) + " " +
+            this.padLeft(ethers.utils.formatUnits(filled, 18), 24) + " " +
+            this.padLeft(ethers.utils.formatUnits(quoteFilled, 18), 24));
+          // console.log("            blockNumber: " + blockNumber + ", timestamp=" + timestamp + ", pairKey=" + pairKey + ", taker=" + taker +
+          //   ", buySell=" + buySell + ", price=" + ethers.utils.formatUnits(price, 12) + ", filled=" + ethers.utils.formatUnits(filled, 18) + ", quoteFilled=" + ethers.utils.formatUnits(quoteFilled, 18));
+        }
+        console.log();
+
       }
 
-      // struct TradeEvent {
-      //     PairKey pairKey; // bytes32
-      //     OrderKey orderKey;
-      //     Account taker; // address
-      //     Account maker; // address
-      //     BuySell buySell; // uint8
-      //     Price price; // uint128
-      //     Tokens filled; // int128
-      //     Tokens quoteFilled; // int128
-      //     uint48 blockNumber; // 2^48 = 281,474,976,710,656
-      //     uint48 timestamp; // 2^48 = 281,474,976,710,656
-      // }
-      // console.log("              # Block  Timestamp Pair Key   Order Key  Taker        Maker        B/S            Price                Filled   Quote Tokens Filled")
-      // console.log("            --- ----- ---------- ---------- ---------- ------------ ------------ ---- --------------- --------------------- ---------------------");
-      console.log("              # Block  Timestamp Pair Key   Taker        B/S            Price                   Filled      Quote Tokens Filled")
-      console.log("            --- ----- ---------- ---------- ------------ ---- --------------- ------------------------ ------------------------");
-      const tradeLength = await this.chadex.tradesLength();
-      const tradeEvents = await this.chadex.getTradeEvents(parseInt(tradeLength) + 1, 0); // Adding 1 to show empty record at end
-      for (let i = 0; i < tradeEvents.length && tradeEvents[i][0] != 0; i++) {
-        const [pairKey, /*orderKey, */taker, /*maker, */buySell, price, filled, quoteFilled, blockNumber, timestamp] = tradeEvents[i];
-        // var minutes = (timestamp - (now / 1000)) / 60;
-        console.log("              " + i + " " + this.padLeft(blockNumber, 5) + " " + timestamp + " " +
-          pairKey.substring(0, 10) + " " +
-          // orderKey.substring(0, 10) + " " +
-          this.getShortAccountName(taker) + " " +
-          // this.getShortAccountName(maker) + " " +
-          (buySell == 1 ? "Buy  " : "Sell ") + " " +
-          this.padLeft(ethers.utils.formatUnits(price, 12), 14) + " " +
-          this.padLeft(ethers.utils.formatUnits(filled, 18), 24) + " " +
-          this.padLeft(ethers.utils.formatUnits(quoteFilled, 18), 24));
-        // console.log("            blockNumber: " + blockNumber + ", timestamp=" + timestamp + ", pairKey=" + pairKey + ", taker=" + taker +
-        //   ", buySell=" + buySell + ", price=" + ethers.utils.formatUnits(price, 12) + ", filled=" + ethers.utils.formatUnits(filled, 18) + ", quoteFilled=" + ethers.utils.formatUnits(quoteFilled, 18));
-      }
-      console.log();
 
       // struct PairTokenResult {
       //     Token token;

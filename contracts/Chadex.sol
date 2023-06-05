@@ -291,7 +291,6 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
     struct TradeEvent {
-        PairKey pairKey; // bytes32
         // OrderKey orderKey;
         Account taker; // address
         // Account maker; // address
@@ -302,7 +301,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         uint48 blockNumber; // 2^48 = 281,474,976,710,656
         uint48 timestamp; // 2^48 = 281,474,976,710,656
     }
-    TradeEvent[] public trades;
+    mapping(PairKey => TradeEvent[]) public trades;
 
 
     function execute(TradeInput[] calldata tradeInputs) public {
@@ -503,7 +502,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
                 }
             }
             emit TradeSummary(moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled, tokensOnOrder, block.timestamp);
-            trades.push(TradeEvent(moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled, uint48(block.number), uint48(block.timestamp)));
+            trades[moreInfo.pairKey].push(TradeEvent(moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled, uint48(block.number), uint48(block.timestamp)));
         }
     }
 
@@ -738,13 +737,13 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         }
     }
 
-    function tradesLength() public view returns (uint) {
-        return trades.length;
+    function tradesLength(PairKey pairKey) public view returns (uint) {
+        return trades[pairKey].length;
     }
-    function getTradeEvents(uint count, uint offset) public view returns (TradeEvent[] memory results) {
+    function getTradeEvents(PairKey pairKey, uint count, uint offset) public view returns (TradeEvent[] memory results) {
         results = new TradeEvent[](count);
-        for (uint i = 0; i < count && ((i + offset) < trades.length); i = onePlus(i)) {
-            results[i] = trades[i + offset];
+        for (uint i = 0; i < count && ((i + offset) < trades[pairKey].length); i = onePlus(i)) {
+            results[i] = trades[pairKey][i + offset];
         }
     }
 
