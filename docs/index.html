@@ -1533,48 +1533,36 @@
           },
           filteredPairs() {
             console.log("filteredPairs: ");
-            // Vue.set(this, "pairToIndex", pairToIndex);
-            // Vue.set(this, "indexToPair", indexToPair);
-
             const results = [];
             const filterRegex = this.settings.pairsTable.filter && this.settings.pairsTable.filter.length > 0 ? new RegExp(this.settings.pairsTable.filter, 'i') : null;
-            // console.log("filterRegex: " + JSON.stringify(filterRegex));
-
             for (const pair of this.indexToPair) {
-              console.log("pair: " + JSON.stringify(pair, null, 2))
               const baseToken = this.tokens[pair.baseIndex];
               const quoteToken = this.tokens[pair.quoteIndex];
-              results.push({
-                pairKey: pair.pairKey,
-                baseToken: this.indexToAddress[pair.baseIndex],
-                baseSymbol: baseToken.symbol,
-                baseDecimals: baseToken.decimals,
-                quoteToken: this.indexToAddress[pair.quoteIndex],
-                quoteSymbol: quoteToken.symbol,
-                quoteDecimals: quoteToken.decimals,
-                multiplier: pair.multiplier,
-                divisor: pair.divisor,
-                bestBuyOrder: pair.bestBuyOrder,
-                bestSellOrder: pair.bestSellOrder,
-              });
-            }
-
-
-            for (const [pairKey, pair] of Object.entries(this.pairs)) {
-              // console.log("filteredPairs - pairKey: " + pairKey + ", pair: " + JSON.stringify(pair, null, 2));
               let include = true;
               if (filterRegex) {
-                if (!filterRegex.test(pair.base.symbol) && !filterRegex.test(pair.base.name) && !filterRegex.test(pair.quote.symbol) && !filterRegex.test(pair.quote.name)) {
+                if (!filterRegex.test(baseToken.symbol) && !filterRegex.test(baseToken.name) && !filterRegex.test(quoteToken.symbol) && !filterRegex.test(quoteToken.name)) {
                   include = false;
                 }
               }
               if (include) {
-                // results.push({
-                //   pairKey,
-                //   ...pair,
-                // });
+                results.push({
+                  pairKey: pair.pairKey,
+                  baseToken: this.indexToAddress[pair.baseIndex],
+                  baseSymbol: baseToken.symbol,
+                  baseName: baseToken.name,
+                  baseDecimals: baseToken.decimals,
+                  quoteToken: this.indexToAddress[pair.quoteIndex],
+                  quoteSymbol: quoteToken.symbol,
+                  quoteName: quoteToken.name,
+                  quoteDecimals: quoteToken.decimals,
+                  multiplier: pair.multiplier,
+                  divisor: pair.divisor,
+                  bestBuyOrder: pair.bestBuyOrder,
+                  bestSellOrder: pair.bestSellOrder,
+                });
               }
             }
+            console.log("results: " + JSON.stringify(results, null, 2))
             return results;
           },
           filteredSortedPairs() {
