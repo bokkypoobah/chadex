@@ -191,7 +191,8 @@
                   <b-form-select size="sm" v-model="settings.pairsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
                 </div>
               </div>
-              <b-table small fixed striped responsive hover :fields="pairsFields" :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1">
+              <!-- <b-table small fixed striped responsive hover :fields="pairsFields" :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1"> -->
+              <b-table small fixed striped responsive hover :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1">
               </b-table>
             </b-card-text>
           </b-card>
@@ -1220,13 +1221,13 @@
 
           pairs: {},
           pair: {},
+          tokens: {},
 
           transfers: {},
           pools: {},
           trades: {},
           blockTimestamps: {},
           collections: {},
-          tokens: [],
           selectedCollections: {},
           selectedMainTable: {},
 
@@ -1538,6 +1539,14 @@
             const results = [];
             const filterRegex = this.settings.pairsTable.filter && this.settings.pairsTable.filter.length > 0 ? new RegExp(this.settings.pairsTable.filter, 'i') : null;
             // console.log("filterRegex: " + JSON.stringify(filterRegex));
+
+            for (const pair of this.indexToPair) {
+              console.log("xx pair: " + JSON.stringify(pair, null, 2))
+
+              // const baseToken = this.tokens[]
+            }
+
+
             for (const [pairKey, pair] of Object.entries(this.pairs)) {
               console.log("filteredPairs - pairKey: " + pairKey + ", pair: " + JSON.stringify(pair, null, 2));
               let include = true;
@@ -3001,7 +3010,6 @@
                         const [pairKey, maker, base, quote, baseDecimals, quoteDecimals, factors, timestamp] = logData.args;
                         const [multiplier, divisor] = factors;
                         if (!(pairKey in pairToIndex)) {
-                          console.log("DKLFJDSLKJFJSDKLFJKLDSJFLKDSJKFJLKSDJFKLJDSLJF")
                           for (const address of [base, quote]) {
                             if (!(address in addressToIndex)) {
                               addressToIndex[address] = indexToAddress.length;
@@ -3011,7 +3019,7 @@
                             if (!(addressIndex in tokens)) {
                               const details = await this.getERC20TokenDetails(context, address);
                               // console.log("token " + address + " => " + JSON.stringify(details));
-                              tokens[addressIndex] = [ details.symbol, details.name, details.decimals, details.totalSupply ];
+                              tokens[addressIndex] = { symbol: details.symbol, name: details.name, decimals: details.decimals, totalSupply: details.totalSupply };
                             }
                           }
                           const baseIndex = addressToIndex[base];
