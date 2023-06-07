@@ -356,7 +356,7 @@
                   <b-card no-body no-header bg-variant="light" class="m-0 p-0 w-100">
                     <b-card-body class="m-1 p-1">
                       <b-form-group label-cols-lg="1" label="Sell" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
-                        <b-form-group :label="(pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Amount') + ' :'" label-for="sell-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
+                        <b-form-group :label="(pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Amount') + ':'" label-for="sell-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
                           <b-form-input type="text" size="sm" id="sell-tokens" v-model.trim="sell.tokens" placeholder="1.01234567891234567" class="w-50"></b-form-input>
                         </b-form-group>
                         <b-form-group label="Min Price:" label-for="sell-price" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Up to 12 whole-number and 11 decimal places" class="mx-0 my-1 p-0">
@@ -382,7 +382,7 @@
                   <b-card no-body no-header bg-variant="light" class="m-0 p-0 w-100">
                     <b-card-body class="m-1 p-1">
                       <b-form-group label-cols-lg="1" label="Buy" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
-                        <b-form-group :label="(pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Amount') + ' :'" label-for="buy-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
+                        <b-form-group :label="(pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Amount') + ':'" label-for="buy-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
                           <b-form-input type="text" size="sm" id="buy-tokens" v-model.trim="buy.tokens" placeholder="1.01234567891234567" class="w-50"></b-form-input>
                         </b-form-group>
                         <b-form-group label="Max Price:" label-for="buy-price" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Up to 12 whole-number and 11 decimal places" class="mx-0 my-1 p-0">
@@ -1634,7 +1634,7 @@
                 });
               }
             }
-            console.log("filteredPairs: " + JSON.stringify(results, null, 2))
+            // console.log("filteredPairs: " + JSON.stringify(results, null, 2))
             return results;
           },
           filteredSortedPairs() {
@@ -1646,7 +1646,7 @@
             return this.filteredSortedPairs.slice((this.settings.pairsTable.currentPage - 1) * this.settings.pairsTable.pageSize, this.settings.pairsTable.currentPage * this.settings.pairsTable.pageSize);
           },
           filteredPairBuyOrders() {
-            // console.log("filteredPairBuyOrders");
+            // console.log("filteredPairBuyOrders - pair: " + JSON.stringify(this.pair, null, 2));
             const results = [];
             if (this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
@@ -2167,7 +2167,6 @@
             const pairKey = items[0].pairKey;
             this.settings.pairTable.selectedPair = pairKey;
             this.settings.tabIndex = 2;
-            // this.selected = items
           },
           checkCoinFormValidity() {
             const valid = this.$refs.coinForm.checkValidity()
@@ -2349,14 +2348,30 @@
               if (!(this.settings.pairTable.selectedPair in this.pair)) {
                 Vue.set(this.pair, this.settings.pairTable.selectedPair, {});
               }
-              for (let i = 0; i < 2; i++) {
-                const orders = await chadexContract.getOrders(this.settings.pairTable.selectedPair, i, 1000, 0, ORDERKEY_SENTINEL);
+              for (let buySell = 0; buySell < 2; buySell++) {
+                const orders = await chadexContract.getOrders(this.settings.pairTable.selectedPair, buySell, 1000, 0, ORDERKEY_SENTINEL);
                 console.log("orders: " + JSON.stringify(orders, null, 2));
                 const records = [];
+                const makers = {};
                 for (let j = 0; j < orders.length; j++) {
                   const [price, orderKey, nextOrderKey, maker, expiry, tokens, availableBase, availableQuote] = orders[j];
                   if (price == 0) {
                     break;
+                  }
+                  if (!(maker in makers)) {
+                    if (buySell == 0) {
+                      // TODO: Convert first
+                      makers[maker] = ethers.BigNumber.from(availableQuote).sub(ethers.BigNumber.from(tokens));
+                    } else {
+                      makers[maker] = ethers.BigNumber.from(availableBase).sub(ethers.BigNumber.from(tokens));
+                    }
+                  } else {
+                    if (buySell == 0) {
+                      // TODO: Convert first
+                      makers[maker] = makers[maker].sub(ethers.BigNumber.from(tokens));
+                    } else {
+                      makers[maker] = makers[maker].sub(ethers.BigNumber.from(tokens));
+                    }
                   }
                   records.push({
                     price: ethers.BigNumber.from(price).toString(),
@@ -2365,11 +2380,12 @@
                     maker,
                     expiry: parseInt(expiry),
                     tokens: ethers.BigNumber.from(tokens).toString(),
+                    available: makers[maker].toString(),
                     availableBase: ethers.BigNumber.from(availableBase).toString(),
                     availableQuote: ethers.BigNumber.from(availableQuote).toString(),
                   });
                 }
-                Vue.set(this.pair[this.settings.pairTable.selectedPair], i, records);
+                Vue.set(this.pair[this.settings.pairTable.selectedPair], buySell, records);
                 // console.log("records: " + JSON.stringify(records, null, 2));
               }
 
@@ -2865,7 +2881,7 @@
             if (this.chainId == CHAINID_SEPOLIA) {
               await this.syncChadexEvents(context);
               await this.syncChadexPairs(context);
-              // await this.syncChadexPair(context);
+              await this.syncChadexPair(context);
             }
             // for (const [address, coinInfo] of Object.entries(this.settings.tokens)) {
             //   if (coinInfo.sync && !this.sync.halt) {
@@ -3039,30 +3055,30 @@
             const indexToAddressDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
             if (indexToAddressDataItems.length == 1) {
               indexToAddress = indexToAddressDataItems[0].object;
-              console.log("indexToAddress: " + JSON.stringify(indexToAddress));
+              // console.log("indexToAddress: " + JSON.stringify(indexToAddress));
             }
             const addressToIndexDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
             if (addressToIndexDataItems.length == 1) {
               addressToIndex = addressToIndexDataItems[0].object;
-              console.log("addressToIndex: " + JSON.stringify(addressToIndex));
+              // console.log("addressToIndex: " + JSON.stringify(addressToIndex));
             }
             let indexToPair = [];
             let pairToIndex = {};
             const indexToPairDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_indexToPair").toArray();
             if (indexToPairDataItems.length == 1) {
               indexToPair = indexToPairDataItems[0].object;
-              console.log("indexToPair: " + JSON.stringify(indexToPair));
+              // console.log("indexToPair: " + JSON.stringify(indexToPair));
             }
             const pairToIndexDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_pairToIndex").toArray();
             if (pairToIndexDataItems.length == 1) {
               pairToIndex = pairToIndexDataItems[0].object;
-              console.log("pairToIndex: " + JSON.stringify(pairToIndex));
+              // console.log("pairToIndex: " + JSON.stringify(pairToIndex));
             }
             let tokens = {};
             const tokensDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_tokens").toArray();
             if (tokensDataItems.length == 1) {
               tokens = tokensDataItems[0].object;
-              console.log("tokens: " + JSON.stringify(tokens));
+              // console.log("tokens: " + JSON.stringify(tokens));
             }
             let chadexEvents = {};
             const chadexEventsDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_chadexEvents").toArray();
@@ -3076,7 +3092,7 @@
                 }
               });
             }
-            console.log("chadexEvents: " + JSON.stringify(chadexEvents));
+            // console.log("chadexEvents: " + JSON.stringify(chadexEvents));
             const blockNumbers = Object.keys(chadexEvents).sort((a, b) => { return b - a });
             // console.log("blockNumbers: " + JSON.stringify(blockNumbers));
             const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: 0;
@@ -4860,29 +4876,29 @@
             const indexToAddressDataItems = await db0.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
             if (indexToAddressDataItems.length == 1) {
               this.indexToAddress = indexToAddressDataItems[0].object;
-              console.log("indexToAddress: " + JSON.stringify(this.indexToAddress));
+              // console.log("indexToAddress: " + JSON.stringify(this.indexToAddress));
             }
             const addressToIndexDataItems = await db0.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
             if (addressToIndexDataItems.length == 1) {
               this.addressToIndex = addressToIndexDataItems[0].object;
-              console.log("addressToIndex: " + JSON.stringify(this.addressToIndex));
+              // console.log("addressToIndex: " + JSON.stringify(this.addressToIndex));
             }
 
             const tokensDataItems = await db0.cache.where("objectName").equals(this.chainId + "_tokens").toArray();
             if (tokensDataItems.length == 1) {
               this.tokens = tokensDataItems[0].object;
-              console.log("tokens: " + JSON.stringify(this.tokens));
+              // console.log("tokens: " + JSON.stringify(this.tokens));
             }
 
             const indexToPairDataItems = await db0.cache.where("objectName").equals(this.chainId + "_indexToPair").toArray();
             if (indexToPairDataItems.length == 1) {
               this.indexToPair = indexToPairDataItems[0].object;
-              console.log("indexToPair: " + JSON.stringify(this.indexToPair));
+              // console.log("indexToPair: " + JSON.stringify(this.indexToPair));
             }
             const pairToIndexDataItems = await db0.cache.where("objectName").equals(this.chainId + "_pairToIndex").toArray();
             if (pairToIndexDataItems.length == 1) {
               this.pairToIndex = pairToIndexDataItems[0].object;
-              console.log("pairToIndex: " + JSON.stringify(this.pairToIndex));
+              // console.log("pairToIndex: " + JSON.stringify(this.pairToIndex));
             }
 
             db0.close();
