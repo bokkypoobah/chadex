@@ -412,8 +412,8 @@
                         <b-form-group label="Action:" label-for="sell-action" label-size="sm" label-cols-sm="3" label-align-sm="right" description="'0' fill, '1' fill or kill, '2' fill & add order, '3' remove order, '4' update expiry and tokens" class="mx-0 my-1 p-0">
                           <b-form-input type="text" size="sm" id="sell-action" v-model.trim="sell.action" placeholder="'0' to '4'" class="w-25"></b-form-input>
                         </b-form-group>
-                        <b-form-group label="" label-for="sell-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                          <b-button size="sm" :disabled="false" id="sell-submit" @click="executeRaw()" variant="warning">SELL</b-button>
+                        <b-form-group label="" label-for="sell-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" description="TODO" class="mx-0 my-1 p-0">
+                          <b-button size="sm" :disabled="true" id="sell-submit" @click="executeRaw()" variant="warning">SELL</b-button>
                         </b-form-group>
                       </b-form-group>
                     </b-card-body>
@@ -438,8 +438,8 @@
                         <b-form-group label="Action:" label-for="buy-action" label-size="sm" label-cols-sm="3" label-align-sm="right" description="'0' fill, '1' fill or kill, '2' fill & add order, '3' remove order, '4' update expiry and tokens" class="mx-0 my-1 p-0">
                           <b-form-input type="text" size="sm" id="buy-action" v-model.trim="buy.action" placeholder="'0' to '4'" class="w-25"></b-form-input>
                         </b-form-group>
-                        <b-form-group label="" label-for="buy-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                          <b-button size="sm" :disabled="false" id="buy-submit" @click="executeRaw()" variant="warning">BUY</b-button>
+                        <b-form-group label="" label-for="buy-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" description="TODO" class="mx-0 my-1 p-0">
+                          <b-button size="sm" :disabled="true" id="buy-submit" @click="executeRaw()" variant="warning">BUY</b-button>
                         </b-form-group>
                       </b-form-group>
                     </b-card-body>
@@ -2926,6 +2926,9 @@
             try {
               const tx = await chadexContractWithSigner.execute([action]);
               console.log("tx: " + JSON.stringify(tx));
+              this.$nextTick(() => {
+                this.$bvModal.hide('modal-maker-order');
+              });
             } catch (e) {
               console.log("cancelOrder error: " + JSON.stringify(e));
             }
