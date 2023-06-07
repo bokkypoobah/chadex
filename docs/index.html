@@ -2911,7 +2911,6 @@
             const baseDecimals = parseInt(ethers.BigNumber.from(await erc20.decimals()).toString());
             const chadexContractWithSigner = chadexContract.connect(provider.getSigner());
             const pair = this.indexToPair[this.pairToIndex[this.modalMakerOrder.pairKey]] || {};
-            console.log("pair: " + JSON.stringify(pair, null, 2));
             const action = {
               action: 3,
               base: this.indexToAddress[pair.baseIndex],
@@ -2923,7 +2922,6 @@
               tokens: this.modalMakerOrder.originalTokens,
               skipCheck: false,
             };
-            // console.log("this.raw: " + JSON.stringify(this.raw, null, 2));
             console.log("action: " + JSON.stringify(action, null, 2));
             try {
               const tx = await chadexContractWithSigner.execute([action]);
