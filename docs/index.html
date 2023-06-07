@@ -198,6 +198,9 @@
             <b-form-group label="Tokens (Available):" label-for="modal-maker-order-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" readonly size="sm" id="modal-maker-order-tokens" :value="formatERC20(modalMakerOrder.tokens)" class="w-50"></b-form-input>
             </b-form-group>
+            <b-form-group v-if="indexToAddress[modalMakerOrder.makerIndex] == coinbase" label="" label-for="modal-maker-order-cancel" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" variant="warning" class="ml-1" @click="cancelOrder();" v-b-popover.hover.bottom="'Cancel order'">Cancel Order</b-button>
+            </b-form-group>
             <!-- <pre>
 {{ modalMakerOrder }}
             </pre> -->
@@ -1314,6 +1317,7 @@
             totalSupply: null,
           },
           modalMakerOrder: {
+            pairKey: null,
             buySell: null,
             price: null,
             orderKey: null,
@@ -2787,6 +2791,7 @@
             // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
             this.$bvModal.show('modal-maker-order');
 
+            this.modalMakerOrder.pairKey = this.settings.pairTable.selectedPair;
             this.modalMakerOrder.buySell = buySell;
             this.modalMakerOrder.price = item.price;
             this.modalMakerOrder.orderKey = item.orderKey;
@@ -2896,6 +2901,35 @@
               console.log("tx: " + JSON.stringify(tx));
             } catch (e) {
               console.log("executeRaw error: " + JSON.stringify(e));
+            }
+          },
+          async cancelOrder() {
+            console.log("cancelOrder(): " + JSON.stringify(this.modalMakerOrder, null, 2));
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, provider);
+            const erc20 = new ethers.Contract(this.raw.base, ERC20ABI, provider);
+            const baseDecimals = parseInt(ethers.BigNumber.from(await erc20.decimals()).toString());
+            const chadexContractWithSigner = chadexContract.connect(provider.getSigner());
+            const pair = this.indexToPair[this.pairToIndex[this.modalMakerOrder.pairKey]] || {};
+            console.log("pair: " + JSON.stringify(pair, null, 2));
+            const action = {
+              action: 3,
+              base: this.indexToAddress[pair.baseIndex],
+              quote: this.indexToAddress[pair.quoteIndex],
+              buySell: this.modalMakerOrder.buySell,
+              price: this.modalMakerOrder.price,
+              targetPrice: this.modalMakerOrder.price,
+              expiry: this.modalMakerOrder.expiry,
+              tokens: this.modalMakerOrder.originalTokens,
+              skipCheck: false,
+            };
+            // console.log("this.raw: " + JSON.stringify(this.raw, null, 2));
+            console.log("action: " + JSON.stringify(action, null, 2));
+            try {
+              const tx = await chadexContractWithSigner.execute([action]);
+              console.log("tx: " + JSON.stringify(tx));
+            } catch (e) {
+              console.log("cancelOrder error: " + JSON.stringify(e));
             }
           },
           async mintWeth(wethAddress, action) {
