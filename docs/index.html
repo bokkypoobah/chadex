@@ -3328,12 +3328,43 @@
                 let price = PRICE_EMPTY;
                 let firstOrderKey = ORDERKEY_SENTINEL;
                 orders[buySell] = [];
+                const availableTokens = {};
                 let results = await chadexContract.getOrders(this.settings.pairTable.selectedPair, buySell, GET_ORDERS_BATCH_SIZE, price, firstOrderKey);
                 while (!ethers.BigNumber.from(results[0][0]).isZero()) {
                   for (let k = 0; k < results.length && parseInt(results[k][0]) != 0; k++) {
+                    let [price1, orderKey, nextOrderKey, maker, expiry, tokens, availableBase, availableQuote] = results[k];
+                    // console.log("price1: " + price1 + ", orderKey: " + orderKey);
+                    if (!(maker in availableTokens)) {
+                      if (buySell == 0) {
+                        // TODO: Convert first
+                        availableTokens[maker] = ethers.BigNumber.from(availableQuote);
+                      } else {
+                        availableTokens[maker] = ethers.BigNumber.from(availableBase);
+                      }
+                    }
+                    // } else {
+                    //   if (buySell == 0) {
+                    //     // TODO: Convert first
+                    //     availableTokens[maker] = availableTokens[maker].sub(ethers.BigNumber.from(tokens));
+                    //   } else {
+                    //     availableTokens[maker] = availableTokens[maker].sub(ethers.BigNumber.from(tokens));
+                    //   }
+                    // }
+                    console.log("tokens: " + ethers.utils.formatEther(tokens) + ", available: " + ethers.utils.formatEther(availableTokens[maker]));
+                    if (buySell == 0) {
+                      // TODO: Convert first
+                      // availableTokens[maker] = ethers.BigNumber.from(availableQuote);
+                    } else {
+                      if (tokens.lt(availableTokens[maker])) {
+                        availableTokens[maker] = availableTokens[maker].sub(tokens);
+                      } else {
+                        tokens = availableTokens[maker];
+                        availableTokens[maker] = ethers.BigNumber.from(0);
+                      }
+                    }
                     const makerIndex = this.addressToIndex[results[k][3]];
-                    orders[buySell].push({ price: results[k][0].toString(), orderKey: results[k][1], nextOrderKey: results[k][2], makerIndex, expiry: parseInt(results[k][4]), tokens: results[k][5].toString(), availableBase: results[k][6].toString(), availableQuote: results[k][7].toString() })
-                    price = results[k][0];
+                    orders[buySell].push({ price: price1.toString(), orderKey, nextOrderKey, makerIndex, expiry: parseInt(expiry), tokens: tokens.toString(), available: availableTokens[maker].toString(), availableBase: availableBase.toString(), availableQuote: availableQuote.toString() })
+                    price = price1;
                     firstOrderKey = results[k][2];
                   }
                   results = await chadexContract.getOrders(this.settings.pairTable.selectedPair, buySell, GET_ORDERS_BATCH_SIZE, price, firstOrderKey);
