@@ -3320,7 +3320,7 @@
             const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, context.provider);
             if (this.settings.pairTable.selectedPair in this.pairToIndex) {
               const pairIndex = this.pairToIndex[this.settings.pairTable.selectedPair];
-              // const pair = this.indexToPair[pairIndex];
+              const pair = this.indexToPair[pairIndex];
               // console.log("pair: " + JSON.stringify(pair, null, 2));
               // console.log("pairIndex: " + pairIndex);
               const orders = {};
@@ -3350,11 +3350,22 @@
                     //     availableTokens[maker] = availableTokens[maker].sub(ethers.BigNumber.from(tokens));
                     //   }
                     // }
-                    console.log("tokens: " + ethers.utils.formatEther(tokens) + ", available: " + ethers.utils.formatEther(availableTokens[maker]));
                     if (buySell == 0) {
-                      // TODO: Convert first
-                      // availableTokens[maker] = ethers.BigNumber.from(availableQuote);
+                      const TEN = ethers.BigNumber.from(10);
+                      const PRICE_DECIMALS = 12; // TODO: Read from contract and cache
+                      const tokensInQuote = tokens.mul(TEN.pow(pair.divisor)).mul(price1).div(TEN.pow(pair.multiplier + PRICE_DECIMALS));
+                      console.log("BEFORE price: " + ethers.utils.formatUnits(price1, 12) + ", tokens: " + ethers.utils.formatEther(tokens) + ", tokensInQuote: " + ethers.utils.formatEther(tokensInQuote) + ", available: " + ethers.utils.formatEther(availableTokens[maker]));
+                      if (tokensInQuote.lt(availableTokens[maker])) {
+                        availableTokens[maker] = availableTokens[maker].sub(tokensInQuote);
+                      } else {
+                        // tokens = availableTokens[maker];
+                        const availableTokensInBase = availableTokens[maker].mul(TEN.pow(pair.multiplier + PRICE_DECIMALS)).div(price1).div(TEN.pow(pair.divisor));
+                        tokens = availableTokensInBase;
+                        availableTokens[maker] = ethers.BigNumber.from(0);
+                      }
+                      console.log("AFTER  price: " + ethers.utils.formatUnits(price1, 12) + ", tokens: " + ethers.utils.formatEther(tokens) + ", available: " + ethers.utils.formatEther(availableTokens[maker]));
                     } else {
+                      // console.log("tokens: " + ethers.utils.formatEther(tokens) + ", available: " + ethers.utils.formatEther(availableTokens[maker]));
                       if (tokens.lt(availableTokens[maker])) {
                         availableTokens[maker] = availableTokens[maker].sub(tokens);
                       } else {
