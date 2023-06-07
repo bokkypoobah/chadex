@@ -169,6 +169,40 @@
             </b-form-group>
           </b-modal>
 
+          <b-modal id="modal-maker-order" hide-footer size="lg">
+            <template #modal-title>
+              Maker Order
+              <!-- ERC-20 Token {{ modalTokenDetails.address }} -->
+              <!-- <b-link size="sm" :href="'https://sepolia.etherscan.io/token/' + modalTokenDetails.address + '?a=' + coinbase" target="_blank" variant="link" class="m-0 p-0" v-b-popover.hover.top="'View in etherscan.io'">
+                <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
+              </b-link> -->
+            </template>
+            <b-form-group label="Order Type:" label-for="modal-maker-order-ordertype" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-maker-order-ordertype" :value="modalMakerOrder.buySell == 0 ? 'BUY' : 'SELL'" class="w-50"></b-form-input>
+            </b-form-group>
+            <b-form-group label="Price:" label-for="modal-maker-order-price" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-maker-order-price" :value="formatERC20(modalMakerOrder.price, 12)" class="w-50"></b-form-input>
+            </b-form-group>
+            <b-form-group label="Order Key:" label-for="modal-maker-order-orderkey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-maker-order-orderkey" :value="modalMakerOrder.orderKey" class="w-100"></b-form-input>
+            </b-form-group>
+            <b-form-group label="Maker:" label-for="modal-maker-order-maker" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-maker-order-maker" :value="indexToAddress[modalMakerOrder.makerIndex]" class="w-75"></b-form-input>
+            </b-form-group>
+            <b-form-group label="Expiry:" label-for="modal-maker-order-expiry" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-maker-order-expiry" :value="formatExpiry(modalMakerOrder.expiry)" class="w-50"></b-form-input>
+            </b-form-group>
+            <b-form-group label="Tokens (Original):" label-for="modal-maker-order-originaltokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-maker-order-originaltokens" :value="formatERC20(modalMakerOrder.originalTokens)" class="w-50"></b-form-input>
+            </b-form-group>
+            <b-form-group label="Tokens (Available):" label-for="modal-maker-order-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-maker-order-tokens" :value="formatERC20(modalMakerOrder.tokens)" class="w-50"></b-form-input>
+            </b-form-group>
+            <!-- <pre>
+{{ modalMakerOrder }}
+            </pre> -->
+          </b-modal>
+
           <!-- 0:Home -->
           <b-card v-if="coinbase && settings.tabIndex == 0" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
@@ -324,8 +358,9 @@
                     <template #cell(maker)="data">
                       <!-- <b-link v-if="data.item.makerIndex" :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank"> -->
                         <!-- {{ data.item.maker == coinbase ? "(me)" : data.item.maker.substring(0, 10) }} -->
-                        {{ indexToAddress[data.item.makerIndex].substring(0, 10) }}
+                        <!-- {{ indexToAddress[data.item.makerIndex].substring(0, 10) }} -->
                       <!-- </b-link> -->
+                      <b-link @click="showModalMakerOrder(0, data.item);">{{ indexToAddress[data.item.makerIndex].substring(0, 10) }}</b-link>
                     </template>
                   </b-table>
                 </b-col>
@@ -346,8 +381,9 @@
                     <template #cell(maker)="data">
                       <!-- <b-link v-if="data.item.makerIndex" :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank"> -->
                         <!-- {{ data.item.maker == coinbase ? "(me)" : data.item.maker.substring(0, 10) }} -->
-                        {{ indexToAddress[data.item.makerIndex].substring(0, 10) }}
+                        <!-- {{ indexToAddress[data.item.makerIndex].substring(0, 10) }} -->
                       <!-- </b-link> -->
+                      <b-link @click="showModalMakerOrder(1, data.item);">{{ indexToAddress[data.item.makerIndex].substring(0, 10) }}</b-link>
                     </template>
                   </b-table>
                 </b-col>
@@ -1277,6 +1313,17 @@
             allowance: null,
             totalSupply: null,
           },
+          modalMakerOrder: {
+            buySell: null,
+            price: null,
+            orderKey: null,
+            makerIndex: null,
+            expiry: null,
+            originalTokens: null,
+            tokens: null,
+            availableBase: null,
+            availableQuote: null,
+          },
 
           addressToIndex: {},
           indexToAddress: [],
@@ -1661,6 +1708,7 @@
                     nextOrderKey: order.nextOrderKey,
                     makerIndex: order.makerIndex,
                     expiry: order.expiry,
+                    originalTokens: order.originalTokens,
                     tokens: order.tokens,
                     filled: order.filled,
                     availableBase: order.availableBase,
@@ -1685,6 +1733,7 @@
                     nextOrderKey: order.nextOrderKey,
                     makerIndex: order.makerIndex,
                     expiry: order.expiry,
+                    originalTokens: order.originalTokens,
                     tokens: order.tokens,
                     filled: order.filled,
                     availableBase: order.availableBase,
@@ -2726,6 +2775,60 @@
             this.modalTokenDetails.allowance = ethers.BigNumber.from(await erc20.allowance(this.coinbase, CHADEXADDRESS_SEPOLIA)).toString();
             this.modalTokenDetails.totalSupply = ethers.BigNumber.from(await erc20.totalSupply()).toString() || "?";
             console.log("balance: " + this.modalTokenDetails.balance);
+          },
+          async showModalMakerOrder(buySell, item) {
+            console.log("showModalMakerOrder - buySell: " + buySell + ", item: " + JSON.stringify(item));
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+            // console.log("showModalDetails: " + JSON.stringify(item));
+            // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
+            // console.log(url);
+            // const data = await fetch(url).then(response => response.json());
+            // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
+            this.$bvModal.show('modal-maker-order');
+
+            this.modalMakerOrder.buySell = buySell;
+            this.modalMakerOrder.price = item.price;
+            this.modalMakerOrder.orderKey = item.orderKey;
+            this.modalMakerOrder.makerIndex = item.makerIndex;
+            this.modalMakerOrder.expiry = item.expiry;
+            this.modalMakerOrder.originalTokens = item.originalTokens;
+            this.modalMakerOrder.tokens = item.tokens;
+            this.modalMakerOrder.availableBase = item.availableBase;
+            this.modalMakerOrder.availableQuote = item.availableQuote;
+
+            console.log("this.modalMakerOrder: " + JSON.stringify(this.modalMakerOrder, null, 2));
+
+            // modalMakerOrder: {
+            //   buySell: null,
+            //   price: null,
+            //   orderKey: null,
+            //   makerIndex: null,
+            //   expiry: null,
+            //   originalTokens: null,
+            //   tokens: null,
+            //   availableBase: null,
+            //   availableQuote: null,
+            // },
+
+            // showModalMakerOrder - buySell: 0, item: {"price":"690300000000",
+            // "orderIndex":0,"orderKey":"0x2cbf5214c69de294780880b856be423d0036196ac94c147d11ecebd3eb3063b8",
+            // "nextOrderKey":"0x0000000000000000000000000000000000000000000000000000000000000000",
+            // "makerIndex":1,"expiry":1704027599,"tokens":"46546665560000000",
+            // "availableBase":"2535124317432610932","availableQuote":"1749996316323731327"}
+
+            // this.modalTokenDetails.tokenIndex = tokenIndex;
+            // const token = this.tokens[tokenIndex] || {};
+            // console.log("this.tokens: " + JSON.stringify(this.tokens, null, 2));
+            // this.modalTokenDetails.address = this.indexToAddress[tokenIndex] || "?";
+            // this.modalTokenDetails.symbol = token.symbol || "?";
+            // this.modalTokenDetails.name = token.name || "?";
+            // this.modalTokenDetails.decimals = token.decimals || "?";
+            // const erc20 = new ethers.Contract(this.modalTokenDetails.address, ERC20ABI, provider);
+            // this.modalTokenDetails.balance = ethers.BigNumber.from(await erc20.balanceOf(this.coinbase)).toString();
+            // this.modalTokenDetails.allowance = ethers.BigNumber.from(await erc20.allowance(this.coinbase, CHADEXADDRESS_SEPOLIA)).toString();
+            // this.modalTokenDetails.totalSupply = ethers.BigNumber.from(await erc20.totalSupply()).toString() || "?";
+            // console.log("balance: " + this.modalTokenDetails.balance);
           },
           toggleSyncAccounts(items) {
             let someFalse = false;
