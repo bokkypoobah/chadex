@@ -277,7 +277,7 @@
                 </div> -->
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <div v-if="!sync.section" class="mt-0 pr-1">
+                <div v-if="false && !sync.section" class="mt-0 pr-1">
                   <b-button size="sm" @click="syncPairs('pair')" variant="primary" v-b-popover.hover.top="'Sync selected pair'">Sync</b-button>
                 </div>
                 <div class="mt-1" style="width: 250px;">
@@ -322,9 +322,10 @@
                       {{ formatExpiry(data.item.expiry) }}
                     </template>
                     <template #cell(maker)="data">
-                      <b-link v-if="data.item.maker" :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                        {{ data.item.maker == coinbase ? "(me)" : data.item.maker.substring(0, 10) }}
-                      </b-link>
+                      <!-- <b-link v-if="data.item.makerIndex" :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank"> -->
+                        <!-- {{ data.item.maker == coinbase ? "(me)" : data.item.maker.substring(0, 10) }} -->
+                        {{ indexToAddress[data.item.makerIndex].substring(0, 10) }}
+                      <!-- </b-link> -->
                     </template>
                   </b-table>
                 </b-col>
@@ -343,9 +344,10 @@
                       {{ formatExpiry(data.item.expiry) }}
                     </template>
                     <template #cell(maker)="data">
-                      <b-link v-if="data.item.maker" :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                        {{ data.item.maker == coinbase ? "(me)" : data.item.maker.substring(0, 10) }}
-                      </b-link>
+                      <!-- <b-link v-if="data.item.makerIndex" :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank"> -->
+                        <!-- {{ data.item.maker == coinbase ? "(me)" : data.item.maker.substring(0, 10) }} -->
+                        {{ indexToAddress[data.item.makerIndex].substring(0, 10) }}
+                      <!-- </b-link> -->
                     </template>
                   </b-table>
                 </b-col>
@@ -1656,7 +1658,7 @@
                   orderIndex,
                   orderKey: order.orderKey,
                   nextOrderKey: order.nextOrderKey,
-                  maker: order.maker,
+                  makerIndex: order.makerIndex,
                   expiry: order.expiry,
                   tokens: order.tokens,
                   filled: order.filled,
@@ -1678,7 +1680,7 @@
                   orderIndex,
                   orderKey: order.orderKey,
                   nextOrderKey: order.nextOrderKey,
-                  maker: order.maker,
+                  makerIndex: order.makerIndex,
                   expiry: order.expiry,
                   tokens: order.tokens,
                   filled: order.filled,
@@ -1694,24 +1696,26 @@
             const results = [];
             if (this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
-              for (const [itemIndex, item] of pair.history.entries()) {
-                // console.log(itemIndex + " " + JSON.stringify(item));
-                results.push({
-                  // txHash: item.txHash,
-                  // blockNumber: item.blockNumber,
-                  // action: item.action,
-                  ...item,
-                //   price: order.price,
-                //   orderIndex,
-                //   orderKey: order.orderKey,
-                //   nextOrderKey: order.nextOrderKey,
-                //   maker: order.maker,
-                //   expiry: order.expiry,
-                //   tokens: order.tokens,
-                //   filled: order.filled,
-                //   availableBase: order.availableBase,
-                //   availableQuote: order.availableQuote,
-                });
+              if ('history' in pair) {
+                for (const [itemIndex, item] of pair.history.entries()) {
+                  // console.log(itemIndex + " " + JSON.stringify(item));
+                  results.push({
+                    // txHash: item.txHash,
+                    // blockNumber: item.blockNumber,
+                    // action: item.action,
+                    ...item,
+                  //   price: order.price,
+                  //   orderIndex,
+                  //   orderKey: order.orderKey,
+                  //   nextOrderKey: order.nextOrderKey,
+                  //   maker: order.maker,
+                  //   expiry: order.expiry,
+                  //   tokens: order.tokens,
+                  //   filled: order.filled,
+                  //   availableBase: order.availableBase,
+                  //   availableQuote: order.availableQuote,
+                  });
+                }
               }
             }
             // console.log("filteredPairHistory: " + JSON.stringify(results, null, 2));
@@ -3381,6 +3385,10 @@
                   results = await chadexContract.getOrders(this.settings.pairTable.selectedPair, buySell, GET_ORDERS_BATCH_SIZE, price, firstOrderKey);
                 }
                 console.log("orders[" + buySell + "]: " + JSON.stringify(orders[buySell], null, 2));
+                if (!(this.settings.pairTable.selectedPair in this.pair)) {
+                  Vue.set(this.pair, this.settings.pairTable.selectedPair, {});
+                }
+                Vue.set(this.pair[this.settings.pairTable.selectedPair], buySell, orders[buySell]);
               }
             }
           },
@@ -4883,13 +4891,13 @@
           // if ('chadexChainId' in localStorage) {
           //   this.chainId = localStorage.chadexChainId;
           // }
-          if ('chadexPairsV1' in localStorage) {
-            this.pairs = JSON.parse(localStorage.chadexPairsV1);
-          }
-          if ('chadexPairV1' in localStorage) {
-            this.pair = JSON.parse(localStorage.chadexPairV1);
-            // console.log("this.pair: " + JSON.stringify(this.pair, null, 2));
-          }
+          // if ('chadexPairsV1' in localStorage) {
+          //   this.pairs = JSON.parse(localStorage.chadexPairsV1);
+          // }
+          // if ('chadexPairV1' in localStorage) {
+          //   this.pair = JSON.parse(localStorage.chadexPairV1);
+          //   // console.log("this.pair: " + JSON.stringify(this.pair, null, 2));
+          // }
           if ('chadexSettings' in localStorage) {
             const tempSettings = JSON.parse(localStorage.chadexSettings);
             if ('version' in tempSettings && tempSettings.version == this.settings.version) {
