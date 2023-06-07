@@ -345,7 +345,7 @@
               <!-- <b-table small fixed striped responsive hover :fields="pairFields" :items="pagedFilteredSortedPair" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1"> -->
               <b-row class="m-0 p-0">
                 <b-col class="ml-0 mr-0 pl-0 pr-1">
-                  <b-table small fixed striped responsive hover selectable select-mode="single" @row-selected="pairBuyRowSelected" :fields="pairBuyOrdersFields" :items="pagedFilteredSortedPairBuyOrders" show-empty empty-html="Loading" head-variant="light" class="mx-0 my-1">
+                  <b-table small fixed striped responsive hover selectable select-mode="single" selected-variant="primary" @row-selected="pairBuyRowSelected" :fields="pairBuyOrdersFields" :items="pagedFilteredSortedPairBuyOrders" show-empty empty-html="Loading" head-variant="light" class="mx-0 my-1">
                     <template #head(tokens)="data">
                       {{ pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Amount' }}
                     </template>
@@ -368,7 +368,7 @@
                   </b-table>
                 </b-col>
                 <b-col class="ml-0 mr-0 pl-1 pr-0">
-                  <b-table small fixed striped responsive hover selectable select-mode="single" @row-selected="pairSellRowSelected" :fields="pairSellOrdersFields" :items="pagedFilteredSortedPairSellOrders" show-empty empty-html="Loading" head-variant="light" class="mx-0 my-1">
+                  <b-table small fixed striped responsive hover selectable select-mode="single" selected-variant="primary" @row-selected="pairSellRowSelected" :fields="pairSellOrdersFields" :items="pagedFilteredSortedPairSellOrders" show-empty empty-html="Loading" head-variant="light" class="mx-0 my-1">
                     <template #head(tokens)="data">
                       {{ pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Amount' }}
                     </template>
@@ -1343,6 +1343,9 @@
           pair: {},
           tokens: {},
 
+          selectedBuyOrders: {},
+          selectedSellOrders: {},
+
           transfers: {},
           pools: {},
           trades: {},
@@ -1717,6 +1720,7 @@
                     filled: order.filled,
                     availableBase: order.availableBase,
                     availableQuote: order.availableQuote,
+                    _rowVariant: order.orderKey in this.selectedBuyOrders ? 'primary' : undefined,
                   });
                 }
               }
@@ -1742,6 +1746,7 @@
                     filled: order.filled,
                     availableBase: order.availableBase,
                     availableQuote: order.availableQuote,
+                    _rowVariant: order.orderKey in this.selectedSellOrders ? 'primary' : undefined,
                   });
                 }
               }
@@ -2231,6 +2236,7 @@
           },
           pairBuyRowSelected(items) {
             console.log("pairBuyRowSelected: " + JSON.stringify(items));
+            const selectedBuyOrders = {};
             if (items.length > 0) {
               const selectedPair = this.settings.pairTable.selectedPair;
               console.log("selectedPair: " + selectedPair);
@@ -2244,19 +2250,21 @@
 
               for (const order of this.pagedFilteredSortedPairBuyOrders) {
                 console.log(JSON.stringify(order));
+                selectedBuyOrders[order.orderKey] = true;
                 if (order.orderKey == orderKey) {
                   break;
                 }
               }
-
-
               // const pairKey = items[0].pairKey;
               // this.settings.pairTable.selectedPair = pairKey;
               // this.settings.tabIndex = 2;
             }
+            Vue.set(this, 'selectedBuyOrders', selectedBuyOrders);
+            console.log("selectedBuyOrders: " + JSON.stringify(selectedBuyOrders));
           },
           pairSellRowSelected(items) {
             console.log("pairSellRowSelected: " + JSON.stringify(items));
+            const selectedSellOrders = {};
             if (items.length > 0) {
               const selectedPair = this.settings.pairTable.selectedPair;
               console.log("selectedPair: " + selectedPair);
@@ -2270,6 +2278,7 @@
 
               for (const order of this.pagedFilteredSortedPairSellOrders) {
                 console.log(JSON.stringify(order));
+                selectedSellOrders[order.orderKey] = true;
                 if (order.orderKey == orderKey) {
                   break;
                 }
@@ -2278,6 +2287,8 @@
               // this.settings.pairTable.selectedPair = pairKey;
               // this.settings.tabIndex = 2;
             }
+            Vue.set(this, 'selectedSellOrders', selectedSellOrders);
+            console.log("selectedSellOrders: " + JSON.stringify(selectedSellOrders));
           },
           checkCoinFormValidity() {
             const valid = this.$refs.coinForm.checkValidity()
