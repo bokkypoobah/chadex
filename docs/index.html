@@ -3329,7 +3329,7 @@
                 let firstOrderKey = ORDERKEY_SENTINEL;
                 orders[buySell] = [];
                 let results = await chadexContract.getOrders(this.settings.pairTable.selectedPair, buySell, GET_ORDERS_BATCH_SIZE, price, firstOrderKey);
-                while (parseInt(results[0][0]) != 0) {
+                while (!ethers.BigNumber.from(results[0][0]).isZero()) {
                   for (let k = 0; k < results.length && parseInt(results[k][0]) != 0; k++) {
                     const makerIndex = this.addressToIndex[results[k][3]];
                     orders[buySell].push({ price: results[k][0].toString(), orderKey: results[k][1], nextOrderKey: results[k][2], makerIndex, expiry: parseInt(results[k][4]), tokens: results[k][5].toString(), availableBase: results[k][6].toString(), availableQuote: results[k][7].toString() })
@@ -3338,7 +3338,7 @@
                   }
                   results = await chadexContract.getOrders(this.settings.pairTable.selectedPair, buySell, GET_ORDERS_BATCH_SIZE, price, firstOrderKey);
                 }
-                console.log("orders: " + JSON.stringify(orders, null, 2));
+                console.log("orders[" + buySell + "]: " + JSON.stringify(orders[buySell], null, 2));
               }
             }
           },
