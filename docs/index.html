@@ -308,7 +308,7 @@
               <!-- <b-table small fixed striped responsive hover :fields="pairFields" :items="pagedFilteredSortedPair" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1"> -->
               <b-row class="m-0 p-0">
                 <b-col class="ml-0 mr-0 pl-0 pr-1">
-                  <b-table small fixed striped responsive hover :fields="pairBuyOrdersFields" :items="pagedFilteredSortedPairBuyOrders" show-empty empty-html="Click Sync above to retrieve buy orders" head-variant="light" class="mx-0 my-1">
+                  <b-table small fixed striped responsive hover :fields="pairBuyOrdersFields" :items="pagedFilteredSortedPairBuyOrders" show-empty empty-html="Loading" head-variant="light" class="mx-0 my-1">
                     <template #head(tokens)="data">
                       {{ pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Amount' }}
                     </template>
@@ -330,7 +330,7 @@
                   </b-table>
                 </b-col>
                 <b-col class="ml-0 mr-0 pl-1 pr-0">
-                  <b-table small fixed striped responsive hover :fields="pairSellOrdersFields" :items="pagedFilteredSortedPairSellOrders" show-empty empty-html="Click Sync above to retrieve sell orders" head-variant="light" class="mx-0 my-1">
+                  <b-table small fixed striped responsive hover :fields="pairSellOrdersFields" :items="pagedFilteredSortedPairSellOrders" show-empty empty-html="Loading" head-variant="light" class="mx-0 my-1">
                     <template #head(tokens)="data">
                       {{ pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Amount' }}
                     </template>
@@ -408,7 +408,7 @@
                 </b-col>
               </b-row>
 
-              <b-table small fixed striped responsive hover :fields="pairHistoryFields" :items="pagedFilteredSortedPairHistory" show-empty empty-html="Click Sync above to retrieve sell orders" head-variant="light" class="mx-0 my-1">
+              <b-table small fixed striped responsive hover :fields="pairHistoryFields" :items="pagedFilteredSortedPairHistory" show-empty empty-html="TODO: History" head-variant="light" class="mx-0 my-1">
                 <template #cell(timestamp)="data">
                   <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'txIndex: ' + data.item.transactionIndex + ' logIndex: ' + data.item.logIndex" target="_blank">
                     {{ formatTimestamp(data.item.timestamp) }}
@@ -1652,19 +1652,21 @@
             const results = [];
             if (this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
-              for (const [orderIndex, order] of pair[0].entries()) {
-                results.push({
-                  price: order.price,
-                  orderIndex,
-                  orderKey: order.orderKey,
-                  nextOrderKey: order.nextOrderKey,
-                  makerIndex: order.makerIndex,
-                  expiry: order.expiry,
-                  tokens: order.tokens,
-                  filled: order.filled,
-                  availableBase: order.availableBase,
-                  availableQuote: order.availableQuote,
-                });
+              if ('0' in pair) {
+                for (const [orderIndex, order] of pair[0].entries()) {
+                  results.push({
+                    price: order.price,
+                    orderIndex,
+                    orderKey: order.orderKey,
+                    nextOrderKey: order.nextOrderKey,
+                    makerIndex: order.makerIndex,
+                    expiry: order.expiry,
+                    tokens: order.tokens,
+                    filled: order.filled,
+                    availableBase: order.availableBase,
+                    availableQuote: order.availableQuote,
+                  });
+                }
               }
             }
             return results;
@@ -1674,19 +1676,21 @@
             const results = [];
             if (this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
-              for (const [orderIndex, order] of pair[1].entries()) {
-                results.push({
-                  price: order.price,
-                  orderIndex,
-                  orderKey: order.orderKey,
-                  nextOrderKey: order.nextOrderKey,
-                  makerIndex: order.makerIndex,
-                  expiry: order.expiry,
-                  tokens: order.tokens,
-                  filled: order.filled,
-                  availableBase: order.availableBase,
-                  availableQuote: order.availableQuote,
-                });
+              if ('1' in pair) {
+                for (const [orderIndex, order] of pair[1].entries()) {
+                  results.push({
+                    price: order.price,
+                    orderIndex,
+                    orderKey: order.orderKey,
+                    nextOrderKey: order.nextOrderKey,
+                    makerIndex: order.makerIndex,
+                    expiry: order.expiry,
+                    tokens: order.tokens,
+                    filled: order.filled,
+                    availableBase: order.availableBase,
+                    availableQuote: order.availableQuote,
+                  });
+                }
               }
             }
             return results;
@@ -3337,6 +3341,7 @@
                 while (!ethers.BigNumber.from(results[0][0]).isZero()) {
                   for (let k = 0; k < results.length && parseInt(results[k][0]) != 0; k++) {
                     let [price1, orderKey, nextOrderKey, maker, expiry, tokens, availableBase, availableQuote] = results[k];
+                    const originalTokens = tokens;
                     // console.log("price1: " + price1 + ", orderKey: " + orderKey);
                     if (!(maker in availableTokens)) {
                       if (buySell == 0) {
@@ -3358,7 +3363,7 @@
                       const TEN = ethers.BigNumber.from(10);
                       const PRICE_DECIMALS = 12; // TODO: Read from contract and cache
                       const tokensInQuote = tokens.mul(TEN.pow(pair.divisor)).mul(price1).div(TEN.pow(pair.multiplier + PRICE_DECIMALS));
-                      console.log("BEFORE price: " + ethers.utils.formatUnits(price1, 12) + ", tokens: " + ethers.utils.formatEther(tokens) + ", tokensInQuote: " + ethers.utils.formatEther(tokensInQuote) + ", available: " + ethers.utils.formatEther(availableTokens[maker]));
+                      // console.log("BEFORE price: " + ethers.utils.formatUnits(price1, 12) + ", tokens: " + ethers.utils.formatEther(tokens) + ", tokensInQuote: " + ethers.utils.formatEther(tokensInQuote) + ", available: " + ethers.utils.formatEther(availableTokens[maker]));
                       if (tokensInQuote.lt(availableTokens[maker])) {
                         availableTokens[maker] = availableTokens[maker].sub(tokensInQuote);
                       } else {
@@ -3367,7 +3372,7 @@
                         tokens = availableTokensInBase;
                         availableTokens[maker] = ethers.BigNumber.from(0);
                       }
-                      console.log("AFTER  price: " + ethers.utils.formatUnits(price1, 12) + ", tokens: " + ethers.utils.formatEther(tokens) + ", available: " + ethers.utils.formatEther(availableTokens[maker]));
+                      // console.log("AFTER  price: " + ethers.utils.formatUnits(price1, 12) + ", tokens: " + ethers.utils.formatEther(tokens) + ", available: " + ethers.utils.formatEther(availableTokens[maker]));
                     } else {
                       // console.log("tokens: " + ethers.utils.formatEther(tokens) + ", available: " + ethers.utils.formatEther(availableTokens[maker]));
                       if (tokens.lt(availableTokens[maker])) {
@@ -3378,7 +3383,7 @@
                       }
                     }
                     const makerIndex = this.addressToIndex[results[k][3]];
-                    orders[buySell].push({ price: price1.toString(), orderKey, nextOrderKey, makerIndex, expiry: parseInt(expiry), tokens: tokens.toString(), available: availableTokens[maker].toString(), availableBase: availableBase.toString(), availableQuote: availableQuote.toString() })
+                    orders[buySell].push({ price: price1.toString(), orderKey, nextOrderKey, makerIndex, expiry: parseInt(expiry), originalTokens: originalTokens.toString(), tokens: tokens.toString(), available: availableTokens[maker].toString(), availableBase: availableBase.toString(), availableQuote: availableQuote.toString() })
                     price = price1;
                     firstOrderKey = results[k][2];
                   }
