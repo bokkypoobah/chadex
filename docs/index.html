@@ -397,7 +397,7 @@
                   <b-card no-body no-header bg-variant="light" class="m-0 p-0 w-100">
                     <b-card-body class="m-1 p-1">
                       <b-form-group label-cols-lg="1" label="Sell" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
-                        <b-form-group :label="(pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Amount') + ':'" label-for="sell-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
+                        <b-form-group :label="(pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Base Amount') + ':'" label-for="sell-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
                           <b-form-input type="text" size="sm" id="sell-tokens" v-model.trim="sell.tokens" placeholder="1.01234567891234567" class="w-50"></b-form-input>
                         </b-form-group>
                         <b-form-group label="Min Price:" label-for="sell-price" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Up to 12 whole-number and 11 decimal places" class="mx-0 my-1 p-0">
@@ -405,6 +405,9 @@
                         </b-form-group>
                         <b-form-group label="Max Average Price:" label-for="sell-targetprice" label-size="sm" label-cols-sm="3" label-align-sm="right" description="ONLY when filling orders (0 to ignore)" class="mx-0 my-1 p-0">
                           <b-form-input type="text" size="sm" id="sell-targetprice" v-model.trim="sell.targetPrice" placeholder="e.g. 0.69015" class="w-50"></b-form-input>
+                        </b-form-group>
+                        <b-form-group :label="(pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Quote Amount') + ':'" label-for="sell-quotetokens" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
+                          <b-form-input type="text" readonly size="sm" id="sell-quotetokens" v-model.trim="sell.quoteTokens" placeholder="1.01234567891234567" class="w-50"></b-form-input>
                         </b-form-group>
                         <b-form-group label="Expiry:" label-for="sell-expiry" label-size="sm" label-cols-sm="3" label-align-sm="right"  description="Unix time. '0' for no expiry" class="mx-0 my-1 p-0">
                           <b-form-input type="text" size="sm" id="sell-expiry" v-model.trim="sell.expiry" placeholder="e.g. '1704027599' for 23:59:59 31/12/2023" class="w-25"></b-form-input>
@@ -423,7 +426,7 @@
                   <b-card no-body no-header bg-variant="light" class="m-0 p-0 w-100">
                     <b-card-body class="m-1 p-1">
                       <b-form-group label-cols-lg="1" label="Buy" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
-                        <b-form-group :label="(pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Amount') + ':'" label-for="buy-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
+                        <b-form-group :label="(pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].baseSymbol || 'Base Amount') + ':'" label-for="buy-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
                           <b-form-input type="text" size="sm" id="buy-tokens" v-model.trim="buy.tokens" placeholder="1.01234567891234567" class="w-50"></b-form-input>
                         </b-form-group>
                         <b-form-group label="Max Price:" label-for="buy-price" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Up to 12 whole-number and 11 decimal places" class="mx-0 my-1 p-0">
@@ -431,6 +434,9 @@
                         </b-form-group>
                         <b-form-group label="Min Average Price:" label-for="buy-targetprice" label-size="sm" label-cols-sm="3" label-align-sm="right" description="ONLY when filling orders (0 to ignore)" class="mx-0 my-1 p-0">
                           <b-form-input type="text" size="sm" id="buy-targetprice" v-model.trim="buy.targetPrice" placeholder="e.g. 0.69015" class="w-50"></b-form-input>
+                        </b-form-group>
+                        <b-form-group :label="(pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].baseSymbol || 'Quote Amount') + ':'" label-for="buy-quotetokens" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
+                          <b-form-input type="text" readonly size="sm" id="buy-quotetokens" v-model.trim="buy.quoteTokens" placeholder="1.01234567891234567" class="w-50"></b-form-input>
                         </b-form-group>
                         <b-form-group label="Expiry:" label-for="buy-expiry" label-size="sm" label-cols-sm="3" label-align-sm="right"  description="Unix time. '0' for no expiry" class="mx-0 my-1 p-0">
                           <b-form-input type="text" size="sm" id="buy-expiry" v-model.trim="buy.expiry" placeholder="e.g. '1704027599' for 23:59:59 31/12/2023" class="w-25"></b-form-input>
@@ -1275,6 +1281,7 @@
             targetPrice: null,
             expiry: 1704027599,
             tokens: null,
+            quoteTokens: null,
           },
           buy: {
             action: 2,
@@ -1282,6 +1289,7 @@
             targetPrice: null,
             expiry: 1704027599,
             tokens: null,
+            quoteTokens: null,
           },
           raw: {
             action: 2,
@@ -2294,6 +2302,7 @@
               }
               if (!tokens.isZero() || !quoteTokens.isZero()) {
                 Vue.set(this.buy, 'tokens', ethers.utils.formatUnits(tokens, 18));
+                Vue.set(this.buy, 'quoteTokens', ethers.utils.formatUnits(quoteTokens, 18));
                 Vue.set(this.buy, 'price', ethers.utils.formatUnits(items[0].price, 12));
                 Vue.set(this.buy, 'targetPrice', ethers.utils.formatUnits(averagePrice, 12));
               }
