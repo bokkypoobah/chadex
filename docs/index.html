@@ -414,8 +414,8 @@
                       <b-form-group label="Action:" label-for="sell-action" label-size="sm" label-cols-sm="3" label-align-sm="right" description="'0' fill, '1' fill or kill, '2' fill & add order, '3' remove order, '4' update expiry and tokens" class="mx-0 my-1 p-0">
                         <b-form-input type="text" size="sm" id="sell-action" v-model.trim="sell.action" placeholder="'0' to '4'" class="w-25"></b-form-input>
                       </b-form-group>
-                      <b-form-group label="" label-for="sell-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" description="TODO" class="mx-0 my-1 p-0">
-                        <b-button size="sm" :disabled="true" id="sell-submit" @click="executeRaw()" variant="warning">SELL</b-button>
+                      <b-form-group label="" label-for="sell-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Fill in fields above first!" class="mx-0 my-1 p-0">
+                        <b-button size="sm" :disabled="false" id="sell-submit" @click="executeSell()" variant="warning">SELL</b-button>
                       </b-form-group>
                     </b-card-body>
                   </b-card>
@@ -441,8 +441,8 @@
                       <b-form-group label="Action:" label-for="buy-action" label-size="sm" label-cols-sm="3" label-align-sm="right" description="'0' fill, '1' fill or kill, '2' fill & add order, '3' remove order, '4' update expiry and tokens" class="mx-0 my-1 p-0">
                         <b-form-input type="text" size="sm" id="buy-action" v-model.trim="buy.action" placeholder="'0' to '4'" class="w-25"></b-form-input>
                       </b-form-group>
-                      <b-form-group label="" label-for="buy-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" description="TODO" class="mx-0 my-1 p-0">
-                        <b-button size="sm" :disabled="true" id="buy-submit" @click="executeRaw()" variant="warning">BUY</b-button>
+                      <b-form-group label="" label-for="buy-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Fill in fields above first!" class="mx-0 my-1 p-0">
+                        <b-button size="sm" :disabled="false" id="buy-submit" @click="executeBuy()" variant="warning">BUY</b-button>
                       </b-form-group>
                     </b-card-body>
                   </b-card>
@@ -2988,6 +2988,60 @@
               console.log("tx: " + JSON.stringify(tx));
             } catch (e) {
               console.log("mintWeenus error: " + JSON.stringify(e));
+            }
+          },
+          async executeSell() {
+            console.log("executeSell(): " + JSON.stringify(this.sell, null, 2));
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, provider);
+            const selectedPair = this.getSelectedPair;
+            if (selectedPair) {
+              const chadexContractWithSigner = chadexContract.connect(provider.getSigner());
+              const action = {
+                action: this.sell.action,
+                base: this.indexToAddress[selectedPair.baseIndex],
+                quote: this.indexToAddress[selectedPair.quoteIndex],
+                buySell: 1,
+                price: ethers.utils.parseUnits(this.sell.price, 12).toString(),
+                targetPrice: ethers.utils.parseUnits(this.sell.targetPrice, 12).toString(),
+                expiry: this.sell.expiry,
+                tokens: ethers.utils.parseUnits(this.sell.tokens, selectedPair.baseDecimals).toString(),
+                skipCheck: false,
+              };
+              console.log("action: " + JSON.stringify(action, null, 2));
+              try {
+                const tx = await chadexContractWithSigner.execute([action]);
+                console.log("tx: " + JSON.stringify(tx));
+              } catch (e) {
+                console.log("executeSell error: " + JSON.stringify(e));
+              }
+            }
+          },
+          async executeBuy() {
+            console.log("executeBuy(): " + JSON.stringify(this.buy, null, 2));
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, provider);
+            const selectedPair = this.getSelectedPair;
+            if (selectedPair) {
+              const chadexContractWithSigner = chadexContract.connect(provider.getSigner());
+              const action = {
+                action: this.buy.action,
+                base: this.indexToAddress[selectedPair.baseIndex],
+                quote: this.indexToAddress[selectedPair.quoteIndex],
+                buySell: 0,
+                price: ethers.utils.parseUnits(this.buy.price, 12).toString(),
+                targetPrice: ethers.utils.parseUnits(this.buy.targetPrice, 12).toString(),
+                expiry: this.buy.expiry,
+                tokens: ethers.utils.parseUnits(this.buy.tokens, selectedPair.baseDecimals).toString(),
+                skipCheck: false,
+              };
+              console.log("action: " + JSON.stringify(action, null, 2));
+              try {
+                const tx = await chadexContractWithSigner.execute([action]);
+                console.log("tx: " + JSON.stringify(tx));
+              } catch (e) {
+                console.log("executeBuy error: " + JSON.stringify(e));
+              }
             }
           },
           async executeRaw() {
