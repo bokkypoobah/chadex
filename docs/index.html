@@ -347,7 +347,7 @@
                 <b-col class="ml-0 mr-0 pl-0 pr-1">
                   <b-table small fixed striped responsive hover selectable select-mode="single" selected-variant="primary" @row-selected="pairBuyRowSelected" :fields="pairBuyOrdersFields" :items="pagedFilteredSortedPairBuyOrders" show-empty empty-html="Loading" head-variant="light" class="mx-0 my-1">
                     <template #head(tokens)="data">
-                      {{ pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Amount' }}
+                      {{ getSelectedBaseSymbol }}
                     </template>
                     <template #cell(price)="data">
                       {{ formatERC20(data.item.price, 12) }}
@@ -370,7 +370,7 @@
                 <b-col class="ml-0 mr-0 pl-1 pr-0">
                   <b-table small fixed striped responsive hover selectable select-mode="single" selected-variant="primary" @row-selected="pairSellRowSelected" :fields="pairSellOrdersFields" :items="pagedFilteredSortedPairSellOrders" show-empty empty-html="Loading" head-variant="light" class="mx-0 my-1">
                     <template #head(tokens)="data">
-                      {{ pairs[settings.pairTable.selectedPair] && pairs[settings.pairTable.selectedPair].base.symbol || 'Amount' }}
+                      {{ getSelectedBaseSymbol }}
                     </template>
                     <template #cell(price)="data">
                       {{ formatERC20(data.item.price, 12) }}
@@ -396,14 +396,14 @@
                 <b-col class="ml-0 mr-0 pl-0 pr-1">
                   <b-card no-body no-header bg-variant="light" class="m-0 p-0 w-100">
                     <b-card-body class="m-1 p-1">
-                      <b-form-group :label="'Sell ' + getSelectedBaseSymbol + ':'" label-for="sell-tokens" :state="checkValidPrice(sell.tokens)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
-                        <b-form-input type="text" size="sm" id="sell-tokens" v-model.trim="sell.tokens" :state="checkValidPrice(sell.tokens)" placeholder="1.01234567891234567" class="w-50"></b-form-input>
+                      <b-form-group :label="'Sell ' + getSelectedBaseSymbol + ':'" label-for="sell-tokens" :state="checkValidTokens(sell.tokens)" :invalid-feedback="messages.invalidInputTokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                        <b-form-input type="text" size="sm" id="sell-tokens" v-model.trim="sell.tokens" :state="checkValidTokens(sell.tokens)" v-b-popover.hover="'Enter amount of ' + getSelectedBaseSymbol + '. Up to 18 whole numbers and 24 decimal places'" class="w-50"></b-form-input>
                       </b-form-group>
-                      <b-form-group :label="'Buy ' + getSelectedQuoteSymbol + ':'" label-for="sell-quotetokens" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
-                        <b-form-input type="text" readonly size="sm" id="sell-quotetokens" v-model.trim="sell.quoteTokens" placeholder="1.01234567891234567" class="w-50"></b-form-input>
+                      <b-form-group :label="'Buy ' + getSelectedQuoteSymbol + ':'" label-for="sell-quotetokens" :state="checkValidTokens(sell.quoteTokens)" :invalid-feedback="messages.invalidInputTokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                        <b-form-input type="text" size="sm" id="sell-quotetokens" v-model.trim="sell.quoteTokens" :state="checkValidTokens(sell.quoteTokens)" v-b-popover.hover="'Enter amount of ' + getSelectedQuoteSymbol + '. Up to 18 whole numbers and 24 decimal places'" class="w-50"></b-form-input>
                       </b-form-group>
-                      <b-form-group label="Min Price:" label-for="sell-price" :state="checkValidPrice(sell.price)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Up to 12 whole-number and 11 decimal places" class="mx-0 my-1 p-0">
-                        <b-form-input type="text" size="sm" id="sell-price" v-model.trim="sell.price" :state="checkValidPrice(sell.price)" placeholder="e.g. 0.69012345678" class="w-50"></b-form-input>
+                      <b-form-group label="Min Price:" label-for="sell-price" :state="checkValidPrice(sell.price)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                        <b-form-input type="text" size="sm" id="sell-price" v-model.trim="sell.price" :state="checkValidPrice(sell.price)" v-b-popover.hover="'Up to 12 whole numbers and 12 decimal places'" class="w-50"></b-form-input>
                       </b-form-group>
                       <b-form-group label="Max Average Price:" label-for="sell-targetprice" :state="checkValidPrice(sell.targetPrice)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" description="ONLY when filling orders (0 to ignore)" class="mx-0 my-1 p-0">
                         <b-form-input type="text" size="sm" id="sell-targetprice" v-model.trim="sell.targetPrice" :state="checkValidPrice(sell.targetPrice)" placeholder="e.g. 0.69015" class="w-50"></b-form-input>
@@ -423,13 +423,13 @@
                 <b-col class="ml-0 mr-0 pl-1 pr-0">
                   <b-card no-body no-header bg-variant="light" class="m-0 p-0 w-100">
                     <b-card-body class="m-1 p-1">
-                      <b-form-group :label="'Buy ' + getSelectedBaseSymbol + ':'" label-for="buy-tokens" :state="checkValidPrice(buy.tokens)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
-                        <b-form-input type="text" size="sm" id="buy-tokens" v-model.trim="buy.tokens" :state="checkValidPrice(buy.tokens)" placeholder="1.01234567891234567" class="w-50"></b-form-input>
+                      <b-form-group :label="'Buy ' + getSelectedBaseSymbol + ':'" label-for="buy-tokens" :state="checkValidTokens(buy.tokens)" :invalid-feedback="messages.invalidInputTokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                        <b-form-input type="text" size="sm" id="buy-tokens" v-model.trim="buy.tokens" :state="checkValidTokens(buy.tokens)"  v-b-popover.hover="'Enter amount of ' + getSelectedBaseSymbol + '. Up to 18 whole numbers and 24 decimal places'" class="w-50"></b-form-input>
                       </b-form-group>
-                      <b-form-group :label="'Sell ' + getSelectedQuoteSymbol + ':'" label-for="buy-quotetokens" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Tokens. e.g. '1.012345678901234567'" class="mx-0 my-1 p-0">
-                        <b-form-input type="text" readonly size="sm" id="buy-quotetokens" v-model.trim="buy.quoteTokens" placeholder="1.01234567891234567" class="w-50"></b-form-input>
+                      <b-form-group :label="'Sell ' + getSelectedQuoteSymbol + ':'" label-for="buy-quotetokens" :state="checkValidTokens(buy.quoteTokens)" :invalid-feedback="messages.invalidInputTokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                        <b-form-input type="text" size="sm" id="buy-quotetokens" v-model.trim="buy.quoteTokens" :state="checkValidTokens(buy.quoteTokens)" v-b-popover.hover="'Enter amount of ' + getSelectedQuoteSymbol + '. Up to 18 whole numbers and 24 decimal places'" class="w-50"></b-form-input>
                       </b-form-group>
-                      <b-form-group label="Max Price:" label-for="buy-price" :state="checkValidPrice(buy.price)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Up to 12 whole-number and 11 decimal places" class="mx-0 my-1 p-0">
+                      <b-form-group label="Max Price:" label-for="buy-price" :state="checkValidPrice(buy.price)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
                         <b-form-input type="text" size="sm" id="buy-price" v-model.trim="buy.price" :state="checkValidPrice(buy.price)" placeholder="e.g. 0.69012345678" class="w-50"></b-form-input>
                       </b-form-group>
                       <b-form-group label="Min Average Price:" label-for="buy-targetprice" :state="checkValidPrice(buy.targetPrice)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" description="ONLY when filling orders (0 to ignore)" class="mx-0 my-1 p-0">
@@ -1126,6 +1126,8 @@
         el: '#app',
         // --- DATA ---
         data: {
+          PRICE_DECIMALS: 12, // Match Chadex contract PRICE_DECIMALS
+
           connected: false,
           chainId: null,
           coinbase: null,
@@ -1359,7 +1361,8 @@
           selectedMainTable: {},
 
           messages: {
-            invalidInputPrice: "Please enter a valid price 999,999,999,999.999_999_999_999",
+            invalidInputTokens: "Please enter a valid amount - up to 18 whole numbers and 24 decimal places",
+            invalidInputPrice: "Please enter a valid price - up to 12 whole numbers and 12 decimal places",
           },
 
           tokenInfo: {
@@ -1440,10 +1443,10 @@
             { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'tokens', label: 'Amount', sortable: false, thStyle: 'width: 30%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'price', label: 'Buy Price', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'price', label: 'BUY Price', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
           ],
           pairSellOrdersFields: [
-            { key: 'price', label: 'Sell Price', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'price', label: 'SELL Price', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'tokens', label: 'Amount', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'maker', label: 'Maker', sortable: false, thStyle: 'width: 25%;', tdClass: 'text-left' },
@@ -2281,7 +2284,6 @@
               console.log("pairKey: " + pair.pairKey + ", orderKey: " + orderKey);
               // console.log("pagedFilteredSortedPairBuyOrders: " + JSON.stringify(this.pagedFilteredSortedPairBuyOrders));
               const TEN = ethers.BigNumber.from(10);
-              const PRICE_DECIMALS = 12; // TODO: Read from contract and cache
 
               let tokens = ethers.BigNumber.from(0);
               let quoteTokens = ethers.BigNumber.from(0);
@@ -2289,8 +2291,8 @@
               for (const order of this.pagedFilteredSortedPairBuyOrders) {
                 console.log(JSON.stringify(order));
                 tokens = tokens.add(order.tokens);
-                quoteTokens = quoteTokens.add(ethers.BigNumber.from(order.tokens).mul(TEN.pow(pair.divisor)).mul(order.price).div(TEN.pow(pair.multiplier + PRICE_DECIMALS)));
-                averagePrice = tokens.isZero() ? ethers.BigNumber.from(0) : quoteTokens.mul(TEN.pow(pair.multiplier + PRICE_DECIMALS)).div(tokens).div(TEN.pow(pair.divisor));
+                quoteTokens = quoteTokens.add(ethers.BigNumber.from(order.tokens).mul(TEN.pow(pair.divisor)).mul(order.price).div(TEN.pow(pair.multiplier + this.PRICE_DECIMALS)));
+                averagePrice = tokens.isZero() ? ethers.BigNumber.from(0) : quoteTokens.mul(TEN.pow(pair.multiplier + this.PRICE_DECIMALS)).div(tokens).div(TEN.pow(pair.divisor));
                 console.log("tokens: " + ethers.utils.formatEther(tokens) + ", quoteTokens: " + ethers.utils.formatEther(quoteTokens) +", averagePrice: " + ethers.utils.formatUnits(averagePrice, 12));
                 selectedBuyOrders[order.orderKey] = true;
                 if (order.orderKey == orderKey) {
@@ -2321,7 +2323,6 @@
               console.log("pairKey: " + pair.pairKey + ", orderKey: " + orderKey);
               // console.log("pagedFilteredSortedPairSellOrders: " + JSON.stringify(this.pagedFilteredSortedPairSellOrders));
               const TEN = ethers.BigNumber.from(10);
-              const PRICE_DECIMALS = 12; // TODO: Read from contract and cache
 
               let tokens = ethers.BigNumber.from(0);
               let quoteTokens = ethers.BigNumber.from(0);
@@ -2329,8 +2330,8 @@
               for (const order of this.pagedFilteredSortedPairSellOrders) {
                 console.log(JSON.stringify(order));
                 tokens = tokens.add(order.tokens);
-                quoteTokens = quoteTokens.add(ethers.BigNumber.from(order.tokens).mul(TEN.pow(pair.divisor)).mul(order.price).div(TEN.pow(pair.multiplier + PRICE_DECIMALS)));
-                averagePrice = tokens.isZero() ? ethers.BigNumber.from(0) : quoteTokens.mul(TEN.pow(pair.multiplier + PRICE_DECIMALS)).div(tokens).div(TEN.pow(pair.divisor));
+                quoteTokens = quoteTokens.add(ethers.BigNumber.from(order.tokens).mul(TEN.pow(pair.divisor)).mul(order.price).div(TEN.pow(pair.multiplier + this.PRICE_DECIMALS)));
+                averagePrice = tokens.isZero() ? ethers.BigNumber.from(0) : quoteTokens.mul(TEN.pow(pair.multiplier + this.PRICE_DECIMALS)).div(tokens).div(TEN.pow(pair.divisor));
                 console.log("tokens: " + ethers.utils.formatEther(tokens) + ", quoteTokens: " + ethers.utils.formatEther(quoteTokens) +", averagePrice: " + ethers.utils.formatUnits(averagePrice, 12));
                 selectedSellOrders[order.orderKey] = true;
                 if (order.orderKey == orderKey) {
@@ -2349,10 +2350,26 @@
           },
           checkValidPrice(p) {
             if (p) {
-              const pStripped = p.replace(/[,_]/g,"");
-              if (/^[+-]?\d{0,12}(\.\d{0,12})?$/.test(pStripped)) {
+              const stripped = p.replace(/[,_]/g,"");
+              if (/^[+-]?\d{0,12}(\.\d{0,12})?$/.test(stripped)) {
                 try {
-                  return !isNaN(parseFloat(pStripped));
+                  return !isNaN(parseFloat(stripped));
+                } catch (e) {
+                  return false;
+                }
+              } else {
+                return false;
+              }
+            }
+            return null;
+          },
+          checkValidTokens(t) {
+            if (t) {
+              const stripped = t.replace(/[,_]/g,"");
+              if (/^[+-]?\d{0,18}(\.\d{0,24})?$/.test(stripped)) {
+                try {
+                  // return !isNaN(ethers.BigNumber.from(stripped));
+                  return !isNaN(parseFloat(stripped));
                 } catch (e) {
                   return false;
                 }
@@ -3686,14 +3703,13 @@
                     // }
                     if (buySell == 0) {
                       const TEN = ethers.BigNumber.from(10);
-                      const PRICE_DECIMALS = 12; // TODO: Read from contract and cache
-                      const tokensInQuote = tokens.mul(TEN.pow(pair.divisor)).mul(price1).div(TEN.pow(pair.multiplier + PRICE_DECIMALS));
+                      const tokensInQuote = tokens.mul(TEN.pow(pair.divisor)).mul(price1).div(TEN.pow(pair.multiplier + this.PRICE_DECIMALS));
                       // console.log("BEFORE price: " + ethers.utils.formatUnits(price1, 12) + ", tokens: " + ethers.utils.formatEther(tokens) + ", tokensInQuote: " + ethers.utils.formatEther(tokensInQuote) + ", available: " + ethers.utils.formatEther(availableTokens[maker]));
                       if (tokensInQuote.lt(availableTokens[maker])) {
                         availableTokens[maker] = availableTokens[maker].sub(tokensInQuote);
                       } else {
                         // tokens = availableTokens[maker];
-                        const availableTokensInBase = availableTokens[maker].mul(TEN.pow(pair.multiplier + PRICE_DECIMALS)).div(price1).div(TEN.pow(pair.divisor));
+                        const availableTokensInBase = availableTokens[maker].mul(TEN.pow(pair.multiplier + this.PRICE_DECIMALS)).div(price1).div(TEN.pow(pair.divisor));
                         tokens = availableTokensInBase;
                         availableTokens[maker] = ethers.BigNumber.from(0);
                       }
