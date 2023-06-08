@@ -2275,9 +2275,17 @@
               const orderKey = items[0].orderKey;
               console.log("pairKey: " + pair.pairKey + ", orderKey: " + orderKey);
               // console.log("pagedFilteredSortedPairSellOrders: " + JSON.stringify(this.pagedFilteredSortedPairSellOrders));
+              const TEN = ethers.BigNumber.from(10);
+              const PRICE_DECIMALS = 12; // TODO: Read from contract and cache
 
+              let tokens = ethers.BigNumber.from(0);
+              let quoteTokens = ethers.BigNumber.from(0);
               for (const order of this.pagedFilteredSortedPairSellOrders) {
                 console.log(JSON.stringify(order));
+                tokens = tokens.add(order.tokens);
+                quoteTokens = quoteTokens.add(ethers.BigNumber.from(order.tokens).mul(TEN.pow(pair.divisor)).mul(order.price).div(TEN.pow(pair.multiplier + PRICE_DECIMALS)));
+                const averagePrice = tokens.isZero() ? ethers.BigNumber.from(0) : quoteTokens.mul(TEN.pow(pair.multiplier + PRICE_DECIMALS)).div(tokens).div(TEN.pow(pair.divisor));
+                console.log("tokens: " + ethers.utils.formatEther(tokens) + ", quoteTokens: " + ethers.utils.formatEther(quoteTokens) +", averagePrice: " + ethers.utils.formatUnits(averagePrice, 12));
                 selectedSellOrders[order.orderKey] = true;
                 if (order.orderKey == orderKey) {
                   break;
