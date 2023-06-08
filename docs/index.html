@@ -405,8 +405,8 @@
                       <b-form-group label="Min Price:" label-for="sell-price" :state="checkValidPrice(sell.price)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
                         <b-form-input type="text" size="sm" id="sell-price" v-model.trim="sell.price" :state="checkValidPrice(sell.price)" v-b-popover.hover="'Up to 12 whole numbers and 12 decimal places'" class="w-50"></b-form-input>
                       </b-form-group>
-                      <b-form-group label="Max Average Price:" label-for="sell-targetprice" :state="checkValidPrice(sell.targetPrice)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" description="ONLY when filling orders (0 to ignore)" class="mx-0 my-1 p-0">
-                        <b-form-input type="text" size="sm" id="sell-targetprice" v-model.trim="sell.targetPrice" :state="checkValidPrice(sell.targetPrice)" placeholder="e.g. 0.69015" class="w-50"></b-form-input>
+                      <b-form-group label="Max Average Price:" label-for="sell-targetprice" :state="checkValidPrice(sell.targetPrice)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                        <b-form-input type="text" size="sm" id="sell-targetprice" v-model.trim="sell.targetPrice" :state="checkValidPrice(sell.targetPrice)" v-b-popover.hover="'Up to 12 whole numbers and 12 decimal places. Only required when filling orders'" class="w-50"></b-form-input>
                       </b-form-group>
                       <b-form-group label="Expiry:" label-for="sell-expiry" label-size="sm" label-cols-sm="3" label-align-sm="right"  description="Unix time. '0' for no expiry" class="mx-0 my-1 p-0">
                         <b-form-input type="text" size="sm" id="sell-expiry" v-model.trim="sell.expiry" placeholder="e.g. '1704027599' for 23:59:59 31/12/2023" class="w-25"></b-form-input>
@@ -430,10 +430,10 @@
                         <b-form-input type="text" size="sm" id="buy-quotetokens" v-model.trim="buy.quoteTokens" :state="checkValidTokens(buy.quoteTokens)" v-b-popover.hover="'Enter amount of ' + getSelectedQuoteSymbol + '. Up to 18 whole numbers and 24 decimal places'" class="w-50"></b-form-input>
                       </b-form-group>
                       <b-form-group label="Max Price:" label-for="buy-price" :state="checkValidPrice(buy.price)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                        <b-form-input type="text" size="sm" id="buy-price" v-model.trim="buy.price" :state="checkValidPrice(buy.price)" placeholder="e.g. 0.69012345678" class="w-50"></b-form-input>
+                        <b-form-input type="text" size="sm" id="buy-price" v-model.trim="buy.price" :state="checkValidPrice(buy.price)" v-b-popover.hover="'Up to 12 whole numbers and 12 decimal places'" class="w-50"></b-form-input>
                       </b-form-group>
-                      <b-form-group label="Min Average Price:" label-for="buy-targetprice" :state="checkValidPrice(buy.targetPrice)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" description="ONLY when filling orders (0 to ignore)" class="mx-0 my-1 p-0">
-                        <b-form-input type="text" size="sm" id="buy-targetprice" v-model.trim="buy.targetPrice" :state="checkValidPrice(buy.targetPrice)" placeholder="e.g. 0.69015" class="w-50"></b-form-input>
+                      <b-form-group label="Min Average Price:" label-for="buy-targetprice" :state="checkValidPrice(buy.targetPrice)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                        <b-form-input type="text" size="sm" id="buy-targetprice" v-model.trim="buy.targetPrice" :state="checkValidPrice(buy.targetPrice)" v-b-popover.hover="'Up to 12 whole numbers and 12 decimal places. Only required when filling orders'" class="w-50"></b-form-input>
                       </b-form-group>
                       <b-form-group label="Expiry:" label-for="buy-expiry" label-size="sm" label-cols-sm="3" label-align-sm="right"  description="Unix time. '0' for no expiry" class="mx-0 my-1 p-0">
                         <b-form-input type="text" size="sm" id="buy-expiry" v-model.trim="buy.expiry" placeholder="e.g. '1704027599' for 23:59:59 31/12/2023" class="w-25"></b-form-input>
@@ -1126,8 +1126,6 @@
         el: '#app',
         // --- DATA ---
         data: {
-          PRICE_DECIMALS: 12, // Match Chadex contract PRICE_DECIMALS
-
           connected: false,
           chainId: null,
           coinbase: null,
@@ -2275,24 +2273,17 @@
             const selectedBuyOrders = {};
             if (items.length > 0) {
               const selectedPair = this.settings.pairTable.selectedPair;
-              console.log("selectedPair: " + selectedPair);
               const selectedPairIndex = this.pairToIndex[selectedPair];
-              console.log("selectedPairIndex: " + selectedPairIndex);
               const pair = this.indexToPair[selectedPairIndex];
-              console.log("pair: " + JSON.stringify(pair, null, 2));
               const orderKey = items[0].orderKey;
-              console.log("pairKey: " + pair.pairKey + ", orderKey: " + orderKey);
-              // console.log("pagedFilteredSortedPairBuyOrders: " + JSON.stringify(this.pagedFilteredSortedPairBuyOrders));
-              const TEN = ethers.BigNumber.from(10);
-
-              let tokens = ethers.BigNumber.from(0);
-              let quoteTokens = ethers.BigNumber.from(0);
-              let averagePrice = ethers.BigNumber.from(0);
+              let tokens = ZERO;
+              let quoteTokens = ZERO;
+              let averagePrice = ZERO;
               for (const order of this.pagedFilteredSortedPairBuyOrders) {
                 console.log(JSON.stringify(order));
                 tokens = tokens.add(order.tokens);
-                quoteTokens = quoteTokens.add(ethers.BigNumber.from(order.tokens).mul(TEN.pow(pair.divisor)).mul(order.price).div(TEN.pow(pair.multiplier + this.PRICE_DECIMALS)));
-                averagePrice = tokens.isZero() ? ethers.BigNumber.from(0) : quoteTokens.mul(TEN.pow(pair.multiplier + this.PRICE_DECIMALS)).div(tokens).div(TEN.pow(pair.divisor));
+                quoteTokens = quoteTokens.add(ethers.BigNumber.from(order.tokens).mul(TEN.pow(pair.divisor)).mul(order.price).div(TEN.pow(pair.multiplier + PRICE_DECIMALS)));
+                averagePrice = tokens.isZero() ? ZERO : quoteTokens.mul(TEN.pow(pair.multiplier + PRICE_DECIMALS)).div(tokens).div(TEN.pow(pair.divisor));
                 console.log("tokens: " + ethers.utils.formatEther(tokens) + ", quoteTokens: " + ethers.utils.formatEther(quoteTokens) +", averagePrice: " + ethers.utils.formatUnits(averagePrice, 12));
                 selectedBuyOrders[order.orderKey] = true;
                 if (order.orderKey == orderKey) {
@@ -2314,24 +2305,17 @@
             const selectedSellOrders = {};
             if (items.length > 0) {
               const selectedPair = this.settings.pairTable.selectedPair;
-              console.log("selectedPair: " + selectedPair);
               const selectedPairIndex = this.pairToIndex[selectedPair];
-              console.log("selectedPairIndex: " + selectedPairIndex);
               const pair = this.indexToPair[selectedPairIndex];
-              console.log("pair: " + JSON.stringify(pair, null, 2));
               const orderKey = items[0].orderKey;
-              console.log("pairKey: " + pair.pairKey + ", orderKey: " + orderKey);
-              // console.log("pagedFilteredSortedPairSellOrders: " + JSON.stringify(this.pagedFilteredSortedPairSellOrders));
-              const TEN = ethers.BigNumber.from(10);
-
-              let tokens = ethers.BigNumber.from(0);
-              let quoteTokens = ethers.BigNumber.from(0);
-              let averagePrice = ethers.BigNumber.from(0);
+              let tokens = ZERO;
+              let quoteTokens = ZERO;
+              let averagePrice = ZERO;
               for (const order of this.pagedFilteredSortedPairSellOrders) {
                 console.log(JSON.stringify(order));
                 tokens = tokens.add(order.tokens);
-                quoteTokens = quoteTokens.add(ethers.BigNumber.from(order.tokens).mul(TEN.pow(pair.divisor)).mul(order.price).div(TEN.pow(pair.multiplier + this.PRICE_DECIMALS)));
-                averagePrice = tokens.isZero() ? ethers.BigNumber.from(0) : quoteTokens.mul(TEN.pow(pair.multiplier + this.PRICE_DECIMALS)).div(tokens).div(TEN.pow(pair.divisor));
+                quoteTokens = quoteTokens.add(ethers.BigNumber.from(order.tokens).mul(TEN.pow(pair.divisor)).mul(order.price).div(TEN.pow(pair.multiplier + PRICE_DECIMALS)));
+                averagePrice = tokens.isZero() ? ZERO : quoteTokens.mul(TEN.pow(pair.multiplier + PRICE_DECIMALS)).div(tokens).div(TEN.pow(pair.divisor));
                 console.log("tokens: " + ethers.utils.formatEther(tokens) + ", quoteTokens: " + ethers.utils.formatEther(quoteTokens) +", averagePrice: " + ethers.utils.formatUnits(averagePrice, 12));
                 selectedSellOrders[order.orderKey] = true;
                 if (order.orderKey == orderKey) {
@@ -3702,16 +3686,15 @@
                     //   }
                     // }
                     if (buySell == 0) {
-                      const TEN = ethers.BigNumber.from(10);
-                      const tokensInQuote = tokens.mul(TEN.pow(pair.divisor)).mul(price1).div(TEN.pow(pair.multiplier + this.PRICE_DECIMALS));
+                      const tokensInQuote = tokens.mul(TEN.pow(pair.divisor)).mul(price1).div(TEN.pow(pair.multiplier + PRICE_DECIMALS));
                       // console.log("BEFORE price: " + ethers.utils.formatUnits(price1, 12) + ", tokens: " + ethers.utils.formatEther(tokens) + ", tokensInQuote: " + ethers.utils.formatEther(tokensInQuote) + ", available: " + ethers.utils.formatEther(availableTokens[maker]));
                       if (tokensInQuote.lt(availableTokens[maker])) {
                         availableTokens[maker] = availableTokens[maker].sub(tokensInQuote);
                       } else {
                         // tokens = availableTokens[maker];
-                        const availableTokensInBase = availableTokens[maker].mul(TEN.pow(pair.multiplier + this.PRICE_DECIMALS)).div(price1).div(TEN.pow(pair.divisor));
+                        const availableTokensInBase = availableTokens[maker].mul(TEN.pow(pair.multiplier + PRICE_DECIMALS)).div(price1).div(TEN.pow(pair.divisor));
                         tokens = availableTokensInBase;
-                        availableTokens[maker] = ethers.BigNumber.from(0);
+                        availableTokens[maker] = ZERO;
                       }
                       // console.log("AFTER  price: " + ethers.utils.formatUnits(price1, 12) + ", tokens: " + ethers.utils.formatEther(tokens) + ", available: " + ethers.utils.formatEther(availableTokens[maker]));
                     } else {
@@ -3720,7 +3703,7 @@
                         availableTokens[maker] = availableTokens[maker].sub(tokens);
                       } else {
                         tokens = availableTokens[maker];
-                        availableTokens[maker] = ethers.BigNumber.from(0);
+                        availableTokens[maker] = ZERO;
                       }
                     }
                     const makerIndex = this.addressToIndex[results[k][3]];
