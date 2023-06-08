@@ -408,11 +408,11 @@
                       <b-form-group label="Max Average Price:" label-for="sell-targetprice" :state="checkValidPrice(sell.targetPrice)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
                         <b-form-input type="text" size="sm" id="sell-targetprice" v-model.trim="sell.targetPrice" :state="checkValidPrice(sell.targetPrice)" v-b-popover.hover="'Up to 12 whole numbers and 12 decimal places. Only required when filling orders'" class="w-50"></b-form-input>
                       </b-form-group>
-                      <b-form-group label="Expiry:" label-for="sell-expiry" label-size="sm" label-cols-sm="3" label-align-sm="right"  description="Unix time. '0' for no expiry" class="mx-0 my-1 p-0">
-                        <b-form-input type="text" size="sm" id="sell-expiry" v-model.trim="sell.expiry" placeholder="e.g. '1704027599' for 23:59:59 31/12/2023" class="w-25"></b-form-input>
+                      <b-form-group label="Action:" label-for="sell-action" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                        <b-form-select size="sm" v-model="sell.action" :options="actionOptions" v-b-popover.hover.top="'Yeah. Action'" class="w-50"></b-form-select>
                       </b-form-group>
-                      <b-form-group label="Action:" label-for="sell-action" label-size="sm" label-cols-sm="3" label-align-sm="right" description="'0' fill, '1' fill or kill, '2' fill & add order, '3' remove order, '4' update expiry and tokens" class="mx-0 my-1 p-0">
-                        <b-form-input type="text" size="sm" id="sell-action" v-model.trim="sell.action" placeholder="'0' to '4'" class="w-25"></b-form-input>
+                      <b-form-group v-if="sell.action == 2" label="Expiry:" label-for="sell-expiry" label-size="sm" label-cols-sm="3" label-align-sm="right"  description="Unix time. '0' for no expiry" class="mx-0 my-1 p-0">
+                        <b-form-input type="text" size="sm" id="sell-expiry" v-model.trim="sell.expiry" placeholder="e.g. '1704027599' for 23:59:59 31/12/2023" class="w-25"></b-form-input>
                       </b-form-group>
                       <b-form-group label="" label-for="sell-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Fill in fields above first!" class="mx-0 my-1 p-0">
                         <b-button size="sm" :disabled="false" id="sell-submit" @click="executeSell()" variant="warning">SELL</b-button>
@@ -435,11 +435,11 @@
                       <b-form-group label="Min Average Price:" label-for="buy-targetprice" :state="checkValidPrice(buy.targetPrice)" :invalid-feedback="messages.invalidInputPrice" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
                         <b-form-input type="text" size="sm" id="buy-targetprice" v-model.trim="buy.targetPrice" :state="checkValidPrice(buy.targetPrice)" v-b-popover.hover="'Up to 12 whole numbers and 12 decimal places. Only required when filling orders'" class="w-50"></b-form-input>
                       </b-form-group>
-                      <b-form-group label="Expiry:" label-for="buy-expiry" label-size="sm" label-cols-sm="3" label-align-sm="right"  description="Unix time. '0' for no expiry" class="mx-0 my-1 p-0">
-                        <b-form-input type="text" size="sm" id="buy-expiry" v-model.trim="buy.expiry" placeholder="e.g. '1704027599' for 23:59:59 31/12/2023" class="w-25"></b-form-input>
+                      <b-form-group label="Action:" label-for="buy-action" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                        <b-form-select size="sm" v-model="buy.action" :options="actionOptions" v-b-popover.hover.top="'Yeah. Action'" class="w-50"></b-form-select>
                       </b-form-group>
-                      <b-form-group label="Action:" label-for="buy-action" label-size="sm" label-cols-sm="3" label-align-sm="right" description="'0' fill, '1' fill or kill, '2' fill & add order, '3' remove order, '4' update expiry and tokens" class="mx-0 my-1 p-0">
-                        <b-form-input type="text" size="sm" id="buy-action" v-model.trim="buy.action" placeholder="'0' to '4'" class="w-25"></b-form-input>
+                      <b-form-group v-if="buy.action == 2" label="Expiry:" label-for="buy-expiry" label-size="sm" label-cols-sm="3" label-align-sm="right"  description="Unix time. '0' for no expiry" class="mx-0 my-1 p-0">
+                        <b-form-input type="text" size="sm" id="buy-expiry" v-model.trim="buy.expiry" placeholder="e.g. '1704027599' for 23:59:59 31/12/2023" class="w-25"></b-form-input>
                       </b-form-group>
                       <b-form-group label="" label-for="buy-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Fill in fields above first!" class="mx-0 my-1 p-0">
                         <b-button size="sm" :disabled="false" id="buy-submit" @click="executeBuy()" variant="warning">BUY</b-button>
@@ -1396,6 +1396,14 @@
             "trade": "Trade",
             "tradesummary": "Trade Summary",
           },
+
+          actionOptions: [
+            { value: 0, text: 'Fill' },
+            { value: 1, text: 'Fill Or Kill' },
+            { value: 2, text: 'Fill And Add Order' },
+            // { value: 3, text: 'Remove Order' },
+            // { value: 4, text: 'Update Expiry And Tokens' },
+          ],
 
           pairsSortOptions: [
             { value: 'symbolquotebaseasc', text: '▲ Quote, ▲ Base' },
