@@ -1341,6 +1341,7 @@
           pairs: {},
           pair: {},
           tokens: {},
+          events: {}, // TODO: Only load relevant events to reduce memory load, in loadCurrentData()
 
           selectedBuyOrders: {},
           selectedSellOrders: {},
@@ -1527,7 +1528,7 @@
             34: "U3Collect",
           },
           db: {
-            name: "chadexdata089h",
+            name: "chadexdata089i",
             version: 1,
             schemaDefinition: {
               cache: '&objectName',
@@ -1791,7 +1792,7 @@
             return results;
           },
           filteredPairHistory() {
-            // console.log("filteredPairHistory");
+            console.log("filteredPairHistory");
             const results = [];
             if (this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
@@ -1831,7 +1832,6 @@
             return results;
           },
           filteredSortedPairHistory() {
-
             let results = this.filteredPairHistory;
             results.sort((a, b) => {
               if (a.blockNumber == b.blockNumber) {
@@ -3237,7 +3237,7 @@
             this.sync.section = null;
             this.sync.halt = false;
             db.close();
-            await this.loadCurrentData();
+            // await this.loadCurrentData(); // TODO
           },
           async syncBlockTimestamps(context, newBlocks) {
             this.sync.completed = 0;
@@ -3418,20 +3418,20 @@
               tokens = tokensDataItems[0].object;
               // console.log("tokens: " + JSON.stringify(tokens));
             }
-            let chadexEvents = {};
-            const chadexEventsDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_chadexEvents").toArray();
-            if (chadexEventsDataItems.length == 1) {
-              chadexEvents = chadexEventsDataItems[0].object;
-              // console.log("chadexEvents: " + JSON.stringify(chadexEvents));
-              Object.keys(chadexEvents).forEach(function (key) {
-                if ('unconfirmed' in chadexEvents[key]) {
-                  console.log("DELETING: " + key + " => " + JSON.stringify(chadexEvents[key]));
-                  delete chadexEvents[key];
+            let events = {};
+            const eventsDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_events").toArray();
+            if (eventsDataItems.length == 1) {
+              events = eventsDataItems[0].object;
+              // console.log("events: " + JSON.stringify(events));
+              Object.keys(events).forEach(function (key) {
+                if ('unconfirmed' in events[key]) {
+                  console.log("DELETING: " + key + " => " + JSON.stringify(events[key]));
+                  delete events[key];
                 }
               });
             }
-            // console.log("chadexEvents: " + JSON.stringify(chadexEvents));
-            const blockNumbers = Object.keys(chadexEvents).sort((a, b) => { return b - a });
+            // console.log("events: " + JSON.stringify(events));
+            const blockNumbers = Object.keys(events).sort((a, b) => { return b - a });
             // console.log("blockNumbers: " + JSON.stringify(blockNumbers));
             const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: 0;
             console.log("startBlock: " + startBlock);
@@ -3533,17 +3533,17 @@
                       }
                       if (record) {
                         const confirmations = context.latestBlockNumber - blockNumber;
-                        if (!(blockNumber in chadexEvents)) {
-                          chadexEvents[blockNumber] = confirmations < CONFIRMATIONS ? { unconfirmed: true } : {};
+                        if (!(blockNumber in events)) {
+                          events[blockNumber] = confirmations < CONFIRMATIONS ? { unconfirmed: true } : {};
                         }
-                        if (!(transactionIndex in chadexEvents[blockNumber])) {
-                          chadexEvents[blockNumber][transactionIndex] = {};
+                        if (!(transactionIndex in events[blockNumber])) {
+                          events[blockNumber][transactionIndex] = {};
                         }
-                        if (!(txHash in chadexEvents[blockNumber][transactionIndex])) {
-                          chadexEvents[blockNumber][transactionIndex][txHash] = {};
+                        if (!(txHash in events[blockNumber][transactionIndex])) {
+                          events[blockNumber][transactionIndex][txHash] = {};
                         }
-                        if (!(logIndex in chadexEvents[blockNumber][transactionIndex][txHash])) {
-                          chadexEvents[blockNumber][transactionIndex][txHash][logIndex] = record;
+                        if (!(logIndex in events[blockNumber][transactionIndex][txHash])) {
+                          events[blockNumber][transactionIndex][txHash][logIndex] = record;
                           newChadexEvents++;
                         }
                       }
@@ -3560,7 +3560,7 @@
               // done = true; // TODO
             } while (!done && !this.sync.halt);
 
-            // console.log("chadexEvents: " + JSON.stringify(chadexEvents, null, 2));
+            // console.log("events: " + JSON.stringify(events, null, 2));
             // console.log("pairs: " + JSON.stringify(pairs, null, 2));
             // console.log("tokens: " + JSON.stringify(tokens));
             // console.log("addressToIndex: " + JSON.stringify(addressToIndex));
@@ -3593,7 +3593,7 @@
             }).catch(function(error) {
               console.log("error: " + error);
             });
-            await context.db.cache.put({ objectName: this.chainId + "_chadexEvents", object: chadexEvents }).then (function() {
+            await context.db.cache.put({ objectName: this.chainId + "_events", object: events }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
             });
@@ -3717,7 +3717,7 @@
                   }
                   results = await chadexContract.getOrders(this.settings.pairTable.selectedPair, buySell, GET_ORDERS_BATCH_SIZE, price, firstOrderKey);
                 }
-                console.log("orders[" + buySell + "]: " + JSON.stringify(orders[buySell], null, 2));
+                // console.log("orders[" + buySell + "]: " + JSON.stringify(orders[buySell], null, 2));
                 if (!(this.settings.pairTable.selectedPair in this.pair)) {
                   Vue.set(this.pair, this.settings.pairTable.selectedPair, {});
                 }
@@ -5292,9 +5292,16 @@
               this.pairToIndex = pairToIndexDataItems[0].object;
               // console.log("pairToIndex: " + JSON.stringify(this.pairToIndex));
             }
+            // TODO: Fix up a race condition - the data is sometimes available, sometimes not. Otherwise it will get re-scraped
+            const eventsDataItems = await db0.cache.where("objectName").equals(this.chainId + "_events").toArray();
+            console.log("eventsDataItems.length: " + eventsDataItems.length);
+            if (eventsDataItems.length == 1) {
+              this.events = eventsDataItems[0].object;
+              console.log("events: " + JSON.stringify(this.events));
+            }
 
             db0.close();
-            await this.loadCurrentData();
+            // await this.loadCurrentData(); // TODO
           })();
         },
       })
