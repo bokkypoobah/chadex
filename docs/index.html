@@ -381,10 +381,6 @@
                       {{ formatExpiryShort(data.item.expiry) }}
                     </template>
                     <template #cell(maker)="data">
-                      <!-- <b-link v-if="data.item.makerIndex" :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank"> -->
-                        <!-- {{ data.item.maker == coinbase ? "(me)" : data.item.maker.substring(0, 10) }} -->
-                        <!-- {{ indexToAddress[data.item.makerIndex].substring(0, 10) }} -->
-                      <!-- </b-link> -->
                       <b-link @click="showModalMakerOrder(1, data.item);">{{ indexToAddress[data.item.makerIndex].substring(0, 10) }}</b-link>
                     </template>
                   </b-table>
