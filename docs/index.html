@@ -1831,6 +1831,7 @@
             return results;
           },
           filteredSortedPairHistory() {
+
             let results = this.filteredPairHistory;
             results.sort((a, b) => {
               if (a.blockNumber == b.blockNumber) {
@@ -4745,12 +4746,6 @@
             }
             return result;
           },
-          formatTimestamp(ts) {
-            if (ts != null) {
-              return moment.unix(ts).format("YYYY-MM-DD HH:mm:ss");
-            }
-            return null;
-          },
           formatETH(e) {
             try {
               return e ? parseFloat(ethers.utils.formatEther(e)).toFixed(9) : null;
@@ -4772,12 +4767,11 @@
             }
             return e.toString();
           },
-          formatTimeDiff(unixtime) {
-            if (!unixtime) {
-              return "";
-            } else {
-              return moment.unix(unixtime).fromNow();
+          formatTimestamp(ts) {
+            if (ts != null) {
+              return moment.unix(ts).format("YYYY-MM-DD HH:mm:ss");
             }
+            return null;
           },
           formatExpiryShort(unixtime) {
             if (!unixtime) {
@@ -4795,6 +4789,13 @@
               return "no expiry";
             } else {
               return moment.unix(unixtime).format("YYYY-MM-DD HH:mm:ss");
+            }
+          },
+          formatTimeDiff(unixtime) {
+            if (!unixtime) {
+              return "";
+            } else {
+              return moment.unix(unixtime).fromNow();
             }
           },
           ensOrAddress(addressOrAddressIndex, length = 0) {
