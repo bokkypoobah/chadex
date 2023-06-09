@@ -183,6 +183,9 @@
             <b-form-group label="Price:" label-for="modal-maker-order-price" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" readonly size="sm" id="modal-maker-order-price" :value="formatERC20(modalMakerOrder.price, 12)" class="w-50"></b-form-input>
             </b-form-group>
+            <b-form-group label="Pair Key:" label-for="modal-maker-order-pairkey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-maker-order-pairkey" :value="settings.pairTable.selectedPair" class="w-100"></b-form-input>
+            </b-form-group>
             <b-form-group label="Order Key:" label-for="modal-maker-order-orderkey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" readonly size="sm" id="modal-maker-order-orderkey" :value="modalMakerOrder.orderKey" class="w-100"></b-form-input>
             </b-form-group>
@@ -192,10 +195,10 @@
             <b-form-group label="Expiry:" label-for="modal-maker-order-expiry" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" readonly size="sm" id="modal-maker-order-expiry" :value="formatExpiry(modalMakerOrder.expiry)" class="w-50"></b-form-input>
             </b-form-group>
-            <b-form-group label="Tokens (Original):" label-for="modal-maker-order-originaltokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group :label="getSelectedBaseSymbol +' :'" label-for="modal-maker-order-originaltokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" readonly size="sm" id="modal-maker-order-originaltokens" :value="formatERC20(modalMakerOrder.originalTokens)" class="w-50"></b-form-input>
             </b-form-group>
-            <b-form-group label="Tokens (Available):" label-for="modal-maker-order-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group :label="'Available ' + getSelectedBaseSymbol + ':'" label-for="modal-maker-order-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="'Taking into maker\'s ' + (modalMakerOrder.buySell == 0 ? getSelectedQuoteSymbol : getSelectedBaseSymbol) + ' account balance and allowance to Chadex'" class="mx-0 my-1 p-0">
               <b-form-input type="text" readonly size="sm" id="modal-maker-order-tokens" :value="formatERC20(modalMakerOrder.tokens)" class="w-50"></b-form-input>
             </b-form-group>
             <b-form-group v-if="indexToAddress[modalMakerOrder.makerIndex] == coinbase" label="" label-for="modal-maker-order-cancel" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -356,13 +359,9 @@
                       {{ formatERC20(data.item.tokens, 18) }}
                     </template>
                     <template #cell(expiry)="data">
-                      {{ formatExpiry(data.item.expiry) }}
+                      {{ formatExpiryShort(data.item.expiry) }}
                     </template>
                     <template #cell(maker)="data">
-                      <!-- <b-link v-if="data.item.makerIndex" :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank"> -->
-                        <!-- {{ data.item.maker == coinbase ? "(me)" : data.item.maker.substring(0, 10) }} -->
-                        <!-- {{ indexToAddress[data.item.makerIndex].substring(0, 10) }} -->
-                      <!-- </b-link> -->
                       <b-link @click="showModalMakerOrder(0, data.item);">{{ indexToAddress[data.item.makerIndex].substring(0, 10) }}</b-link>
                     </template>
                   </b-table>
@@ -379,7 +378,7 @@
                       {{ formatERC20(data.item.tokens, 18) }}
                     </template>
                     <template #cell(expiry)="data">
-                      {{ formatExpiry(data.item.expiry) }}
+                      {{ formatExpiryShort(data.item.expiry) }}
                     </template>
                     <template #cell(maker)="data">
                       <!-- <b-link v-if="data.item.makerIndex" :href="'https://sepolia.etherscan.io/address/' + data.item.maker" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank"> -->
@@ -4784,7 +4783,7 @@
               return moment.unix(unixtime).fromNow();
             }
           },
-          formatExpiry(unixtime) {
+          formatExpiryShort(unixtime) {
             if (!unixtime) {
               return "no expiry";
             } else {
@@ -4793,6 +4792,13 @@
               } else {
                 return "expired";
               }
+            }
+          },
+          formatExpiry(unixtime) {
+            if (!unixtime) {
+              return "no expiry";
+            } else {
+              return moment.unix(unixtime).format("YYYY-MM-DD HH:mm:ss");
             }
           },
           ensOrAddress(addressOrAddressIndex, length = 0) {
