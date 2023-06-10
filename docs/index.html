@@ -1793,10 +1793,23 @@
           },
           filteredPairHistory() {
             console.log("filteredPairHistory");
+            const pairIndex = this.pairToIndex[this.settings.pairTable.selectedPair];
+            const pair = this.indexToPair[pairIndex] || {};
+            // console.log("filteredPairHistory - pairIndex: " + pairIndex);
+            // console.log("filteredPairHistory - pair: " + JSON.stringify(pair, null, 2).substring(0, 2000));
 
-            console.log("this.events: " + JSON.stringify(this.events, null, 2));
+            // console.log("filteredPairHistory - this.events: " + JSON.stringify(this.events, null, 2).substring(0, 2000));
+
+            for (const [blockNumber, txIndexes] of Object.entries(this.events)) {
+              // console.log("blockNumber: " + blockNumber + " => " + JSON.stringify(txIndexes, null, 2));
+              for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
+                console.log("blockNumber: " + blockNumber + "/" + txIndex + " => " + JSON.stringify(txHashes, null, 2));
+              }
+            }
+
+
             const results = [];
-            if (this.settings.pairTable.selectedPair in this.pair) {
+            if (false && this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
               if ('history' in pair) {
                 for (const [itemIndex, item] of pair.history.entries()) {
@@ -3424,7 +3437,7 @@
             const eventsDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_events").toArray();
             if (eventsDataItems.length == 1) {
               events = eventsDataItems[0].object;
-              console.log("syncChadexEvents - Loading events: " + JSON.stringify(events));
+              // console.log("syncChadexEvents - Loading events: " + JSON.stringify(events));
               Object.keys(events).forEach(function (key) {
                 if ('unconfirmed' in events[key]) {
                   console.log("DELETING: " + key + " => " + JSON.stringify(events[key]));
@@ -3432,7 +3445,7 @@
                 }
               });
             }
-            console.log("syncChadexEvents - events: " + JSON.stringify(events));
+            // console.log("syncChadexEvents - events: " + JSON.stringify(events));
             const blockNumbers = Object.keys(events).sort((a, b) => { return b - a });
             // console.log("blockNumbers: " + JSON.stringify(blockNumbers));
             const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: 0;
@@ -3583,6 +3596,7 @@
             });
             Vue.set(this, "pairToIndex", pairToIndex);
             Vue.set(this, "indexToPair", indexToPair);
+            Vue.set(this, "events", events);
             await context.db.cache.put({ objectName: this.chainId + "_indexToPair", object: indexToPair }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
@@ -3727,7 +3741,7 @@
               }
             }
             const selectedPair = this.getSelectedPair;
-            console.log("selectedPair: " + JSON.stringify(selectedPair));
+            // console.log("syncChadexPair - selectedPair: " + JSON.stringify(selectedPair));
           },
 
           async syncCoinTransfers(context) {
@@ -5305,6 +5319,12 @@
             if (pairToIndexDataItems.length == 1) {
               this.pairToIndex = pairToIndexDataItems[0].object;
               // console.log("pairToIndex: " + JSON.stringify(this.pairToIndex));
+            }
+
+            const eventsDataItems = await db0.cache.where("objectName").equals(this.chainId + "_events").toArray();
+            if (eventsDataItems.length == 1) {
+              this.events = eventsDataItems[0].object;
+              // console.log("mounted - Events: " + JSON.stringify(this.events));
             }
 
             db0.close();
