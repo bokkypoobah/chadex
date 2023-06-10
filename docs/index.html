@@ -1806,15 +1806,30 @@
               for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
                 for (const [txHash, logIndexes] of Object.entries(txHashes)) {
                   for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
-                    console.log("blockNumber: " + blockNumber + "/" + txIndex + "/" + txHash + "/" + logIndex + " => " + JSON.stringify(txInfo, null, 2));
+                    // console.log("blockNumber: " + blockNumber + "/" + txIndex + "/" + txHash + "/" + logIndex + " => " + JSON.stringify(txInfo, null, 2));
                     const pairIndex = txInfo[0];
+                    const pair = this.indexToPair[pairIndex];
                     const timestamp = txInfo[1];
-                    results.push({ blockNumber, txIndex, txHash, logIndex, pairIndex, timestamp, txInfo });
+                    const eventType = txInfo[2];
+                    results.push({
+                      blockNumber,
+                      timestamp,
+                      txIndex,
+                      txHash,
+                      logIndex,
+                      pairIndex,
+                      baseIndex: pair.baseIndex,
+                      quoteIndex: pair.quoteIndex,
+                      baseDecimals: pair.baseDecimals,
+                      quoteDecimals: pair.quoteDecimals,
+                      eventType,
+                      txInfo
+                    });
                   }
                 }
               }
             }
-
+            console.log("filteredPairHistory - results: " + JSON.stringify(results, null, 2).substring(0, 1000));
 
             if (false && this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
