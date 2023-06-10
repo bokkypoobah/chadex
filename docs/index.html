@@ -1801,9 +1801,12 @@
             // console.log("filteredPairHistory - this.events: " + JSON.stringify(this.events, null, 2).substring(0, 2000));
 
             for (const [blockNumber, txIndexes] of Object.entries(this.events)) {
-              // console.log("blockNumber: " + blockNumber + " => " + JSON.stringify(txIndexes, null, 2));
               for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
-                console.log("blockNumber: " + blockNumber + "/" + txIndex + " => " + JSON.stringify(txHashes, null, 2));
+                for (const [txHash, logIndexes] of Object.entries(txHashes)) {
+                  for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
+                    console.log("blockNumber: " + blockNumber + "/" + txIndex + "/" + txHash + "/" + logIndex + " => " + JSON.stringify(txInfo, null, 2));
+                  }
+                }
               }
             }
 
