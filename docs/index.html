@@ -444,7 +444,8 @@
                 </b-col>
               </b-row>
 
-              <b-table small fixed striped responsive hover :fields="pairHistoryFields" :items="pagedFilteredSortedPairHistory" show-empty empty-html="TODO: History" head-variant="light" class="mx-0 my-1">
+              <!-- <b-table small fixed striped responsive hover :fields="pairHistoryFields" :items="pagedFilteredSortedPairHistory" show-empty empty-html="TODO: History" head-variant="light" class="mx-0 my-1"> -->
+              <b-table small fixed striped responsive hover :items="pagedFilteredSortedPairHistory" show-empty empty-html="TODO: History" head-variant="light" class="mx-0 my-1">
                 <template #cell(timestamp)="data">
                   <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'txIndex: ' + data.item.transactionIndex + ' logIndex: ' + data.item.logIndex" target="_blank">
                     {{ formatTimestamp(data.item.timestamp) }}
@@ -1528,7 +1529,7 @@
             34: "U3Collect",
           },
           db: {
-            name: "chadexdata089i",
+            name: "chadexdata089j",
             version: 1,
             schemaDefinition: {
               cache: '&objectName',
@@ -1800,18 +1801,21 @@
 
             // console.log("filteredPairHistory - this.events: " + JSON.stringify(this.events, null, 2).substring(0, 2000));
 
+            const results = [];
             for (const [blockNumber, txIndexes] of Object.entries(this.events)) {
               for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
                 for (const [txHash, logIndexes] of Object.entries(txHashes)) {
                   for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
                     console.log("blockNumber: " + blockNumber + "/" + txIndex + "/" + txHash + "/" + logIndex + " => " + JSON.stringify(txInfo, null, 2));
+                    const pairIndex = txInfo[0];
+                    const timestamp = txInfo[1];
+                    results.push({ blockNumber, txIndex, txHash, logIndex, pairIndex, timestamp, txInfo });
                   }
                 }
               }
             }
 
 
-            const results = [];
             if (false && this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
               if ('history' in pair) {
@@ -3510,7 +3514,7 @@
                         const baseIndex = addressToIndex[base];
                         const quoteIndex = addressToIndex[quote];
                         const makerIndex = addressToIndex[maker];
-                        record = [ "pairadded", pairIndex, makerIndex, baseIndex, quoteIndex, parseInt(timestamp) ];
+                        record = [ pairIndex, parseInt(timestamp), "pairadded", makerIndex, baseIndex, quoteIndex ];
                       } else if (logData.eventFragment.name == "OrderAdded") {
                         const [pairKey, orderKey, maker, buySell, price, expiry, tokens, quoteTokens, timestamp] = logData.args;
                         const pairIndex = pairToIndex[pairKey];
@@ -3519,7 +3523,7 @@
                           indexToAddress.push(maker);
                         }
                         const makerIndex = addressToIndex[maker];
-                        record = [ "orderadded", pairIndex, orderKey, makerIndex, buySell, ethers.BigNumber.from(price).toString(), parseInt(expiry), ethers.BigNumber.from(tokens).toString(), ethers.BigNumber.from(quoteTokens).toString(), parseInt(timestamp) ];
+                        record = [pairIndex, parseInt(timestamp), "orderadded", orderKey, makerIndex, buySell, ethers.BigNumber.from(price).toString(), parseInt(expiry), ethers.BigNumber.from(tokens).toString(), ethers.BigNumber.from(quoteTokens).toString() ];
                       } else if (logData.eventFragment.name == "OrderRemoved") {
                         // TODO event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, uint timestamp);
                       } else if (logData.eventFragment.name == "OrderUpdated") {
@@ -3536,7 +3540,7 @@
                         }
                         const takerIndex = addressToIndex[taker];
                         const makerIndex = addressToIndex[maker];
-                        record = [ "trade", pairIndex, orderKey, takerIndex, makerIndex, buySell, ethers.BigNumber.from(price).toString(), ethers.BigNumber.from(tokens).toString(), ethers.BigNumber.from(quoteTokens).toString(), parseInt(timestamp) ];
+                        record = [ pairIndex, parseInt(timestamp), "trade", orderKey, takerIndex, makerIndex, buySell, ethers.BigNumber.from(price).toString(), ethers.BigNumber.from(tokens).toString(), ethers.BigNumber.from(quoteTokens).toString() ];
                       } else if (logData.eventFragment.name == "TradeSummary") {
                         const [pairKey, taker, buySell, price, tokens, quoteTokens, tokensOnOrder, timestamp] = logData.args;
                         const pairIndex = pairToIndex[pairKey];
@@ -3545,7 +3549,7 @@
                           indexToAddress.push(taker);
                         }
                         const takerIndex = addressToIndex[taker];
-                        record = [ "tradesummary", pairIndex, takerIndex, buySell, ethers.BigNumber.from(price).toString(), ethers.BigNumber.from(tokens).toString(), ethers.BigNumber.from(quoteTokens).toString(), ethers.BigNumber.from(tokensOnOrder).toString(), parseInt(timestamp) ];
+                        record = [ pairIndex, parseInt(timestamp), "tradesummary", takerIndex, buySell, ethers.BigNumber.from(price).toString(), ethers.BigNumber.from(tokens).toString(), ethers.BigNumber.from(quoteTokens).toString(), ethers.BigNumber.from(tokensOnOrder).toString() ];
                       } else if (logData.eventFragment.name == "Message") {
                         // TODO event Message(address indexed from, address indexed to, bytes32 indexed pairKey, bytes32 orderKey, string topic, string text, uint timestamp);
                       }
