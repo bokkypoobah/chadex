@@ -1793,6 +1793,8 @@
           },
           filteredPairHistory() {
             console.log("filteredPairHistory");
+
+            console.log("this.events: " + JSON.stringify(this.events, null, 2));
             const results = [];
             if (this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
@@ -3422,7 +3424,7 @@
             const eventsDataItems = await context.db.cache.where("objectName").equals(this.chainId + "_events").toArray();
             if (eventsDataItems.length == 1) {
               events = eventsDataItems[0].object;
-              // console.log("events: " + JSON.stringify(events));
+              console.log("syncChadexEvents - Loading events: " + JSON.stringify(events));
               Object.keys(events).forEach(function (key) {
                 if ('unconfirmed' in events[key]) {
                   console.log("DELETING: " + key + " => " + JSON.stringify(events[key]));
@@ -3430,7 +3432,7 @@
                 }
               });
             }
-            // console.log("events: " + JSON.stringify(events));
+            console.log("syncChadexEvents - events: " + JSON.stringify(events));
             const blockNumbers = Object.keys(events).sort((a, b) => { return b - a });
             // console.log("blockNumbers: " + JSON.stringify(blockNumbers));
             const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: 0;
@@ -3724,7 +3726,7 @@
                 Vue.set(this.pair[this.settings.pairTable.selectedPair], buySell, orders[buySell]);
               }
             }
-            const selectedPair = this.getSelectedPair();
+            const selectedPair = this.getSelectedPair;
             console.log("selectedPair: " + JSON.stringify(selectedPair));
           },
 
@@ -4489,6 +4491,18 @@
 
           },
           async loadCurrentData() {
+
+            // if (Object.keys(this.events) == 0) {
+            //   console.log("loadCurrentData: DEBUG 1");
+            //   // TODO: Fix up a race condition - the data is sometimes available, sometimes not. Otherwise it will get re-scraped
+            //   const eventsDataItems = await db0.cache.where("objectName").equals(this.chainId + "_events").toArray();
+            //   console.log("loadCurrentData - eventsDataItems.length: " + eventsDataItems.length);
+            //   if (eventsDataItems.length == 1) {
+            //     Vue.set(this, 'events', eventsDataItems[0].object);
+            //   }
+            // }
+            // console.log("loadCurrentData - this.events: " + JSON.stringify(this.events));
+
 
             // [
             //   "0xa3f23edc79ae0aa3052a0b5a5fb81f9e13729adb338592d970ffe4a8f5ee3766",
@@ -5292,16 +5306,9 @@
               this.pairToIndex = pairToIndexDataItems[0].object;
               // console.log("pairToIndex: " + JSON.stringify(this.pairToIndex));
             }
-            // TODO: Fix up a race condition - the data is sometimes available, sometimes not. Otherwise it will get re-scraped
-            const eventsDataItems = await db0.cache.where("objectName").equals(this.chainId + "_events").toArray();
-            console.log("eventsDataItems.length: " + eventsDataItems.length);
-            if (eventsDataItems.length == 1) {
-              this.events = eventsDataItems[0].object;
-              console.log("events: " + JSON.stringify(this.events));
-            }
 
             db0.close();
-            // await this.loadCurrentData(); // TODO
+            await this.loadCurrentData();
           })();
         },
       })
