@@ -73,9 +73,12 @@
             </b-card-text>
           </b-card>
 
-          <b-modal id="modal-details" hide-footer size="lg">
+          <b-modal id="modal-tx-details" hide-footer size="lg">
             <template #modal-title>
-              <font size="-1">Tx {{ modalDetails.txHash }}</font>
+              <font size="-1">Tx {{ modalTxDetails.item.txHash }}</font>
+              <b-link size="sm" :href="'https://sepolia.etherscan.io/tx/' + modalTxDetails.item.txHash" target="_blank" variant="link" class="m-0 p-0" v-b-popover.hover.top="'View in etherscan.io'">
+                <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
+              </b-link>
               <!--
               <b-button size="sm" @click="copyToClipboard(modalTx.hash);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
               <b-button size="sm" :href="'https://etherscan.io/tx/' + modalTx.hash" target="_blank" variant="link" class="m-0 p-0" v-b-popover.hover.top="'View in etherscan.io'">
@@ -83,12 +86,12 @@
               </b-button>
               -->
             </template>
-            <b-form-group label="Restore:" label-for="restore-from-backup-browse" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Select backup .tsv file from your local computer to restore'" class="mx-0 my-1 p-0">
+            <!-- <b-form-group label="Restore:" label-for="restore-from-backup-browse" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Select backup .tsv file from your local computer to restore'" class="mx-0 my-1 p-0">
               <b-form-file size="sm" id="restore-from-backup-browse" v-model="restoreFile" @change="backupFilesChange($event.target.name, $event.target.files)" accept=".tsv" class="w-75"></b-form-file>
-            </b-form-group>
+            </b-form-group> -->
             <div>
               <pre>
-                {{ modalDetails }}
+{{ modalTxDetails }}
               </pre>
             </div>
             <!--
@@ -447,9 +450,10 @@
               <!-- <b-table small fixed striped responsive hover :fields="pairHistoryFields" :items="pagedFilteredSortedPairHistory" show-empty empty-html="TODO: History" head-variant="light" class="mx-0 my-1"> -->
               <b-table small fixed striped responsive hover :items="pagedFilteredSortedPairHistory" show-empty empty-html="TODO: History" head-variant="light" class="mx-0 my-1">
                 <template #cell(timestamp)="data">
-                  <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'txIndex: ' + data.item.transactionIndex + ' logIndex: ' + data.item.logIndex" target="_blank">
+                  <b-link @click="showModalTxDetails(data.item);">{{ formatTimestamp(data.item.timestamp) }}</b-link>
+                  <!-- <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'txIndex: ' + data.item.transactionIndex + ' logIndex: ' + data.item.logIndex" target="_blank">
                     {{ formatTimestamp(data.item.timestamp) }}
-                  </b-link>
+                  </b-link> -->
                   <!-- <font size="-2">
                     {{ '.' + data.item.transactionIndex + '/' + data.item.logIndex }}
                   </font> -->
@@ -819,7 +823,7 @@
 
             </div>
 
-            <!-- <b-table small fixed striped responsive hover selectable select-mode="single" @row-selected="showModalDetails" :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Add your tokens in the [tokens] menu, then click [Sync] above" head-variant="light" class="mx-0 my-1"> -->
+            <!-- <b-table small fixed striped responsive hover selectable select-mode="single" @row-selected="showModalTxDetails" :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Add your tokens in the [tokens] menu, then click [Sync] above" head-variant="light" class="mx-0 my-1"> -->
             <b-table small fixed striped responsive hover :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Please click [Sync] above" head-variant="light" class="mx-0 my-1">
               <template #cell(number)="data">
                 <!--
@@ -835,7 +839,7 @@
                     {{ formatTimestamp(data.item[2]) }}
                   </b-link>
                   <font size="-2">
-                    <b-link @click="showModalDetails(data.item);">🔍</b-link>
+                    <b-link @click="showModalTxDetails(data.item);">🔍</b-link>
                   </font>
                 </font>
                 <br />
@@ -956,7 +960,7 @@
                     </b-avatar>
                   </div>
                   <div class="ml-2">
-                    <b-link @click="showModalDetails(data.item);">{{ data.item.name }}</b-link>
+                    <b-link @click="showModalTxDetails(data.item);">{{ data.item.name }}</b-link>
                     <br />
                     {{ data.item.collectionName }}
                     <br />
@@ -1302,7 +1306,8 @@
             completed: null,
             halt: false,
           },
-          modalDetails: {
+          modalTxDetails: {
+            item: null,
             data: null,
             token: null,
             collection: null,
@@ -1797,7 +1802,7 @@
             const pairIndex = this.pairToIndex[this.settings.pairTable.selectedPair];
             const pair = this.indexToPair[pairIndex] || {};
             // console.log("filteredPairHistory - pairIndex: " + pairIndex);
-            // console.log("filteredPairHistory - pair: " + JSON.stringify(pair, null, 2).substring(0, 2000));
+            console.log("filteredPairHistory - pair: " + JSON.stringify(pair, null, 2).substring(0, 2000));
 
             // console.log("filteredPairHistory - this.events: " + JSON.stringify(this.events, null, 2).substring(0, 2000));
 
@@ -1822,6 +1827,8 @@
                       quoteIndex: pair.quoteIndex,
                       baseDecimals: pair.baseDecimals,
                       quoteDecimals: pair.quoteDecimals,
+                      baseSymbol: pair.baseSymbol, // TODO
+                      quoteSymbol: pair.quoteSymbol, // TODO
                       eventType,
                       txInfo
                     });
@@ -2877,66 +2884,67 @@
             console.log(JSON.stringify(this.modalDetails, null, 2));
             this.$bvModal.show('modal-accounts-import');
           },
-          async showModalDetails(item) {
+          async showModalTxDetails(item) {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-            // console.log("showModalDetails: " + JSON.stringify(item));
+            console.log("showModalTxDetails: " + JSON.stringify(item));
             // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
             // console.log(url);
             // const data = await fetch(url).then(response => response.json());
             // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
-            this.$bvModal.show('modal-details');
+            this.$bvModal.show('modal-tx-details');
             const txHash = item[0];
-            this.modalDetails = {
-              item,
-              txHash,
-            };
-            const tx = await provider.getTransaction(txHash);
-            Vue.set(this.modalDetails, 'tx', {
-              hash: tx.hash,
-              type: tx.type,
-              blockHash: tx.blockHash,
-              blockNumber: tx.blockNumber,
-              transactionIndex: tx.transactionIndex,
-              from: tx.from,
-              gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
-              gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
-              to: tx.to,
-              value: ethers.BigNumber.from(tx.value).toString(),
-              nonce: tx.nonce,
-              data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
-              // r: tx.r,
-              // s: tx.s,
-              // v: tx.v,
-              chainId: tx.chainId,
-            });
-            const txReceipt = await provider.getTransactionReceipt(txHash);
-            Vue.set(this.modalDetails, 'txReceipt', {
-              to: txReceipt.to,
-              from: txReceipt.from,
-              contractAddress: txReceipt.contractAddress,
-              transactionIndex: txReceipt.transactionIndex,
-              gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
-              blockHash: txReceipt.blockHash,
-              // transactionHash: txReceipt.transactionHash,
-              logs: txReceipt.logs,
-              blockNumber: txReceipt.blockNumber,
-              // confirmations: txReceipt.confirmations,
-              cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
-              effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
-              status: txReceipt.status,
-              type: txReceipt.type,
-              // byzantium: txReceipt.byzantium,
-            });
-            console.log("tx: " + JSON.stringify(tx, null, 2));
-            console.log("txReceipt: " + JSON.stringify(txReceipt, null, 2));
-            console.log(JSON.stringify(this.modalDetails, null, 2));
+            this.modalTxDetails.item = item;
+            // this.modalTxDetails = {
+            //   item,
+            //   txHash,
+            // };
+            // const tx = await provider.getTransaction(txHash);
+            // Vue.set(this.modalDetails, 'tx', {
+            //   hash: tx.hash,
+            //   type: tx.type,
+            //   blockHash: tx.blockHash,
+            //   blockNumber: tx.blockNumber,
+            //   transactionIndex: tx.transactionIndex,
+            //   from: tx.from,
+            //   gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
+            //   gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
+            //   to: tx.to,
+            //   value: ethers.BigNumber.from(tx.value).toString(),
+            //   nonce: tx.nonce,
+            //   data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
+            //   // r: tx.r,
+            //   // s: tx.s,
+            //   // v: tx.v,
+            //   chainId: tx.chainId,
+            // });
+            // const txReceipt = await provider.getTransactionReceipt(txHash);
+            // Vue.set(this.modalDetails, 'txReceipt', {
+            //   to: txReceipt.to,
+            //   from: txReceipt.from,
+            //   contractAddress: txReceipt.contractAddress,
+            //   transactionIndex: txReceipt.transactionIndex,
+            //   gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
+            //   blockHash: txReceipt.blockHash,
+            //   // transactionHash: txReceipt.transactionHash,
+            //   logs: txReceipt.logs,
+            //   blockNumber: txReceipt.blockNumber,
+            //   // confirmations: txReceipt.confirmations,
+            //   cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
+            //   effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
+            //   status: txReceipt.status,
+            //   type: txReceipt.type,
+            //   // byzantium: txReceipt.byzantium,
+            // });
+            // console.log("tx: " + JSON.stringify(tx, null, 2));
+            // console.log("txReceipt: " + JSON.stringify(txReceipt, null, 2));
+            // console.log(JSON.stringify(this.modalDetails, null, 2));
           },
           async showModalTokenDetails(tokenIndex) {
             console.log("showModalTokenDetails: " + tokenIndex);
             const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-            // console.log("showModalDetails: " + JSON.stringify(item));
+            // console.log("showModalTxDetails: " + JSON.stringify(item));
             // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
             // console.log(url);
             // const data = await fetch(url).then(response => response.json());
@@ -2959,7 +2967,7 @@
             console.log("showModalMakerOrder - buySell: " + buySell + ", item: " + JSON.stringify(item));
             const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-            // console.log("showModalDetails: " + JSON.stringify(item));
+            // console.log("showModalTxDetails: " + JSON.stringify(item));
             // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
             // console.log(url);
             // const data = await fetch(url).then(response => response.json());
