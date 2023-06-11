@@ -80,15 +80,14 @@
               <b-link size="sm" :href="'https://sepolia.etherscan.io/tx/' + modalTxDetails.item.txHash" target="_blank" variant="link" class="m-0 p-0" v-b-popover.hover.top="'View in etherscan.io'">
                 <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
               </b-link>
-              <!--
-              <b-button size="sm" :href="'https://etherscan.io/tx/' + modalTx.hash" target="_blank" variant="link" class="m-0 p-0" v-b-popover.hover.top="'View in etherscan.io'">
-                <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
-              </b-button>
-              -->
             </template>
-            <!-- <b-form-group label="Restore:" label-for="restore-from-backup-browse" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Select backup .tsv file from your local computer to restore'" class="mx-0 my-1 p-0">
-              <b-form-file size="sm" id="restore-from-backup-browse" v-model="restoreFile" @change="backupFilesChange($event.target.name, $event.target.files)" accept=".tsv" class="w-75"></b-form-file>
-            </b-form-group> -->
+            <b-form-group v-if="modalTxDetails.item" label="Block Number:" label-for="modal-tx-details-blocknumber" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-tx-details-blocknumber" :value="modalTxDetails.item.blockNumber" class="w-50"></b-form-input>
+            </b-form-group>
+            <b-form-group v-if="modalTxDetails.item" label="Timestamp:" label-for="modal-tx-details-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-tx-details-timestamp" :value="formatTimestamp(modalTxDetails.item.timestamp)" class="w-50"></b-form-input>
+            </b-form-group>
+
             <div>
               <pre>
 {{ modalTxDetails }}
@@ -2886,16 +2885,17 @@
             this.$bvModal.show('modal-accounts-import');
           },
           async showModalTxDetails(item) {
+            console.log("showModalTxDetails - item: " + JSON.stringify(item));
             const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-            console.log("showModalTxDetails: " + JSON.stringify(item));
             // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
             // console.log(url);
             // const data = await fetch(url).then(response => response.json());
             // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
-            this.$bvModal.show('modal-tx-details');
             const txHash = item[0];
             this.modalTxDetails.item = item;
+            // console.log("showModalTxDetails - this.modalTxDetails.item: " + JSON.stringify(item));
+            this.$bvModal.show('modal-tx-details');
             // this.modalTxDetails = {
             //   item,
             //   txHash,
@@ -2944,12 +2944,6 @@
           async showModalTokenDetails(tokenIndex) {
             console.log("showModalTokenDetails: " + tokenIndex);
             const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-            // console.log("showModalTxDetails: " + JSON.stringify(item));
-            // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
-            // console.log(url);
-            // const data = await fetch(url).then(response => response.json());
-            // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
             this.$bvModal.show('modal-token-details');
             this.modalTokenDetails.tokenIndex = tokenIndex;
             const token = this.tokens[tokenIndex] || {};
@@ -2967,14 +2961,7 @@
           async showModalMakerOrder(buySell, item) {
             console.log("showModalMakerOrder - buySell: " + buySell + ", item: " + JSON.stringify(item));
             const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-            // console.log("showModalTxDetails: " + JSON.stringify(item));
-            // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
-            // console.log(url);
-            // const data = await fetch(url).then(response => response.json());
-            // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
             this.$bvModal.show('modal-maker-order');
-
             this.modalMakerOrder.pairKey = this.settings.pairTable.selectedPair;
             this.modalMakerOrder.buySell = buySell;
             this.modalMakerOrder.price = item.price;
@@ -2985,39 +2972,7 @@
             this.modalMakerOrder.tokens = item.tokens;
             this.modalMakerOrder.availableBase = item.availableBase;
             this.modalMakerOrder.availableQuote = item.availableQuote;
-
             console.log("this.modalMakerOrder: " + JSON.stringify(this.modalMakerOrder, null, 2));
-
-            // modalMakerOrder: {
-            //   buySell: null,
-            //   price: null,
-            //   orderKey: null,
-            //   makerIndex: null,
-            //   expiry: null,
-            //   originalTokens: null,
-            //   tokens: null,
-            //   availableBase: null,
-            //   availableQuote: null,
-            // },
-
-            // showModalMakerOrder - buySell: 0, item: {"price":"690300000000",
-            // "orderIndex":0,"orderKey":"0x2cbf5214c69de294780880b856be423d0036196ac94c147d11ecebd3eb3063b8",
-            // "nextOrderKey":"0x0000000000000000000000000000000000000000000000000000000000000000",
-            // "makerIndex":1,"expiry":1704027599,"tokens":"46546665560000000",
-            // "availableBase":"2535124317432610932","availableQuote":"1749996316323731327"}
-
-            // this.modalTokenDetails.tokenIndex = tokenIndex;
-            // const token = this.tokens[tokenIndex] || {};
-            // console.log("this.tokens: " + JSON.stringify(this.tokens, null, 2));
-            // this.modalTokenDetails.address = this.indexToAddress[tokenIndex] || "?";
-            // this.modalTokenDetails.symbol = token.symbol || "?";
-            // this.modalTokenDetails.name = token.name || "?";
-            // this.modalTokenDetails.decimals = token.decimals || "?";
-            // const erc20 = new ethers.Contract(this.modalTokenDetails.address, ERC20ABI, provider);
-            // this.modalTokenDetails.balance = ethers.BigNumber.from(await erc20.balanceOf(this.coinbase)).toString();
-            // this.modalTokenDetails.allowance = ethers.BigNumber.from(await erc20.allowance(this.coinbase, CHADEXADDRESS_SEPOLIA)).toString();
-            // this.modalTokenDetails.totalSupply = ethers.BigNumber.from(await erc20.totalSupply()).toString() || "?";
-            // console.log("balance: " + this.modalTokenDetails.balance);
           },
           toggleSyncAccounts(items) {
             let someFalse = false;
