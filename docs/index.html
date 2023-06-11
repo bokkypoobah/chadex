@@ -87,6 +87,12 @@
             <b-form-group v-if="modalTxDetails.item" label="Timestamp:" label-for="modal-tx-details-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" readonly size="sm" id="modal-tx-details-timestamp" :value="formatTimestamp(modalTxDetails.item.timestamp)" class="w-50"></b-form-input>
             </b-form-group>
+            <b-form-group v-if="modalTxDetails.tx" label="From:" label-for="modal-tx-details-from" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-tx-details-from" :value="modalTxDetails.tx.from" class="w-75"></b-form-input>
+            </b-form-group>
+            <b-form-group v-if="modalTxDetails.tx" label="To:" label-for="modal-tx-details-to" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="modal-tx-details-to" :value="modalTxDetails.tx.to" class="w-75"></b-form-input>
+            </b-form-group>
 
             <div>
               <pre>
@@ -1308,6 +1314,7 @@
           },
           modalTxDetails: {
             item: null,
+            tx: null,
             data: null,
             token: null,
             collection: null,
@@ -2892,7 +2899,6 @@
             // console.log(url);
             // const data = await fetch(url).then(response => response.json());
             // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
-            const txHash = item[0];
             this.modalTxDetails.item = item;
             // console.log("showModalTxDetails - this.modalTxDetails.item: " + JSON.stringify(item));
             this.$bvModal.show('modal-tx-details');
@@ -2900,14 +2906,23 @@
             //   item,
             //   txHash,
             // };
-            // const tx = await provider.getTransaction(txHash);
-            // Vue.set(this.modalDetails, 'tx', {
+            const tx = await provider.getTransaction(item.txHash);
+            console.log("tx: " + JSON.stringify(tx, null, 2));
+            const txReceipt = await provider.getTransactionReceipt(item.txHash);
+            console.log("txReceipt: " + JSON.stringify(txReceipt, null, 2));
+
+            if (tx.to == CHADEXADDRESS_SEPOLIA) {
+              console.log("Direct tx to: " + tx.to);
+            }
+
+            Vue.set(this.modalTxDetails, 'tx', {
             //   hash: tx.hash,
             //   type: tx.type,
             //   blockHash: tx.blockHash,
             //   blockNumber: tx.blockNumber,
             //   transactionIndex: tx.transactionIndex,
-            //   from: tx.from,
+              from: tx.from,
+              to: tx.to,
             //   gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
             //   gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
             //   to: tx.to,
@@ -2936,7 +2951,7 @@
             //   status: txReceipt.status,
             //   type: txReceipt.type,
             //   // byzantium: txReceipt.byzantium,
-            // });
+            });
             // console.log("tx: " + JSON.stringify(tx, null, 2));
             // console.log("txReceipt: " + JSON.stringify(txReceipt, null, 2));
             // console.log(JSON.stringify(this.modalDetails, null, 2));
