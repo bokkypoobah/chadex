@@ -2907,22 +2907,23 @@
             //   txHash,
             // };
             const tx = await provider.getTransaction(item.txHash);
-            console.log("tx: " + JSON.stringify(tx, null, 2));
+            console.log("showModalTxDetails - tx: " + JSON.stringify(tx));
             const txReceipt = await provider.getTransactionReceipt(item.txHash);
-            console.log("txReceipt: " + JSON.stringify(txReceipt, null, 2));
+            console.log("showModalTxDetails - txReceipt: " + JSON.stringify(txReceipt));
 
             if (tx.to == CHADEXADDRESS_SEPOLIA) {
               const interface = new ethers.utils.Interface(CHADEXABI);
               try {
                 let decodedData = interface.parseTransaction({ data: tx.data, value: tx.value });
-                console.log("decodedData: " + JSON.stringify(decodedData, null, 2));
-                for (let i in decodedData.functionFragment.inputs) {
-                  const c = decodedData.functionFragment.inputs[i];
-                  console.log("  " + i + " " + c.name + " " + c.type + " " + JSON.stringify(decodedData.args[i]));
+                console.log("showModalTxDetails - decodedData: " + JSON.stringify(decodedData, null, 2));
+                if (decodedData.functionFragment.name == "execute") {
+                  console.log("showModalTxDetails - execute()");
+                  // console.log("decodedData.functionFragment.inputs: " + JSON.stringify(decodedData.functionFragment.inputs));
+                  for (let i in decodedData.functionFragment.inputs) {
+                    const c = decodedData.functionFragment.inputs[i];
+                    console.log("  " + i + " " + c.name + " " + c.type + " " + JSON.stringify(decodedData.args[i]));
+                  }
                 }
-                // if (decodedData.functionFragment.name == "execute") {
-                //   console.log("decodedData.functionFragment.inputs: " + JSON.stringify(decodedData.functionFragment.inputs));
-                // }
               } catch (e) {
                 console.log("showModalTxDetails - Error decoding: " + JSON.stringify(tx.data));
               }
