@@ -1805,11 +1805,11 @@
             return results;
           },
           filteredPairHistory() {
-            console.log("filteredPairHistory");
+            // console.log("filteredPairHistory");
             const pairIndex = this.pairToIndex[this.settings.pairTable.selectedPair];
             const pair = this.indexToPair[pairIndex] || {};
             // console.log("filteredPairHistory - pairIndex: " + pairIndex);
-            console.log("filteredPairHistory - pair: " + JSON.stringify(pair, null, 2).substring(0, 2000));
+            // console.log("filteredPairHistory - pair: " + JSON.stringify(pair, null, 2).substring(0, 2000));
 
             // console.log("filteredPairHistory - this.events: " + JSON.stringify(this.events, null, 2).substring(0, 2000));
 
@@ -1843,7 +1843,7 @@
                 }
               }
             }
-            console.log("filteredPairHistory - results: " + JSON.stringify(results, null, 2).substring(0, 1000));
+            // console.log("filteredPairHistory - results: " + JSON.stringify(results, null, 2).substring(0, 1000));
 
             if (false && this.settings.pairTable.selectedPair in this.pair) {
               const pair = this.pair[this.settings.pairTable.selectedPair];
@@ -2918,6 +2918,8 @@
                 console.log("showModalTxDetails - decodedData: " + JSON.stringify(decodedData, null, 2));
                 if (decodedData.functionFragment.name == "execute") {
                   console.log("showModalTxDetails - execute()");
+                  // const tradeInput = decodedData.functionFragment.inputs;
+                  // console.log("showModalTxDetails - tradeInput: " + JSON.stringify(tradeInput, null, 2));
                   // console.log("decodedData.functionFragment.inputs: " + JSON.stringify(decodedData.functionFragment.inputs));
                   for (let i in decodedData.functionFragment.inputs) {
                     const c = decodedData.functionFragment.inputs[i];
@@ -3236,7 +3238,7 @@
               });
           },
           async syncAll(blockNumber) {
-            console.log("syncAll - blockNumber: " + blockNumber);
+            console.log(moment().format("HH:mm:ss") + " syncAll - blockNumber: " + blockNumber);
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
@@ -3411,7 +3413,7 @@
 
           async syncChadexEvents(context) {
             const CONFIRMATIONS = 20;
-            console.log("syncChadexEvents - latestBlockNumber: " + context.latestBlockNumber);
+            console.log(moment().format("HH:mm:ss") + " syncChadexEvents - latestBlockNumber: " + context.latestBlockNumber);
             const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, context.provider);
             let batchSize = 100000000;
             const BATCHREDUCTIONFACTOR = 0.50;
@@ -3464,7 +3466,7 @@
             const blockNumbers = Object.keys(events).sort((a, b) => { return b - a });
             // console.log("blockNumbers: " + JSON.stringify(blockNumbers));
             const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: 0;
-            console.log("startBlock: " + startBlock);
+            // console.log("startBlock: " + startBlock);
             for (const address of [CHADEXADDRESS_SEPOLIA, this.coinbase]) {
               if (!(address in addressToIndex)) {
                 addressToIndex[address] = indexToAddress.length;
@@ -3639,7 +3641,7 @@
           },
 
           async syncChadexPairs(context) {
-            console.log("syncChadexPairs - latestBlockNumber: " + context.latestBlockNumber);
+            console.log(moment().format("HH:mm:ss") + " syncChadexPairs - latestBlockNumber: " + context.latestBlockNumber);
             const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, context.provider);
             const GET_PAIRS_BATCH_SIZE = 20;
             const GET_PAIRS_OFFSET = 0; // TODO: Create loop to collect > batch size
@@ -3683,7 +3685,7 @@
           },
 
           async syncChadexPair(context) {
-            console.log("syncChadexPair - latestBlockNumber: " + context.latestBlockNumber);
+            console.log(moment().format("HH:mm:ss") + " syncChadexPair - latestBlockNumber: " + context.latestBlockNumber);
             const PRICE_EMPTY = 0;
             const GET_ORDERS_BATCH_SIZE = 10;
             const chadexContract = new ethers.Contract(CHADEXADDRESS_SEPOLIA, CHADEXABI, context.provider);
@@ -4948,7 +4950,7 @@
             // }
           },
           async connectToWeb3() {
-            console.log("connectToWeb3");
+            console.log(moment().format("HH:mm:ss") + " connectToWeb3");
             if (!window.ethereum) {
               this.connected = false;
             } else {
@@ -4960,15 +4962,15 @@
                 this.connected = false;
               }
             }
-            console.log("connectToWeb3 - connected: " + this.connected);
+            console.log(moment().format("HH:mm:ss") + " connectToWeb3 - connected: " + this.connected);
             if (!this.connected) {
               alert("Please use the https://metamask.io addon with Firefox, Chromium, Opera or Chrome, or any other other web3 browser, for web3 data retrieval. And refresh!");
             } else {
               const t = this;
-              console.log("connectToWeb3 - installing listeners");
+              console.log(moment().format("HH:mm:ss") + " connectToWeb3 - installing listeners");
               function handleChainChanged(_chainId) {
                 t.chainId = _chainId;
-                console.log("this.chainId: " + t.chainId);
+                console.log(moment().format("HH:mm:ss") + " connectToWeb3 - handleChainChanged - this.chainId: " + t.chainId);
                 alert('Ethereum chain has changed - reloading this page.')
                 window.location.reload();
               }
@@ -4977,11 +4979,11 @@
               async function handleAccountsChanged(accounts) {
                 const signer = provider.getSigner();
                 t.coinbase = await signer.getAddress();
-                console.log("handleAccountsChanged: " + t.coinbase);
+                console.log(moment().format("HH:mm:ss") + " connectToWeb3 - handleAccountsChanged: " + t.coinbase);
               }
               window.ethereum.on('accountsChanged', handleAccountsChanged);
               async function handleNewBlock(blockNumber) {
-                console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + JSON.stringify(blockNumber));
+                console.log(moment().format("HH:mm:ss") + " handleNewBlock - New Block #" + blockNumber);
                 const block = await provider.getBlock();
                 t.blockNumber = blockNumber;
                 t.timestamp = block.timestamp;
@@ -4992,7 +4994,7 @@
               this.coinbase = await signer.getAddress();
               const network = await provider.getNetwork();
               this.chainId = network.chainId;
-              console.log("this.chainId: " + this.chainId);
+              console.log(moment().format("HH:mm:ss") + " connectToWeb3 - this.chainId: " + this.chainId);
             }
           },
           // TODO: Delete
@@ -5267,9 +5269,7 @@
           //   this.connect = localStorage.chadexConnectV1;;
           // }
           (async() => {
-            console.log("mounted - Before connectToWeb3");
             await this.connectToWeb3();
-            console.log("mounted - After connectToWeb3");
           })();
 
           // if ('chadexCoinbase' in localStorage) {
