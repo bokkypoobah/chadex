@@ -76,11 +76,11 @@
           <b-modal id="modal-tx-details" hide-footer size="lg">
             <template #modal-title>
               <font size="-1">Tx {{ modalTxDetails.item.txHash }}</font>
+              <b-button size="sm" @click="copyToClipboard(modalTxDetails.item.txHash);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
               <b-link size="sm" :href="'https://sepolia.etherscan.io/tx/' + modalTxDetails.item.txHash" target="_blank" variant="link" class="m-0 p-0" v-b-popover.hover.top="'View in etherscan.io'">
                 <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
               </b-link>
               <!--
-              <b-button size="sm" @click="copyToClipboard(modalTx.hash);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
               <b-button size="sm" :href="'https://etherscan.io/tx/' + modalTx.hash" target="_blank" variant="link" class="m-0 p-0" v-b-popover.hover.top="'View in etherscan.io'">
                 <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
               </b-button>
@@ -148,6 +148,7 @@
           <b-modal id="modal-token-details" hide-footer size="lg">
             <template #modal-title>
               ERC-20 Token {{ modalTokenDetails.address }}
+              <b-button size="sm" @click="copyToClipboard(modalTokenDetails.address);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
               <b-link size="sm" :href="'https://sepolia.etherscan.io/token/' + modalTokenDetails.address + '?a=' + coinbase" target="_blank" variant="link" class="m-0 p-0" v-b-popover.hover.top="'View in etherscan.io'">
                 <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
               </b-link>
@@ -4941,24 +4942,26 @@
             }
           },
           copyToClipboard(str) {
-            // https://github.com/30-seconds/30-seconds-of-code/blob/master/snippets/copyToClipboard.md
-            const el = document.createElement('textarea');
-            el.value = str;
-            el.setAttribute('readonly', '');
-            el.style.position = 'absolute';
-            el.style.left = '-9999px';
-            document.body.appendChild(el);
-            const selected =
-              document.getSelection().rangeCount > 0
-                ? document.getSelection().getRangeAt(0)
-                : false;
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            if (selected) {
-              document.getSelection().removeAllRanges();
-              document.getSelection().addRange(selected);
-            }
+            navigator.clipboard.writeText(str);
+            // Below does not work when copying from modal dialog window
+            // // https://github.com/30-seconds/30-seconds-of-code/blob/master/snippets/copyToClipboard.md
+            // const el = document.createElement('textarea');
+            // el.value = str;
+            // el.setAttribute('readonly', '');
+            // el.style.position = 'absolute';
+            // el.style.left = '-9999px';
+            // document.body.appendChild(el);
+            // const selected =
+            //   document.getSelection().rangeCount > 0
+            //     ? document.getSelection().getRangeAt(0)
+            //     : false;
+            // el.select();
+            // document.execCommand('copy');
+            // document.body.removeChild(el);
+            // if (selected) {
+            //   document.getSelection().removeAllRanges();
+            //   document.getSelection().addRange(selected);
+            // }
           },
           async connectToWeb3() {
             console.log("connectToWeb3");
