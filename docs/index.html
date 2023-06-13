@@ -469,7 +469,7 @@
             </template>
             <b-card-text class="m-0 p-0">
               <!-- <b-table small fixed striped responsive hover :fields="pairHistoryFields" :items="pagedFilteredSortedPairHistory" show-empty empty-html="TODO: History" head-variant="light" class="mx-0 my-1"> -->
-              <b-table small fixed striped responsive hover :items="pagedFilteredSortedPairHistory" show-empty empty-html="TODO: History" head-variant="light" class="mx-0 my-1">
+              <b-table small fixed striped responsive hover :items="pagedFilteredSortedPairHistory" show-empty empty-html="TODO: History" head-variant="light" class="mx-0 my-0">
                 <template #cell(timestamp)="data">
                   <b-link @click="showModalTxDetails(data.item);">{{ formatTimestamp(data.item.timestamp) }}</b-link>
                   <!-- <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'txIndex: ' + data.item.transactionIndex + ' logIndex: ' + data.item.logIndex" target="_blank">
