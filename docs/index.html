@@ -452,7 +452,22 @@
                   </b-card>
                 </b-col>
               </b-row>
+            </b-card-text>
+          </b-card>
 
+          <!-- 1&2:HISTORY -->
+          <b-card v-if="coinbase && (settings.tabIndex == 1 || settings.tabIndex == 2)" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
+            <template #header>
+              History
+              <!-- <div class="d-flex flex-wrap m-0 p-0">
+                <div class="mt-0 pr-2">
+                  Pair
+                </div>
+                <div class="mt-0 pr-1">
+                  <b-form-select size="sm" v-model="settings.pairTable.selectedPair" @change="saveSettings()" :options="pairsOptions"></b-form-select>
+                </div> -->
+            </template>
+            <b-card-text class="m-0 p-0">
               <!-- <b-table small fixed striped responsive hover :fields="pairHistoryFields" :items="pagedFilteredSortedPairHistory" show-empty empty-html="TODO: History" head-variant="light" class="mx-0 my-1"> -->
               <b-table small fixed striped responsive hover :items="pagedFilteredSortedPairHistory" show-empty empty-html="TODO: History" head-variant="light" class="mx-0 my-1">
                 <template #cell(timestamp)="data">
@@ -1806,8 +1821,16 @@
           },
           filteredPairHistory() {
             // console.log("filteredPairHistory");
-            const pairIndex = this.pairToIndex[this.settings.pairTable.selectedPair];
-            const pair = this.indexToPair[pairIndex] || {};
+
+            const selectedPairIndex = this.settings.tabIndex == 1 ? null : this.pairToIndex[this.settings.pairTable.selectedPair];
+            console.log("selectedPairIndex: " + selectedPairIndex);
+// (settings.tabIndex == 1 || settings.tabIndex == 2)
+//
+//             const pairIndex = this.pairToIndex[this.settings.pairTable.selectedPair];
+            // const pair = this.indexToPair[pairIndex] || {};
+
+
+
             // console.log("filteredPairHistory - pairIndex: " + pairIndex);
             // console.log("filteredPairHistory - pair: " + JSON.stringify(pair, null, 2).substring(0, 2000));
 
@@ -1821,24 +1844,26 @@
                     // console.log("blockNumber: " + blockNumber + "/" + txIndex + "/" + txHash + "/" + logIndex + " => " + JSON.stringify(txInfo, null, 2));
                     const pairIndex = txInfo[0];
                     const pair = this.indexToPair[pairIndex];
-                    const timestamp = txInfo[1];
-                    const eventType = txInfo[2];
-                    results.push({
-                      blockNumber,
-                      timestamp,
-                      txIndex,
-                      txHash,
-                      logIndex,
-                      pairIndex,
-                      baseIndex: pair.baseIndex,
-                      quoteIndex: pair.quoteIndex,
-                      baseDecimals: pair.baseDecimals,
-                      quoteDecimals: pair.quoteDecimals,
-                      baseSymbol: pair.baseSymbol, // TODO
-                      quoteSymbol: pair.quoteSymbol, // TODO
-                      eventType,
-                      txInfo
-                    });
+                    if (selectedPairIndex == null || selectedPairIndex == pairIndex) {
+                      const timestamp = txInfo[1];
+                      const eventType = txInfo[2];
+                      results.push({
+                        blockNumber,
+                        timestamp,
+                        txIndex,
+                        txHash,
+                        logIndex,
+                        pairIndex,
+                        baseIndex: pair.baseIndex,
+                        quoteIndex: pair.quoteIndex,
+                        baseDecimals: pair.baseDecimals,
+                        quoteDecimals: pair.quoteDecimals,
+                        baseSymbol: pair.baseSymbol, // TODO
+                        quoteSymbol: pair.quoteSymbol, // TODO
+                        eventType,
+                        txInfo
+                      });
+                    }
                   }
                 }
               }
@@ -2921,6 +2946,7 @@
                   // const tradeInput = decodedData.functionFragment.inputs;
                   // console.log("showModalTxDetails - tradeInput: " + JSON.stringify(tradeInput, null, 2));
                   // console.log("decodedData.functionFragment.inputs: " + JSON.stringify(decodedData.functionFragment.inputs));
+                  console.log("decodedData.args: " + JSON.stringify(decodedData.args));
                   for (let i in decodedData.functionFragment.inputs) {
                     const c = decodedData.functionFragment.inputs[i];
                     console.log("  " + i + " " + c.name + " " + c.type + " " + JSON.stringify(decodedData.args[i]));
