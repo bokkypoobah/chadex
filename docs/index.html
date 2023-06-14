@@ -88,22 +88,32 @@
               <b-form-input type="text" readonly size="sm" id="modal-tx-details-timestamp" :value="formatTimestamp(modalTxDetails.item.timestamp)" class="w-50"></b-form-input>
             </b-form-group>
             <b-form-group v-if="modalTxDetails.tx" label="From:" label-for="modal-tx-details-from" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <template slot="description">
+                <div v-if="ensOrAddress(modalTxDetails.tx.from) != modalTxDetails.tx.from">
+                  {{ modalTxDetails.tx.from }}
+                </div>
+              </template>
               <b-input-group size="sm" class="w-75">
-                <b-form-input type="text" readonly size="sm" id="modal-tx-details-from" :value="modalTxDetails.tx.from"></b-form-input>
+                <b-form-input type="text" readonly size="sm" id="modal-tx-details-from" :value="ensOrAddress(modalTxDetails.tx.from)"></b-form-input>
                 <b-input-group-append class="ml-1">
                   <b-button size="sm" @click="copyToClipboard(modalTxDetails.tx.from);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                  <b-link size="sm" :href="'https://sepolia.etherscan.io/address/' + modalTxDetails.tx.from" target="_blank" variant="link" class="m-0 p-0" v-b-popover.hover.top="'View in etherscan.io'">
+                  <b-link size="sm" :href="'https://sepolia.etherscan.io/address/' + modalTxDetails.tx.from" target="_blank" variant="link" class="m-0 ml-1 p-0" v-b-popover.hover.top="'View in etherscan.io'">
                     <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
                   </b-link>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
             <b-form-group v-if="modalTxDetails.tx" label="To:" label-for="modal-tx-details-to" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <template slot="description">
+                <div v-if="ensOrAddress(modalTxDetails.tx.to) != modalTxDetails.tx.to">
+                  {{ modalTxDetails.tx.to }}
+                </div>
+              </template>
               <b-input-group size="sm" class="w-75">
-                <b-form-input type="text" readonly size="sm" id="modal-tx-details-to" :value="modalTxDetails.tx.to"></b-form-input>
+                <b-form-input type="text" readonly size="sm" id="modal-tx-details-to" :value="ensOrAddress(modalTxDetails.tx.to)"></b-form-input>
                 <b-input-group-append class="ml-1">
                   <b-button size="sm" @click="copyToClipboard(modalTxDetails.tx.to);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                  <b-link size="sm" :href="'https://sepolia.etherscan.io/address/' + modalTxDetails.tx.to" target="_blank" variant="link" class="m-0 p-0" v-b-popover.hover.top="'View in etherscan.io'">
+                  <b-link size="sm" :href="'https://sepolia.etherscan.io/address/' + modalTxDetails.tx.to" target="_blank" variant="link" class="m-0 ml-1 p-0" v-b-popover.hover.top="'View in etherscan.io'">
                     <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
                   </b-link>
                 </b-input-group-append>
@@ -215,7 +225,20 @@
               <b-form-input type="text" readonly size="sm" id="modal-maker-order-orderkey" :value="modalMakerOrder.orderKey" class="w-100"></b-form-input>
             </b-form-group>
             <b-form-group label="Maker:" label-for="modal-maker-order-maker" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-maker-order-maker" :value="indexToAddress[modalMakerOrder.makerIndex]" class="w-75"></b-form-input>
+              <template slot="description">
+                <div v-if="ensOrAddress(modalMakerOrder.makerIndex) != indexToAddress[modalMakerOrder.makerIndex]">
+                  {{ indexToAddress[modalMakerOrder.makerIndex] }}
+                </div>
+              </template>
+              <b-input-group size="sm" class="w-75">
+                <b-form-input type="text" readonly size="sm" id="modal-maker-order-maker" :value="ensOrAddress(modalMakerOrder.makerIndex)"></b-form-input>
+                <b-input-group-append class="ml-1">
+                  <b-button size="sm" @click="copyToClipboard(indexToAddress[modalMakerOrder.makerIndex]);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-link size="sm" :href="'https://sepolia.etherscan.io/address/' + indexToAddress[modalMakerOrder.makerIndex]" target="_blank" variant="link" class="m-0 ml-1 p-0" v-b-popover.hover.top="'View in etherscan.io'">
+                    <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
+                  </b-link>
+                </b-input-group-append>
+              </b-input-group>
             </b-form-group>
             <b-form-group label="Expiry:" label-for="modal-maker-order-expiry" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" readonly size="sm" id="modal-maker-order-expiry" :value="formatExpiry(modalMakerOrder.expiry)" class="w-50"></b-form-input>
