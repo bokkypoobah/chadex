@@ -1346,6 +1346,7 @@
           modalTxDetails: {
             item: null,
             tx: null,
+            tradeInputs: null,
             data: null,
             token: null,
             collection: null,
@@ -2933,7 +2934,7 @@
             this.$bvModal.show('modal-accounts-import');
           },
           async showModalTxDetails(item) {
-            console.log("showModalTxDetails - item: " + JSON.stringify(item));
+            // console.log("showModalTxDetails - item: " + JSON.stringify(item));
             const provider = new ethers.providers.Web3Provider(window.ethereum);
 
             // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
@@ -2948,21 +2949,46 @@
             //   txHash,
             // };
             const tx = await provider.getTransaction(item.txHash);
-            console.log("showModalTxDetails - tx: " + JSON.stringify(tx));
+            // console.log("showModalTxDetails - tx: " + JSON.stringify(tx));
             const txReceipt = await provider.getTransactionReceipt(item.txHash);
-            console.log("showModalTxDetails - txReceipt: " + JSON.stringify(txReceipt));
+            // console.log("showModalTxDetails - txReceipt: " + JSON.stringify(txReceipt));
 
             if (tx.to == CHADEXADDRESS_SEPOLIA) {
               const interface = new ethers.utils.Interface(CHADEXABI);
               try {
                 let decodedData = interface.parseTransaction({ data: tx.data, value: tx.value });
-                console.log("showModalTxDetails - decodedData: " + JSON.stringify(decodedData, null, 2));
+                // console.log("showModalTxDetails - decodedData: " + JSON.stringify(decodedData, null, 2));
                 if (decodedData.functionFragment.name == "execute") {
                   console.log("showModalTxDetails - execute()");
                   // const tradeInput = decodedData.functionFragment.inputs;
                   // console.log("showModalTxDetails - tradeInput: " + JSON.stringify(tradeInput, null, 2));
                   // console.log("decodedData.functionFragment.inputs: " + JSON.stringify(decodedData.functionFragment.inputs));
-                  console.log("decodedData.args: " + JSON.stringify(decodedData.args));
+                  // console.log("decodedData.args: " + JSON.stringify(decodedData.args));
+                  // struct TradeInput {
+                  //     Action action;
+                  //     BuySell buySell;
+                  //     Token base;
+                  //     Token quote;
+                  //     Price price;
+                  //     Price targetPrice;
+                  //     Unixtime expiry;
+                  //     Tokens tokens;
+                  //     bool skipCheck;
+                  // }
+
+                  const tradeInputs = [];
+                  for (let i = 0; i < decodedData.args.length; i++) {
+                    // console.log("decodedData.args[" + i + "]: " + JSON.stringify(decodedData.args[i]));
+                    const details = decodedData.args[i][0];
+                    // console.log("details: " + JSON.stringify(details, null, 2));
+                    const [action, buySell, base, quote, price, targetPrice, expiry, tokens, skipCheck] = decodedData.args[i][0];
+                    // console.log("action: " + action + ", buySell: " + buySell + ", base:" + base + ", quote:" + quote + ", price: " + price + ", targetPrice: " + targetPrice + ", expiry: " + expiry + ", tokens: " + tokens + ", skipCheck: " + skipCheck);
+                    tradeInputs.push({ action, buySell, base, quote, price: price.toString(), targetPrice: targetPrice.toString(), expiry: parseInt(expiry), tokens: tokens.toString(), skipCheck });
+                    // TODO: Testing
+                    tradeInputs.push({ action, buySell, base, quote, price: price.toString(), targetPrice: targetPrice.toString(), expiry: parseInt(expiry), tokens: tokens.toString(), skipCheck });
+                  }
+                  console.log("tradeInputs: " + JSON.stringify(tradeInputs, null, 2));
+                  Vue.set(this.modalTxDetails, 'tradeInputs', tradeInputs);
                   for (let i in decodedData.functionFragment.inputs) {
                     const c = decodedData.functionFragment.inputs[i];
                     console.log("  " + i + " " + c.name + " " + c.type + " " + JSON.stringify(decodedData.args[i]));
