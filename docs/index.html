@@ -387,7 +387,7 @@
                       {{ formatExpiryShort(data.item.expiry) }}
                     </template>
                     <template #cell(maker)="data">
-                      <b-link @click="showModalMakerOrder(0, data.item);">{{ indexToAddress[data.item.makerIndex].substring(0, 10) }}</b-link>
+                      <b-link @click="showModalMakerOrder(0, data.item);">{{ ensOrAddress(data.item.makerIndex, 16) }}</b-link>
                     </template>
                   </b-table>
                 </b-col>
@@ -406,7 +406,7 @@
                       {{ formatExpiryShort(data.item.expiry) }}
                     </template>
                     <template #cell(maker)="data">
-                      <b-link @click="showModalMakerOrder(1, data.item);">{{ indexToAddress[data.item.makerIndex].substring(0, 10) }}</b-link>
+                      <b-link @click="showModalMakerOrder(1, data.item);">{{ ensOrAddress(data.item.makerIndex, 16) }}</b-link>
                     </template>
                   </b-table>
                 </b-col>
