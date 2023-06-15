@@ -81,13 +81,13 @@
                 <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
               </b-link>
             </template>
-            <b-form-group v-if="modalTxDetails.item" label="Block Number:" label-for="modal-tx-details-blocknumber" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalTxDetails.item" label="Block Number:" label-for="modal-tx-details-blocknumber" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" readonly size="sm" id="modal-tx-details-blocknumber" :value="modalTxDetails.item.blockNumber" class="w-50"></b-form-input>
             </b-form-group>
-            <b-form-group v-if="modalTxDetails.item" label="Timestamp:" label-for="modal-tx-details-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalTxDetails.item" label="Timestamp:" label-for="modal-tx-details-timestamp" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" readonly size="sm" id="modal-tx-details-timestamp" :value="formatTimestamp(modalTxDetails.item.timestamp)" class="w-50"></b-form-input>
             </b-form-group>
-            <b-form-group v-if="modalTxDetails.tx" label="From:" label-for="modal-tx-details-from" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalTxDetails.tx" label="From:" label-for="modal-tx-details-from" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
               <template slot="description">
                 <div v-if="ensOrAddress(modalTxDetails.tx.from) != modalTxDetails.tx.from">
                   {{ modalTxDetails.tx.from }}
@@ -103,7 +103,7 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalTxDetails.tx" label="To:" label-for="modal-tx-details-to" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalTxDetails.tx" label="To:" label-for="modal-tx-details-to" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
               <template slot="description">
                 <div v-if="ensOrAddress(modalTxDetails.tx.to) != modalTxDetails.tx.to">
                   {{ modalTxDetails.tx.to }}
@@ -119,6 +119,50 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
+
+            <span v-if="modalTxDetails.tradeInputs" v-for="(tradeInput, tradeInputIndex) in modalTxDetails.tradeInputs" :key="tradeInputIndex">
+              <!-- {{ tradeInputIndex }} {{ tradeInput }} -->
+              <!-- <b-form-group :label="'Execute[' + tradeInputIndex + ']:'" label-for="modal-tx-details-execute" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0"> -->
+              <!-- <b-form-group :label="'Execute[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0"> -->
+
+                <b-form-group :label="'Action[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  <b-form-input type="text" readonly size="sm" :value="tradeInput.action == 0 ? 'Fill' : (tradeInput.action == 1 ? 'Fill Or Kill' : 'Fill And Add Order')" class="w-50"></b-form-input>
+                </b-form-group>
+
+                <b-form-group :label="'Buy/Sell[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  <b-form-input type="text" readonly size="sm" :value="tradeInput.buySell == 0 ? 'Buy' : 'Sell'" class="w-50"></b-form-input>
+                </b-form-group>
+
+                <b-form-group :label="'Base[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  <b-form-input type="text" readonly size="sm" :value="tradeInput.base" class="w-75"></b-form-input>
+                </b-form-group>
+
+                <b-form-group :label="'Quote[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  <b-form-input type="text" readonly size="sm" :value="tradeInput.quote" class="w-75"></b-form-input>
+                </b-form-group>
+
+                <b-form-group :label="'Price[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  <b-form-input type="text" readonly size="sm" :value="tradeInput.price" class="w-50"></b-form-input>
+                </b-form-group>
+
+                <b-form-group :label="'Target Price[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  <b-form-input type="text" readonly size="sm" :value="tradeInput.targetPrice" class="w-50"></b-form-input>
+                </b-form-group>
+
+                <b-form-group :label="'Expiry[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  <b-form-input type="text" readonly size="sm" :value="tradeInput.expiry" class="w-50"></b-form-input>
+                </b-form-group>
+
+                <b-form-group :label="'Tokens[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  <b-form-input type="text" readonly size="sm" :value="tradeInput.tokens" class="w-50"></b-form-input>
+                </b-form-group>
+
+                <b-form-group :label="'Skip Check[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  <b-form-input type="text" readonly size="sm" :value="tradeInput.skipCheck ? 'Yes' : 'No'" class="w-50"></b-form-input>
+                </b-form-group>
+
+              <!-- </b-form-group> -->
+            </span>
 
             <div>
               <pre>
@@ -3008,7 +3052,7 @@
                     // console.log("action: " + action + ", buySell: " + buySell + ", base:" + base + ", quote:" + quote + ", price: " + price + ", targetPrice: " + targetPrice + ", expiry: " + expiry + ", tokens: " + tokens + ", skipCheck: " + skipCheck);
                     tradeInputs.push({ action, buySell, base, quote, price: price.toString(), targetPrice: targetPrice.toString(), expiry: parseInt(expiry), tokens: tokens.toString(), skipCheck });
                     // TODO: Testing
-                    tradeInputs.push({ action, buySell, base, quote, price: price.toString(), targetPrice: targetPrice.toString(), expiry: parseInt(expiry), tokens: tokens.toString(), skipCheck });
+                    // tradeInputs.push({ action, buySell, base, quote, price: price.toString(), targetPrice: targetPrice.toString(), expiry: parseInt(expiry), tokens: tokens.toString(), skipCheck });
                   }
                   console.log("tradeInputs: " + JSON.stringify(tradeInputs, null, 2));
                   Vue.set(this.modalTxDetails, 'tradeInputs', tradeInputs);
