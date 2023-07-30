@@ -304,7 +304,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     mapping(PairKey => TradeEvent[]) public trades;
 
 
-    function execute(TradeInput[] calldata tradeInputs) public {
+    function execute(TradeInput[] calldata tradeInputs) public reentrancyGuard {
         for (uint i = 0; i < tradeInputs.length; i = onePlus(i)) {
             TradeInput memory tradeInput = tradeInputs[i];
             MoreInfo memory moreInfo = _getMoreInfo(tradeInput, Account.wrap(msg.sender));

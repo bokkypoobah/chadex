@@ -1,3 +1,4 @@
+Compiled 1 Solidity file successfully
 
 
   Chadex
@@ -12,7 +13,7 @@
         Token1 deployed
         > Deployed WETH - gasUsed: 555407 ~ ETH 0.02221628 ~ USD 44
         WETH deployed
-        > Deployed Chadex - gasUsed: 5328270 ~ ETH 0.2131308 ~ USD 426
+        > Deployed Chadex - gasUsed: 5339068 ~ ETH 0.21356272 ~ USD 427
         Chadex deployed
         > Transfer Token0 - gasUsed: 51421 ~ ETH 0.00205684 ~ USD 4
           + Token0:0x5FbD 5.0 Transfer(from: deployer:0xf39F, to: user0:0x7099, tokens: 100.0)
@@ -64,14 +65,14 @@
         > user3->weth.approve(chadex, 2.69) - gasUsed: 46155 ~ ETH 0.0018462 ~ USD 3
           + WETH:0x9fE4 28.0 Approval(tokenOwner: user3:0x15d3, spender: Chadex:0xCf7E, tokens: 2.69)
 
-        --- Setup Completed. Chadex bytecode ~24447 ---
+        --- Setup Completed. Chadex bytecode ~24497 ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
           -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F       9999.988111990769096276                      0.0                      0.0                      0.0
-          user0:0x7099           9899.99979478394350412                    100.0                    100.0                    100.0
-          user1:0x3C44           9899.99980028582777505                    100.0                    100.0                    100.0
-          user2:0x90F7          9899.999804192029760845                    100.0                    100.0                    100.0
-          user3:0x15d3          9899.999807000981151995                    100.0                    100.0                    100.0
+          deployer:0xf39F       9999.988094751803008225                      0.0                      0.0                      0.0
+          user0:0x7099          9899.999794781793757755                    100.0                    100.0                    100.0
+          user1:0x3C44           9899.99980028421650387                    100.0                    100.0                    100.0
+          user2:0x90F7          9899.999804190800660445                    100.0                    100.0                    100.0
+          user3:0x15d3             9899.999807000026888                    100.0                    100.0                    100.0
           Chadex:0xCf7E                             0.0                      0.0                      0.0                      0.0
 
           Chadex: Chadex:0xCf7E
@@ -85,27 +86,27 @@
     "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     "price": "690100000000",
     "targetPrice": "690100000000",
-    "expiry": 1685959427,
+    "expiry": 1690757164,
     "tokens": "1000000000000000000",
     "skipCheck": false
   }
 ]
-        > user0->chadex.execute(actionsA) - gasUsed: 289433 ~ ETH 0.01157732 ~ USD 23
-          + Chadex:0xCf7E 29.0 PairAdded(pairKey: 0x2230c662, maker: user0:0x7099, base: Token0:0x5FbD, quote: WETH:0x9fE4, baseDecimals: 18, quoteDecimals: 18, factors: 0,0, timestamp: 1685955855)
-          + Chadex:0xCf7E 29.1 OrderAdded(pairKey: 0x2230c662, orderKey: 0x029dbe28, maker: user0:0x7099, buySell: 0, price: 0.6901, expiry: 1685959427, tokens: 1000000000000000000, quoteTokens: 690100000000000000, timestamp: 1685955855)
-        > user1->chadex.execute(actionsA) - gasUsed: 130648 ~ ETH 0.00522592 ~ USD 10
-          + Chadex:0xCf7E 30.0 OrderAdded(pairKey: 0x2230c662, orderKey: 0x901f0c2b, maker: user1:0x3C44, buySell: 0, price: 0.6901, expiry: 1685959427, tokens: 1000000000000000000, quoteTokens: 690100000000000000, timestamp: 1685955856)
-        > user2->chadex.execute(actionsA) - gasUsed: 130648 ~ ETH 0.00522592 ~ USD 10
-          + Chadex:0xCf7E 31.0 OrderAdded(pairKey: 0x2230c662, orderKey: 0x1bba7378, maker: user2:0x90F7, buySell: 0, price: 0.6901, expiry: 1685959427, tokens: 1000000000000000000, quoteTokens: 690100000000000000, timestamp: 1685955857)
+        > user0->chadex.execute(actionsA) - gasUsed: 311668 ~ ETH 0.01246672 ~ USD 24
+          + Chadex:0xCf7E 29.0 PairAdded(pairKey: 0x2230c662, maker: user0:0x7099, base: Token0:0x5FbD, quote: WETH:0x9fE4, baseDecimals: 18, quoteDecimals: 18, factors: 0,0, timestamp: 1690753589)
+          + Chadex:0xCf7E 29.1 OrderAdded(pairKey: 0x2230c662, orderKey: 0x029dbe28, maker: user0:0x7099, buySell: 0, price: 0.6901, expiry: 1690757164, tokens: 1000000000000000000, quoteTokens: 690100000000000000, timestamp: 1690753589)
+        > user1->chadex.execute(actionsA) - gasUsed: 132983 ~ ETH 0.00531932 ~ USD 10
+          + Chadex:0xCf7E 30.0 OrderAdded(pairKey: 0x2230c662, orderKey: 0x901f0c2b, maker: user1:0x3C44, buySell: 0, price: 0.6901, expiry: 1690757164, tokens: 1000000000000000000, quoteTokens: 690100000000000000, timestamp: 1690753590)
+        > user2->chadex.execute(actionsA) - gasUsed: 132983 ~ ETH 0.00531932 ~ USD 10
+          + Chadex:0xCf7E 31.0 OrderAdded(pairKey: 0x2230c662, orderKey: 0x1bba7378, maker: user2:0x90F7, buySell: 0, price: 0.6901, expiry: 1690757164, tokens: 1000000000000000000, quoteTokens: 690100000000000000, timestamp: 1690753591)
 
         --- After Adding Orders ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
           -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F       9999.988111990769096276                      0.0                      0.0                      0.0
-          user0:0x7099           9899.99949885580938875                    100.0                    100.0                    100.0
-          user1:0x3C44           9899.99966706538106661                    100.0                    100.0                    100.0
-          user2:0x90F7          9899.999671290338173453                    100.0                    100.0                    100.0
-          user3:0x15d3          9899.999807000981151995                    100.0                    100.0                    100.0
+          deployer:0xf39F       9999.988094751803008225                      0.0                      0.0                      0.0
+          user0:0x7099          9899.999476119001718639                    100.0                    100.0                    100.0
+          user1:0x3C44          9899.999664681984399734                    100.0                    100.0                    100.0
+          user2:0x90F7          9899.999668913069949385                    100.0                    100.0                    100.0
+          user3:0x15d3             9899.999807000026888                    100.0                    100.0                    100.0
           Chadex:0xCf7E                             0.0                      0.0                      0.0                      0.0
 
           Chadex: Chadex:0xCf7E
@@ -117,9 +118,9 @@
               2         0.6901 0x1bba7378 0x00000000 user2:0x90F7      59.99                   1.0     3.897985799159542095                     2.69
 
             price: 0.6901 head=0x029dbe28 tail=0x1bba7378
-              Order key=0x029dbe28 next=0x901f0c2b maker=user0:0x7099 expiry=59.98s tokens=1.0
-              Order key=0x901f0c2b next=0x1bba7378 maker=user1:0x3C44 expiry=59.98s tokens=1.0
-              Order key=0x1bba7378 next=0x00000000 maker=user2:0x90F7 expiry=59.98s tokens=1.0
+              Order key=0x029dbe28 next=0x901f0c2b maker=user0:0x7099 expiry=59.99s tokens=1.0
+              Order key=0x901f0c2b next=0x1bba7378 maker=user1:0x3C44 expiry=59.99s tokens=1.0
+              Order key=0x1bba7378 next=0x00000000 maker=user2:0x90F7 expiry=59.99s tokens=1.0
 
               #     SELL Price OrderKey   Next       Maker         Expiry(s)                Tokens     Total Available Base    Total Available Quote
             --- -------------- ---------- ---------- ------------ ---------- --------------------- ------------------------ ------------------------
@@ -128,7 +129,7 @@
               # Block  Timestamp Taker        B/S            Price                   Filled      Quote Tokens Filled
             --- ----- ---------- ------------ ---- --------------- ------------------------ ------------------------
 
-            pairKey: 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d, base=["0x5FbDB2315678afecb367f032d93F642f64180aa3",18], quote=["0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",18], factors=0,0, bestBuyOrder=[{"type":"BigNumber","hex":"0xa0ad2a5500"},"0x029dbe282b96de95c4b5c614ab564c21b14b8151a225e087810236cbdff74d88","0x901f0c2b9abfa5246a662310a35f3547616e6dd36db780eba3a5df0d2f8a300b","0x70997970C51812dc3A010C7d01b50e0d17dc79C8",{"type":"BigNumber","hex":"0x647db303"},{"type":"BigNumber","hex":"0x0de0b6b3a7640000"},{"type":"BigNumber","hex":"0x36186d6e926bf14f"},{"type":"BigNumber","hex":"0x2554ccbf6dcd0000"}], bestSellOrder=[{"type":"BigNumber","hex":"0x00"},"0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000",{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"}]
+            pairKey: 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d, base=["0x5FbDB2315678afecb367f032d93F642f64180aa3",18], quote=["0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",18], factors=0,0, bestBuyOrder=[{"type":"BigNumber","hex":"0xa0ad2a5500"},"0x029dbe282b96de95c4b5c614ab564c21b14b8151a225e087810236cbdff74d88","0x901f0c2b9abfa5246a662310a35f3547616e6dd36db780eba3a5df0d2f8a300b","0x70997970C51812dc3A010C7d01b50e0d17dc79C8",{"type":"BigNumber","hex":"0x64c6e82c"},{"type":"BigNumber","hex":"0x0de0b6b3a7640000"},{"type":"BigNumber","hex":"0x36186d6e926bf14f"},{"type":"BigNumber","hex":"0x2554ccbf6dcd0000"}], bestSellOrder=[{"type":"BigNumber","hex":"0x00"},"0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000",{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"}]
 
         Executing: [
   {
@@ -138,37 +139,37 @@
     "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     "price": "690100000000",
     "targetPrice": "690100000000",
-    "expiry": 1685959427,
+    "expiry": 1690757164,
     "tokens": "1000000000000000000",
     "skipCheck": false
   }
 ]
-        > user3->chadex.execute(actions) - gasUsed: 200774 ~ ETH 0.00803096 ~ USD 16
+        > user3->chadex.execute(actions) - gasUsed: 203109 ~ ETH 0.00812436 ~ USD 16
           + Token0:0x5FbD 32.0 Transfer(from: user3:0x15d3, to: user0:0x7099, tokens: 1.0)
           + WETH:0x9fE4 32.1 Transfer(from: user0:0x7099, to: user3:0x15d3, tokens: 0.6901)
-          + Chadex:0xCf7E 32.2 Trade(tradeResult: 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d,0x029dbe282b96de95c4b5c614ab564c21b14b8151a225e087810236cbdff74d88,0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65,0x70997970C51812dc3A010C7d01b50e0d17dc79C8,1,690100000000,1000000000000000000,690100000000000000,1685955858)
-          + Chadex:0xCf7E 32.3 TradeSummary(pairKey: 0x2230c662, taker: user3:0x15d3, buySell: 1, price: 0.6901, tokens: 1000000000000000000, quoteTokens: 690100000000000000, tokensOnOrder: 0, timestamp: 1685955858)
+          + Chadex:0xCf7E 32.2 Trade(tradeResult: 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d,0x029dbe282b96de95c4b5c614ab564c21b14b8151a225e087810236cbdff74d88,0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65,0x70997970C51812dc3A010C7d01b50e0d17dc79C8,1,690100000000,1000000000000000000,690100000000000000,1690753592)
+          + Chadex:0xCf7E 32.3 TradeSummary(pairKey: 0x2230c662, taker: user3:0x15d3, buySell: 1, price: 0.6901, tokens: 1000000000000000000, quoteTokens: 690100000000000000, tokensOnOrder: 0, timestamp: 1690753592)
 
         --- After Executing Against Orders ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
           -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F       9999.988111990769096276                      0.0                      0.0                      0.0
-          user0:0x7099           9899.99949885580938875                    101.0                    100.0                  99.3099
-          user1:0x3C44           9899.99966706538106661                    100.0                    100.0                    100.0
-          user2:0x90F7          9899.999671290338173453                    100.0                    100.0                    100.0
-          user3:0x15d3          9899.999603192759582567                     99.0                    100.0                 100.6901
+          deployer:0xf39F       9999.988094751803008225                      0.0                      0.0                      0.0
+          user0:0x7099          9899.999476119001718639                    101.0                    100.0                  99.3099
+          user1:0x3C44          9899.999664681984399734                    100.0                    100.0                    100.0
+          user2:0x90F7          9899.999668913069949385                    100.0                    100.0                    100.0
+          user3:0x15d3          9899.999600820431931706                     99.0                    100.0                 100.6901
           Chadex:0xCf7E                             0.0                      0.0                      0.0                      0.0
 
           Chadex: Chadex:0xCf7E
           ----- Pair 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d Token0:0x5FbD/WETH:0x9fE4 0 0 -----
               #      BUY Price OrderKey   Next       Maker         Expiry(s)                Tokens     Total Available Base    Total Available Quote
             --- -------------- ---------- ---------- ------------ ---------- --------------------- ------------------------ ------------------------
-              0         0.6901 0x901f0c2b 0x1bba7378 user1:0x3C44      59.98                   1.0     3.897985799159542095                     2.69
-              1         0.6901 0x1bba7378 0x00000000 user2:0x90F7      59.98                   1.0     3.897985799159542095                     2.69
+              0         0.6901 0x901f0c2b 0x1bba7378 user1:0x3C44      59.99                   1.0     3.897985799159542095                     2.69
+              1         0.6901 0x1bba7378 0x00000000 user2:0x90F7      59.99                   1.0     3.897985799159542095                     2.69
 
             price: 0.6901 head=0x901f0c2b tail=0x1bba7378
-              Order key=0x901f0c2b next=0x1bba7378 maker=user1:0x3C44 expiry=59.98s tokens=1.0
-              Order key=0x1bba7378 next=0x00000000 maker=user2:0x90F7 expiry=59.98s tokens=1.0
+              Order key=0x901f0c2b next=0x1bba7378 maker=user1:0x3C44 expiry=59.99s tokens=1.0
+              Order key=0x1bba7378 next=0x00000000 maker=user2:0x90F7 expiry=59.99s tokens=1.0
 
               #     SELL Price OrderKey   Next       Maker         Expiry(s)                Tokens     Total Available Base    Total Available Quote
             --- -------------- ---------- ---------- ------------ ---------- --------------------- ------------------------ ------------------------
@@ -176,9 +177,9 @@
 
               # Block  Timestamp Taker        B/S            Price                   Filled      Quote Tokens Filled
             --- ----- ---------- ------------ ---- --------------- ------------------------ ------------------------
-              0    32 1685955858 user3:0x15d3 Buy           0.6901                      1.0                   0.6901
+              0    32 1690753592 user3:0x15d3 Buy           0.6901                      1.0                   0.6901
 
-            pairKey: 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d, base=["0x5FbDB2315678afecb367f032d93F642f64180aa3",18], quote=["0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",18], factors=0,0, bestBuyOrder=[{"type":"BigNumber","hex":"0xa0ad2a5500"},"0x901f0c2b9abfa5246a662310a35f3547616e6dd36db780eba3a5df0d2f8a300b","0x1bba7378b9f9a173dd941afc98cb057fe0c16e455bdb1c8ed5335ae7dc10cfc6","0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",{"type":"BigNumber","hex":"0x647db303"},{"type":"BigNumber","hex":"0x0de0b6b3a7640000"},{"type":"BigNumber","hex":"0x36186d6e926bf14f"},{"type":"BigNumber","hex":"0x2554ccbf6dcd0000"}], bestSellOrder=[{"type":"BigNumber","hex":"0x00"},"0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000",{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"}]
+            pairKey: 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d, base=["0x5FbDB2315678afecb367f032d93F642f64180aa3",18], quote=["0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",18], factors=0,0, bestBuyOrder=[{"type":"BigNumber","hex":"0xa0ad2a5500"},"0x901f0c2b9abfa5246a662310a35f3547616e6dd36db780eba3a5df0d2f8a300b","0x1bba7378b9f9a173dd941afc98cb057fe0c16e455bdb1c8ed5335ae7dc10cfc6","0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",{"type":"BigNumber","hex":"0x64c6e82c"},{"type":"BigNumber","hex":"0x0de0b6b3a7640000"},{"type":"BigNumber","hex":"0x36186d6e926bf14f"},{"type":"BigNumber","hex":"0x2554ccbf6dcd0000"}], bestSellOrder=[{"type":"BigNumber","hex":"0x00"},"0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000",{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"},{"type":"BigNumber","hex":"0x00"}]
 
 tokenBalanceAndAllowance: [
   [
@@ -193,7 +194,7 @@ tokenBalanceAndAllowance: [
   ]
 ]
 
-    ✔ 00. Test 00 (271ms)
+    ✔ 00. Test 00 (265ms)
 
 
   1 passing (1s)
