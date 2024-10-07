@@ -1,35 +1,36 @@
+Compiled 4 Solidity files successfully
 
 
   Chadex
 
       beforeEach
         --- Setup Tokens and Chadex Contracts. Assuming gasPrice: 10.0 gwei, ethUsd: 2500.0 ---
-        > Deployed Token0 - gasUsed: 517605 ~ ETH 0.00517605 ~ USD 12
+        > Deployed Token0 - gasUsed: 520863 ~ ETH 0.00520863 ~ USD 13
           + Token0:0x5FbD 1.0 Transfer(from: null:0x0000, to: deployer:0xf39F, tokens: 400.0)
         Token0 deployed
-        > Deployed Token1 - gasUsed: 517605 ~ ETH 0.00517605 ~ USD 12
+        > Deployed Token1 - gasUsed: 520863 ~ ETH 0.00520863 ~ USD 13
           + Token1:0xe7f1 2.0 Transfer(from: null:0x0000, to: deployer:0xf39F, tokens: 400.0)
         Token1 deployed
-        > Deployed WETH - gasUsed: 544160 ~ ETH 0.0054416 ~ USD 13
+        > Deployed WETH - gasUsed: 550672 ~ ETH 0.00550672 ~ USD 13
         WETH deployed
-        > Deployed Chadex - gasUsed: 4907713 ~ ETH 0.04907713 ~ USD 122
+        > Deployed Chadex - gasUsed: 5156357 ~ ETH 0.05156357 ~ USD 128
         Chadex deployed
-        > Transfer Token0 - gasUsed: 51417 ~ ETH 0.00051417 ~ USD 1
+        > Transfer Token0 - gasUsed: 51395 ~ ETH 0.00051395 ~ USD 1
           + Token0:0x5FbD 5.0 Transfer(from: deployer:0xf39F, to: user0:0x7099, tokens: 100.0)
-        > Transfer Token0 - gasUsed: 51405 ~ ETH 0.00051405 ~ USD 1
+        > Transfer Token0 - gasUsed: 51383 ~ ETH 0.00051383 ~ USD 1
           + Token0:0x5FbD 6.0 Transfer(from: deployer:0xf39F, to: user1:0x3C44, tokens: 100.0)
-        > Transfer Token0 - gasUsed: 51417 ~ ETH 0.00051417 ~ USD 1
+        > Transfer Token0 - gasUsed: 51395 ~ ETH 0.00051395 ~ USD 1
           + Token0:0x5FbD 7.0 Transfer(from: deployer:0xf39F, to: user2:0x90F7, tokens: 100.0)
-        > Transfer Token0 - gasUsed: 46617 ~ ETH 0.00046617 ~ USD 1
+        > Transfer Token0 - gasUsed: 46595 ~ ETH 0.00046595 ~ USD 1
           + Token0:0x5FbD 8.0 Transfer(from: deployer:0xf39F, to: user3:0x15d3, tokens: 100.0)
         Tokens transferred
-        > Transfer Token1 - gasUsed: 51417 ~ ETH 0.00051417 ~ USD 1
+        > Transfer Token1 - gasUsed: 51395 ~ ETH 0.00051395 ~ USD 1
           + Token1:0xe7f1 9.0 Transfer(from: deployer:0xf39F, to: user0:0x7099, tokens: 100.0)
-        > Transfer Token1 - gasUsed: 51405 ~ ETH 0.00051405 ~ USD 1
+        > Transfer Token1 - gasUsed: 51383 ~ ETH 0.00051383 ~ USD 1
           + Token1:0xe7f1 10.0 Transfer(from: deployer:0xf39F, to: user1:0x3C44, tokens: 100.0)
-        > Transfer Token1 - gasUsed: 51417 ~ ETH 0.00051417 ~ USD 1
+        > Transfer Token1 - gasUsed: 51395 ~ ETH 0.00051395 ~ USD 1
           + Token1:0xe7f1 11.0 Transfer(from: deployer:0xf39F, to: user2:0x90F7, tokens: 100.0)
-        > Transfer Token1 - gasUsed: 46617 ~ ETH 0.00046617 ~ USD 1
+        > Transfer Token1 - gasUsed: 46595 ~ ETH 0.00046595 ~ USD 1
           + Token1:0xe7f1 12.0 Transfer(from: deployer:0xf39F, to: user3:0x15d3, tokens: 100.0)
         > Send weth - gasUsed: 44784 ~ ETH 0.00044784 ~ USD 1
           + WETH:0x9fE4 13.0 Deposit(dst: user0:0x7099, wad: 100.0)
@@ -43,35 +44,35 @@
           + Token0:0x5FbD 17.0 Approval(tokenOwner: user0:0x7099, spender: Chadex:0xCf7E, tokens: 10.0)
         > user0->token1.approve(chadex, 10.0) - gasUsed: 46152 ~ ETH 0.00046152 ~ USD 1
           + Token1:0xe7f1 18.0 Approval(tokenOwner: user0:0x7099, spender: Chadex:0xCf7E, tokens: 10.0)
-        > user0->weth.approve(chadex, 2.69) - gasUsed: 46152 ~ ETH 0.00046152 ~ USD 1
+        > user0->weth.approve(chadex, 2.69) - gasUsed: 46175 ~ ETH 0.00046175 ~ USD 1
           + WETH:0x9fE4 19.0 Approval(tokenOwner: user0:0x7099, spender: Chadex:0xCf7E, tokens: 2.69)
         > user1->token0.approve(chadex, 10.0) - gasUsed: 46152 ~ ETH 0.00046152 ~ USD 1
           + Token0:0x5FbD 20.0 Approval(tokenOwner: user1:0x3C44, spender: Chadex:0xCf7E, tokens: 10.0)
         > user1->token1.approve(chadex, 10.0) - gasUsed: 46152 ~ ETH 0.00046152 ~ USD 1
           + Token1:0xe7f1 21.0 Approval(tokenOwner: user1:0x3C44, spender: Chadex:0xCf7E, tokens: 10.0)
-        > user1->weth.approve(chadex, 2.69) - gasUsed: 46152 ~ ETH 0.00046152 ~ USD 1
+        > user1->weth.approve(chadex, 2.69) - gasUsed: 46175 ~ ETH 0.00046175 ~ USD 1
           + WETH:0x9fE4 22.0 Approval(tokenOwner: user1:0x3C44, spender: Chadex:0xCf7E, tokens: 2.69)
         > user2->token0.approve(chadex, 10.0) - gasUsed: 46152 ~ ETH 0.00046152 ~ USD 1
           + Token0:0x5FbD 23.0 Approval(tokenOwner: user2:0x90F7, spender: Chadex:0xCf7E, tokens: 10.0)
         > user2->token1.approve(chadex, 10.0) - gasUsed: 46152 ~ ETH 0.00046152 ~ USD 1
           + Token1:0xe7f1 24.0 Approval(tokenOwner: user2:0x90F7, spender: Chadex:0xCf7E, tokens: 10.0)
-        > user2->weth.approve(chadex, 2.69) - gasUsed: 46152 ~ ETH 0.00046152 ~ USD 1
+        > user2->weth.approve(chadex, 2.69) - gasUsed: 46175 ~ ETH 0.00046175 ~ USD 1
           + WETH:0x9fE4 25.0 Approval(tokenOwner: user2:0x90F7, spender: Chadex:0xCf7E, tokens: 2.69)
         > user3->token0.approve(chadex, 10.0) - gasUsed: 46152 ~ ETH 0.00046152 ~ USD 1
           + Token0:0x5FbD 26.0 Approval(tokenOwner: user3:0x15d3, spender: Chadex:0xCf7E, tokens: 10.0)
         > user3->token1.approve(chadex, 10.0) - gasUsed: 46152 ~ ETH 0.00046152 ~ USD 1
           + Token1:0xe7f1 27.0 Approval(tokenOwner: user3:0x15d3, spender: Chadex:0xCf7E, tokens: 10.0)
-        > user3->weth.approve(chadex, 2.69) - gasUsed: 46152 ~ ETH 0.00046152 ~ USD 1
+        > user3->weth.approve(chadex, 2.69) - gasUsed: 46175 ~ ETH 0.00046175 ~ USD 1
           + WETH:0x9fE4 28.0 Approval(tokenOwner: user3:0x15d3, spender: Chadex:0xCf7E, tokens: 2.69)
 
-        --- Setup Completed. Chadex bytecode ~22475 ---
+        --- Setup Completed. Chadex bytecode ~23672 ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
           -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F       9999.988827054206789649                      0.0                      0.0                      0.0
-          user0:0x7099          9899.999794883804193864                    100.0                    100.0                    100.0
-          user1:0x3C44          9899.999800363136379024                    100.0                    100.0                    100.0
-          user2:0x90F7          9899.999804253334122864                    100.0                    100.0                    100.0
-          user3:0x15d3          9899.999807050782688608                    100.0                    100.0                    100.0
+          deployer:0xf39F       9999.988407145422022281                      0.0                      0.0                      0.0
+          user0:0x7099          9899.999794806693705487                    100.0                    100.0                    100.0
+          user1:0x3C44          9899.999800299730536376                    100.0                    100.0                    100.0
+          user2:0x90F7          9899.999804199633734847                    100.0                    100.0                    100.0
+          user3:0x15d3          9899.999807004041342277                    100.0                    100.0                    100.0
           Chadex:0xCf7E                             0.0                      0.0                      0.0                      0.0
 
           Chadex: Chadex:0xCf7E
@@ -85,27 +86,27 @@
     "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     "price": "690100000",
     "targetPrice": "690100000",
-    "expiry": 1728283798,
+    "expiry": 1728283876,
     "tokens": "1000000000000000000",
     "skipCheck": false
   }
 ]
-        > user0->chadex.execute(actionsA) - gasUsed: 306745 ~ ETH 0.00306745 ~ USD 7
-          + Chadex:0xCf7E 29.0 PairAdded(pairKey: 0x2230c662, maker: user0:0x7099, base: Token0:0x5FbD, quote: WETH:0x9fE4, baseDecimals: 18, quoteDecimals: 18, timestamp: 1728280226)
-          + Chadex:0xCf7E 29.1 OrderAdded(pairKey: 0x2230c662, orderKey: 0x5f5b46ef, maker: user0:0x7099, buySell: 0, price: 0.0006901, expiry: 1728283798, tokens: 1000000000000000000, quoteTokens: 690100000000000000, timestamp: 1728280226)
-        > user1->chadex.execute(actionsA) - gasUsed: 131572 ~ ETH 0.00131572 ~ USD 3
-          + Chadex:0xCf7E 30.0 OrderAdded(pairKey: 0x2230c662, orderKey: 0x2659c505, maker: user1:0x3C44, buySell: 0, price: 0.0006901, expiry: 1728283798, tokens: 1000000000000000000, quoteTokens: 690100000000000000, timestamp: 1728280227)
-        > user2->chadex.execute(actionsA) - gasUsed: 131572 ~ ETH 0.00131572 ~ USD 3
-          + Chadex:0xCf7E 31.0 OrderAdded(pairKey: 0x2230c662, orderKey: 0xfb874a1e, maker: user2:0x90F7, buySell: 0, price: 0.0006901, expiry: 1728283798, tokens: 1000000000000000000, quoteTokens: 690100000000000000, timestamp: 1728280228)
+        > user0->chadex.execute(actionsA) - gasUsed: 306633 ~ ETH 0.00306633 ~ USD 7
+          + Chadex:0xCf7E 29.0 PairAdded(pairKey: 0x2230c662, maker: user0:0x7099, base: Token0:0x5FbD, quote: WETH:0x9fE4, baseDecimals: 18, quoteDecimals: 18, timestamp: 1728280303)
+          + Chadex:0xCf7E 29.1 OrderAdded(pairKey: 0x2230c662, orderKey: 0x5f5b46ef, maker: user0:0x7099, buySell: 0, price: 0.0006901, expiry: 1728283876, tokens: 1000000000000000000, quoteTokens: 690100000000000000, timestamp: 1728280303)
+        > user1->chadex.execute(actionsA) - gasUsed: 131480 ~ ETH 0.0013148 ~ USD 3
+          + Chadex:0xCf7E 30.0 OrderAdded(pairKey: 0x2230c662, orderKey: 0x2659c505, maker: user1:0x3C44, buySell: 0, price: 0.0006901, expiry: 1728283876, tokens: 1000000000000000000, quoteTokens: 690100000000000000, timestamp: 1728280304)
+        > user2->chadex.execute(actionsA) - gasUsed: 131480 ~ ETH 0.0013148 ~ USD 3
+          + Chadex:0xCf7E 31.0 OrderAdded(pairKey: 0x2230c662, orderKey: 0xfb874a1e, maker: user2:0x90F7, buySell: 0, price: 0.0006901, expiry: 1728283876, tokens: 1000000000000000000, quoteTokens: 690100000000000000, timestamp: 1728280305)
 
         --- After Adding Orders ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
           -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F       9999.988827054206789649                      0.0                      0.0                      0.0
-          user0:0x7099          9899.999481283002524194                    100.0                    100.0                    100.0
-          user1:0x3C44           9899.99966621054540458                    100.0                    100.0                    100.0
-          user2:0x90F7           9899.99967042048744924                    100.0                    100.0                    100.0
-          user3:0x15d3          9899.999807050782688608                    100.0                    100.0                    100.0
+          deployer:0xf39F       9999.988407145422022281                      0.0                      0.0                      0.0
+          user0:0x7099          9899.999481304048649179                    100.0                    100.0                    100.0
+          user1:0x3C44          9899.999666234795738656                    100.0                    100.0                    100.0
+          user2:0x90F7          9899.999670454983559727                    100.0                    100.0                    100.0
+          user3:0x15d3          9899.999807004041342277                    100.0                    100.0                    100.0
           Chadex:0xCf7E                             0.0                      0.0                      0.0                      0.0
 
           Chadex: Chadex:0xCf7E
@@ -136,25 +137,25 @@
     "quote": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     "price": "690100000",
     "targetPrice": "690100000",
-    "expiry": 1728283798,
+    "expiry": 1728283876,
     "tokens": "1000000000000000000",
     "skipCheck": false
   }
 ]
-        > user3->chadex.execute(actions) - gasUsed: 110979 ~ ETH 0.00110979 ~ USD 2
+        > user3->chadex.execute(actions) - gasUsed: 110828 ~ ETH 0.00110828 ~ USD 2
           + Token0:0x5FbD 32.0 Transfer(from: user3:0x15d3, to: user0:0x7099, tokens: 1.0)
           + WETH:0x9fE4 32.1 Transfer(from: user0:0x7099, to: user3:0x15d3, tokens: 0.6901)
-          + Chadex:0xCf7E 32.2 Trade(tradeResult: 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d,0x5f5b46ef3a258c4fc894797e5e48cc5f539bafd791c7ea56c451aadc8930e4b9,0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65,0x70997970C51812dc3A010C7d01b50e0d17dc79C8,1,690100000,1000000000000000000,690100000000000000,1728280229)
-          + Chadex:0xCf7E 32.3 TradeSummary(pairKey: 0x2230c662, taker: user3:0x15d3, buySell: 1, price: 0.0006901, tokens: 1000000000000000000, quoteTokens: 690100000000000000, tokensOnOrder: 0, timestamp: 1728280229)
+          + Chadex:0xCf7E 32.2 Trade(tradeResult: 0x2230c6628c386e0711d05be97c05411940ccc2227d241b6a90778ed45f57b98d,0x5f5b46ef3a258c4fc894797e5e48cc5f539bafd791c7ea56c451aadc8930e4b9,0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65,0x70997970C51812dc3A010C7d01b50e0d17dc79C8,1,690100000,1000000000000000000,690100000000000000,1728280306)
+          + Chadex:0xCf7E 32.3 TradeSummary(pairKey: 0x2230c662, taker: user3:0x15d3, buySell: 1, price: 0.0006901, tokens: 1000000000000000000, quoteTokens: 690100000000000000, tokensOnOrder: 0, timestamp: 1728280306)
 
         --- After Executing Against Orders ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
           -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F       9999.988827054206789649                      0.0                      0.0                      0.0
-          user0:0x7099          9899.999481283002524194                    101.0                    100.0                  99.3099
-          user1:0x3C44           9899.99966621054540458                    100.0                    100.0                    100.0
-          user2:0x90F7           9899.99967042048744924                    100.0                    100.0                    100.0
-          user3:0x15d3          9899.999694401075413173                     99.0                    100.0                 100.6901
+          deployer:0xf39F       9999.988407145422022281                      0.0                      0.0                      0.0
+          user0:0x7099          9899.999481304048649179                    101.0                    100.0                  99.3099
+          user1:0x3C44          9899.999666234795738656                    100.0                    100.0                    100.0
+          user2:0x90F7          9899.999670454983559727                    100.0                    100.0                    100.0
+          user3:0x15d3          9899.999694503632414637                     99.0                    100.0                 100.6901
           Chadex:0xCf7E                             0.0                      0.0                      0.0                      0.0
 
           Chadex: Chadex:0xCf7E
@@ -188,7 +189,7 @@ tokenBalanceAndAllowance: [
   ]
 ]
 
-    ✔ 00. Test 00 (261ms)
+    ✔ 00. Test 00 (287ms)
 
 
   1 passing (1s)

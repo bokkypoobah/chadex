@@ -7,17 +7,11 @@ module.exports = {
   solidity: {
     version: "0.8.24",
     settings: {
-      viaIR: false,
+      evmVersion: "cancun",
       optimizer: {
         enabled: true,
-        runs: 200
-      }
-    }
+        runs: 1000,
+      },
+    },
   },
-  // defaultNetwork: "hardhat",
-  // networks: {
-  //     hardhat: {
-  //         blockGasLimit: 30_000_000,
-  //     },
-  // },
 };
