@@ -14,10 +14,10 @@ module.exports = {
       }
     }
   },
-  defaultNetwork: "hardhat",
-  networks: {
-      hardhat: {
-          blockGasLimit: 30_000_000,
-      },
-  },
+  // defaultNetwork: "hardhat",
+  // networks: {
+  //     hardhat: {
+  //         blockGasLimit: 30_000_000,
+  //     },
+  // },
 };
