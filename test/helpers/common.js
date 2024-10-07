@@ -29,8 +29,8 @@ class Data {
 
     this.chadex = null;
 
-    this.gasPrice = ethers.utils.parseUnits("40", "gwei");
-    this.ethUsd = ethers.utils.parseUnits("2000.00", 18);
+    this.gasPrice = ethers.utils.parseUnits("10", "gwei");
+    this.ethUsd = ethers.utils.parseUnits("2500.00", 18);
 
     this.verbose = false;
   }

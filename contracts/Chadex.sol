@@ -28,13 +28,13 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 // Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2023
 // ----------------------------------------------------------------------------
 
-type Account is address;
-type Factor is uint8;
-type OrderKey is bytes32;
-type PairKey is bytes32;
-type Token is address;
-type Tokens is int128;
-type Unixtime is uint64;
+type Account is address;  // 2^160
+type Factor is uint8;     // 2^8
+type OrderKey is bytes32; // 2^256
+type PairKey is bytes32;  // 2^256
+type Token is address;    // 2^160
+type Tokens is int128;    // 2^128 = 340, 282,366,920,938,463,463, 374,607,431,768,211,456
+type Unixtime is uint40;  // 2^40  = 1,099,511,627,776. For Unixtime, 1,099,511,627,776 seconds = 34865.285000507356672 years
 
 enum BuySell { Buy, Sell }
 // TODO: Consider rolling UpdateExpiryAndTokens into FillAnyAndAddOrder
@@ -299,7 +299,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         Tokens filled; // int128
         Tokens quoteFilled; // int128
         uint48 blockNumber; // 2^48 = 281,474,976,710,656
-        uint48 timestamp; // 2^48 = 281,474,976,710,656
+        Unixtime timestamp;
     }
     // mapping(PairKey => TradeEvent[]) public trades;
 
