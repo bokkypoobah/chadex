@@ -33,7 +33,7 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 
 
 type Account is address;  // 2^160
-type Factor is uint8;     // 2^8
+type Decimals is uint8;   // 2^8
 type OrderKey is bytes32; // 2^256
 type PairKey is bytes32;  // 2^256
 type Token is address;    // 2^160
@@ -84,8 +84,8 @@ contract ChadexBase {
     struct Pair {
         Token base;
         Token quote;
-        uint8 baseDecimals;
-        uint8 quoteDecimals;
+        Decimals baseDecimals;
+        Decimals quoteDecimals;
     }
     struct OrderQueue {
         OrderKey head;
@@ -112,8 +112,8 @@ contract ChadexBase {
         Account taker;
         BuySell inverseBuySell;
         PairKey pairKey;
-        uint8 baseDecimals;
-        uint8 quoteDecimals;
+        Decimals baseDecimals;
+        Decimals quoteDecimals;
     }
     struct TradeResult {
         PairKey pairKey;
@@ -143,7 +143,7 @@ contract ChadexBase {
     mapping(PairKey => mapping(BuySell => mapping(Price => OrderQueue))) orderQueues;
     mapping(OrderKey => Order) orders;
 
-    event PairAdded(PairKey indexed pairKey, Account maker, Token indexed base, Token indexed quote, uint8 baseDecimals, uint8 quoteDecimals, Unixtime timestamp);
+    event PairAdded(PairKey indexed pairKey, Account maker, Token indexed base, Token indexed quote, Decimals baseDecimals, Decimals quoteDecimals, Unixtime timestamp);
     event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens, Tokens quoteTokens, Unixtime timestamp);
     event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, Unixtime timestamp);
     event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens, Unixtime timestamp);
@@ -167,9 +167,9 @@ contract ChadexBase {
     error InvalidMessageText(uint maxLength);
     error CalculatedBaseTokensOverflow(uint baseTokens, uint max);
     error CalculatedQuoteTokensOverflow(uint quoteTokens, uint max);
-    error MaxTokenDecimals24(uint8 decimals); // TODO: Add token address if code size can be reduced
+    error MaxTokenDecimals24(Decimals decimals); // TODO: Add token address if code size can be reduced
 
-    function pair(uint i) public view returns (PairKey pairKey, Token base, Token quote, uint8 baseDecimals, uint8 quoteDecimals) {
+    function pair(uint i) public view returns (PairKey pairKey, Token base, Token quote, Decimals baseDecimals, Decimals quoteDecimals) {
         pairKey = pairKeys[i];
         Pair memory p = pairs[pairKey];
         return (pairKey, p.base, p.quote, p.baseDecimals, p.quoteDecimals);
@@ -261,36 +261,36 @@ contract ChadexBase {
     // TODO
     // factors = baseDecimals >= quoteDecimals ? Factors(Factor.wrap(baseDecimals - quoteDecimals), Factor.wrap(0)) : Factors(Factor.wrap(0), Factor.wrap(quoteDecimals - baseDecimals));
 
-    function baseToQuote(uint8 baseDecimals, uint8 quoteDecimals, uint baseTokens, Price price) pure internal returns (uint quoteTokens) {
+    function baseToQuote(Decimals baseDecimals, Decimals quoteDecimals, uint baseTokens, Price price) pure internal returns (uint quoteTokens) {
 
         // quoteTokens = divisor * baseTokens * price / 10^9 / multiplier
         // quoteTokens = divisor * baseTokens * price / multiplier
 
-        quoteTokens = baseTokens * Price.unwrap(price) * 10**quoteDecimals / 10**PRICE_DECIMALS / 10**baseDecimals;
+        quoteTokens = baseTokens * Price.unwrap(price) * 10**Decimals.unwrap(quoteDecimals) / 10**PRICE_DECIMALS / 10**Decimals.unwrap(baseDecimals);
 
         // quoteTokens = uint128((10 ** Factor.unwrap(factors.divisor)) * tokens * uint(Price.unwrap(price)) / (10 ** (Factor.unwrap(factors.multiplier) + PRICE_DECIMALS)));
         // if (quoteTokens >= uint(uint128(Tokens.unwrap(TOKENS_MAX)))) {
         //     revert CalculatedQuoteTokensOverflow(quoteTokens, uint(uint128(Tokens.unwrap(TOKENS_MAX))));
         // }
     }
-    function quoteToBase(uint8 baseDecimals, uint8 quoteDecimals, uint quoteTokens, Price price) pure internal returns (uint baseTokens) {
+    function quoteToBase(Decimals baseDecimals, Decimals quoteDecimals, uint quoteTokens, Price price) pure internal returns (uint baseTokens) {
 
         //   baseTokens = multiplier * quoteTokens * 10^9 / price / divisor
         //   baseTokens = multiplier * quoteTokens / price / divisor
 
-        baseTokens = quoteTokens * 10**PRICE_DECIMALS * 10**baseDecimals / Price.unwrap(price) / 10**quoteDecimals;
+        baseTokens = quoteTokens * 10**PRICE_DECIMALS * 10**Decimals.unwrap(baseDecimals) / Price.unwrap(price) / 10**Decimals.unwrap(quoteDecimals);
 
         // tokens = (10 ** (Factor.unwrap(factors.multiplier) + PRICE_DECIMALS)) * quoteTokens / uint(Price.unwrap(price)) / (10 ** Factor.unwrap(factors.divisor));
         // if (tokens >= uint(uint128(Tokens.unwrap(TOKENS_MAX)))) {
         //     revert CalculatedBaseTokensOverflow(tokens, uint(uint128(Tokens.unwrap(TOKENS_MAX))));
         // }
     }
-    function baseAndQuoteToPrice(uint8 baseDecimals, uint8 quoteDecimals, uint baseTokens, uint quoteTokens) pure internal returns (Price price) {
+    function baseAndQuoteToPrice(Decimals baseDecimals, Decimals quoteDecimals, uint baseTokens, uint quoteTokens) pure internal returns (Price price) {
 
         //   price = multiplier * quoteTokens * 10^9 / baseTokens / divisor
         //   price = multiplier * quoteTokens / baseTokens / divisor
 
-        price = Price.wrap(uint64(quoteTokens * 10**PRICE_DECIMALS * 10**baseDecimals / baseTokens / 10**quoteDecimals));
+        price = Price.wrap(uint64(quoteTokens * 10**PRICE_DECIMALS * 10**Decimals.unwrap(baseDecimals) / baseTokens / 10**Decimals.unwrap(quoteDecimals)));
         // baseTokens = quoteTokens * 10**PRICE_DECIMALS * 10**baseDecimals / 10**quoteDecimals;
 
         // price = tokens == 0 ? Price.wrap(0) : Price.wrap(uint64((10 ** (Factor.unwrap(factors.multiplier) + PRICE_DECIMALS)) * quoteTokens / tokens / (10 ** Factor.unwrap(factors.divisor))));
@@ -352,12 +352,12 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         PairKey pairKey = generatePairKey(tradeInput);
         Pair memory pair = pairs[pairKey];
         if (Token.unwrap(pair.base) == address(0)) {
-            uint8 baseDecimals = _decimals(tradeInput.base);
-            uint8 quoteDecimals = _decimals(tradeInput.quote);
-            if (baseDecimals > 24) {
+            Decimals baseDecimals = _decimals(tradeInput.base);
+            Decimals quoteDecimals = _decimals(tradeInput.quote);
+            if (Decimals.unwrap(baseDecimals) > 24) {
                 revert MaxTokenDecimals24(baseDecimals);
             }
-            if (quoteDecimals > 24) {
+            if (Decimals.unwrap(quoteDecimals) > 24) {
                 revert MaxTokenDecimals24(quoteDecimals);
             }
             pairs[pairKey] = Pair(tradeInput.base, tradeInput.quote, baseDecimals, quoteDecimals);
@@ -616,14 +616,14 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     }
 
 
-    function _decimals(Token token) internal view returns (uint8 __d) {
+    function _decimals(Token token) internal view returns (Decimals __d) {
         if (Token.unwrap(token) == Token.unwrap(THEDAO)) {
-            return 16;
+            return Decimals.wrap(16);
         } else {
             try IERC20(Token.unwrap(token)).decimals() returns (uint8 _d) {
-                __d = _d;
+                __d = Decimals.wrap(_d);
             } catch {
-                __d = type(uint8).max;
+                __d = Decimals.wrap(type(uint8).max);
             }
         }
     }
@@ -748,7 +748,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
 
     struct PairTokenResult {
         Token token;
-        uint8 decimals;
+        Decimals decimals;
     }
     struct PairResult {
         PairKey pairKey;
