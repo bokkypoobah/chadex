@@ -134,6 +134,7 @@ contract ChadexBase {
     Tokens public constant TOKENS_MIN = Tokens.wrap(0);
     Tokens public constant TOKENS_MAX = Tokens.wrap(999_999_999_999_999_999_999_999_999_999_999_999); // 2^128 = 340, 282,366,920, 938,463,463, 374,607,431, 768,211,456
     OrderKey public constant ORDERKEY_SENTINEL = OrderKey.wrap(0x0);
+    Token constant THEDAO = Token.wrap(0xBB9bc244D798123fDe783fCc1C72d3Bb8C189413);
     uint constant TOPIC_LENGTH_MAX = 48;
     uint constant TEXT_LENGTH_MAX = 280;
 
@@ -274,6 +275,17 @@ contract ChadexBase {
             revert TransferFromFailed(token, from, to, tokens);
         }
     }
+    function decimals(Token token) internal view returns (Decimals __d) {
+        if (Token.unwrap(token) == Token.unwrap(THEDAO)) {
+            return Decimals.wrap(16);
+        } else {
+            try IERC20(Token.unwrap(token)).decimals() returns (uint8 _d) {
+                __d = Decimals.wrap(_d);
+            } catch {
+                __d = Decimals.wrap(type(uint8).max);
+            }
+        }
+    }
 }
 
 
@@ -291,8 +303,6 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     //     uint48 blockNumber; // 2^48 = 281,474,976,710,656
     //     Unixtime timestamp;
     // }
-
-    Token constant THEDAO = Token.wrap(0xBB9bc244D798123fDe783fCc1C72d3Bb8C189413);
 
     // mapping(PairKey => TradeEvent[]) public trades;
 
@@ -318,8 +328,8 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         PairKey pairKey = generatePairKey(tradeInput);
         Pair memory pair = pairs[pairKey];
         if (Token.unwrap(pair.base) == address(0)) {
-            Decimals baseDecimals = _decimals(tradeInput.base);
-            Decimals quoteDecimals = _decimals(tradeInput.quote);
+            Decimals baseDecimals = decimals(tradeInput.base);
+            Decimals quoteDecimals = decimals(tradeInput.quote);
             if (Decimals.unwrap(baseDecimals) > 24) {
                 revert MaxTokenDecimals24(baseDecimals);
             }
@@ -579,19 +589,6 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         }
         order.expiry = tradeInput.expiry;
         emit OrderUpdated(moreInfo.pairKey, orderKey, moreInfo.taker, tradeInput.buySell, tradeInput.price, tradeInput.expiry, order.tokens, Unixtime.wrap(uint40(block.timestamp)));
-    }
-
-
-    function _decimals(Token token) internal view returns (Decimals __d) {
-        if (Token.unwrap(token) == Token.unwrap(THEDAO)) {
-            return Decimals.wrap(16);
-        } else {
-            try IERC20(Token.unwrap(token)).decimals() returns (uint8 _d) {
-                __d = Decimals.wrap(_d);
-            } catch {
-                __d = Decimals.wrap(type(uint8).max);
-            }
-        }
     }
 
     /// @dev Send message
