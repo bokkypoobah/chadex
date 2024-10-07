@@ -9,6 +9,7 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 //
 // TODO:
 //   * Check limits for Tokens(uint128) x Price(uint64) and conversions
+//   * Check ccy1/ccy2 vs ccy2/ccy1?
 //   * Check cost of taking vs making expired or dummy orders
 //   * Serverless UI
 //   * ?Move updated orders to the end of the queue
@@ -25,7 +26,7 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 // code, please send a proportionate amount to bokkypoobah.eth .
 // Don't be stingy! Donations welcome!
 //
-// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2023
+// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2024
 // ----------------------------------------------------------------------------
 
 type Account is address;  // 2^160
@@ -55,11 +56,6 @@ interface IERC20 {
     function transfer(address to, uint tokens) external returns (bool success);
     function approve(address spender, uint tokens) external returns (bool success);
     function transferFrom(address from, address to, uint tokens) external returns (bool success);
-}
-
-
-function onePlus(uint x) pure returns (uint) {
-    unchecked { return 1 + x; }
 }
 
 
@@ -170,7 +166,7 @@ contract ChadexBase {
     error InvalidMessageText(uint maxLength);
     error CalculatedBaseTokensOverflow(uint baseTokens, uint max);
     error CalculatedQuoteTokensOverflow(uint quoteTokens, uint max);
-    error InvalidTokenDecimals(uint8 decimals, uint8 max);
+    error MaxTokenDecimals24(uint8 decimals);
 
     function pair(uint i) public view returns (PairKey pairKey, Token base, Token quote, Factors memory factors) {
         pairKey = pairKeys[i];
@@ -301,11 +297,14 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         uint48 blockNumber; // 2^48 = 281,474,976,710,656
         Unixtime timestamp;
     }
+
+    Token constant THEDAO = Token.wrap(0xBB9bc244D798123fDe783fCc1C72d3Bb8C189413);
+
     // mapping(PairKey => TradeEvent[]) public trades;
 
 
     function execute(TradeInput[] calldata tradeInputs) public reentrancyGuard {
-        for (uint i = 0; i < tradeInputs.length; i = onePlus(i)) {
+        for (uint i; i < tradeInputs.length; i++) {
             TradeInput memory tradeInput = tradeInputs[i];
             MoreInfo memory moreInfo = _getMoreInfo(tradeInput, Account.wrap(msg.sender));
             if (uint(tradeInput.action) <= uint(Action.FillAnyAndAddOrder)) {
@@ -326,13 +325,13 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         Factors memory factors;
         Pair memory pair = pairs[pairKey];
         if (Token.unwrap(pair.base) == address(0)) {
-            uint8 baseDecimals = IERC20(Token.unwrap(tradeInput.base)).decimals();
-            uint8 quoteDecimals = IERC20(Token.unwrap(tradeInput.quote)).decimals();
+            uint8 baseDecimals = _decimals(tradeInput.base);
+            uint8 quoteDecimals = _decimals(tradeInput.quote);
             if (baseDecimals > 24) {
-                revert InvalidTokenDecimals(baseDecimals, 24);
+                revert MaxTokenDecimals24(baseDecimals);
             }
             if (quoteDecimals > 24) {
-                revert InvalidTokenDecimals(quoteDecimals, 24);
+                revert MaxTokenDecimals24(quoteDecimals);
             }
             factors = baseDecimals >= quoteDecimals ? Factors(Factor.wrap(baseDecimals - quoteDecimals), Factor.wrap(0)) : Factors(Factor.wrap(0), Factor.wrap(quoteDecimals - baseDecimals));
             pairs[pairKey] = Pair(tradeInput.base, tradeInput.quote, factors);
@@ -594,6 +593,18 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     }
 
 
+    function _decimals(Token token) internal view returns (uint8 __d) {
+        if (Token.unwrap(token) == Token.unwrap(THEDAO)) {
+            return 16;
+        } else {
+            try IERC20(Token.unwrap(token)).decimals() returns (uint8 _d) {
+                __d = _d;
+            } catch {
+                __d = type(uint8).max;
+            }
+        }
+    }
+
     /// @dev Send message
     /// @param to Destination address, or address(0) for general messages
     /// @param pairKey Key to specific pair, or bytes32(0) for no specific pair
@@ -660,7 +671,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
                 }
                 orderResults[i] = OrderResult(price, orderKey, order.next, order.maker, order.expiry, order.tokens, Tokens.wrap(int128(uint128(availableBase))), Tokens.wrap(int128(uint128(availableQuote))));
                 orderKey = order.next;
-                i = onePlus(i);
+                i++;
             }
             price = getNextBestPrice(pairKey, buySell, price);
         }
@@ -732,7 +743,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     }
     function getPairs(uint count, uint offset) public view returns (PairResult[] memory pairResults) {
         pairResults = new PairResult[](count);
-        for (uint i = 0; i < count && ((i + offset) < pairKeys.length); i = onePlus(i)) {
+        for (uint i = 0; i < count && ((i + offset) < pairKeys.length); i++) {
             pairResults[i] = getPair(i + offset);
         }
     }
@@ -742,7 +753,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     // }
     // function getTradeEvents(PairKey pairKey, uint count, uint offset) public view returns (TradeEvent[] memory results) {
     //     results = new TradeEvent[](count);
-    //     for (uint i = 0; i < count && ((i + offset) < trades[pairKey].length); i = onePlus(i)) {
+    //     for (uint i = 0; i < count && ((i + offset) < trades[pairKey].length); i++) {
     //         results[i] = trades[pairKey][i + offset];
     //     }
     // }
@@ -755,7 +766,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     // }
     // function getTokenInfo(Token[] memory tokens) public view returns (TokenInfoResult[] memory results) {
     //     results = new TokenInfoResult[](tokens.length);
-    //     for (uint i = 0; i < tokens.length; i = onePlus(i)) {
+    //     for (uint i = 0; i < tokens.length; i++) {
     //         IERC20 t = IERC20(Token.unwrap(tokens[i]));
     //         results[i] = TokenInfoResult(t.symbol(), t.name(), t.decimals(), Tokens.wrap(int128(uint128(t.totalSupply()))));
     //     }
@@ -768,7 +779,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     function getTokenBalanceAndAllowance(Account[] memory owners, Token[] memory tokens) public view returns (TokenBalanceAndAllowanceResult[] memory results) {
         require(owners.length == tokens.length);
         results = new TokenBalanceAndAllowanceResult[](owners.length);
-        for (uint i = 0; i < owners.length; i = onePlus(i)) {
+        for (uint i = 0; i < owners.length; i++) {
             IERC20 t = IERC20(Token.unwrap(tokens[i]));
             results[i] = TokenBalanceAndAllowanceResult(Tokens.wrap(int128(uint128(t.allowance(Account.unwrap(owners[i]), address(this))))), Tokens.wrap(int128(uint128(t.balanceOf(Account.unwrap(owners[i]))))));
         }
