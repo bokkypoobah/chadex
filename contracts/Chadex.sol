@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 
 // ----------------------------------------------------------------------------
-// Chadex v 0.8.9a-testing
+// Chadex v 0.8.9b-testing
 //
 // Deployed to Sepolia
 //
@@ -133,7 +133,7 @@ contract ChadexBase {
     uint8 public constant PRICE_DECIMALS = 12;
     Price public constant PRICE_EMPTY = Price.wrap(0);
     Price public constant PRICE_MIN = Price.wrap(1);
-    Price public constant PRICE_MAX = Price.wrap(999_999_999_999_999_999_999_999); // 2^128 = 340, 282,366,920,938,463,463, 374,607,431,768,211,456
+    Price public constant PRICE_MAX = Price.wrap(10_999_999_999_999_999_999); // 2^64 = 18, 446,744,073, 709,552,000
     Tokens public constant TOKENS_MIN = Tokens.wrap(0);
     Tokens public constant TOKENS_MAX = Tokens.wrap(999_999_999_999_999_999_999_999_999_999_999_999); // 2^128 = 340, 282,366,920, 938,463,463, 374,607,431, 768,211,456
     OrderKey public constant ORDERKEY_SENTINEL = OrderKey.wrap(0x0);
@@ -271,7 +271,7 @@ contract ChadexBase {
         }
     }
     function baseAndQuoteToPrice(Factors memory factors, uint tokens, uint quoteTokens) pure internal returns (Price price) {
-        price = tokens == 0 ? Price.wrap(0) : Price.wrap(uint128((10 ** (Factor.unwrap(factors.multiplier) + PRICE_DECIMALS)) * quoteTokens / tokens / (10 ** Factor.unwrap(factors.divisor))));
+        price = tokens == 0 ? Price.wrap(0) : Price.wrap(uint64((10 ** (Factor.unwrap(factors.multiplier) + PRICE_DECIMALS)) * quoteTokens / tokens / (10 ** Factor.unwrap(factors.divisor))));
     }
     function availableTokens(Token token, Account wallet) internal view returns (uint tokens) {
         uint allowance = IERC20(Token.unwrap(token)).allowance(Account.unwrap(wallet), address(this));
@@ -301,7 +301,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         uint48 blockNumber; // 2^48 = 281,474,976,710,656
         uint48 timestamp; // 2^48 = 281,474,976,710,656
     }
-    mapping(PairKey => TradeEvent[]) public trades;
+    // mapping(PairKey => TradeEvent[]) public trades;
 
 
     function execute(TradeInput[] calldata tradeInputs) public reentrancyGuard {
@@ -502,7 +502,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
                 }
             }
             emit TradeSummary(moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled, tokensOnOrder, block.timestamp);
-            trades[moreInfo.pairKey].push(TradeEvent(moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled, uint48(block.number), uint48(block.timestamp)));
+            // trades[moreInfo.pairKey].push(TradeEvent(moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled, uint48(block.number), uint48(block.timestamp)));
         }
     }
 
@@ -737,15 +737,15 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         }
     }
 
-    function tradesLength(PairKey pairKey) public view returns (uint) {
-        return trades[pairKey].length;
-    }
-    function getTradeEvents(PairKey pairKey, uint count, uint offset) public view returns (TradeEvent[] memory results) {
-        results = new TradeEvent[](count);
-        for (uint i = 0; i < count && ((i + offset) < trades[pairKey].length); i = onePlus(i)) {
-            results[i] = trades[pairKey][i + offset];
-        }
-    }
+    // function tradesLength(PairKey pairKey) public view returns (uint) {
+    //     return trades[pairKey].length;
+    // }
+    // function getTradeEvents(PairKey pairKey, uint count, uint offset) public view returns (TradeEvent[] memory results) {
+    //     results = new TradeEvent[](count);
+    //     for (uint i = 0; i < count && ((i + offset) < trades[pairKey].length); i = onePlus(i)) {
+    //         results[i] = trades[pairKey][i + offset];
+    //     }
+    // }
 
     // struct TokenInfoResult {
     //     string symbol;
