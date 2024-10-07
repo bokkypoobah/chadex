@@ -86,6 +86,8 @@ contract ChadexBase {
         Token base;
         Token quote;
         Factors factors;
+        uint8 baseDecimals;
+        uint8 quoteDecimals;
     }
     struct OrderQueue {
         OrderKey head;
@@ -166,7 +168,7 @@ contract ChadexBase {
     error InvalidMessageText(uint maxLength);
     error CalculatedBaseTokensOverflow(uint baseTokens, uint max);
     error CalculatedQuoteTokensOverflow(uint quoteTokens, uint max);
-    error MaxTokenDecimals24(uint8 decimals);
+    error MaxTokenDecimals24(uint8 decimals); // TODO: Add token address if code size can be reduced
 
     function pair(uint i) public view returns (PairKey pairKey, Token base, Token quote, Factors memory factors) {
         pairKey = pairKeys[i];
@@ -334,7 +336,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
                 revert MaxTokenDecimals24(quoteDecimals);
             }
             factors = baseDecimals >= quoteDecimals ? Factors(Factor.wrap(baseDecimals - quoteDecimals), Factor.wrap(0)) : Factors(Factor.wrap(0), Factor.wrap(quoteDecimals - baseDecimals));
-            pairs[pairKey] = Pair(tradeInput.base, tradeInput.quote, factors);
+            pairs[pairKey] = Pair(tradeInput.base, tradeInput.quote, factors, baseDecimals, quoteDecimals);
             pairKeys.push(pairKey);
             emit PairAdded(pairKey, taker, tradeInput.base, tradeInput.quote, baseDecimals, quoteDecimals, factors, block.timestamp);
         } else {
