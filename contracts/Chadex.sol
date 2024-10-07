@@ -226,17 +226,10 @@ contract ChadexBase {
         return OrderKey.wrap(keccak256(abi.encodePacked(this, maker, buySell, base, quote, price)));
     }
 
-    // Price:
-    // Want to allow 0.000 111 111 111 which is 999 999 999 * 10^-12
-    // Want to allow 999 999 999 000.0 which is 999 999 999 * 10^3
-    // Want to represent by 999 999 999 * 10^-12 to 999 999 999 * 10^3
-
     // ERC-20
     // ONLY permit decimals from 0 to 24
     // Want to do token calculations on uint precision
     // Want to limit calculated range within a safe range
-
-    // Can limit DEX trading Tokens, to limit the input
 
     // 2^16 = 65,536
     // 2^32 = 4,294,967,296
@@ -245,22 +238,6 @@ contract ChadexBase {
     // 2^64 = 18, 446,744,073,709,551,616
     // 2^128 = 340, 282,366,920,938,463,463, 374,607,431,768,211,456
     // 2^256 = 115,792, 089,237,316,195,423,570, 985,008,687,907,853,269, 984,665,640,564,039,457, 584,007,913,129,639,936
-    // Price uint64 -> uint128 340, 282,366,920,938,463,463, 374,607,431,768,211,456
-    //
-    // Notes:
-    //   quoteTokens = divisor * baseTokens * price / 10^9 / multiplier
-    //   baseTokens = multiplier * quoteTokens * 10^9 / price / divisor
-    //   price = multiplier * quoteTokens * 10^9 / baseTokens / divisor
-    // Including the 10^9 with the multiplier:
-    //   quoteTokens = divisor * baseTokens * price / multiplier
-    //   baseTokens = multiplier * quoteTokens / price / divisor
-    //   price = multiplier * quoteTokens / baseTokens / divisor
-
-    // Old factors to be replaced:
-    // .multiplier = baseDecimals - quoteDecimals, if baseDecimals >= quoteDecimals
-    // .divisor = quoteDecimals - baseDecimals, if baseDecimals < quoteDecimals
-    // TODO
-    // factors = baseDecimals >= quoteDecimals ? Factors(Factor.wrap(baseDecimals - quoteDecimals), Factor.wrap(0)) : Factors(Factor.wrap(0), Factor.wrap(quoteDecimals - baseDecimals));
 
     function baseToQuote(Decimals baseDecimals, Decimals quoteDecimals, uint baseTokens, Price price) pure internal returns (uint quoteTokens) {
         // quoteTokens = divisor * baseTokens * price * 10^quoteDecimals / 10^9 / 10^baseDecimals
@@ -303,17 +280,17 @@ contract ChadexBase {
 contract Chadex is ChadexBase, ReentrancyGuard {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
-    struct TradeEvent {
-        // OrderKey orderKey;
-        Account taker; // address
-        // Account maker; // address
-        BuySell buySell; // uint8
-        Price price; // uint128
-        Tokens filled; // int128
-        Tokens quoteFilled; // int128
-        uint48 blockNumber; // 2^48 = 281,474,976,710,656
-        Unixtime timestamp;
-    }
+    // struct TradeEvent {
+    //     // OrderKey orderKey;
+    //     Account taker; // address
+    //     // Account maker; // address
+    //     BuySell buySell; // uint8
+    //     Price price; // uint128
+    //     Tokens filled; // int128
+    //     Tokens quoteFilled; // int128
+    //     uint48 blockNumber; // 2^48 = 281,474,976,710,656
+    //     Unixtime timestamp;
+    // }
 
     Token constant THEDAO = Token.wrap(0xBB9bc244D798123fDe783fCc1C72d3Bb8C189413);
 
