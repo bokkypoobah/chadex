@@ -275,14 +275,14 @@ contract ChadexBase {
             revert TransferFromFailed(token, from, to, tokens);
         }
     }
-    function decimals(Token token) internal view returns (Decimals __d) {
+    function decimals(Token token) internal view returns (Decimals _d) {
         if (Token.unwrap(token) == Token.unwrap(THEDAO)) {
             return Decimals.wrap(16);
         } else {
-            try IERC20(Token.unwrap(token)).decimals() returns (uint8 _d) {
-                __d = Decimals.wrap(_d);
+            try IERC20(Token.unwrap(token)).decimals() returns (uint8 __d) {
+                _d = Decimals.wrap(__d);
             } catch {
-                __d = Decimals.wrap(type(uint8).max);
+                _d = Decimals.wrap(type(uint8).max);
             }
         }
     }
