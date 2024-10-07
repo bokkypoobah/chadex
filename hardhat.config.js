@@ -14,4 +14,9 @@ module.exports = {
       },
     },
   },
+  networks: {
+    hardhat: {
+      allowUnlimitedContractSize: true,
+    },
+  },
 };
