@@ -164,9 +164,9 @@ describe("Chadex", function () {
     const baseTokens5 = ethers.utils.parseUnits("69", data.decimals0);
 
     const actionsA = [
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 12).toString(), targetPrice: ethers.utils.parseUnits(price1, 12).toString(), expiry: expiry, tokens: baseTokens1.toString(), skipCheck: false },
-      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 12).toString(), targetPrice: ethers.utils.parseUnits(price2, 12).toString(), expiry: expiry, tokens: baseTokens2.toString(), skipCheck: false },
-      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 12).toString(), targetPrice: ethers.utils.parseUnits(price3, 12).toString(), expiry: expiry, tokens: baseTokens3.toString(), skipCheck: false },
+      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), targetPrice: ethers.utils.parseUnits(price1, 9).toString(), expiry: expiry, tokens: baseTokens1.toString(), skipCheck: false },
+      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 9).toString(), targetPrice: ethers.utils.parseUnits(price2, 9).toString(), expiry: expiry, tokens: baseTokens2.toString(), skipCheck: false },
+      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 9).toString(), targetPrice: ethers.utils.parseUnits(price3, 9).toString(), expiry: expiry, tokens: baseTokens3.toString(), skipCheck: false },
     ];
     console.log("        Executing: " + JSON.stringify(actionsA, null, 2));
 
@@ -184,8 +184,8 @@ describe("Chadex", function () {
     const targetPrice1 = "0.6901";
     const baseTokensB1 = ethers.utils.parseUnits("1", data.decimals0);
     const actionsB1 = [
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB1.toString(), skipCheck: false },
-      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB1.toString() },
+      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 9).toString(), expiry: expiry, tokens: baseTokensB1.toString(), skipCheck: false },
+      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 9).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 9).toString(), expiry: expiry, tokens: baseTokensB1.toString() },
     ];
     console.log("        Executing: " + JSON.stringify(actionsB1, null, 2));
     const executeB1Tx = await data.chadex.connect(data.user3Signer).execute(actionsB1);
@@ -193,8 +193,8 @@ describe("Chadex", function () {
 
     // const baseTokensB2 = ethers.utils.parseUnits("6.9", data.decimals0);
     // const actionsB2 = [
-    //   { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB2.toString() },
-    //   { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 12).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 12).toString(), expiry: expiry, tokens: baseTokensB2.toString() },
+    //   { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 9).toString(), expiry: expiry, tokens: baseTokensB2.toString() },
+    //   { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price2, 9).toString(), targetPrice: ethers.utils.parseUnits(targetPrice1, 9).toString(), expiry: expiry, tokens: baseTokensB2.toString() },
     // ];
     // console.log("        Executing: " + JSON.stringify(actionsB2, null, 2));
     // const executeB2Tx = await data.chadex.connect(data.user3Signer).execute(actionsB2);
@@ -237,7 +237,7 @@ describe("Chadex", function () {
 
     // const baseTokensB1 = ethers.utils.parseUnits("0.31", data.decimals0);
     // const actionsB1 = [
-    //   { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 12).toString(), targetPrice: ethers.utils.parseUnits(price1, 12).toString(), expiry: expiry, tokens: baseTokensB1.toString() },
+    //   { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), targetPrice: ethers.utils.parseUnits(price1, 9).toString(), expiry: expiry, tokens: baseTokensB1.toString() },
     // ];
     // console.log("        Executing: " + JSON.stringify(actionsB1, null, 2));
     // const executeB1Tx = await data.chadex.connect(data.user2Signer).execute(actionsB1);
@@ -246,7 +246,7 @@ describe("Chadex", function () {
 
     // const baseTokensC = ethers.utils.parseUnits("-1", data.decimals0);
     // const actionsC = [
-    //   { action: Action.RemoveOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 12).toString(), targetPrice: ethers.utils.parseUnits(price1, 12).toString(), expiry: expiry, tokens: baseTokensC.toString() },
+    //   { action: Action.RemoveOrder, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price3, 9).toString(), targetPrice: ethers.utils.parseUnits(price1, 9).toString(), expiry: expiry, tokens: baseTokensC.toString() },
     // ];
     // console.log("        Executing: " + JSON.stringify(actionsC, null, 2));
     // const executeCTx = await data.chadex.connect(data.user2Signer).execute(actionsC);
@@ -256,7 +256,7 @@ describe("Chadex", function () {
     // const newExpiry = parseInt(new Date()/1000) + 24*60*60;
     // const baseTokensD = ethers.utils.parseUnits("-0.3", data.decimals0);
     // const actionsD = [
-    //   { action: Action.UpdateExpiryAndTokens, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 12).toString(), targetPrice: ethers.utils.parseUnits(price1, 12).toString(), expiry: newExpiry, tokens: baseTokensD.toString() },
+    //   { action: Action.UpdateExpiryAndTokens, buySell: BuySell.Buy, base: data.token0.address, quote: data.weth.address, price: ethers.utils.parseUnits(price1, 9).toString(), targetPrice: ethers.utils.parseUnits(price1, 9).toString(), expiry: newExpiry, tokens: baseTokensD.toString() },
     // ];
     // console.log("        Executing: " + JSON.stringify(actionsD, null, 2));
     // const executeDTx = await data.chadex.connect(data.user0Signer).execute(actionsD);
