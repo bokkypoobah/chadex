@@ -233,15 +233,14 @@ class Data {
       const pairInfos = [];
       for (let j = 0; j < pairsLength; j++) {
         const info = await this.chadex.pair(j);
-        // console.log("info: " + JSON.stringify(info));
-        pairInfos.push({ pairKey: info[0], baseToken: info[1], quoteToken: info[2], factors: info[3] })
+        pairInfos.push({ pairKey: info[0], tokenz: info[1], decimalss: info[2] })
       }
 
       let now = new Date();
       let row = 0;
       for (let j = 0; j < pairInfos.length; j++) {
         const pair = pairInfos[j];
-        console.log("          ----- Pair " + pair.pairKey + " " + this.getShortAccountName(pair.baseToken) + "/" + this.getShortAccountName(pair.quoteToken) + " " + pair.factors[0] + " " + pair.factors[1] + " -----");
+        console.log("          ----- Pair " + pair.pairKey + " " + this.getShortAccountName(pair.tokenz[0]) + "/" + this.getShortAccountName(pair.tokenz[1]) + " " + pair.decimalss[0] + " " + pair.decimalss[1] + " -----");
         for (let buySell = 0; buySell < 2; buySell++) {
           console.log("              #     " + (buySell == 0 ? " BUY" : "SELL") +" Price OrderKey   Next       Maker         Expiry(s)                Tokens     Total Available Base    Total Available Quote")
           console.log("            --- -------------- ---------- ---------- ------------ ---------- --------------------- ------------------------ ------------------------");
@@ -348,9 +347,8 @@ class Data {
       // }
       const pairs = await this.chadex.getPairs(2, 0);
       for (let i = 0; i < pairs.length && pairs[i][0] != 0; i++) {
-        const [pairKey, base, quote, factors, bestBuyOrder, bestSellOrder] = pairs[i];
-        console.log("            pairKey: " + pairKey + ", base=" + JSON.stringify(base) + ", quote=" + JSON.stringify(quote) +
-          ", factors=" + factors +
+        const [pairKey, tokenz, decimalss, bestBuyOrder, bestSellOrder] = pairs[i];
+        console.log("            pairKey: " + pairKey + ", tokenz=" + JSON.stringify(tokenz) + ", decimalss=" + JSON.stringify(decimalss) +
           ", bestBuyOrder=" + JSON.stringify(bestBuyOrder) + ", bestSellOrder=" + JSON.stringify(bestSellOrder));
       }
       console.log();
