@@ -216,6 +216,7 @@ contract ChadexBase {
     }
     function inverseBuySell(BuySell buySell) internal pure returns (BuySell inverse) {
         inverse = (buySell == BuySell.Buy) ? BuySell.Sell : BuySell.Buy;
+        // inverse = BuySell(uint8(1) - uint8(buySell));
     }
     function generatePairKey(TradeInput memory info) internal view returns (PairKey) {
         return PairKey.wrap(keccak256(abi.encodePacked(this, info.base, info.quote)));
