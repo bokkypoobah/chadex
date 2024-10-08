@@ -719,7 +719,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     }
     function getPairs(uint count, uint offset) public view returns (PairResult[] memory pairResults) {
         pairResults = new PairResult[](count);
-        for (uint i = 0; i < count && ((i + offset) < pairKeys.length); i++) {
+        for (uint i; i < count && ((i + offset) < pairKeys.length); i++) {
             pairResults[i] = getPair(i + offset);
         }
     }
@@ -729,7 +729,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     // }
     // function getTradeEvents(PairKey pairKey, uint count, uint offset) public view returns (TradeEvent[] memory results) {
     //     results = new TradeEvent[](count);
-    //     for (uint i = 0; i < count && ((i + offset) < trades[pairKey].length); i++) {
+    //     for (uint i; i < count && ((i + offset) < trades[pairKey].length); i++) {
     //         results[i] = trades[pairKey][i + offset];
     //     }
     // }
@@ -742,7 +742,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     // }
     // function getTokenInfo(Token[] memory tokens) public view returns (TokenInfoResult[] memory results) {
     //     results = new TokenInfoResult[](tokens.length);
-    //     for (uint i = 0; i < tokens.length; i++) {
+    //     for (uint i; i < tokens.length; i++) {
     //         IERC20 t = IERC20(Token.unwrap(tokens[i]));
     //         results[i] = TokenInfoResult(t.symbol(), t.name(), t.decimals(), Tokens.wrap(int128(uint128(t.totalSupply()))));
     //     }
@@ -755,7 +755,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     function getTokenBalanceAndAllowance(Account[] memory owners, Token[] memory tokens) public view returns (TokenBalanceAndAllowanceResult[] memory results) {
         require(owners.length == tokens.length);
         results = new TokenBalanceAndAllowanceResult[](owners.length);
-        for (uint i = 0; i < owners.length; i++) {
+        for (uint i; i < owners.length; i++) {
             IERC20 t = IERC20(Token.unwrap(tokens[i]));
             results[i] = TokenBalanceAndAllowanceResult(Tokens.wrap(int128(uint128(t.allowance(Account.unwrap(owners[i]), address(this))))), Tokens.wrap(int128(uint128(t.balanceOf(Account.unwrap(owners[i]))))));
         }
