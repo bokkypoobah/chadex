@@ -649,11 +649,9 @@ contract Chadex is ChadexBase, ReentrancyGuard {
                 if (buySell == BuySell.Buy) {
                     availableQuote = availableTokens(pair.tokenz[1], order.maker);
                     availableBase = quoteToBase(pair.decimalss, availableQuote, price);
-                    availableBase = 0;
                 } else {
                     availableBase = availableTokens(pair.tokenz[0], order.maker);
                     availableQuote = baseToQuote(pair.decimalss, availableBase, price);
-                    availableQuote = 0;
                 }
                 orderResults[i] = OrderResult(price, orderKey, order.next, order.maker, order.expiry, order.tokens, Tokens.wrap(int128(uint128(availableBase))), Tokens.wrap(int128(uint128(availableQuote))));
                 orderKey = order.next;
