@@ -98,8 +98,7 @@ contract ChadexBase {
     struct TradeInput {
         Action action;
         BuySell buySell;
-        Token base;
-        Token quote;
+        Token[2] tokenz; // 0: base, 1: quote
         Price price;
         Price targetPrice;
         Unixtime expiry;
@@ -141,7 +140,7 @@ contract ChadexBase {
     mapping(PairKey => mapping(BuySell => mapping(Price => OrderQueue))) orderQueues;
     mapping(OrderKey => Order) orders;
 
-    event PairAdded(PairKey indexed pairKey, Account maker, Token indexed base, Token indexed quote, Decimals baseDecimals, Decimals quoteDecimals, Unixtime timestamp);
+    event PairAdded(PairKey indexed pairKey, Account maker, Token indexed base, Token indexed quote, Decimals[2] decimalss, Unixtime timestamp);
     event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens, Tokens quoteTokens, Unixtime timestamp);
     event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens tokens, Unixtime timestamp);
     event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens tokens, Unixtime timestamp);
@@ -219,10 +218,10 @@ contract ChadexBase {
         // inverse = BuySell(uint8(1) - uint8(buySell));
     }
     function generatePairKey(TradeInput memory info) internal view returns (PairKey) {
-        return PairKey.wrap(keccak256(abi.encodePacked(this, info.base, info.quote)));
+        return PairKey.wrap(keccak256(abi.encodePacked(this, info.tokenz)));
     }
-    function generateOrderKey(Account maker, BuySell buySell, Token base, Token quote, Price price) internal view returns (OrderKey) {
-        return OrderKey.wrap(keccak256(abi.encodePacked(this, maker, buySell, base, quote, price)));
+    function generateOrderKey(Account maker, BuySell buySell, Token[2] memory tokenz, Price price) internal view returns (OrderKey) {
+        return OrderKey.wrap(keccak256(abi.encodePacked(this, maker, buySell, tokenz, price)));
     }
 
     // ERC-20
@@ -326,32 +325,32 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         PairKey pairKey = generatePairKey(tradeInput);
         Pair memory pair = pairs[pairKey];
         if (Token.unwrap(pair.tokenz[0]) == address(0)) {
-            Decimals baseDecimals = decimals(tradeInput.base);
-            Decimals quoteDecimals = decimals(tradeInput.quote);
+            Decimals baseDecimals = decimals(tradeInput.tokenz[0]);
+            Decimals quoteDecimals = decimals(tradeInput.tokenz[1]);
             if (Decimals.unwrap(baseDecimals) > 24) {
                 revert MaxTokenDecimals24(baseDecimals);
             }
             if (Decimals.unwrap(quoteDecimals) > 24) {
                 revert MaxTokenDecimals24(quoteDecimals);
             }
-            pairs[pairKey] = Pair([tradeInput.base, tradeInput.quote], [baseDecimals, quoteDecimals]);
+            pairs[pairKey] = Pair(tradeInput.tokenz, [baseDecimals, quoteDecimals]);
             pairKeys.push(pairKey);
-            emit PairAdded(pairKey, taker, tradeInput.base, tradeInput.quote, baseDecimals, quoteDecimals, Unixtime.wrap(uint40(block.timestamp)));
+            emit PairAdded(pairKey, taker, tradeInput.tokenz[0], tradeInput.tokenz[1], [baseDecimals, quoteDecimals], Unixtime.wrap(uint40(block.timestamp)));
         }
         return MoreInfo(taker, inverseBuySell(tradeInput.buySell), pairKey, pair.decimalss);
     }
 
     function _checkTakerAvailableTokens(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal view {
         if (tradeInput.buySell == BuySell.Buy) {
-            uint availableTokens = availableTokens(tradeInput.quote, moreInfo.taker);
+            uint availableTokens = availableTokens(tradeInput.tokenz[1], moreInfo.taker);
             uint quoteTokens = baseToQuote(moreInfo.decimalss, uint(uint128(Tokens.unwrap(tradeInput.tokens))), tradeInput.price);
             if (availableTokens < quoteTokens) {
-                revert InsufficientQuoteTokenBalanceOrAllowance(tradeInput.quote, moreInfo.taker, Tokens.wrap(int128(uint128(quoteTokens))), Tokens.wrap(int128(uint128(availableTokens))));
+                revert InsufficientQuoteTokenBalanceOrAllowance(tradeInput.tokenz[1], moreInfo.taker, Tokens.wrap(int128(uint128(quoteTokens))), Tokens.wrap(int128(uint128(availableTokens))));
             }
         } else {
-            uint availableTokens = availableTokens(tradeInput.base, moreInfo.taker);
+            uint availableTokens = availableTokens(tradeInput.tokenz[0], moreInfo.taker);
             if (availableTokens < uint(uint128(Tokens.unwrap(tradeInput.tokens)))) {
-                revert InsufficientTokenBalanceOrAllowance(tradeInput.base, moreInfo.taker, tradeInput.tokens, Tokens.wrap(int128(uint128(availableTokens))));
+                revert InsufficientTokenBalanceOrAllowance(tradeInput.tokenz[0], moreInfo.taker, tradeInput.tokens, Tokens.wrap(int128(uint128(availableTokens))));
             }
         }
     }
@@ -372,7 +371,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         } else {
             makerTokensToFill = uint(uint128(Tokens.unwrap(order.tokens)));
             if (tradeInput.buySell == BuySell.Buy) {
-                uint _availableTokens = availableTokens(tradeInput.base, order.maker);
+                uint _availableTokens = availableTokens(tradeInput.tokenz[0], order.maker);
                 if (_availableTokens > 0) {
                     if (makerTokensToFill > _availableTokens) {
                         makerTokensToFill = _availableTokens;
@@ -385,8 +384,8 @@ contract Chadex is ChadexBase, ReentrancyGuard {
                     }
                     quoteTokensToTransfer = baseToQuote(moreInfo.decimalss, tokensToTransfer, price);
                     if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
-                        transferFrom(tradeInput.quote, moreInfo.taker, order.maker, quoteTokensToTransfer);
-                        transferFrom(tradeInput.base, order.maker, moreInfo.taker, tokensToTransfer);
+                        transferFrom(tradeInput.tokenz[1], moreInfo.taker, order.maker, quoteTokensToTransfer);
+                        transferFrom(tradeInput.tokenz[0], order.maker, moreInfo.taker, tokensToTransfer);
                     }
                     emit Trade(TradeResult(moreInfo.pairKey, orderKey, moreInfo.taker, order.maker, tradeInput.buySell, price, Tokens.wrap(int128(uint128(tokensToTransfer))), Tokens.wrap(int128(uint128(quoteTokensToTransfer))), Unixtime.wrap(uint40(block.timestamp))));
                     // trades.push(TradeEvent(moreInfo.pairKey, orderKey, moreInfo.taker, order.maker, tradeInput.buySell, price, Tokens.wrap(int128(uint128(tokensToTransfer))), Tokens.wrap(int128(uint128(quoteTokensToTransfer))), uint48(block.number), uint48(block.timestamp)));
@@ -394,7 +393,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
                     deleteOrder = true;
                 }
             } else {
-                uint availableQuoteTokens = availableTokens(tradeInput.quote, order.maker);
+                uint availableQuoteTokens = availableTokens(tradeInput.tokenz[1], order.maker);
                 if (availableQuoteTokens > 0) {
                     uint availableQuoteTokensInBaseTokens = quoteToBase(moreInfo.decimalss, availableQuoteTokens, price);
                     if (makerTokensToFill > availableQuoteTokensInBaseTokens) {
@@ -411,8 +410,8 @@ contract Chadex is ChadexBase, ReentrancyGuard {
                         quoteTokensToTransfer = baseToQuote(moreInfo.decimalss, tokensToTransfer, price);
                     }
                     if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
-                        transferFrom(tradeInput.base, moreInfo.taker, order.maker, tokensToTransfer);
-                        transferFrom(tradeInput.quote, order.maker, moreInfo.taker, quoteTokensToTransfer);
+                        transferFrom(tradeInput.tokenz[0], moreInfo.taker, order.maker, tokensToTransfer);
+                        transferFrom(tradeInput.tokenz[1], order.maker, moreInfo.taker, quoteTokensToTransfer);
                     }
                     emit Trade(TradeResult(moreInfo.pairKey, orderKey, moreInfo.taker, order.maker, tradeInput.buySell, price, Tokens.wrap(int128(uint128(tokensToTransfer))), Tokens.wrap(int128(uint128(quoteTokensToTransfer))), Unixtime.wrap(uint40(block.timestamp))));
                     // trades.push(TradeEvent(moreInfo.pairKey, orderKey, moreInfo.taker, order.maker, tradeInput.buySell, price, Tokens.wrap(int128(uint128(tokensToTransfer))), Tokens.wrap(int128(uint128(quoteTokensToTransfer))), uint48(block.number), uint48(block.timestamp)));
@@ -503,7 +502,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     }
 
     function _addOrder(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
-        orderKey = generateOrderKey(moreInfo.taker, tradeInput.buySell, tradeInput.base, tradeInput.quote, tradeInput.price);
+        orderKey = generateOrderKey(moreInfo.taker, tradeInput.buySell, tradeInput.tokenz, tradeInput.price);
         if (Account.unwrap(orders[orderKey].maker) != address(0)) {
             revert CannotInsertDuplicateOrder(orderKey);
         }
@@ -570,7 +569,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     }
 
     function _updateExpiryAndTokens(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
-        orderKey = generateOrderKey(moreInfo.taker, tradeInput.buySell, tradeInput.base, tradeInput.quote, tradeInput.price);
+        orderKey = generateOrderKey(moreInfo.taker, tradeInput.buySell, tradeInput.tokenz, tradeInput.price);
         Order storage order = orders[orderKey];
         if (Account.unwrap(order.maker) != Account.unwrap(moreInfo.taker)) {
             revert OrderNotFoundForUpdate(orderKey);
