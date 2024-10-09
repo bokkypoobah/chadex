@@ -106,7 +106,7 @@ class Data {
               } else if (a.name == 'wad' || a.name == 'amount' || a.name == 'balance' || a.name == 'value') {
                 result = result + ethers.utils.formatUnits(data.args[a.name], 18);
               } else if (a.name == 'price') {
-                result = result + ethers.utils.formatUnits(data.args[a.name], 12);
+                result = result + ethers.utils.formatUnits(data.args[a.name], 9);
               } else {
                 result = result + data.args[a.name].toString();
               }
@@ -258,7 +258,7 @@ class Data {
               const [price1, orderKey, nextOrderKey, maker, expiry, tokens, availableBase, availableQuote] = orderInfo;
               var minutes = (expiry - now / 1000) / 60;
               console.log("              " + (row++) + " " +
-                this.padLeft(ethers.utils.formatUnits(price1, 12), 14) + " " +
+                this.padLeft(ethers.utils.formatUnits(price1, 9), 14) + " " +
                 orderKey.substring(0, 10) + " " +
                 nextOrderKey.substring(0, 10) + " " +
                 this.getShortAccountName(maker) + " " +
@@ -278,7 +278,7 @@ class Data {
           price = await this.chadex.getBestPrice(pair.pairKey, buySell);
           while (price != 0) {
             var orderQueue = await this.chadex.getOrderQueue(pair.pairKey, buySell, price);
-            console.log("            price: " + ethers.utils.formatUnits(price, 12) + " head=" + orderQueue[0].substring(0, 10) + " tail=" + orderQueue[1].substring(0, 10));
+            console.log("            price: " + ethers.utils.formatUnits(price, 9) + " head=" + orderQueue[0].substring(0, 10) + " tail=" + orderQueue[1].substring(0, 10));
             let orderKey = orderQueue[0];
             while (orderKey != 0) {
               let order = await this.chadex.getOrder(orderKey);
