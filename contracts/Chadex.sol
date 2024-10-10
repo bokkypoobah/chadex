@@ -157,7 +157,6 @@ contract ChadexBase {
     error UnableToBuyBelowTargetPrice(Price price, Price targetPrice);
     error UnableToSellAboveTargetPrice(Price price, Price targetPrice);
     error OrderNotFoundForUpdate(OrderKey orderKey);
-    error OnlyPositiveTokensAccepted(Tokens tokens);
     error InvalidMessageTopic(uint maxLength);
     error InvalidMessageText(uint maxLength);
     error CalculatedBaseTokensTooStrong(uint baseTokens, uint max);
@@ -307,9 +306,6 @@ contract Chadex is ChadexBase, ReentrancyGuard {
             TradeInput memory tradeInput = tradeInputs[i];
             MoreInfo memory moreInfo = _getMoreInfo(tradeInput, Account.wrap(msg.sender));
             if (uint(tradeInput.action) <= uint(Action.FillAnyAndAddOrder)) {
-                if (Tokens.unwrap(tradeInput.tokens) <= 0) {
-                    revert OnlyPositiveTokensAccepted(tradeInput.tokens);
-                }
                 _trade(tradeInput, moreInfo);
             } else if (tradeInput.action == Action.RemoveOrder) {
                 _removeOrder(tradeInput, moreInfo);
