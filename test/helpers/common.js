@@ -86,43 +86,7 @@ class Data {
     // console.log("this.contracts: " + JSON.stringify(this.contracts, null, 2));
     receipt.logs.forEach((log) => {
       // console.log("log.address: " + log.address);
-      if (log.address == this.token0.target) {
-        // console.log("token0: " + this.token0.target);
-        const event = this.token0.interface.parseLog(log);
-        if (event.name == "Transfer") {
-          const [from, to, tokens] = event.args;
-          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
-            "from: " + this.getShortAccountName(from) +
-            ", to: " + this.getShortAccountName(to) +
-            ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
-          );
-        } else if (event.name == "Approval") {
-          const [owner, spender, tokens] = event.args;
-          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
-            "owner: " + this.getShortAccountName(owner) +
-            ", spender: " + this.getShortAccountName(spender) +
-            ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
-          );
-        }
-        // console.log("event.args: " + JSON.stringify(event.args));
-      } else if (log.address == this.token1.target) {
-        const event = this.token1.interface.parseLog(log);
-        if (event.name == "Transfer") {
-          const [from, to, tokens] = event.args;
-          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
-            "from: " + this.getShortAccountName(from) +
-            ", to: " + this.getShortAccountName(to) +
-            ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
-          );
-        } else if (event.name == "Approval") {
-          const [owner, spender, tokens] = event.args;
-          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
-            "owner: " + this.getShortAccountName(owner) +
-            ", spender: " + this.getShortAccountName(spender) +
-            ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
-          );
-        }
-      } else if (log.address == this.weth.target) {
+      if (log.address == this.token0.target || log.address == this.token1.target || log.address == this.weth.target) {
         // console.log("weth: " + this.token0.target);
         const event = this.weth.interface.parseLog(log);
         if (event.name == "Transfer") {
@@ -156,7 +120,48 @@ class Data {
         }
       } else if (log.address == this.chadex.target) {
         const event = this.chadex.interface.parseLog(log);
-        console.log("          + CHADEX " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
+        // event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens baseTokens, Unixtime timestamp);
+        // event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens baseTokens, Unixtime timestamp);
+        // event Trade(TradeResult tradeResult);
+        // event TradeSummary(PairKey indexed pairKey, Account indexed taker, BuySell buySell, Price price, Tokens baseTokens, Tokens quoteTokens, Tokens tokensOnOrder, Unixtime timestamp);
+        // event Message(address indexed from, address indexed to, bytes32 indexed pairKey, bytes32 orderKey, string topic, string text, Unixtime timestamp);
+        if (event.name == "PairAdded") {
+          // event PairAdded(PairKey indexed pairKey, Account maker, Token indexed base, Token indexed quote, Decimals[2] decimalss, Unixtime timestamp);
+          const [pairKey, maker, base, quote, decimalss, timestamp] = event.args;
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
+            "pairKey: " + pairKey.substring(0, 20) +
+            ", maker: " + this.getShortAccountName(maker) +
+            ", base: " + this.getShortAccountName(base) +
+            ", quote: " + this.getShortAccountName(quote) +
+            ", decimalss: " + JSON.stringify(decimalss.map(e => parseInt(e))) +
+            ", timestamp: " + timestamp + ")"
+          );
+        } else if (event.name == "OrderAdded") {
+          // event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens baseTokens, Tokens quoteTokens, Unixtime timestamp);
+          const [pairKey, orderKey, maker, buySell, price, expiry, baseTokens, quoteTokens, timestamp] = event.args;
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
+            "pairKey: " + pairKey.substring(0, 20) +
+            ", orderKey: " + orderKey.substring(0, 20) +
+            ", maker: " + this.getShortAccountName(maker) +
+            ", buySell: " + buySell +
+            ", price: " + price.toString() +
+            ", expiry: " + expiry +
+            ", baseTokens: " + baseTokens +
+            ", quoteTokens: " + quoteTokens +
+            ", timestamp: " + timestamp + ")"
+          );
+          console.log("          + CHADEX.OrderAdded " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
+        } else if (event.name == "OrderRemoved") {
+          console.log("          + CHADEX.OrderRemoved " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
+        } else if (event.name == "OrderUpdated") {
+          console.log("          + CHADEX.OrderUpdated " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
+        } else if (event.name == "Trade") {
+          console.log("          + CHADEX.Trade " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
+        } else if (event.name == "TradeSummary") {
+          console.log("          + CHADEX.TradeSummary " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
+        } else if (event.name == "Message") {
+          console.log("          + CHADEX.Message " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
+        }
       } else {
         console.log("          + " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
       }
