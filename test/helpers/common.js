@@ -85,13 +85,92 @@ class Data {
     console.log("        > " + prefix + " - gasUsed: " + receipt.gasUsed + " ~ ETH " + ethers.formatEther(fee) + " ~ USD " + feeUsd);
     // console.log("this.contracts: " + JSON.stringify(this.contracts, null, 2));
     receipt.logs.forEach((log) => {
+      // console.log("log.address: " + log.address);
+      if (log.address == this.token0.target) {
+        // console.log("token0: " + this.token0.target);
+        const event = this.token0.interface.parseLog(log);
+        if (event.name == "Transfer") {
+          const [from, to, tokens] = event.args;
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
+            "from: " + this.getShortAccountName(from) +
+            ", to: " + this.getShortAccountName(to) +
+            ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
+          );
+        } else if (event.name == "Approval") {
+          const [owner, spender, tokens] = event.args;
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
+            "owner: " + this.getShortAccountName(owner) +
+            ", spender: " + this.getShortAccountName(spender) +
+            ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
+          );
+        }
+        // console.log("event.args: " + JSON.stringify(event.args));
+      } else if (log.address == this.token1.target) {
+        const event = this.token1.interface.parseLog(log);
+        if (event.name == "Transfer") {
+          const [from, to, tokens] = event.args;
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
+            "from: " + this.getShortAccountName(from) +
+            ", to: " + this.getShortAccountName(to) +
+            ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
+          );
+        } else if (event.name == "Approval") {
+          const [owner, spender, tokens] = event.args;
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
+            "owner: " + this.getShortAccountName(owner) +
+            ", spender: " + this.getShortAccountName(spender) +
+            ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
+          );
+        }
+      } else if (log.address == this.weth.target) {
+        // console.log("weth: " + this.token0.target);
+        const event = this.weth.interface.parseLog(log);
+        if (event.name == "Transfer") {
+          const [from, to, tokens] = event.args;
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
+            "from: " + this.getShortAccountName(from) +
+            ", to: " + this.getShortAccountName(to) +
+            ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
+          );
+        } else if (event.name == "Deposit") {
+          const [to, tokens] = event.args;
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
+            "from: " + this.getShortAccountName(ZERO_ADDRESS) +
+            ", to: " + this.getShortAccountName(to) +
+            ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
+          );
+        } else if (event.name == "Withdrawal") {
+          const [from, tokens] = event.args;
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
+            "from: " + this.getShortAccountName(from) +
+            ", to: " + this.getShortAccountName(ZERO_ADDRESS) +
+            ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
+          );
+        } else if (event.name == "Approval") {
+          const [owner, spender, tokens] = event.args;
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
+            "owner: " + this.getShortAccountName(owner) +
+            ", spender: " + this.getShortAccountName(spender) +
+            ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
+          );
+        }
+      } else if (log.address == this.chadex.target) {
+        const event = this.chadex.interface.parseLog(log);
+        console.log("          + CHADEX " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
+      } else {
+        console.log("          + " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
+      }
+    });
+
+    return;
+    receipt.logs.forEach((log) => {
       let found = false;
       for (let i = 0; i < this.contracts.length && !found; i++) {
         try {
           var data = this.contracts[i].interface.parseLog(log);
           // console.log("this.contracts[i].interface: " + JSON.stringify(this.contracts[i].interface, null, 2));
           if (data) {
-            console.log("data: " + JSON.stringify(data, null, 2));            
+            console.log("data: " + JSON.stringify(data, null, 2));
           }
           var result = data.name + "(";
           let separator = "";
