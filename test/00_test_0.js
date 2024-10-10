@@ -173,8 +173,6 @@ describe("Chadex", function () {
     const execute0aTx = await data.chadex.connect(data.user0Signer).execute(actionsA);
     await data.printEvents("user0->chadex.execute(actionsA)", await execute0aTx.wait());
 
-    return;
-
     const execute1aTx = await data.chadex.connect(data.user1Signer).execute(actionsA);
     await data.printEvents("user1->chadex.execute(actionsA)", await execute1aTx.wait());
 
@@ -212,7 +210,7 @@ describe("Chadex", function () {
     const owners = [data.user0];
     const tokens = [data.token0.target];
     const tokenBalanceAndAllowance = await data.chadex.getTokenBalanceAndAllowance(owners, tokens);
-    console.log("tokenBalanceAndAllowance: " + JSON.stringify(tokenBalanceAndAllowance, null, 2));
+    console.log("tokenBalanceAndAllowance: " + JSON.stringify(tokenBalanceAndAllowance.map(e => e.toString()), null, 2));
 
     // const tradeEvents = await data.chadex.getTradeEvents(10, 0);
     // console.log("tradeEvents: " + JSON.stringify(tradeEvents, null, 2));

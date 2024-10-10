@@ -146,11 +146,11 @@ class Data {
             ", buySell: " + buySell +
             ", price: " + price.toString() +
             ", expiry: " + expiry +
-            ", baseTokens: " + baseTokens +
-            ", quoteTokens: " + quoteTokens +
+            ", baseTokens: " + ethers.formatUnits(baseTokens, 18) +  // TODO - use decimals
+            ", quoteTokens: " + ethers.formatUnits(quoteTokens, 18) + // TODO - use decimals
             ", timestamp: " + timestamp + ")"
           );
-          console.log("          + CHADEX.OrderAdded " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
+          // console.log("          + CHADEX.OrderAdded " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
         } else if (event.name == "OrderRemoved") {
           console.log("          + CHADEX.OrderRemoved " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
         } else if (event.name == "OrderUpdated") {
@@ -308,7 +308,7 @@ class Data {
     console.log("          -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------");
     const checkAccounts = [this.deployer, this.user0, this.user1, this.user2, this.user3/*, this.feeAccount, this.uiFeeAccount*/];
     if (this.chadex) {
-      checkAccounts.push(this.chadex.address);
+      checkAccounts.push(this.chadex.target);
     }
     for (let i = 0; i < checkAccounts.length; i++) {
       const balance = await ethers.provider.getBalance(checkAccounts[i]);
@@ -321,7 +321,7 @@ class Data {
 
     if (this.chadex) {
       const pairsLength = parseInt(await this.chadex.pairsLength());
-      console.log("          Chadex: " + this.getShortAccountName(this.chadex.address));
+      console.log("          Chadex: " + this.getShortAccountName(this.chadex.target));
       const pairInfos = [];
       for (let j = 0; j < pairsLength; j++) {
         const info = await this.chadex.pair(j);
@@ -343,12 +343,14 @@ class Data {
           const baseDecimals = this.decimals[pair.baseToken];
           const quoteDecimals = this.decimals[pair.quoteToken];
           let results = await this.chadex.getOrders(pair.pairKey, buySell, ORDERSIZE, price, firstOrderKey);
+          // console.log("results: " + JSON.stringify(results.map(e => e.toString()), null, 2));
           while (parseInt(results[0][0]) != 0) {
             // console.log("            * --- Start price: " + price + ", firstOrderKey: " + firstOrderKey + " ---")
             for (let k = 0; k < results.length && parseInt(results[k][0]) != 0; k++) {
               const orderInfo = results[k];
+              // console.log("orderInfo: " + JSON.stringify(orderInfo.map(e => e.toString()), null, 2));
               const [price1, orderKey, nextOrderKey, maker, expiry, tokens, availableBase, availableQuote] = orderInfo;
-              var minutes = (expiry - now / 1000) / 60;
+              var minutes = (parseInt(expiry) - (parseInt(now) / 1000)) / 60;
               console.log("              " + (row++) + " " +
                 this.padLeft(ethers.formatUnits(price1, 9), 14) + " " +
                 orderKey.substring(0, 10) + " " +
@@ -374,7 +376,7 @@ class Data {
             let orderKey = orderQueue[0];
             while (orderKey != 0) {
               let order = await this.chadex.getOrder(orderKey);
-              var minutes = (order[2] - new Date() / 1000) / 60;
+              var minutes = (parseInt(order[2]) - new Date() / 1000) / 60;
               console.log("              Order key=" + orderKey.substring(0, 10) + " next=" + order[0].substring(0, 10) +
                 " maker=" + this.getShortAccountName(order[1]) +
                 " expiry=" + minutes.toFixed(2) + "s tokens=" + ethers.formatUnits(order[3], pair.baseDecimals));
@@ -440,8 +442,8 @@ class Data {
       const pairs = await this.chadex.getPairs(2, 0);
       for (let i = 0; i < pairs.length && pairs[i][0] != 0; i++) {
         const [pairKey, tokenz, decimalss, bestBuyOrder, bestSellOrder] = pairs[i];
-        console.log("            pairKey: " + pairKey + ", tokenz=" + JSON.stringify(tokenz) + ", decimalss=" + JSON.stringify(decimalss) +
-          ", bestBuyOrder=" + JSON.stringify(bestBuyOrder) + ", bestSellOrder=" + JSON.stringify(bestSellOrder));
+        console.log("            pairKey: " + pairKey + ", tokenz=" + JSON.stringify(tokenz) + ", decimalss=" + JSON.stringify(decimalss.map(e => parseInt(e))) +
+          ", bestBuyOrder=" + JSON.stringify(bestBuyOrder.map(e => e.toString())) + ", bestSellOrder=" + JSON.stringify(bestSellOrder.map(e => e.toString())));
       }
       console.log();
     }
