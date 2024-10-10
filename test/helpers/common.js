@@ -89,8 +89,10 @@ class Data {
       for (let i = 0; i < this.contracts.length && !found; i++) {
         try {
           var data = this.contracts[i].interface.parseLog(log);
-          console.log("this.contracts[i].interface: " + JSON.stringify(this.contracts[i].interface, null, 2));
-          console.log("data: " + JSON.stringify(data, null, 2));
+          // console.log("this.contracts[i].interface: " + JSON.stringify(this.contracts[i].interface, null, 2));
+          if (data) {
+            console.log("data: " + JSON.stringify(data, null, 2));            
+          }
           var result = data.name + "(";
           let separator = "";
           data.eventFragment.inputs.forEach((a) => {
