@@ -118,7 +118,7 @@ contract ChadexBase {
         Account maker;
         BuySell buySell;
         Price price;
-        Tokens tokens;
+        Tokens baseTokens;
         Tokens quoteTokens;
         Unixtime timestamp;
     }
