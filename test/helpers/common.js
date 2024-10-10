@@ -91,29 +91,29 @@ class Data {
         const event = this.weth.interface.parseLog(log);
         if (event.name == "Transfer") {
           const [from, to, tokens] = event.args;
-          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
-            "from: " + this.getShortAccountName(from) +
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name +
+            "(from: " + this.getShortAccountName(from) +
             ", to: " + this.getShortAccountName(to) +
             ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
           );
         } else if (event.name == "Deposit") {
           const [to, tokens] = event.args;
-          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
-            "from: " + this.getShortAccountName(ZERO_ADDRESS) +
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name +
+            "(from: " + this.getShortAccountName(ZERO_ADDRESS) +
             ", to: " + this.getShortAccountName(to) +
             ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
           );
         } else if (event.name == "Withdrawal") {
           const [from, tokens] = event.args;
-          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
-            "from: " + this.getShortAccountName(from) +
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name +
+            "(from: " + this.getShortAccountName(from) +
             ", to: " + this.getShortAccountName(ZERO_ADDRESS) +
             ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
           );
         } else if (event.name == "Approval") {
           const [owner, spender, tokens] = event.args;
-          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
-            "owner: " + this.getShortAccountName(owner) +
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name +
+            "(owner: " + this.getShortAccountName(owner) +
             ", spender: " + this.getShortAccountName(spender) +
             ", tokens: " + ethers.formatUnits(tokens, this.decimals0) + ")"
           );
@@ -126,8 +126,8 @@ class Data {
         if (event.name == "PairAdded") {
           // event PairAdded(PairKey indexed pairKey, Account maker, Token indexed base, Token indexed quote, Decimals[2] decimalss, Unixtime timestamp);
           const [pairKey, maker, base, quote, decimalss, timestamp] = event.args;
-          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
-            "pairKey: " + pairKey.substring(0, 20) +
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name +
+            "(pairKey: " + pairKey.substring(0, 20) +
             ", maker: " + this.getShortAccountName(maker) +
             ", base: " + this.getShortAccountName(base) +
             ", quote: " + this.getShortAccountName(quote) +
@@ -137,8 +137,8 @@ class Data {
         } else if (event.name == "OrderAdded") {
           // event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens baseTokens, Tokens quoteTokens, Unixtime timestamp);
           const [pairKey, orderKey, maker, buySell, price, expiry, baseTokens, quoteTokens, timestamp] = event.args;
-          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
-            "pairKey: " + pairKey.substring(0, 20) +
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name +
+            "(pairKey: " + pairKey.substring(0, 20) +
             ", orderKey: " + orderKey.substring(0, 20) +
             ", maker: " + this.getShortAccountName(maker) +
             ", buySell: " + buySell +
@@ -157,8 +157,8 @@ class Data {
           // event Trade(TradeResult tradeResult);
           const [tradeResult] = event.args;
           const [pairKey, orderKey, taker, maker, buySell, price, baseTokens, quoteTokens, timestamp] = tradeResult;
-          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
-            "pairKey: " + pairKey.substring(0, 20) +
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name +
+            "(pairKey: " + pairKey.substring(0, 20) +
             ", orderKey: " + orderKey.substring(0, 20) +
             ", taker: " + this.getShortAccountName(taker) +
             ", maker: " + this.getShortAccountName(maker) +
@@ -172,8 +172,8 @@ class Data {
         } else if (event.name == "TradeSummary") {
           // event TradeSummary(PairKey indexed pairKey, Account indexed taker, BuySell buySell, Price price, Tokens baseTokens, Tokens quoteTokens, Tokens tokensOnOrder, Unixtime timestamp);
           const [pairKey, taker, buySell, price, baseTokens, quoteTokens, tokensOnOrder, timestamp] = event.args;
-          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
-            "pairKey: " + pairKey.substring(0, 20) +
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name +
+            "(pairKey: " + pairKey.substring(0, 20) +
             ", taker: " + this.getShortAccountName(taker) +
             ", buySell: " + buySell +
             ", price: " + ethers.formatUnits(price, 9) +
