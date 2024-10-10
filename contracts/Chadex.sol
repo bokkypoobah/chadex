@@ -63,17 +63,15 @@ interface IERC20 {
 
 
 contract ReentrancyGuard {
-    uint private _executing;
+    bool transient lock;
 
     error ReentrancyAttempted();
 
     modifier reentrancyGuard() {
-        if (_executing == 1) {
-            revert ReentrancyAttempted();
-        }
-        _executing = 1;
+        require(!lock, ReentrancyAttempted());
+        lock = true;
         _;
-        _executing = 2;
+        lock = false;
     }
 }
 
