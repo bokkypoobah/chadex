@@ -29,8 +29,8 @@ class Data {
 
     this.chadex = null;
 
-    this.gasPrice = ethers.utils.parseUnits("10", "gwei");
-    this.ethUsd = ethers.utils.parseUnits("2500.00", 18);
+    this.gasPrice = ethers.parseUnits("10", "gwei");
+    this.ethUsd = ethers.parseUnits("2500.00", 18);
 
     this.verbose = false;
   }
@@ -68,25 +68,29 @@ class Data {
     return address.substring(0, 20);
   }
   addContract(contract, contractName) {
-    const address = contract.address;
+    const address = contract.target;
     this.accounts.push(address);
     this.accountNames[address.toLowerCase()] = contractName;
     this.contracts.push(contract);
-    if (this.verbose) {
+    // if (this.verbose) {
       console.log("      Mapping contract " + address + " => " + this.getShortAccountName(address));
-    }
+    // }
   }
 
 
   printEvents(prefix, receipt) {
-    var fee = receipt.gasUsed.mul(this.gasPrice);
-    var feeUsd = fee.mul(this.ethUsd).div(ethers.utils.parseUnits("1", 18)).div(ethers.utils.parseUnits("1", 18));
-    console.log("        > " + prefix + " - gasUsed: " + receipt.gasUsed + " ~ ETH " + ethers.utils.formatEther(fee) + " ~ USD " + feeUsd);
+    // console.log("printEvents - receipt: " + JSON.stringify(receipt));
+    var fee = BigInt(receipt.gasUsed) * BigInt(this.gasPrice);
+    var feeUsd = fee * this.ethUsd / ethers.parseUnits("1", 18) / ethers.parseUnits("1", 18);
+    console.log("        > " + prefix + " - gasUsed: " + receipt.gasUsed + " ~ ETH " + ethers.formatEther(fee) + " ~ USD " + feeUsd);
+    // console.log("this.contracts: " + JSON.stringify(this.contracts, null, 2));
     receipt.logs.forEach((log) => {
       let found = false;
       for (let i = 0; i < this.contracts.length && !found; i++) {
         try {
           var data = this.contracts[i].interface.parseLog(log);
+          console.log("this.contracts[i].interface: " + JSON.stringify(this.contracts[i].interface, null, 2));
+          console.log("data: " + JSON.stringify(data, null, 2));
           var result = data.name + "(";
           let separator = "";
           data.eventFragment.inputs.forEach((a) => {
@@ -96,17 +100,17 @@ class Data {
             } else if (a.type == 'uint256' || a.type == 'uint128' || a.type == 'uint64') {
               if (a.name == 'tokens') {
                 const decimals = this.decimals[log.address] || 18;
-                result = result + ethers.utils.formatUnits(data.args[a.name], decimals);
+                result = result + ethers.formatUnits(data.args[a.name], decimals);
               } else if (a.name.substring(0, 10) == 'baseTokens') {
                 const decimals = this.decimals[this.token0.address] || 18;
-                result = result + ethers.utils.formatUnits(data.args[a.name], decimals);
+                result = result + ethers.formatUnits(data.args[a.name], decimals);
               } else if (a.name.substring(0, 11) == 'quoteTokens') {
                 const decimals = this.decimals[this.weth.address] || 18;
-                result = result + ethers.utils.formatUnits(data.args[a.name], decimals);
+                result = result + ethers.formatUnits(data.args[a.name], decimals);
               } else if (a.name == 'wad' || a.name == 'amount' || a.name == 'balance' || a.name == 'value') {
-                result = result + ethers.utils.formatUnits(data.args[a.name], 18);
+                result = result + ethers.formatUnits(data.args[a.name], 18);
               } else if (a.name == 'price') {
-                result = result + ethers.utils.formatUnits(data.args[a.name], 9);
+                result = result + ethers.formatUnits(data.args[a.name], 9);
               } else {
                 result = result + data.args[a.name].toString();
               }
@@ -154,20 +158,22 @@ class Data {
 
   async setToken0(token) {
     this.token0 = token;
+    // console.log("setToken0: " + JSON.stringify(token));
     this.decimals0 = await this.token0.decimals();
-    this.decimals[token.address] = this.decimals0;
+    // console.log("this.decimals0: " + JSON.stringify(this.decimals0.toString()));
+    this.decimals[token.target] = this.decimals0;
     this.addContract(token, "Token0");
   }
   async setToken1(token) {
     this.token1 = token;
     this.decimals1 = await this.token1.decimals();
-    this.decimals[token.address] = this.decimals1;
+    this.decimals[token.target] = this.decimals1;
     this.addContract(token, "Token1");
   }
   async setWeth(weth) {
     this.weth = weth;
     this.decimalsWeth = await this.weth.decimals();
-    this.decimals[weth.address] = this.decimalsWeth;
+    this.decimals[weth.target] = this.decimalsWeth;
     this.addContract(weth, "WETH");
   }
   async setChadex(chadex) {
@@ -223,7 +229,7 @@ class Data {
       const token0Balance = this.token0 == null ? 0 : await this.token0.balanceOf(checkAccounts[i]);
       const token1Balance = this.token1 == null ? 0 : await this.token1.balanceOf(checkAccounts[i]);
       const wethBalance = this.weth == null ? 0 : await this.weth.balanceOf(checkAccounts[i]);
-      console.log("          " + this.padRight(this.getShortAccountName(checkAccounts[i]), 20) + " " + this.padLeft(ethers.utils.formatEther(balance), 24) + " " + this.padLeft(ethers.utils.formatUnits(token0Balance, this.decimals0), 24) + " " + this.padLeft(ethers.utils.formatUnits(token1Balance, this.decimals1), 24) + " " + this.padLeft(ethers.utils.formatUnits(wethBalance, this.decimalsWeth), 24));
+      console.log("          " + this.padRight(this.getShortAccountName(checkAccounts[i]), 20) + " " + this.padLeft(ethers.formatEther(balance), 24) + " " + this.padLeft(ethers.formatUnits(token0Balance, this.decimals0), 24) + " " + this.padLeft(ethers.formatUnits(token1Balance, this.decimals1), 24) + " " + this.padLeft(ethers.formatUnits(wethBalance, this.decimalsWeth), 24));
     }
     console.log();
 
@@ -258,14 +264,14 @@ class Data {
               const [price1, orderKey, nextOrderKey, maker, expiry, tokens, availableBase, availableQuote] = orderInfo;
               var minutes = (expiry - now / 1000) / 60;
               console.log("              " + (row++) + " " +
-                this.padLeft(ethers.utils.formatUnits(price1, 9), 14) + " " +
+                this.padLeft(ethers.formatUnits(price1, 9), 14) + " " +
                 orderKey.substring(0, 10) + " " +
                 nextOrderKey.substring(0, 10) + " " +
                 this.getShortAccountName(maker) + " " +
                 this.padLeft(minutes.toFixed(2), 10) + " " +
-                this.padLeft(ethers.utils.formatUnits(tokens, baseDecimals), 21) + " " +
-                this.padLeft(ethers.utils.formatUnits(availableBase, baseDecimals), 24) + " " +
-                this.padLeft(ethers.utils.formatUnits(availableQuote, quoteDecimals), 24)
+                this.padLeft(ethers.formatUnits(tokens, baseDecimals), 21) + " " +
+                this.padLeft(ethers.formatUnits(availableBase, baseDecimals), 24) + " " +
+                this.padLeft(ethers.formatUnits(availableQuote, quoteDecimals), 24)
             );
               price = results[k][0];
               firstOrderKey = results[k][2];
@@ -278,14 +284,14 @@ class Data {
           price = await this.chadex.getBestPrice(pair.pairKey, buySell);
           while (price != 0) {
             var orderQueue = await this.chadex.getOrderQueue(pair.pairKey, buySell, price);
-            console.log("            price: " + ethers.utils.formatUnits(price, 9) + " head=" + orderQueue[0].substring(0, 10) + " tail=" + orderQueue[1].substring(0, 10));
+            console.log("            price: " + ethers.formatUnits(price, 9) + " head=" + orderQueue[0].substring(0, 10) + " tail=" + orderQueue[1].substring(0, 10));
             let orderKey = orderQueue[0];
             while (orderKey != 0) {
               let order = await this.chadex.getOrder(orderKey);
               var minutes = (order[2] - new Date() / 1000) / 60;
               console.log("              Order key=" + orderKey.substring(0, 10) + " next=" + order[0].substring(0, 10) +
                 " maker=" + this.getShortAccountName(order[1]) +
-                " expiry=" + minutes.toFixed(2) + "s tokens=" + ethers.utils.formatUnits(order[3], pair.baseDecimals));
+                " expiry=" + minutes.toFixed(2) + "s tokens=" + ethers.formatUnits(order[3], pair.baseDecimals));
               orderKey = order[0];
             }
             price = await this.chadex.getNextBestPrice(pair.pairKey, buySell, price);
@@ -319,11 +325,11 @@ class Data {
         //     this.getShortAccountName(taker) + " " +
         //     // this.getShortAccountName(maker) + " " +
         //     (buySell == 1 ? "Buy  " : "Sell ") + " " +
-        //     this.padLeft(ethers.utils.formatUnits(price, 12), 14) + " " +
-        //     this.padLeft(ethers.utils.formatUnits(filled, 18), 24) + " " +
-        //     this.padLeft(ethers.utils.formatUnits(quoteFilled, 18), 24));
+        //     this.padLeft(ethers.formatUnits(price, 12), 14) + " " +
+        //     this.padLeft(ethers.formatUnits(filled, 18), 24) + " " +
+        //     this.padLeft(ethers.formatUnits(quoteFilled, 18), 24));
         //   // console.log("            blockNumber: " + blockNumber + ", timestamp=" + timestamp + ", pairKey=" + pairKey + ", taker=" + taker +
-        //   //   ", buySell=" + buySell + ", price=" + ethers.utils.formatUnits(price, 12) + ", filled=" + ethers.utils.formatUnits(filled, 18) + ", quoteFilled=" + ethers.utils.formatUnits(quoteFilled, 18));
+        //   //   ", buySell=" + buySell + ", price=" + ethers.formatUnits(price, 12) + ", filled=" + ethers.formatUnits(filled, 18) + ", quoteFilled=" + ethers.formatUnits(quoteFilled, 18));
         // }
         console.log();
 
