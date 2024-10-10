@@ -122,8 +122,6 @@ class Data {
         const event = this.chadex.interface.parseLog(log);
         // event OrderRemoved(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Tokens baseTokens, Unixtime timestamp);
         // event OrderUpdated(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens baseTokens, Unixtime timestamp);
-        // event Trade(TradeResult tradeResult);
-        // event TradeSummary(PairKey indexed pairKey, Account indexed taker, BuySell buySell, Price price, Tokens baseTokens, Tokens quoteTokens, Tokens tokensOnOrder, Unixtime timestamp);
         // event Message(address indexed from, address indexed to, bytes32 indexed pairKey, bytes32 orderKey, string topic, string text, Unixtime timestamp);
         if (event.name == "PairAdded") {
           // event PairAdded(PairKey indexed pairKey, Account maker, Token indexed base, Token indexed quote, Decimals[2] decimalss, Unixtime timestamp);
@@ -144,7 +142,7 @@ class Data {
             ", orderKey: " + orderKey.substring(0, 20) +
             ", maker: " + this.getShortAccountName(maker) +
             ", buySell: " + buySell +
-            ", price: " + price.toString() +
+            ", price: " + ethers.formatUnits(price, 9) +
             ", expiry: " + expiry +
             ", baseTokens: " + ethers.formatUnits(baseTokens, 18) +  // TODO - use decimals
             ", quoteTokens: " + ethers.formatUnits(quoteTokens, 18) + // TODO - use decimals
@@ -156,9 +154,35 @@ class Data {
         } else if (event.name == "OrderUpdated") {
           console.log("          + CHADEX.OrderUpdated " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
         } else if (event.name == "Trade") {
-          console.log("          + CHADEX.Trade " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
+          // event Trade(TradeResult tradeResult);
+          const [tradeResult] = event.args;
+          const [pairKey, orderKey, taker, maker, buySell, price, baseTokens, quoteTokens, timestamp] = tradeResult;
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
+            "pairKey: " + pairKey.substring(0, 20) +
+            ", orderKey: " + orderKey.substring(0, 20) +
+            ", taker: " + this.getShortAccountName(taker) +
+            ", maker: " + this.getShortAccountName(maker) +
+            ", buySell: " + buySell +
+            ", price: " + ethers.formatUnits(price, 9) +
+            ", baseTokens: " + ethers.formatUnits(baseTokens, 18) +  // TODO - use decimals
+            ", quoteTokens: " + ethers.formatUnits(quoteTokens, 18) + // TODO - use decimals
+            ", timestamp: " + timestamp + ")"
+          );
+          // console.log("          + CHADEX.Trade " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
         } else if (event.name == "TradeSummary") {
-          console.log("          + CHADEX.TradeSummary " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
+          // event TradeSummary(PairKey indexed pairKey, Account indexed taker, BuySell buySell, Price price, Tokens baseTokens, Tokens quoteTokens, Tokens tokensOnOrder, Unixtime timestamp);
+          const [pairKey, taker, buySell, price, baseTokens, quoteTokens, tokensOnOrder, timestamp] = event.args;
+          console.log("          + " + this.getShortAccountName(log.address) + " " + event.name + "(" +
+            "pairKey: " + pairKey.substring(0, 20) +
+            ", taker: " + this.getShortAccountName(taker) +
+            ", buySell: " + buySell +
+            ", price: " + ethers.formatUnits(price, 9) +
+            ", baseTokens: " + ethers.formatUnits(baseTokens, 18) +  // TODO - use decimals
+            ", quoteTokens: " + ethers.formatUnits(quoteTokens, 18) + // TODO - use decimals
+            ", tokensOnOrder: " + ethers.formatUnits(tokensOnOrder, 18) + // TODO - use decimals
+            ", timestamp: " + timestamp + ")"
+          );
+          // console.log("          + CHADEX.TradeSummary " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
         } else if (event.name == "Message") {
           console.log("          + CHADEX.Message " + this.getShortAccountName(log.address) + " " + JSON.stringify(log.topics));
         }
@@ -350,7 +374,7 @@ class Data {
               const orderInfo = results[k];
               // console.log("orderInfo: " + JSON.stringify(orderInfo.map(e => e.toString()), null, 2));
               const [price1, orderKey, nextOrderKey, maker, expiry, tokens, availableBase, availableQuote] = orderInfo;
-              var minutes = (parseInt(expiry) - (parseInt(now) / 1000)) / 60;
+              var minutes = (parseInt(expiry) - (parseInt(now.getTime()) / 1000)) / 60;
               console.log("              " + (row++) + " " +
                 this.padLeft(ethers.formatUnits(price1, 9), 14) + " " +
                 orderKey.substring(0, 10) + " " +
@@ -376,7 +400,7 @@ class Data {
             let orderKey = orderQueue[0];
             while (orderKey != 0) {
               let order = await this.chadex.getOrder(orderKey);
-              var minutes = (parseInt(order[2]) - new Date() / 1000) / 60;
+              var minutes = (parseInt(order[2]) - (new Date()).getTime() / 1000) / 60;
               console.log("              Order key=" + orderKey.substring(0, 10) + " next=" + order[0].substring(0, 10) +
                 " maker=" + this.getShortAccountName(order[1]) +
                 " expiry=" + minutes.toFixed(2) + "s tokens=" + ethers.formatUnits(order[3], pair.baseDecimals));
