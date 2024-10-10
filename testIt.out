@@ -17,9 +17,9 @@ Compiled 1 Solidity file successfully (evm target: cancun).
           + Token0:0x5FbD Transfer(from: deployer:0xf39F, to: user0:0x7099, tokens: 100.0)
         > Transfer Token0 - gasUsed: 51382 ~ ETH 0.00051382 ~ USD 1
           + Token0:0x5FbD Transfer(from: deployer:0xf39F, to: user1:0x3C44, tokens: 100.0)
-        > Transfer Token0 - gasUsed: 46594 ~ ETH 0.00046594 ~ USD 1
-          + Token0:0x5FbD Transfer(from: deployer:0xf39F, to: user2:0x90F7, tokens: 100.0)
         > Transfer Token0 - gasUsed: 51394 ~ ETH 0.00051394 ~ USD 1
+          + Token0:0x5FbD Transfer(from: deployer:0xf39F, to: user2:0x90F7, tokens: 100.0)
+        > Transfer Token0 - gasUsed: 46594 ~ ETH 0.00046594 ~ USD 1
           + Token0:0x5FbD Transfer(from: deployer:0xf39F, to: user3:0x15d3, tokens: 100.0)
         Tokens transferred
         > Transfer Token1 - gasUsed: 51394 ~ ETH 0.00051394 ~ USD 1
@@ -73,7 +73,7 @@ Compiled 1 Solidity file successfully (evm target: cancun).
     ],
     "price": "690100000",
     "targetPrice": "690100000",
-    "expiry": 1728577832,
+    "expiry": 1728578011,
     "tokens": "1000000000000000000",
     "skipCheck": false
   },
@@ -86,7 +86,7 @@ Compiled 1 Solidity file successfully (evm target: cancun).
     ],
     "price": "690200000",
     "targetPrice": "690200000",
-    "expiry": 1728577832,
+    "expiry": 1728578011,
     "tokens": "2000000000000000000",
     "skipCheck": false
   },
@@ -99,33 +99,33 @@ Compiled 1 Solidity file successfully (evm target: cancun).
     ],
     "price": "690300000",
     "targetPrice": "690300000",
-    "expiry": 1728577832,
+    "expiry": 1728578011,
     "tokens": "3000000000000000000",
     "skipCheck": false
   }
 ]
         > user0->chadex.execute(actionsA) - gasUsed: 598831 ~ ETH 0.00598831 ~ USD 14
-          + Chadex:0xCf7E PairAdded(pairKey: 0x2c831da670a13afa44, maker: user0:0x7099, base: Token0:0x5FbD, quote: WETH:0x9fE4, decimalss: [18,18], timestamp: 1728574260)
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xba50bff8ca4fde4978, maker: user0:0x7099, buySell: 0, price: 0.6901, expiry: 1728577832, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728574260)
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x16ee2eb820c1dc86c5, maker: user0:0x7099, buySell: 0, price: 0.6902, expiry: 1728577832, baseTokens: 2.0, quoteTokens: 1.3804, timestamp: 1728574260)
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x216071ecd309e02f0a, maker: user0:0x7099, buySell: 0, price: 0.6903, expiry: 1728577832, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728574260)
+          + Chadex:0xCf7E PairAdded(pairKey: 0x2c831da670a13afa44, maker: user0:0x7099, base: Token0:0x5FbD, quote: WETH:0x9fE4, decimalss: [18,18], timestamp: 1728574439)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xba50bff8ca4fde4978, maker: user0:0x7099, buySell: 0, price: 0.6901, expiry: 1728578011, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728574439)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x16ee2eb820c1dc86c5, maker: user0:0x7099, buySell: 0, price: 0.6902, expiry: 1728578011, baseTokens: 2.0, quoteTokens: 1.3804, timestamp: 1728574439)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x216071ecd309e02f0a, maker: user0:0x7099, buySell: 0, price: 0.6903, expiry: 1728578011, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728574439)
         > user1->chadex.execute(actionsA) - gasUsed: 326600 ~ ETH 0.003266 ~ USD 8
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x57e1bbde3a5a6e6ba5, maker: user1:0x3C44, buySell: 0, price: 0.6901, expiry: 1728577832, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728574261)
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x4fcf79cf98e01a03f6, maker: user1:0x3C44, buySell: 0, price: 0.6902, expiry: 1728577832, baseTokens: 2.0, quoteTokens: 1.3804, timestamp: 1728574261)
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xc4fd7db027bc75d73f, maker: user1:0x3C44, buySell: 0, price: 0.6903, expiry: 1728577832, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728574261)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x57e1bbde3a5a6e6ba5, maker: user1:0x3C44, buySell: 0, price: 0.6901, expiry: 1728578011, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728574440)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x4fcf79cf98e01a03f6, maker: user1:0x3C44, buySell: 0, price: 0.6902, expiry: 1728578011, baseTokens: 2.0, quoteTokens: 1.3804, timestamp: 1728574440)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xc4fd7db027bc75d73f, maker: user1:0x3C44, buySell: 0, price: 0.6903, expiry: 1728578011, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728574440)
         > user2->chadex.execute(actionsA) - gasUsed: 326600 ~ ETH 0.003266 ~ USD 8
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x452f99950d915502ce, maker: user2:0x90F7, buySell: 0, price: 0.6901, expiry: 1728577832, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728574262)
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xdc9dfdc4362c69200e, maker: user2:0x90F7, buySell: 0, price: 0.6902, expiry: 1728577832, baseTokens: 2.0, quoteTokens: 1.3804, timestamp: 1728574262)
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xe7bb22970ed8b3926f, maker: user2:0x90F7, buySell: 0, price: 0.6903, expiry: 1728577832, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728574262)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x452f99950d915502ce, maker: user2:0x90F7, buySell: 0, price: 0.6901, expiry: 1728578011, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728574441)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xdc9dfdc4362c69200e, maker: user2:0x90F7, buySell: 0, price: 0.6902, expiry: 1728578011, baseTokens: 2.0, quoteTokens: 1.3804, timestamp: 1728574441)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xe7bb22970ed8b3926f, maker: user2:0x90F7, buySell: 0, price: 0.6903, expiry: 1728578011, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728574441)
 
         --- After Adding Orders ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
           -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F       9999.988223423369722563                      0.0                      0.0                      0.0
-          user0:0x7099          9899.999182525701182432                    100.0                    100.0                    100.0
-          user1:0x3C44          9899.999467239861482192                    100.0                    100.0                    100.0
-          user2:0x90F7          9899.999471931992079112                    100.0                    100.0                    100.0
-          user3:0x15d3          9899.999806996834017339                    100.0                    100.0                    100.0
+          deployer:0xf39F       9999.988223404931852821                      0.0                      0.0                      0.0
+          user0:0x7099           9899.99918252569811719                    100.0                    100.0                    100.0
+          user1:0x3C44          9899.999467239859286479                    100.0                    100.0                    100.0
+          user2:0x90F7          9899.999471931990388395                    100.0                    100.0                    100.0
+          user3:0x15d3          9899.999806996833113434                    100.0                    100.0                    100.0
           Chadex:0xCf7E                             0.0                      0.0                      0.0                      0.0
 
           Chadex: Chadex:0xCf7E
@@ -160,7 +160,7 @@ Compiled 1 Solidity file successfully (evm target: cancun).
 
 
 
-            pairKey: 0x2c831da670a13afa44000f723f930fbd31948192e5612f758ae2cfaeee460dc2, tokenz=["0x5FbDB2315678afecb367f032d93F642f64180aa3","0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"], decimalss=[18,18], bestBuyOrder=["690300000","0x216071ecd309e02f0a7c41a681f63c840beb698b2aedb288198fa4cb3667138e","0xc4fd7db027bc75d73f894dcf8f248f903df706acd79ab89dd74e57ca3c14a360","0x70997970C51812dc3A010C7d01b50e0d17dc79C8","1728577832","3000000000000000000","3896856439229320585","2690000000000000000"], bestSellOrder=["0","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000","0","0","0","0"]
+            pairKey: 0x2c831da670a13afa44000f723f930fbd31948192e5612f758ae2cfaeee460dc2, tokenz=["0x5FbDB2315678afecb367f032d93F642f64180aa3","0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"], decimalss=[18,18], bestBuyOrder=["690300000","0x216071ecd309e02f0a7c41a681f63c840beb698b2aedb288198fa4cb3667138e","0xc4fd7db027bc75d73f894dcf8f248f903df706acd79ab89dd74e57ca3c14a360","0x70997970C51812dc3A010C7d01b50e0d17dc79C8","1728578011","3000000000000000000","3896856439229320585","2690000000000000000"], bestSellOrder=["0","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000","0","0","0","0"]
 
         Executing: [
   {
@@ -172,7 +172,7 @@ Compiled 1 Solidity file successfully (evm target: cancun).
     ],
     "price": "690100000",
     "targetPrice": "690100000",
-    "expiry": 1728577832,
+    "expiry": 1728578011,
     "tokens": "10000000000000000000",
     "skipCheck": false
   }
@@ -180,29 +180,29 @@ Compiled 1 Solidity file successfully (evm target: cancun).
         > user3->chadex.execute(actions) - gasUsed: 272998 ~ ETH 0.00272998 ~ USD 6
           + Token0:0x5FbD Transfer(from: user3:0x15d3, to: user0:0x7099, tokens: 3.0)
           + WETH:0x9fE4 Transfer(from: user0:0x7099, to: user3:0x15d3, tokens: 2.0709)
-          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0x216071ecd309e02f0a, taker: user3:0x15d3, maker: user0:0x7099, buySell: 1, price: 0.6903, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728574263)
+          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0x216071ecd309e02f0a, taker: user3:0x15d3, maker: user0:0x7099, buySell: 1, price: 0.6903, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728574442)
           + Token0:0x5FbD Transfer(from: user3:0x15d3, to: user1:0x3C44, tokens: 3.0)
           + WETH:0x9fE4 Transfer(from: user1:0x3C44, to: user3:0x15d3, tokens: 2.0709)
-          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0xc4fd7db027bc75d73f, taker: user3:0x15d3, maker: user1:0x3C44, buySell: 1, price: 0.6903, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728574263)
+          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0xc4fd7db027bc75d73f, taker: user3:0x15d3, maker: user1:0x3C44, buySell: 1, price: 0.6903, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728574442)
           + Token0:0x5FbD Transfer(from: user3:0x15d3, to: user2:0x90F7, tokens: 3.0)
           + WETH:0x9fE4 Transfer(from: user2:0x90F7, to: user3:0x15d3, tokens: 2.0709)
-          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0xe7bb22970ed8b3926f, taker: user3:0x15d3, maker: user2:0x90F7, buySell: 1, price: 0.6903, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728574263)
+          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0xe7bb22970ed8b3926f, taker: user3:0x15d3, maker: user2:0x90F7, buySell: 1, price: 0.6903, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728574442)
           + Token0:0x5FbD Transfer(from: user3:0x15d3, to: user0:0x7099, tokens: 0.896986380759200231)
           + WETH:0x9fE4 Transfer(from: user0:0x7099, to: user3:0x15d3, tokens: 0.6191)
-          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0x16ee2eb820c1dc86c5, taker: user3:0x15d3, maker: user0:0x7099, buySell: 1, price: 0.6902, baseTokens: 0.896986380759200231, quoteTokens: 0.6191, timestamp: 1728574263)
+          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0x16ee2eb820c1dc86c5, taker: user3:0x15d3, maker: user0:0x7099, buySell: 1, price: 0.6902, baseTokens: 0.896986380759200231, quoteTokens: 0.6191, timestamp: 1728574442)
           + Token0:0x5FbD Transfer(from: user3:0x15d3, to: user1:0x3C44, tokens: 0.103013619240799769)
           + WETH:0x9fE4 Transfer(from: user1:0x3C44, to: user3:0x15d3, tokens: 0.0711)
-          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0x4fcf79cf98e01a03f6, taker: user3:0x15d3, maker: user1:0x3C44, buySell: 1, price: 0.6902, baseTokens: 0.103013619240799769, quoteTokens: 0.0711, timestamp: 1728574263)
-          + Chadex:0xCf7E TradeSummary(pairKey: 0x2c831da670a13afa44, taker: user3:0x15d3, buySell: 1, price: 0.69029, baseTokens: 10.0, quoteTokens: 6.9029, tokensOnOrder: 0.0, timestamp: 1728574263)
+          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0x4fcf79cf98e01a03f6, taker: user3:0x15d3, maker: user1:0x3C44, buySell: 1, price: 0.6902, baseTokens: 0.103013619240799769, quoteTokens: 0.0711, timestamp: 1728574442)
+          + Chadex:0xCf7E TradeSummary(pairKey: 0x2c831da670a13afa44, taker: user3:0x15d3, buySell: 1, price: 0.69029, baseTokens: 10.0, quoteTokens: 6.9029, tokensOnOrder: 0.0, timestamp: 1728574442)
 
         --- After Executing Against Orders ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
           -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F       9999.988223423369722563                      0.0                      0.0                      0.0
-          user0:0x7099          9899.999182525701182432   103.896986380759200231                    100.0                    97.31
-          user1:0x3C44          9899.999467239861482192   103.103013619240799769                    100.0                   97.858
-          user2:0x90F7          9899.999471931992079112                    103.0                    100.0                  97.9291
-          user3:0x15d3          9899.999529848093801915                     90.0                    100.0                 106.9029
+          deployer:0xf39F       9999.988223404931852821                      0.0                      0.0                      0.0
+          user0:0x7099           9899.99918252569811719   103.896986380759200231                    100.0                    97.31
+          user1:0x3C44          9899.999467239859286479   103.103013619240799769                    100.0                   97.858
+          user2:0x90F7          9899.999471931990388395                    103.0                    100.0                  97.9291
+          user3:0x15d3           9899.99952984809289801                     90.0                    100.0                 106.9029
           Chadex:0xCf7E                             0.0                      0.0                      0.0                      0.0
 
           Chadex: Chadex:0xCf7E
@@ -228,14 +228,14 @@ Compiled 1 Solidity file successfully (evm target: cancun).
 
 
 
-            pairKey: 0x2c831da670a13afa44000f723f930fbd31948192e5612f758ae2cfaeee460dc2, tokenz=["0x5FbDB2315678afecb367f032d93F642f64180aa3","0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"], decimalss=[18,18], bestBuyOrder=["690200000","0x4fcf79cf98e01a03f641e90081ae6c9f2f25715e7200410f5e6faf60d2968aec","0xdc9dfdc4362c69200ed3447b7901034ef868941b0169e3e83d49f52053e39c49","0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC","1728577832","1896986380759200231","793972761518400463","548000000000000000"], bestSellOrder=["0","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000","0","0","0","0"]
+            pairKey: 0x2c831da670a13afa44000f723f930fbd31948192e5612f758ae2cfaeee460dc2, tokenz=["0x5FbDB2315678afecb367f032d93F642f64180aa3","0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"], decimalss=[18,18], bestBuyOrder=["690200000","0x4fcf79cf98e01a03f641e90081ae6c9f2f25715e7200410f5e6faf60d2968aec","0xdc9dfdc4362c69200ed3447b7901034ef868941b0169e3e83d49f52053e39c49","0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC","1728578011","1896986380759200231","793972761518400463","548000000000000000"], bestSellOrder=["0","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000","0","0","0","0"]
 
 tokenBalanceAndAllowance: [
   "10000000000000000000,103896986380759200231"
 ]
 
-    ✔ 00. Test 00 (63ms)
+    ✔ 00. Test 00 (65ms)
 
 
-  1 passing (594ms)
+  1 passing (653ms)
 
