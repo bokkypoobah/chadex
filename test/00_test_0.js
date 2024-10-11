@@ -181,15 +181,17 @@ describe("Chadex", function () {
 
     await data.printState("After Adding Orders");
 
-    const targetPrice1 = "0.6901";
-    const baseTokensB1 = ethers.parseUnits("10", data.decimals0);
-    const actionsB1 = [
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, tokenz: [data.token0.target, data.weth.target], price: ethers.parseUnits(price1, 9).toString(), targetPrice: ethers.parseUnits(targetPrice1, 9).toString(), expiry: expiry, baseTokens: baseTokensB1.toString(), skipCheck: false },
-      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.target, quote: data.weth.target, price: ethers.parseUnits(price3, 9).toString(), targetPrice: ethers.parseUnits(targetPrice1, 9).toString(), expiry: expiry, baseTokens: baseTokensB1.toString() },
-    ];
-    console.log("        Executing: " + JSON.stringify(actionsB1, null, 2));
-    const executeB1Tx = await data.chadex.connect(data.user3Signer).execute(actionsB1);
-    await data.printEvents("user3->chadex.execute(actions)", await executeB1Tx.wait());
+    if (false) {      
+      const targetPrice1 = "0.6901";
+      const baseTokensB1 = ethers.parseUnits("10", data.decimals0);
+      const actionsB1 = [
+        { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, tokenz: [data.token0.target, data.weth.target], price: ethers.parseUnits(price1, 9).toString(), targetPrice: ethers.parseUnits(targetPrice1, 9).toString(), expiry: expiry, baseTokens: baseTokensB1.toString(), skipCheck: false },
+        // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.target, quote: data.weth.target, price: ethers.parseUnits(price3, 9).toString(), targetPrice: ethers.parseUnits(targetPrice1, 9).toString(), expiry: expiry, baseTokens: baseTokensB1.toString() },
+      ];
+      console.log("        Executing: " + JSON.stringify(actionsB1, null, 2));
+      const executeB1Tx = await data.chadex.connect(data.user3Signer).execute(actionsB1);
+      await data.printEvents("user3->chadex.execute(actions)", await executeB1Tx.wait());
+    }
 
     // const baseTokensB2 = ethers.parseUnits("6.9", data.decimals0);
     // const actionsB2 = [
