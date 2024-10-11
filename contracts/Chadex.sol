@@ -81,30 +81,36 @@ contract ChadexBase {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
     struct Pair {
-        Token[2] tokenz;       // 0: base, 1: quote
-        Decimals[2] decimalss; // 0: base, 1: quote
+        Token[2] tokenz;        // 0: base, 1: quote
+        Decimals[2] decimalss;  // 0: base, 1: quote
     }
     struct OrderQueue {
-        OrderKey head;   // 2^256
-        OrderKey tail;   // 2^256
+        OrderKey head;          // 2^256
+        OrderKey tail;          // 2^256
     }
     struct Order {
-        OrderKey next;   // 2^256
-        Account maker;   // 2^160
-        Unixtime expiry; // 2^40
-        Tokens tokens;   // 2^128
+        OrderKey next;          // 2^256
+        Account maker;          // 2^160
+        Unixtime expiry;        // 2^40
+        Tokens tokens;          // 2^128
+    }
+    struct NewOrder {
+        AccountIndex maker;     // 2^40
+        Unixtime expiry;        // 2^40
+        Tokens tokens;          // 2^128
     }
     struct TradeInput {
-        Action action;      // 2^8
-        BuySell buySell;    // 2^8
-        Token[2] tokenz;    // 2 x 2^160 - 0: base, 1: quote
-        Price price;        // 2^64
-        Price targetPrice;  // 2^64
-        Unixtime expiry;    // 2^40
-        Tokens tokens;      // 2^128
-        bool skipCheck;     // ? 2^1
+        Action action;          // 2^8
+        BuySell buySell;        // 2^8
+        Token[2] tokenz;        // 2 x 2^160 - 0: base, 1: quote
+        Price price;            // 2^64
+        Price targetPrice;      // 2^64
+        Unixtime expiry;        // 2^40
+        Tokens tokens;          // 2^128
+        bool skipCheck;         // ? 2^1
     }
     struct MoreInfo {
+        AccountIndex msgSender;
         Account taker;
         BuySell inverseBuySell;
         PairKey pairKey;
@@ -306,16 +312,16 @@ contract Chadex is ChadexBase, ReentrancyGuard {
 
 
     function execute(TradeInput[] calldata tradeInputs) public reentrancyGuard {
-        AccountIndex msgSenderIndex = accountToIndex[Account.wrap(msg.sender)];
-        if (AccountIndex.unwrap(msgSenderIndex) == 0) {
+        AccountIndex msgSender = accountToIndex[Account.wrap(msg.sender)];
+        if (AccountIndex.unwrap(msgSender) == 0) {
             indexToAccount.push(Account.wrap(msg.sender));
-            msgSenderIndex = AccountIndex.wrap(uint40(indexToAccount.length));
-            accountToIndex[Account.wrap(msg.sender)] = msgSenderIndex;
+            msgSender = AccountIndex.wrap(uint40(indexToAccount.length));
+            accountToIndex[Account.wrap(msg.sender)] = msgSender;
         }
 
         for (uint i; i < tradeInputs.length; i++) {
             TradeInput memory tradeInput = tradeInputs[i];
-            MoreInfo memory moreInfo = _getMoreInfo(tradeInput, Account.wrap(msg.sender));
+            MoreInfo memory moreInfo = _getMoreInfo(tradeInput, Account.wrap(msg.sender), msgSender);
             if (uint(tradeInput.action) <= uint(Action.FillAnyAndAddOrder)) {
                 _trade(tradeInput, moreInfo);
             } else if (tradeInput.action == Action.RemoveOrder) {
@@ -326,7 +332,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         }
     }
 
-    function _getMoreInfo(TradeInput memory tradeInput, Account taker) internal returns (MoreInfo memory moreInfo) {
+    function _getMoreInfo(TradeInput memory tradeInput, Account taker, AccountIndex msgSender) internal returns (MoreInfo memory moreInfo) {
         PairKey pairKey = generatePairKey(tradeInput);
         Pair memory pair = pairs[pairKey];
         if (Token.unwrap(pair.tokenz[0]) == address(0)) {
@@ -342,7 +348,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
             pairKeys.push(pairKey);
             emit PairAdded(pairKey, taker, tradeInput.tokenz[0], tradeInput.tokenz[1], [baseDecimals, quoteDecimals], Unixtime.wrap(uint40(block.timestamp)));
         }
-        return MoreInfo(taker, inverseBuySell(tradeInput.buySell), pairKey, pair.decimalss);
+        return MoreInfo(msgSender, taker, inverseBuySell(tradeInput.buySell), pairKey, pair.decimalss);
     }
 
     function _checkTakerAvailableTokens(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal view {
