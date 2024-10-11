@@ -80,28 +80,28 @@ contract ChadexBase {
     using BokkyPooBahsRedBlackTreeLibrary for BokkyPooBahsRedBlackTreeLibrary.Tree;
 
     struct Pair {
-        Token[2] tokenz; // 0: base, 1: quote
+        Token[2] tokenz;       // 0: base, 1: quote
         Decimals[2] decimalss; // 0: base, 1: quote
     }
     struct OrderQueue {
-        OrderKey head;
-        OrderKey tail;
+        OrderKey head;   // 2^256
+        OrderKey tail;   // 2^256
     }
     struct Order {
-        OrderKey next;
-        Account maker;
-        Unixtime expiry;
-        Tokens tokens;
+        OrderKey next;   // 2^256
+        Account maker;   // 2^160
+        Unixtime expiry; // 2^40
+        Tokens tokens;   // 2^128
     }
     struct TradeInput {
-        Action action;
-        BuySell buySell;
-        Token[2] tokenz; // 0: base, 1: quote
-        Price price;
-        Price targetPrice;
-        Unixtime expiry;
-        Tokens tokens;
-        bool skipCheck;
+        Action action;      // 2^8
+        BuySell buySell;    // 2^8
+        Token[2] tokenz;    // 2 x 2^160 - 0: base, 1: quote
+        Price price;        // 2^64
+        Price targetPrice;  // 2^64
+        Unixtime expiry;    // 2^40
+        Tokens tokens;      // 2^128
+        bool skipCheck;     // ? 2^1
     }
     struct MoreInfo {
         Account taker;
