@@ -32,13 +32,14 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 // import "hardhat/console.sol";
 
 
-type Account is address;  // 2^160
-type Decimals is uint8;   // 2^8
-type OrderKey is bytes32; // 2^256
-type PairKey is bytes32;  // 2^256
-type Token is address;    // 2^160
-type Tokens is uint128;   // 2^128 = 340, 282,366,920,938,463,463, 374,607,431,768,211,456
-type Unixtime is uint40;  // 2^40  = 1,099,511,627,776. For Unixtime, 1,099,511,627,776 seconds = 34865.285000507356672 years
+type Account is address;     // 2^160
+type AccountIndex is uint40; // 2^40 = 1,099,511,627,776
+type Decimals is uint8;      // 2^8
+type OrderKey is bytes32;    // 2^256
+type PairKey is bytes32;     // 2^256
+type Token is address;       // 2^160
+type Tokens is uint128;      // 2^128 = 340, 282,366,920,938,463,463, 374,607,431,768,211,456
+type Unixtime is uint40;     // 2^40  = 1,099,511,627,776. For Unixtime, 1,099,511,627,776 seconds = 34865.285000507356672 years
 
 enum BuySell { Buy, Sell }
 // TODO: Consider rolling UpdateExpiryAndTokens into FillAnyAndAddOrder
@@ -137,6 +138,9 @@ contract ChadexBase {
     mapping(PairKey => mapping(BuySell => BokkyPooBahsRedBlackTreeLibrary.Tree)) priceTrees;
     mapping(PairKey => mapping(BuySell => mapping(Price => OrderQueue))) orderQueues;
     mapping(OrderKey => Order) orders;
+
+    mapping(Account => AccountIndex) accountToIndex; // Note that this will be the index + 1
+    Account[] indexToAccount;
 
     event PairAdded(PairKey indexed pairKey, Account maker, Token indexed base, Token indexed quote, Decimals[2] decimalss, Unixtime timestamp);
     event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens baseTokens, Tokens quoteTokens, Unixtime timestamp);
@@ -302,6 +306,13 @@ contract Chadex is ChadexBase, ReentrancyGuard {
 
 
     function execute(TradeInput[] calldata tradeInputs) public reentrancyGuard {
+        AccountIndex msgSenderIndex = accountToIndex[Account.wrap(msg.sender)];
+        if (AccountIndex.unwrap(msgSenderIndex) == 0) {
+            indexToAccount.push(Account.wrap(msg.sender));
+            msgSenderIndex = AccountIndex.wrap(uint40(indexToAccount.length));
+            accountToIndex[Account.wrap(msg.sender)] = msgSenderIndex;
+        }
+
         for (uint i; i < tradeInputs.length; i++) {
             TradeInput memory tradeInput = tradeInputs[i];
             MoreInfo memory moreInfo = _getMoreInfo(tradeInput, Account.wrap(msg.sender));
