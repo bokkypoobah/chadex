@@ -33,8 +33,10 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 
 
 type Account is address;     // 2^160
-type AccountIndex is uint40; // 2^40 = 1,099,511,627,776
+type AccountIndex is uint32; // 2^32 = 4,294,967,296
 type Decimals is uint8;      // 2^8
+type Nonce is uint24;        // 2^24  = 16,777,216
+type OfferIndex is uint32;   // 2^32 = 4,294,967,296
 type OrderKey is bytes32;    // 2^256
 type PairKey is bytes32;     // 2^256
 type Token is address;       // 2^160
@@ -94,10 +96,14 @@ contract ChadexBase {
         Unixtime expiry;        // 2^40
         Tokens tokens;          // 2^128
     }
-    struct NewOrder {
-        AccountIndex maker;     // 2^40
+    struct Offer {
+        AccountIndex maker;     // 2^32
         Unixtime expiry;        // 2^40
         Tokens tokens;          // 2^128
+    }
+    struct Offers {
+        OfferIndex head;        // 2^32
+        Offer[] offers;
     }
     struct TradeInput {
         Action action;          // 2^8
@@ -145,8 +151,10 @@ contract ChadexBase {
     mapping(PairKey => mapping(BuySell => mapping(Price => OrderQueue))) orderQueues;
     mapping(OrderKey => Order) orders;
 
-    mapping(Account => AccountIndex) accountToIndex; // Note that this will be the index + 1
+    mapping(Account => AccountIndex) accountToIndex; // Note that we will use index + 1 for array below
     Account[] indexToAccount;
+
+    mapping(PairKey => mapping(BuySell => mapping(Price => Offers))) offers;
 
     event PairAdded(PairKey indexed pairKey, Account maker, Token indexed base, Token indexed quote, Decimals[2] decimalss, Unixtime timestamp);
     event OrderAdded(PairKey indexed pairKey, OrderKey indexed orderKey, Account indexed maker, BuySell buySell, Price price, Unixtime expiry, Tokens baseTokens, Tokens quoteTokens, Unixtime timestamp);
@@ -315,7 +323,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         AccountIndex msgSender = accountToIndex[Account.wrap(msg.sender)];
         if (AccountIndex.unwrap(msgSender) == 0) {
             indexToAccount.push(Account.wrap(msg.sender));
-            msgSender = AccountIndex.wrap(uint40(indexToAccount.length));
+            msgSender = AccountIndex.wrap(uint32(indexToAccount.length));
             accountToIndex[Account.wrap(msg.sender)] = msgSender;
         }
 
