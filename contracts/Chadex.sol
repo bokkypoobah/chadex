@@ -29,7 +29,7 @@ import "./BokkyPooBahsRedBlackTreeLibrary.sol";
 // Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2024
 // ----------------------------------------------------------------------------
 
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 
 type Account is address;     // 2^160
@@ -698,25 +698,57 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         Pair memory pair = pairs[pairKey];
         Price price = getBestPrice(pairKey, buySell);
         while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(price)) {
-            OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
-            OrderKey orderKey = orderQueue.head;
-            while (isNotSentinel(orderKey)) {
-                Order memory order = orders[orderKey];
+            console.log("getBestOrder.price", uint(Price.unwrap(price)));
+            Offers memory offers = offers[pairKey][buySell][price];
+            // OfferIndex head = offers.head;
+            // console.log("getBestOrder.offers.head", uint(OfferIndex.unwrap(head)));
+            Offer[] memory queue = offers.queue;
+            // console.log("getBestOrder.offers.queue.length", queue.length);
+            // Offer memory offer = queue[uint(OfferIndex.unwrap(head))];
+            // console.log("getBestOrder.offers.queue[head].maker", uint(AccountIndex.unwrap(offer.maker)));
+            // Account maker = indexToAccount[AccountIndex.unwrap(offer.maker) - 1];
+            // console.log("getBestOrder.offers.queue[head].maker - account", Account.unwrap(maker));
+            // offers[moreInfo.pairKey][tradeInput.buySell][tradeInput.price].queue.push(Offer(moreInfo.msgSender, tradeInput.expiry, tradeInput.baseTokens));
+
+            // TODO: Replace keys with index, remove next
+            for (uint i = OfferIndex.unwrap(offers.head); i < offers.queue.length; i++) {
+                Offer memory offer = queue[i];
+                // console.log("getBestOrder.offers.queue[i].maker", uint(AccountIndex.unwrap(offer.maker)));
+                Account maker = indexToAccount[AccountIndex.unwrap(offer.maker) - 1];
+                console.log("getBestOrder.offers.queue[i].maker - account", Account.unwrap(maker));
                 uint availableBase;
                 uint availableQuote;
                 if (buySell == BuySell.Buy) {
-                    availableQuote = availableTokens(pair.tokenz[1], order.maker);
+                    availableQuote = availableTokens(pair.tokenz[1], maker);
                     availableBase = quoteToBase(pair.decimalss, availableQuote, price);
                 } else {
-                    availableBase = availableTokens(pair.tokenz[0], order.maker);
+                    availableBase = availableTokens(pair.tokenz[0], maker);
                     availableQuote = baseToQuote(pair.decimalss, availableBase, price);
                 }
-                if (availableBase > 0 && availableQuote > 0 && (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) > block.timestamp)) {
-                    orderResult = BestOrderResult(price, orderKey, order.next, order.maker, order.expiry, order.tokens, Tokens.wrap(uint128(availableBase)), Tokens.wrap(uint128(availableQuote)));
+                if (availableBase > 0 && availableQuote > 0 && (Unixtime.unwrap(offer.expiry) == 0 || Unixtime.unwrap(offer.expiry) > block.timestamp)) {
+                    orderResult = BestOrderResult(price, ORDERKEY_SENTINEL, ORDERKEY_SENTINEL, maker, offer.expiry, offer.tokens, Tokens.wrap(uint128(availableBase)), Tokens.wrap(uint128(availableQuote)));
                     break;
                 }
-                orderKey = order.next;
             }
+            // OrderQueue memory orderQueue = orderQueues[pairKey][buySell][price];
+            // OrderKey orderKey = orderQueue.head;
+            // while (isNotSentinel(orderKey)) {
+            //     Order memory order = orders[orderKey];
+            //     uint availableBase;
+            //     uint availableQuote;
+            //     if (buySell == BuySell.Buy) {
+            //         availableQuote = availableTokens(pair.tokenz[1], order.maker);
+            //         availableBase = quoteToBase(pair.decimalss, availableQuote, price);
+            //     } else {
+            //         availableBase = availableTokens(pair.tokenz[0], order.maker);
+            //         availableQuote = baseToQuote(pair.decimalss, availableBase, price);
+            //     }
+            //     if (availableBase > 0 && availableQuote > 0 && (Unixtime.unwrap(order.expiry) == 0 || Unixtime.unwrap(order.expiry) > block.timestamp)) {
+            //         orderResult = BestOrderResult(price, orderKey, order.next, order.maker, order.expiry, order.tokens, Tokens.wrap(uint128(availableBase)), Tokens.wrap(uint128(availableQuote)));
+            //         break;
+            //     }
+            //     orderKey = order.next;
+            // }
             if (Price.unwrap(orderResult.price) > 0) {
                 break;
             }
