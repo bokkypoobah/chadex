@@ -710,7 +710,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
             // console.log("getBestOrder.offers.queue[head].maker - account", Account.unwrap(maker));
             // offers[moreInfo.pairKey][tradeInput.buySell][tradeInput.price].queue.push(Offer(moreInfo.msgSender, tradeInput.expiry, tradeInput.baseTokens));
 
-            // TODO: Replace keys with index, remove next
+            // TODO: Replace keys with index, remove next?
             for (uint i = OfferIndex.unwrap(offers.head); i < offers.queue.length; i++) {
                 Offer memory offer = queue[i];
                 // console.log("getBestOrder.offers.queue[i].maker", uint(AccountIndex.unwrap(offer.maker)));
