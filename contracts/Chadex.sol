@@ -328,6 +328,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         }
 
         for (uint i; i < tradeInputs.length; i++) {
+            console.log("          * execute", i);
             TradeInput memory tradeInput = tradeInputs[i];
             MoreInfo memory moreInfo = _getMoreInfo(tradeInput, Account.wrap(msg.sender), msgSender);
             if (uint(tradeInput.action) <= uint(Action.FillAnyAndAddOrder)) {
@@ -341,6 +342,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     }
 
     function _getMoreInfo(TradeInput memory tradeInput, Account taker, AccountIndex msgSender) internal returns (MoreInfo memory moreInfo) {
+        console.log(unicode"            ↳ _getMoreInfo");
         PairKey pairKey = generatePairKey(tradeInput);
         Pair memory pair = pairs[pairKey];
         if (Token.unwrap(pair.tokenz[0]) == address(0)) {
@@ -360,6 +362,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     }
 
     function _checkTakerAvailableTokens(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal view {
+        console.log(unicode"              ↳ _checkTakerAvailableTokens");
         if (tradeInput.buySell == BuySell.Buy) {
             uint availableTokens = availableTokens(tradeInput.tokenz[1], moreInfo.taker);
             uint quoteTokens = baseToQuote(moreInfo.decimalss, uint(Tokens.unwrap(tradeInput.baseTokens)), tradeInput.price);
@@ -381,6 +384,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         uint quoteTokensToTransfer;
     }
     function _handleOrder(TradeInput memory tradeInput, MoreInfo memory moreInfo, Price price, OrderKey orderKey, Order storage order) internal returns (HandleOrderResults memory vars) {
+        console.log(unicode"              ↳ _handleOrder");
         bool deleteOrder;
         uint makerTokensToFill;
         uint tokensToTransfer;
@@ -443,6 +447,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     }
 
     function _trade(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (Tokens filled, Tokens quoteFilled, Tokens tokensOnOrder, OrderKey orderKey) {
+        console.log(unicode"            ↳ _trade");
         if (Price.unwrap(tradeInput.price) < Price.unwrap(PRICE_MIN) || Price.unwrap(tradeInput.price) > Price.unwrap(PRICE_MAX)) {
             revert InvalidPrice(tradeInput.price, PRICE_MAX);
         }
@@ -521,6 +526,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     }
 
     function _addOrder(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
+        console.log(unicode"            ↳ _addOrder");
         orderKey = generateOrderKey(moreInfo.taker, tradeInput.buySell, tradeInput.tokenz, tradeInput.price);
         if (Account.unwrap(orders[orderKey].maker) != address(0)) {
             revert CannotInsertDuplicateOrder(orderKey);
@@ -551,6 +557,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     }
 
     function _removeOrder(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (OrderKey orderKey) {
+        console.log(unicode"            ↳ _removeOrder");
         OrderQueue storage orderQueue = orderQueues[moreInfo.pairKey][tradeInput.buySell][tradeInput.price];
         orderKey = orderQueue.head;
         OrderKey prevOrderKey;
