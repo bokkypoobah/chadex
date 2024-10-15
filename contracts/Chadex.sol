@@ -362,13 +362,13 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     function _checkTakerAvailableTokens(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal view {
         if (tradeInput.buySell == BuySell.Buy) {
             uint availableTokens = availableTokens(tradeInput.tokenz[1], moreInfo.taker);
-            uint quoteTokens = baseToQuote(moreInfo.decimalss, uint(uint128(Tokens.unwrap(tradeInput.baseTokens))), tradeInput.price);
+            uint quoteTokens = baseToQuote(moreInfo.decimalss, uint(Tokens.unwrap(tradeInput.baseTokens)), tradeInput.price);
             if (availableTokens < quoteTokens) {
                 revert InsufficientQuoteTokenBalanceOrAllowance(tradeInput.tokenz[1], moreInfo.taker, Tokens.wrap(uint128(quoteTokens)), Tokens.wrap(uint128(availableTokens)));
             }
         } else {
             uint availableTokens = availableTokens(tradeInput.tokenz[0], moreInfo.taker);
-            if (availableTokens < uint(uint128(Tokens.unwrap(tradeInput.baseTokens)))) {
+            if (availableTokens < uint(Tokens.unwrap(tradeInput.baseTokens))) {
                 revert InsufficientTokenBalanceOrAllowance(tradeInput.tokenz[0], moreInfo.taker, tradeInput.baseTokens, Tokens.wrap(uint128(availableTokens)));
             }
         }
