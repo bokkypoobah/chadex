@@ -12,4 +12,11 @@ module.exports = {
       },
     },
   },
+  defaultNetwork: "hardhat",
+  networks: {
+    hardhat: {
+      allowUnlimitedContractSize: true,
+      // blockGasLimit: 30_000_000,
+    },
+  },
 };

@@ -788,30 +788,30 @@ contract Chadex is ChadexBase, ReentrancyGuard {
     //     }
     // }
 
-    // struct TokenInfoResult {
-    //     string symbol;
-    //     string name;
-    //     uint8 decimals;
-    //     Tokens totalSupply;
-    // }
-    // function getTokenInfo(Token[] memory tokens) public view returns (TokenInfoResult[] memory results) {
-    //     results = new TokenInfoResult[](tokens.length);
-    //     for (uint i; i < tokens.length; i++) {
-    //         IERC20 t = IERC20(Token.unwrap(tokens[i]));
-    //         results[i] = TokenInfoResult(t.symbol(), t.name(), t.decimals(), Tokens.wrap(int128(uint128(t.totalSupply()))));
-    //     }
-    // }
+    struct TokenInfoResult {
+        string symbol;
+        string name;
+        uint8 decimals;
+        Tokens totalSupply;
+    }
+    function getTokenInfo(Token[] memory tokens) public view returns (TokenInfoResult[] memory results) {
+        results = new TokenInfoResult[](tokens.length);
+        for (uint i; i < tokens.length; i++) {
+            IERC20 t = IERC20(Token.unwrap(tokens[i]));
+            results[i] = TokenInfoResult(t.symbol(), t.name(), t.decimals(), Tokens.wrap(uint128(t.totalSupply())));
+        }
+    }
 
-    // struct TokenBalanceAndAllowanceResult {
-    //     Tokens balance;
-    //     Tokens allowance;
-    // }
-    // function getTokenBalanceAndAllowance(Account[] memory owners, Token[] memory tokens) public view returns (TokenBalanceAndAllowanceResult[] memory results) {
-    //     require(owners.length == tokens.length);
-    //     results = new TokenBalanceAndAllowanceResult[](owners.length);
-    //     for (uint i; i < owners.length; i++) {
-    //         IERC20 t = IERC20(Token.unwrap(tokens[i]));
-    //         results[i] = TokenBalanceAndAllowanceResult(Tokens.wrap(uint128(t.allowance(Account.unwrap(owners[i]), address(this)))), Tokens.wrap(uint128(t.balanceOf(Account.unwrap(owners[i])))));
-    //     }
-    // }
+    struct TokenBalanceAndAllowanceResult {
+        Tokens balance;
+        Tokens allowance;
+    }
+    function getTokenBalanceAndAllowance(Account[] memory owners, Token[] memory tokens) public view returns (TokenBalanceAndAllowanceResult[] memory results) {
+        require(owners.length == tokens.length);
+        results = new TokenBalanceAndAllowanceResult[](owners.length);
+        for (uint i; i < owners.length; i++) {
+            IERC20 t = IERC20(Token.unwrap(tokens[i]));
+            results[i] = TokenBalanceAndAllowanceResult(Tokens.wrap(uint128(t.allowance(Account.unwrap(owners[i]), address(this)))), Tokens.wrap(uint128(t.balanceOf(Account.unwrap(owners[i])))));
+        }
+    }
 }

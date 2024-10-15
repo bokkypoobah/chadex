@@ -166,7 +166,7 @@ describe("Chadex", function () {
     const actionsA = [
       { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, tokenz: [data.token0.target, data.weth.target], price: ethers.parseUnits(price1, 9).toString(), targetPrice: ethers.parseUnits(price1, 9).toString(), expiry: expiry, baseTokens: baseTokens1.toString(), skipCheck: false },
       { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, tokenz: [data.token0.target, data.weth.target], price: ethers.parseUnits(price2, 9).toString(), targetPrice: ethers.parseUnits(price2, 9).toString(), expiry: expiry, baseTokens: baseTokens2.toString(), skipCheck: false },
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, tokenz: [data.token0.target, data.weth.target], price: ethers.parseUnits(price3, 9).toString(), targetPrice: ethers.parseUnits(price3, 9).toString(), expiry: expiry, baseTokens: baseTokens3.toString(), skipCheck: false },
+      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, tokenz: [data.token0.target, data.weth.target], price: ethers.parseUnits(price3, 9).toString(), targetPrice: ethers.parseUnits(price3, 9).toString(), expiry: expired, baseTokens: baseTokens3.toString(), skipCheck: false },
     ];
     console.log("        Executing: " + JSON.stringify(actionsA, null, 2));
 
@@ -181,7 +181,7 @@ describe("Chadex", function () {
 
     await data.printState("After Adding Orders");
 
-    if (false) {      
+    if (true) {
       const targetPrice1 = "0.6901";
       const baseTokensB1 = ethers.parseUnits("10", data.decimals0);
       const actionsB1 = [

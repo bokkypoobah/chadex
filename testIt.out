@@ -73,7 +73,7 @@ Compiled 1 Solidity file successfully (evm target: cancun).
     ],
     "price": "690100000",
     "targetPrice": "690100000",
-    "expiry": 1728875026,
+    "expiry": 1728967552,
     "baseTokens": "1000000000000000000",
     "skipCheck": false
   },
@@ -86,7 +86,7 @@ Compiled 1 Solidity file successfully (evm target: cancun).
     ],
     "price": "690200000",
     "targetPrice": "690200000",
-    "expiry": 1728875026,
+    "expiry": 1728967552,
     "baseTokens": "2000000000000000000",
     "skipCheck": false
   },
@@ -99,89 +99,42 @@ Compiled 1 Solidity file successfully (evm target: cancun).
     ],
     "price": "690300000",
     "targetPrice": "690300000",
-    "expiry": 1728875026,
+    "expiry": 1728960352,
     "baseTokens": "3000000000000000000",
     "skipCheck": false
   }
 ]
         > user0->chadex.execute(actionsA) - gasUsed: 800348 ~ ETH 0.00800348 ~ USD 20
-          + Chadex:0xCf7E PairAdded(pairKey: 0x2c831da670a13afa44, maker: user0:0x7099, base: Token0:0x5FbD, quote: WETH:0x9fE4, decimalss: [18,18], timestamp: 1728871453)
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xba50bff8ca4fde4978, maker: user0:0x7099, buySell: 0, price: 0.6901, expiry: 1728875026, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728871453)
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x16ee2eb820c1dc86c5, maker: user0:0x7099, buySell: 0, price: 0.6902, expiry: 1728875026, baseTokens: 2.0, quoteTokens: 1.3804, timestamp: 1728871453)
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x216071ecd309e02f0a, maker: user0:0x7099, buySell: 0, price: 0.6903, expiry: 1728875026, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728871453)
+          + Chadex:0xCf7E PairAdded(pairKey: 0x2c831da670a13afa44, maker: user0:0x7099, base: Token0:0x5FbD, quote: WETH:0x9fE4, decimalss: [18,18], timestamp: 1728963979)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xba50bff8ca4fde4978, maker: user0:0x7099, buySell: 0, price: 0.6901, expiry: 1728967552, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728963979)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x16ee2eb820c1dc86c5, maker: user0:0x7099, buySell: 0, price: 0.6902, expiry: 1728967552, baseTokens: 2.0, quoteTokens: 1.3804, timestamp: 1728963979)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x216071ecd309e02f0a, maker: user0:0x7099, buySell: 0, price: 0.6903, expiry: 1728960352, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728963979)
         > user1->chadex.execute(actionsA) - gasUsed: 459686 ~ ETH 0.00459686 ~ USD 11
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x57e1bbde3a5a6e6ba5, maker: user1:0x3C44, buySell: 0, price: 0.6901, expiry: 1728875026, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728871454)
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x4fcf79cf98e01a03f6, maker: user1:0x3C44, buySell: 0, price: 0.6902, expiry: 1728875026, baseTokens: 2.0, quoteTokens: 1.3804, timestamp: 1728871454)
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xc4fd7db027bc75d73f, maker: user1:0x3C44, buySell: 0, price: 0.6903, expiry: 1728875026, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728871454)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x57e1bbde3a5a6e6ba5, maker: user1:0x3C44, buySell: 0, price: 0.6901, expiry: 1728967552, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728963980)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x4fcf79cf98e01a03f6, maker: user1:0x3C44, buySell: 0, price: 0.6902, expiry: 1728967552, baseTokens: 2.0, quoteTokens: 1.3804, timestamp: 1728963980)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xc4fd7db027bc75d73f, maker: user1:0x3C44, buySell: 0, price: 0.6903, expiry: 1728960352, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728963980)
         > user2->chadex.execute(actionsA) - gasUsed: 459686 ~ ETH 0.00459686 ~ USD 11
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x452f99950d915502ce, maker: user2:0x90F7, buySell: 0, price: 0.6901, expiry: 1728875026, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728871455)
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xdc9dfdc4362c69200e, maker: user2:0x90F7, buySell: 0, price: 0.6902, expiry: 1728875026, baseTokens: 2.0, quoteTokens: 1.3804, timestamp: 1728871455)
-          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xe7bb22970ed8b3926f, maker: user2:0x90F7, buySell: 0, price: 0.6903, expiry: 1728875026, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728871455)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x452f99950d915502ce, maker: user2:0x90F7, buySell: 0, price: 0.6901, expiry: 1728967552, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728963981)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xdc9dfdc4362c69200e, maker: user2:0x90F7, buySell: 0, price: 0.6902, expiry: 1728967552, baseTokens: 2.0, quoteTokens: 1.3804, timestamp: 1728963981)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0xe7bb22970ed8b3926f, maker: user2:0x90F7, buySell: 0, price: 0.6903, expiry: 1728960352, baseTokens: 3.0, quoteTokens: 2.0709, timestamp: 1728963981)
 
         --- After Adding Orders ---
           Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
           -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F       9999.988210955317099005                      0.0                      0.0                      0.0
-          user0:0x7099          9899.998976486419932812                    100.0                    100.0                    100.0
-          user1:0x3C44          9899.999331508195633072                    100.0                    100.0                    100.0
-          user2:0x90F7          9899.999336513886588224                    100.0                    100.0                    100.0
-          user3:0x15d3          9899.999806996144219732                    100.0                    100.0                    100.0
+          deployer:0xf39F       9999.987489056334794134                      0.0                      0.0                      0.0
+          user0:0x7099          9899.998976322806554099                    100.0                    100.0                    100.0
+          user1:0x3C44          9899.999331403457668474                    100.0                    100.0                    100.0
+          user2:0x90F7          9899.999336429671683603                    100.0                    100.0                    100.0
+          user3:0x15d3          9899.999806956194251375                    100.0                    100.0                    100.0
           Chadex:0xCf7E                             0.0                      0.0                      0.0                      0.0
 
           Chadex: Chadex:0xCf7E
           ----- Pair 0x2c831da670a13afa44000f723f930fbd31948192e5612f758ae2cfaeee460dc2 Token0:0x5FbD/WETH:0x9fE4 18 18 -----
               #      BUY Price OrderKey   Next       Maker         Expiry(s)                Tokens     Total Available Base    Total Available Quote
             --- -------------- ---------- ---------- ------------ ---------- --------------------- ------------------------ ------------------------
-              0         0.6903 0x216071ec 0xc4fd7db0 user0:0x7099      60.00                   3.0     3.896856439229320585                     2.69
-              1         0.6903 0xc4fd7db0 0xe7bb2297 user1:0x3C44      60.00                   3.0     3.896856439229320585                     2.69
-              2         0.6903 0xe7bb2297 0x00000000 user2:0x90F7      60.00                   3.0     3.896856439229320585                     2.69
-              3         0.6902 0x16ee2eb8 0x4fcf79cf user0:0x7099      60.00                   2.0     3.897421037380469429                     2.69
-              4         0.6902 0x4fcf79cf 0xdc9dfdc4 user1:0x3C44      60.00                   2.0     3.897421037380469429                     2.69
-              5         0.6902 0xdc9dfdc4 0x00000000 user2:0x90F7      60.00                   2.0     3.897421037380469429                     2.69
-              6         0.6901 0xba50bff8 0x57e1bbde user0:0x7099      60.00                   1.0     3.897985799159542095                     2.69
-              7         0.6901 0x57e1bbde 0x452f9995 user1:0x3C44      60.00                   1.0     3.897985799159542095                     2.69
-              8         0.6901 0x452f9995 0x00000000 user2:0x90F7      60.00                   1.0     3.897985799159542095                     2.69
-
-            price: 0.6903 head=0x216071ec tail=0xe7bb2297
-              Order key=0x216071ec next=0xc4fd7db0 maker=user0:0x7099 expiry=60.00s tokens=3.0
-              Order key=0xc4fd7db0 next=0xe7bb2297 maker=user1:0x3C44 expiry=60.00s tokens=3.0
-              Order key=0xe7bb2297 next=0x00000000 maker=user2:0x90F7 expiry=60.00s tokens=3.0
-            price: 0.6902 head=0x16ee2eb8 tail=0xdc9dfdc4
-              Order key=0x16ee2eb8 next=0x4fcf79cf maker=user0:0x7099 expiry=60.00s tokens=2.0
-              Order key=0x4fcf79cf next=0xdc9dfdc4 maker=user1:0x3C44 expiry=60.00s tokens=2.0
-              Order key=0xdc9dfdc4 next=0x00000000 maker=user2:0x90F7 expiry=60.00s tokens=2.0
-            price: 0.6901 head=0xba50bff8 tail=0x452f9995
-              Order key=0xba50bff8 next=0x57e1bbde maker=user0:0x7099 expiry=60.00s tokens=1.0
-              Order key=0x57e1bbde next=0x452f9995 maker=user1:0x3C44 expiry=60.00s tokens=1.0
-              Order key=0x452f9995 next=0x00000000 maker=user2:0x90F7 expiry=60.00s tokens=1.0
-
-              #     SELL Price OrderKey   Next       Maker         Expiry(s)                Tokens     Total Available Base    Total Available Quote
-            --- -------------- ---------- ---------- ------------ ---------- --------------------- ------------------------ ------------------------
-
-
-
-getBestOrder.price 690300000
-getBestOrder.offers.queue[i].maker - account 0x70997970c51812dc3a010c7d01b50e0d17dc79c8
-            pairKey: 0x2c831da670a13afa44000f723f930fbd31948192e5612f758ae2cfaeee460dc2, tokenz=["0x5FbDB2315678afecb367f032d93F642f64180aa3","0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"], decimalss=[18,18], bestBuyOrder=["690300000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x70997970C51812dc3A010C7d01b50e0d17dc79C8","1728875026","3000000000000000000","3896856439229320585","2690000000000000000"], bestSellOrder=["0","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000","0","0","0","0"]
-
-
-        --- After Executing Against Orders ---
-          Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
-          -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------
-          deployer:0xf39F       9999.988210955317099005                      0.0                      0.0                      0.0
-          user0:0x7099          9899.998976486419932812                    100.0                    100.0                    100.0
-          user1:0x3C44          9899.999331508195633072                    100.0                    100.0                    100.0
-          user2:0x90F7          9899.999336513886588224                    100.0                    100.0                    100.0
-          user3:0x15d3          9899.999806996144219732                    100.0                    100.0                    100.0
-          Chadex:0xCf7E                             0.0                      0.0                      0.0                      0.0
-
-          Chadex: Chadex:0xCf7E
-          ----- Pair 0x2c831da670a13afa44000f723f930fbd31948192e5612f758ae2cfaeee460dc2 Token0:0x5FbD/WETH:0x9fE4 18 18 -----
-              #      BUY Price OrderKey   Next       Maker         Expiry(s)                Tokens     Total Available Base    Total Available Quote
-            --- -------------- ---------- ---------- ------------ ---------- --------------------- ------------------------ ------------------------
-              0         0.6903 0x216071ec 0xc4fd7db0 user0:0x7099      59.99                   3.0     3.896856439229320585                     2.69
-              1         0.6903 0xc4fd7db0 0xe7bb2297 user1:0x3C44      59.99                   3.0     3.896856439229320585                     2.69
-              2         0.6903 0xe7bb2297 0x00000000 user2:0x90F7      59.99                   3.0     3.896856439229320585                     2.69
+              0         0.6903 0x216071ec 0xc4fd7db0 user0:0x7099     -60.01                   3.0     3.896856439229320585                     2.69
+              1         0.6903 0xc4fd7db0 0xe7bb2297 user1:0x3C44     -60.01                   3.0     3.896856439229320585                     2.69
+              2         0.6903 0xe7bb2297 0x00000000 user2:0x90F7     -60.01                   3.0     3.896856439229320585                     2.69
               3         0.6902 0x16ee2eb8 0x4fcf79cf user0:0x7099      59.99                   2.0     3.897421037380469429                     2.69
               4         0.6902 0x4fcf79cf 0xdc9dfdc4 user1:0x3C44      59.99                   2.0     3.897421037380469429                     2.69
               5         0.6902 0xdc9dfdc4 0x00000000 user2:0x90F7      59.99                   2.0     3.897421037380469429                     2.69
@@ -190,9 +143,9 @@ getBestOrder.offers.queue[i].maker - account 0x70997970c51812dc3a010c7d01b50e0d1
               8         0.6901 0x452f9995 0x00000000 user2:0x90F7      59.99                   1.0     3.897985799159542095                     2.69
 
             price: 0.6903 head=0x216071ec tail=0xe7bb2297
-              Order key=0x216071ec next=0xc4fd7db0 maker=user0:0x7099 expiry=59.99s tokens=3.0
-              Order key=0xc4fd7db0 next=0xe7bb2297 maker=user1:0x3C44 expiry=59.99s tokens=3.0
-              Order key=0xe7bb2297 next=0x00000000 maker=user2:0x90F7 expiry=59.99s tokens=3.0
+              Order key=0x216071ec next=0xc4fd7db0 maker=user0:0x7099 expiry=-60.01s tokens=3.0
+              Order key=0xc4fd7db0 next=0xe7bb2297 maker=user1:0x3C44 expiry=-60.01s tokens=3.0
+              Order key=0xe7bb2297 next=0x00000000 maker=user2:0x90F7 expiry=-60.01s tokens=3.0
             price: 0.6902 head=0x16ee2eb8 tail=0xdc9dfdc4
               Order key=0x16ee2eb8 next=0x4fcf79cf maker=user0:0x7099 expiry=59.99s tokens=2.0
               Order key=0x4fcf79cf next=0xdc9dfdc4 maker=user1:0x3C44 expiry=59.99s tokens=2.0
@@ -209,11 +162,80 @@ getBestOrder.offers.queue[i].maker - account 0x70997970c51812dc3a010c7d01b50e0d1
 
 getBestOrder.price 690300000
 getBestOrder.offers.queue[i].maker - account 0x70997970c51812dc3a010c7d01b50e0d17dc79c8
-            pairKey: 0x2c831da670a13afa44000f723f930fbd31948192e5612f758ae2cfaeee460dc2, tokenz=["0x5FbDB2315678afecb367f032d93F642f64180aa3","0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"], decimalss=[18,18], bestBuyOrder=["690300000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x70997970C51812dc3A010C7d01b50e0d17dc79C8","1728875026","3000000000000000000","3896856439229320585","2690000000000000000"], bestSellOrder=["0","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000","0","0","0","0"]
+getBestOrder.offers.queue[i].maker - account 0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc
+getBestOrder.offers.queue[i].maker - account 0x90f79bf6eb2c4f870365e785982e1f101e93b906
+getBestOrder.price 690200000
+getBestOrder.offers.queue[i].maker - account 0x70997970c51812dc3a010c7d01b50e0d17dc79c8
+            pairKey: 0x2c831da670a13afa44000f723f930fbd31948192e5612f758ae2cfaeee460dc2, tokenz=["0x5FbDB2315678afecb367f032d93F642f64180aa3","0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"], decimalss=[18,18], bestBuyOrder=["690200000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x70997970C51812dc3A010C7d01b50e0d17dc79C8","1728967552","2000000000000000000","3897421037380469429","2690000000000000000"], bestSellOrder=["0","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000","0","0","0","0"]
+
+        Executing: [
+  {
+    "action": 2,
+    "buySell": 1,
+    "tokenz": [
+      "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
+    ],
+    "price": "690100000",
+    "targetPrice": "690100000",
+    "expiry": 1728967552,
+    "baseTokens": "10000000000000000000",
+    "skipCheck": false
+  }
+]
+        > user3->chadex.execute(actions) - gasUsed: 576531 ~ ETH 0.00576531 ~ USD 14
+          + Token0:0x5FbD Transfer(from: user3:0x15d3, to: user0:0x7099, tokens: 2.0)
+          + WETH:0x9fE4 Transfer(from: user0:0x7099, to: user3:0x15d3, tokens: 1.3804)
+          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0x16ee2eb820c1dc86c5, taker: user3:0x15d3, maker: user0:0x7099, buySell: 1, price: 0.6902, baseTokens: 2.0, quoteTokens: 1.3804, timestamp: 1728963982)
+          + Token0:0x5FbD Transfer(from: user3:0x15d3, to: user1:0x3C44, tokens: 2.0)
+          + WETH:0x9fE4 Transfer(from: user1:0x3C44, to: user3:0x15d3, tokens: 1.3804)
+          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0x4fcf79cf98e01a03f6, taker: user3:0x15d3, maker: user1:0x3C44, buySell: 1, price: 0.6902, baseTokens: 2.0, quoteTokens: 1.3804, timestamp: 1728963982)
+          + Token0:0x5FbD Transfer(from: user3:0x15d3, to: user2:0x90F7, tokens: 2.0)
+          + WETH:0x9fE4 Transfer(from: user2:0x90F7, to: user3:0x15d3, tokens: 1.3804)
+          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0xdc9dfdc4362c69200e, taker: user3:0x15d3, maker: user2:0x90F7, buySell: 1, price: 0.6902, baseTokens: 2.0, quoteTokens: 1.3804, timestamp: 1728963982)
+          + Token0:0x5FbD Transfer(from: user3:0x15d3, to: user0:0x7099, tokens: 1.0)
+          + WETH:0x9fE4 Transfer(from: user0:0x7099, to: user3:0x15d3, tokens: 0.6901)
+          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0xba50bff8ca4fde4978, taker: user3:0x15d3, maker: user0:0x7099, buySell: 1, price: 0.6901, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728963982)
+          + Token0:0x5FbD Transfer(from: user3:0x15d3, to: user1:0x3C44, tokens: 1.0)
+          + WETH:0x9fE4 Transfer(from: user1:0x3C44, to: user3:0x15d3, tokens: 0.6901)
+          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0x57e1bbde3a5a6e6ba5, taker: user3:0x15d3, maker: user1:0x3C44, buySell: 1, price: 0.6901, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728963982)
+          + Token0:0x5FbD Transfer(from: user3:0x15d3, to: user2:0x90F7, tokens: 1.0)
+          + WETH:0x9fE4 Transfer(from: user2:0x90F7, to: user3:0x15d3, tokens: 0.6901)
+          + Chadex:0xCf7E Trade(pairKey: 0x2c831da670a13afa44, orderKey: 0x452f99950d915502ce, taker: user3:0x15d3, maker: user2:0x90F7, buySell: 1, price: 0.6901, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728963982)
+          + Chadex:0xCf7E OrderAdded(pairKey: 0x2c831da670a13afa44, orderKey: 0x2a5851bb9fe514d7fb, maker: user3:0x15d3, buySell: 1, price: 0.6901, expiry: 1728967552, baseTokens: 1.0, quoteTokens: 0.6901, timestamp: 1728963982)
+          + Chadex:0xCf7E TradeSummary(pairKey: 0x2c831da670a13afa44, taker: user3:0x15d3, buySell: 1, price: 0.690166666, baseTokens: 9.0, quoteTokens: 6.2115, tokensOnOrder: 1.0, timestamp: 1728963982)
+
+        --- After Executing Against Orders ---
+          Account                                   ETH                 TOK0[18]                 TOK1[18]                 WETH[18] Blah
+          -------------------- ------------------------ ------------------------ ------------------------ ------------------------ ---------------------------------------------
+          deployer:0xf39F       9999.987489056334794134                      0.0                      0.0                      0.0
+          user0:0x7099          9899.998976322806554099                    103.0                    100.0                  97.9295
+          user1:0x3C44          9899.999331403457668474                    103.0                    100.0                  97.9295
+          user2:0x90F7          9899.999336429671683603                    103.0                    100.0                  97.9295
+          user3:0x15d3          9899.999221583789840662                     91.0                    100.0                 106.2115
+          Chadex:0xCf7E                             0.0                      0.0                      0.0                      0.0
+
+          Chadex: Chadex:0xCf7E
+          ----- Pair 0x2c831da670a13afa44000f723f930fbd31948192e5612f758ae2cfaeee460dc2 Token0:0x5FbD/WETH:0x9fE4 18 18 -----
+              #      BUY Price OrderKey   Next       Maker         Expiry(s)                Tokens     Total Available Base    Total Available Quote
+            --- -------------- ---------- ---------- ------------ ---------- --------------------- ------------------------ ------------------------
 
 
-    ✔ 00. Test 00 (59ms)
+              #     SELL Price OrderKey   Next       Maker         Expiry(s)                Tokens     Total Available Base    Total Available Quote
+            --- -------------- ---------- ---------- ------------ ---------- --------------------- ------------------------ ------------------------
+              0         0.6901 0x2a5851bb 0x00000000 user3:0x15d3      59.99                   1.0                      1.0                   0.6901
+
+            price: 0.6901 head=0x2a5851bb tail=0x2a5851bb
+              Order key=0x2a5851bb next=0x00000000 maker=user3:0x15d3 expiry=59.99s tokens=1.0
 
 
-  1 passing (774ms)
+getBestOrder.price 690100000
+getBestOrder.offers.queue[i].maker - account 0x15d34aaf54267db7d7c367839aaf71a00a2c6a65
+            pairKey: 0x2c831da670a13afa44000f723f930fbd31948192e5612f758ae2cfaeee460dc2, tokenz=["0x5FbDB2315678afecb367f032d93F642f64180aa3","0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"], decimalss=[18,18], bestBuyOrder=["0","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000","0","0","0","0"], bestSellOrder=["690100000","0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000000","0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65","1728967552","1000000000000000000","1000000000000000000","690100000000000000"]
+
+
+    ✔ 00. Test 00 (65ms)
+
+
+  1 passing (864ms)
 
