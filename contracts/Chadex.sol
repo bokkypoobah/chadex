@@ -333,6 +333,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
             MoreInfo memory moreInfo = _getMoreInfo(tradeInput, Account.wrap(msg.sender), msgSender);
             if (uint(tradeInput.action) <= uint(Action.FillAnyAndAddOrder)) {
                 _trade(tradeInput, moreInfo);
+                // _tradeOld(tradeInput, moreInfo);
             } else if (tradeInput.action == Action.RemoveOrder) {
                 _removeOrder(tradeInput, moreInfo);
             } else if (tradeInput.action == Action.UpdateExpiryAndTokens) {
@@ -483,10 +484,19 @@ contract Chadex is ChadexBase, ReentrancyGuard {
                         uint availableBaseTokens = availableTokens(tradeInput.tokenz[0], maker);
                         console.log("              _trade.offers.queue[i] - availableBaseTokens", availableBaseTokens);
                     } else {
-                        uint availableQuoteTokens = availableTokens(tradeInput.tokenz[1], maker);
-                        console.log("              _trade.offers.queue[i] - availableQuoteTokens", availableQuoteTokens);
-                        uint availableQuoteTokensInBaseTokens = quoteToBase(moreInfo.decimalss, availableQuoteTokens, bestMatchingPrice);
-                        console.log("              _trade.offers.queue[i] - availableQuoteTokensInBaseTokens", availableQuoteTokensInBaseTokens);
+                        uint quoteTokens = availableTokens(tradeInput.tokenz[1], maker);
+                        console.log("              _trade.offers.queue[i] - quoteTokens", quoteTokens);
+                        uint quoteTokensInBaseTokens = quoteToBase(moreInfo.decimalss, quoteTokens, bestMatchingPrice);
+                        console.log("              _trade.offers.queue[i] - quoteTokensInBaseTokens", quoteTokensInBaseTokens);
+                        uint baseTokens;
+                        if (Tokens.unwrap(tradeInput.baseTokens) > quoteTokensInBaseTokens) {
+                            baseTokens = quoteTokensInBaseTokens;
+                        } else {
+                            baseTokens = Tokens.unwrap(tradeInput.baseTokens);
+                            quoteTokens = baseToQuote(moreInfo.decimalss, baseTokens, bestMatchingPrice);
+                        }
+                        console.log("              _trade.offers.queue[i] - Transfer baseTokens", baseTokens);
+                        console.log("              _trade.offers.queue[i] - Transfer quoteTokens", quoteTokens);
                     }
                 } else {
                    // TODO: Handle expired
@@ -494,6 +504,87 @@ contract Chadex is ChadexBase, ReentrancyGuard {
             }
 
 
+            OrderQueue storage orderQueue = orderQueues[moreInfo.pairKey][moreInfo.inverseBuySell][bestMatchingPrice];
+            OrderKey bestMatchingOrderKey = orderQueue.head;
+            while (isNotSentinel(bestMatchingOrderKey)) {
+                Order storage order = orders[bestMatchingOrderKey];
+                HandleOrderResults memory results = _handleOrder(tradeInput, moreInfo, bestMatchingPrice, bestMatchingOrderKey, order);
+                order.tokens = Tokens.wrap(uint128(Tokens.unwrap(order.tokens) - uint128(results.tokensToTransfer)));
+                filled = Tokens.wrap(uint128(Tokens.unwrap(filled) + uint128(results.tokensToTransfer)));
+                quoteFilled = Tokens.wrap(uint128(Tokens.unwrap(quoteFilled) + uint128(results.quoteTokensToTransfer)));
+                tradeInput.baseTokens = Tokens.wrap(uint128(Tokens.unwrap(tradeInput.baseTokens) - uint128(results.tokensToTransfer)));
+                if (results.deleteOrder) {
+                    OrderKey temp = bestMatchingOrderKey;
+                    bestMatchingOrderKey = order.next;
+                    orderQueue.head = order.next;
+                    if (OrderKey.unwrap(orderQueue.tail) == OrderKey.unwrap(bestMatchingOrderKey)) {
+                        orderQueue.tail = ORDERKEY_SENTINEL;
+                    }
+                    delete orders[temp];
+                } else {
+                    bestMatchingOrderKey = order.next;
+                }
+                if (Tokens.unwrap(tradeInput.baseTokens) == 0) {
+                    break;
+                }
+            }
+            if (isSentinel(orderQueue.head)) {
+                delete orderQueues[moreInfo.pairKey][moreInfo.inverseBuySell][bestMatchingPrice];
+                Price tempBestMatchingPrice = getMatchingNextBestPrice(moreInfo, bestMatchingPrice);
+                BokkyPooBahsRedBlackTreeLibrary.Tree storage priceTree = priceTrees[moreInfo.pairKey][moreInfo.inverseBuySell];
+                if (priceTree.exists(bestMatchingPrice)) {
+                    priceTree.remove(bestMatchingPrice);
+                }
+                bestMatchingPrice = tempBestMatchingPrice;
+            } else {
+                bestMatchingPrice = getMatchingNextBestPrice(moreInfo, bestMatchingPrice);
+            }
+        }
+        if (tradeInput.action == Action.FillAllOrNothing) {
+            if (Tokens.unwrap(tradeInput.baseTokens) > 0) {
+                revert UnableToFillOrder(tradeInput.baseTokens);
+            }
+        }
+        if (Tokens.unwrap(tradeInput.baseTokens) > 0 && (tradeInput.action == Action.FillAnyAndAddOrder)) {
+            orderKey = _addOrder(tradeInput, moreInfo);
+            tokensOnOrder = tradeInput.baseTokens;
+        }
+        if (Tokens.unwrap(filled) > 0 || Tokens.unwrap(quoteFilled) > 0) {
+            Price price = Tokens.unwrap(filled) > 0 ? baseAndQuoteToPrice(moreInfo.decimalss, uint(uint128(Tokens.unwrap(filled))), uint(uint128(Tokens.unwrap(quoteFilled)))) : Price.wrap(0);
+            if (Price.unwrap(tradeInput.targetPrice) != 0) {
+                if (tradeInput.buySell == BuySell.Buy) {
+                    if (Price.unwrap(price) > Price.unwrap(tradeInput.targetPrice)) {
+                        revert UnableToBuyBelowTargetPrice(price, tradeInput.targetPrice);
+                    }
+                } else {
+                    if (Price.unwrap(price) < Price.unwrap(tradeInput.targetPrice)) {
+                        revert UnableToSellAboveTargetPrice(price, tradeInput.targetPrice);
+                    }
+                }
+            }
+            emit TradeSummary(moreInfo.pairKey, moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled, tokensOnOrder, Unixtime.wrap(uint40(block.timestamp)));
+            // trades[moreInfo.pairKey].push(TradeEvent(moreInfo.taker, tradeInput.buySell, price, filled, quoteFilled, uint48(block.number), uint48(block.timestamp)));
+        }
+    }
+
+
+    function _tradeOld(TradeInput memory tradeInput, MoreInfo memory moreInfo) internal returns (Tokens filled, Tokens quoteFilled, Tokens tokensOnOrder, OrderKey orderKey) {
+        console.log(unicode"            ↳ _tradeOld");
+        if (Price.unwrap(tradeInput.price) < Price.unwrap(PRICE_MIN) || Price.unwrap(tradeInput.price) > Price.unwrap(PRICE_MAX)) {
+            revert InvalidPrice(tradeInput.price, PRICE_MAX);
+        }
+        if (Tokens.unwrap(tradeInput.baseTokens) > Tokens.unwrap(TOKENS_MAX)) {
+            revert InvalidTokens(tradeInput.baseTokens, TOKENS_MAX);
+        }
+        // TODO: Need this?
+        // if (!tradeInput.skipCheck) {
+        //     _checkTakerAvailableTokens(tradeInput, moreInfo);
+        // }
+        Price bestMatchingPrice = getMatchingBestPrice(moreInfo);
+        while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
+               ((tradeInput.buySell == BuySell.Buy && Price.unwrap(bestMatchingPrice) <= Price.unwrap(tradeInput.price)) ||
+                (tradeInput.buySell == BuySell.Sell && Price.unwrap(bestMatchingPrice) >= Price.unwrap(tradeInput.price))) &&
+               Tokens.unwrap(tradeInput.baseTokens) > 0) {
             OrderQueue storage orderQueue = orderQueues[moreInfo.pairKey][moreInfo.inverseBuySell][bestMatchingPrice];
             OrderKey bestMatchingOrderKey = orderQueue.head;
             while (isNotSentinel(bestMatchingOrderKey)) {

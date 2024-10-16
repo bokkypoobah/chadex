@@ -164,28 +164,28 @@ describe("Chadex", function () {
     const baseTokens5 = ethers.parseUnits("69", data.decimals0);
 
     const actionsA = [
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, tokenz: [data.token0.target, data.weth.target], price: ethers.parseUnits(price1, 9).toString(), targetPrice: ethers.parseUnits(price1, 9).toString(), expiry: expiry, baseTokens: baseTokens1.toString(), skipCheck: false },
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, tokenz: [data.token0.target, data.weth.target], price: ethers.parseUnits(price2, 9).toString(), targetPrice: ethers.parseUnits(price2, 9).toString(), expiry: expiry, baseTokens: baseTokens2.toString(), skipCheck: false },
-      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, tokenz: [data.token0.target, data.weth.target], price: ethers.parseUnits(price3, 9).toString(), targetPrice: ethers.parseUnits(price3, 9).toString(), expiry: expiry, baseTokens: baseTokens3.toString(), skipCheck: false },
+      { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, tokenz: [data.token0.target, data.weth.target], price: ethers.parseUnits(price1, 9).toString(), targetPrice: ethers.parseUnits(price1, 9).toString(), expiry: expiry, baseTokens: baseTokens1.toString(), skipCheck: false },
+      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, tokenz: [data.token0.target, data.weth.target], price: ethers.parseUnits(price2, 9).toString(), targetPrice: ethers.parseUnits(price2, 9).toString(), expiry: expiry, baseTokens: baseTokens2.toString(), skipCheck: false },
+      // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, tokenz: [data.token0.target, data.weth.target], price: ethers.parseUnits(price3, 9).toString(), targetPrice: ethers.parseUnits(price3, 9).toString(), expiry: expiry, baseTokens: baseTokens3.toString(), skipCheck: false },
     ];
     console.log("        Executing: " + JSON.stringify(actionsA, null, 2));
 
     const execute0aTx = await data.chadex.connect(data.user0Signer).execute(actionsA);
     await data.printEvents("user0->chadex.execute(actionsA)", await execute0aTx.wait());
 
-    const execute1aTx = await data.chadex.connect(data.user1Signer).execute(actionsA);
-    await data.printEvents("user1->chadex.execute(actionsA)", await execute1aTx.wait());
-
-    const execute1bTx = await data.chadex.connect(data.user2Signer).execute(actionsA);
-    await data.printEvents("user2->chadex.execute(actionsA)", await execute1bTx.wait());
+    // const execute1aTx = await data.chadex.connect(data.user1Signer).execute(actionsA);
+    // await data.printEvents("user1->chadex.execute(actionsA)", await execute1aTx.wait());
+    //
+    // const execute1bTx = await data.chadex.connect(data.user2Signer).execute(actionsA);
+    // await data.printEvents("user2->chadex.execute(actionsA)", await execute1bTx.wait());
 
     await data.printState("After Adding Orders");
 
     if (true) {
       const targetPrice1 = "0.6901";
-      const baseTokensB1 = ethers.parseUnits("1", data.decimals0);
+      const baseTokensB1 = ethers.parseUnits("0.1", data.decimals0);
       const actionsB1 = [
-        { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, tokenz: [data.token0.target, data.weth.target], price: ethers.parseUnits(price1, 9).toString(), targetPrice: ethers.parseUnits(targetPrice1, 9).toString(), expiry: expiry, baseTokens: baseTokensB1.toString(), skipCheck: false },
+        { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, tokenz: [data.token0.target, data.weth.target], price: ethers.parseUnits(price1, 9).toString(), targetPrice: ethers.parseUnits(targetPrice1, 9).toString(), expiry: expiry, baseTokens: baseTokensB1.toString(), skipCheck: false },
         // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.target, quote: data.weth.target, price: ethers.parseUnits(price3, 9).toString(), targetPrice: ethers.parseUnits(targetPrice1, 9).toString(), expiry: expiry, baseTokens: baseTokensB1.toString() },
       ];
       console.log("        Executing: " + JSON.stringify(actionsB1, null, 2));
