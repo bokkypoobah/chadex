@@ -183,7 +183,7 @@ describe("Chadex", function () {
 
     if (true) {
       const targetPrice1 = "0.6901";
-      const baseTokensB1 = ethers.parseUnits("0.1", data.decimals0);
+      const baseTokensB1 = ethers.parseUnits("1", data.decimals0);
       const actionsB1 = [
         { action: Action.FillAnyAndAddOrder, buySell: BuySell.Buy, tokenz: [data.token0.target, data.weth.target], price: ethers.parseUnits(price1, 9).toString(), targetPrice: ethers.parseUnits(targetPrice1, 9).toString(), expiry: expiry, baseTokens: baseTokensB1.toString(), skipCheck: false },
         // { action: Action.FillAnyAndAddOrder, buySell: BuySell.Sell, base: data.token0.target, quote: data.weth.target, price: ethers.parseUnits(price3, 9).toString(), targetPrice: ethers.parseUnits(targetPrice1, 9).toString(), expiry: expiry, baseTokens: baseTokensB1.toString() },
