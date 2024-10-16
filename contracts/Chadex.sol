@@ -465,14 +465,14 @@ contract Chadex is ChadexBase, ReentrancyGuard {
                 (tradeInput.buySell == BuySell.Sell && Price.unwrap(bestMatchingPrice) >= Price.unwrap(tradeInput.price))) &&
                Tokens.unwrap(tradeInput.baseTokens) > 0) {
             console.log("              _trade.bestMatchingPrice", uint(Price.unwrap(bestMatchingPrice)));
-            Offers memory offers = offers[moreInfo.pairKey][moreInfo.inverseBuySell][bestMatchingPrice];
+            Offers storage offers = offers[moreInfo.pairKey][moreInfo.inverseBuySell][bestMatchingPrice];
             // Offer[] memory queue = offers.queue;
             console.log("              _trade.offers.head", uint(OfferIndex.unwrap(offers.head)));
             console.log("              _trade.offers.queue.length", offers.queue.length);
             // Offer memory offer = queue[uint(OfferIndex.unwrap(head))];
             // console.log("getBestOrder.offers.queue[head].maker", uint(AccountIndex.unwrap(offer.maker)));
             for (uint i = OfferIndex.unwrap(offers.head); i < offers.queue.length; i++) {
-                Offer memory offer = offers.queue[i];
+                Offer storage offer = offers.queue[i];
                 Account maker = indexToAccount[AccountIndex.unwrap(offer.maker) - 1];
                 console.log("              _trade.offers.queue - i", i);
                 console.log("              _trade.offers.queue[i].maker", Account.unwrap(maker));
@@ -491,9 +491,13 @@ contract Chadex is ChadexBase, ReentrancyGuard {
                         if (Tokens.unwrap(tradeInput.baseTokens) >= baseTokens) {
                             console.log("              _trade.offers.queue[i] - Requested Equal or More - delete entry and move head");
                             baseTokensToTransfer = baseTokens;
+                            offers.head = OfferIndex.wrap(OfferIndex.unwrap(offers.head) + 1);
+                            delete offers.queue[i];
                         } else {
                             console.log("              _trade.offers.queue[i] - Requested Less - decrement tokens");
                             baseTokensToTransfer = Tokens.unwrap(tradeInput.baseTokens);
+                            offers.queue[i].tokens = Tokens.wrap(uint128(Tokens.unwrap(offers.queue[i].tokens) - baseTokensToTransfer));
+                            console.log("              _trade.offers.queue[i] - Remaining baseTokens", Tokens.unwrap(offers.queue[i].tokens));
                         }
                         uint quoteTokensToTransfer = baseToQuote(moreInfo.decimalss, baseTokensToTransfer, bestMatchingPrice);
                         console.log("              _trade.offers.queue[i] - baseTokensToTransfer", baseTokensToTransfer);
@@ -502,6 +506,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
                             transferFrom(tradeInput.tokenz[1], moreInfo.taker, maker, quoteTokensToTransfer);
                             transferFrom(tradeInput.tokenz[0], maker, moreInfo.taker, baseTokensToTransfer);
                         }
+                        // emit Trade(TradeResult(moreInfo.pairKey, orderKey, moreInfo.taker, order.maker, tradeInput.buySell, price, Tokens.wrap(uint128(tokensToTransfer)), Tokens.wrap(uint128(quoteTokensToTransfer)), Unixtime.wrap(uint40(block.timestamp))));
                     } else {
                         uint quoteTokens = availableTokens(tradeInput.tokenz[1], maker);
                         console.log("              _trade.offers.queue[i] - quoteTokens", quoteTokens);
@@ -518,7 +523,9 @@ contract Chadex is ChadexBase, ReentrancyGuard {
                         console.log("              _trade.offers.queue[i] - Transfer quoteTokens", quoteTokens);
                     }
                 } else {
-                   // TODO: Handle expired
+                    console.log("              _trade.offers.queue[i] - Deleting expired and moving head");
+                    offers.head = OfferIndex.wrap(OfferIndex.unwrap(offers.head) + 1);
+                    delete offers.queue[i];
                 }
             }
 
