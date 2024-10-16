@@ -384,7 +384,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         uint quoteTokensToTransfer;
     }
     function _handleOrder(TradeInput memory tradeInput, MoreInfo memory moreInfo, Price price, OrderKey orderKey, Order storage order) internal returns (HandleOrderResults memory vars) {
-        console.log(unicode"              ↳ _handleOrder");
+        console.log(unicode"              ↳ _handleOrder", uint(Price.unwrap(price)));
         bool deleteOrder;
         uint makerTokensToFill;
         uint tokensToTransfer;
@@ -463,22 +463,36 @@ contract Chadex is ChadexBase, ReentrancyGuard {
                ((tradeInput.buySell == BuySell.Buy && Price.unwrap(bestMatchingPrice) <= Price.unwrap(tradeInput.price)) ||
                 (tradeInput.buySell == BuySell.Sell && Price.unwrap(bestMatchingPrice) >= Price.unwrap(tradeInput.price))) &&
                Tokens.unwrap(tradeInput.baseTokens) > 0) {
+            console.log("              _trade.bestMatchingPrice", uint(Price.unwrap(bestMatchingPrice)));
+            Offers memory offers = offers[moreInfo.pairKey][moreInfo.inverseBuySell][bestMatchingPrice];
+            // Offer[] memory queue = offers.queue;
+            console.log("              _trade.offers.head", uint(OfferIndex.unwrap(offers.head)));
+            console.log("              _trade.offers.queue.length", offers.queue.length);
+            // Offer memory offer = queue[uint(OfferIndex.unwrap(head))];
+            // console.log("getBestOrder.offers.queue[head].maker", uint(AccountIndex.unwrap(offer.maker)));
+            for (uint i = OfferIndex.unwrap(offers.head); i < offers.queue.length; i++) {
+                Offer memory offer = offers.queue[i];
+                Account maker = indexToAccount[AccountIndex.unwrap(offer.maker) - 1];
+                console.log("              _trade.offers.queue - i", i);
+                console.log("              _trade.offers.queue[i].maker", Account.unwrap(maker));
+                console.log("              _trade.offers.queue[i].expiry", uint(Unixtime.unwrap(offer.expiry)));
+                console.log("              _trade.offers.queue[i].tokens", uint(Tokens.unwrap(offer.tokens)));
 
-           console.log("              _trade.bestMatchingPrice", uint(Price.unwrap(bestMatchingPrice)));
-           Offers memory offers = offers[moreInfo.pairKey][moreInfo.inverseBuySell][bestMatchingPrice];
-           // Offer[] memory queue = offers.queue;
-           console.log("              _trade.offers.head", uint(OfferIndex.unwrap(offers.head)));
-           console.log("              _trade.offers.queue.length", offers.queue.length);
-           // Offer memory offer = queue[uint(OfferIndex.unwrap(head))];
-           // console.log("getBestOrder.offers.queue[head].maker", uint(AccountIndex.unwrap(offer.maker)));
-           for (uint i = OfferIndex.unwrap(offers.head); i < offers.queue.length; i++) {
-               Offer memory offer = offers.queue[i];
-               Account maker = indexToAccount[AccountIndex.unwrap(offer.maker) - 1];
-               console.log("              _trade.offers.queue - i", i);
-               console.log("              _trade.offers.queue[i].maker", Account.unwrap(maker));
-               console.log("              _trade.offers.queue[i].expiry", uint(Unixtime.unwrap(offer.expiry)));
-               console.log("              _trade.offers.queue[i].tokens", uint(Tokens.unwrap(offer.tokens)));
-           }
+                if (Unixtime.unwrap(offer.expiry) == 0 || Unixtime.unwrap(offer.expiry) >= block.timestamp) {
+                    if (tradeInput.buySell == BuySell.Buy) {
+                        uint availableBaseTokens = availableTokens(tradeInput.tokenz[0], maker);
+                        console.log("              _trade.offers.queue[i] - availableBaseTokens", availableBaseTokens);
+                    } else {
+                        uint availableQuoteTokens = availableTokens(tradeInput.tokenz[1], maker);
+                        console.log("              _trade.offers.queue[i] - availableQuoteTokens", availableQuoteTokens);
+                        uint availableQuoteTokensInBaseTokens = quoteToBase(moreInfo.decimalss, availableQuoteTokens, bestMatchingPrice);
+                        console.log("              _trade.offers.queue[i] - availableQuoteTokensInBaseTokens", availableQuoteTokensInBaseTokens);
+                    }
+                } else {
+                   // TODO: Handle expired
+                }
+            }
+
 
             OrderQueue storage orderQueue = orderQueues[moreInfo.pairKey][moreInfo.inverseBuySell][bestMatchingPrice];
             OrderKey bestMatchingOrderKey = orderQueue.head;
