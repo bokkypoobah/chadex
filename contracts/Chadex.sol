@@ -454,14 +454,32 @@ contract Chadex is ChadexBase, ReentrancyGuard {
         if (Tokens.unwrap(tradeInput.baseTokens) > Tokens.unwrap(TOKENS_MAX)) {
             revert InvalidTokens(tradeInput.baseTokens, TOKENS_MAX);
         }
-        if (!tradeInput.skipCheck) {
-            _checkTakerAvailableTokens(tradeInput, moreInfo);
-        }
+        // TODO: Need this?
+        // if (!tradeInput.skipCheck) {
+        //     _checkTakerAvailableTokens(tradeInput, moreInfo);
+        // }
         Price bestMatchingPrice = getMatchingBestPrice(moreInfo);
         while (BokkyPooBahsRedBlackTreeLibrary.isNotEmpty(bestMatchingPrice) &&
                ((tradeInput.buySell == BuySell.Buy && Price.unwrap(bestMatchingPrice) <= Price.unwrap(tradeInput.price)) ||
                 (tradeInput.buySell == BuySell.Sell && Price.unwrap(bestMatchingPrice) >= Price.unwrap(tradeInput.price))) &&
                Tokens.unwrap(tradeInput.baseTokens) > 0) {
+
+           console.log("              _trade.bestMatchingPrice", uint(Price.unwrap(bestMatchingPrice)));
+           Offers memory offers = offers[moreInfo.pairKey][moreInfo.inverseBuySell][bestMatchingPrice];
+           // Offer[] memory queue = offers.queue;
+           console.log("              _trade.offers.head", uint(OfferIndex.unwrap(offers.head)));
+           console.log("              _trade.offers.queue.length", offers.queue.length);
+           // Offer memory offer = queue[uint(OfferIndex.unwrap(head))];
+           // console.log("getBestOrder.offers.queue[head].maker", uint(AccountIndex.unwrap(offer.maker)));
+           for (uint i = OfferIndex.unwrap(offers.head); i < offers.queue.length; i++) {
+               Offer memory offer = offers.queue[i];
+               Account maker = indexToAccount[AccountIndex.unwrap(offer.maker) - 1];
+               console.log("              _trade.offers.queue - i", i);
+               console.log("              _trade.offers.queue[i].maker", Account.unwrap(maker));
+               console.log("              _trade.offers.queue[i].expiry", uint(Unixtime.unwrap(offer.expiry)));
+               console.log("              _trade.offers.queue[i].tokens", uint(Tokens.unwrap(offer.tokens)));
+           }
+
             OrderQueue storage orderQueue = orderQueues[moreInfo.pairKey][moreInfo.inverseBuySell][bestMatchingPrice];
             OrderKey bestMatchingOrderKey = orderQueue.head;
             while (isNotSentinel(bestMatchingOrderKey)) {
@@ -709,7 +727,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
             Offers memory offers = offers[pairKey][buySell][price];
             // OfferIndex head = offers.head;
             // console.log("getBestOrder.offers.head", uint(OfferIndex.unwrap(head)));
-            Offer[] memory queue = offers.queue;
+            // Offer[] memory queue = offers.queue;
             // console.log("getBestOrder.offers.queue.length", queue.length);
             // Offer memory offer = queue[uint(OfferIndex.unwrap(head))];
             // console.log("getBestOrder.offers.queue[head].maker", uint(AccountIndex.unwrap(offer.maker)));
@@ -719,7 +737,7 @@ contract Chadex is ChadexBase, ReentrancyGuard {
 
             // TODO: Replace keys with index, remove next?
             for (uint i = OfferIndex.unwrap(offers.head); i < offers.queue.length; i++) {
-                Offer memory offer = queue[i];
+                Offer memory offer = offers.queue[i];
                 // console.log("getBestOrder.offers.queue[i].maker", uint(AccountIndex.unwrap(offer.maker)));
                 Account maker = indexToAccount[AccountIndex.unwrap(offer.maker) - 1];
                 console.log("getBestOrder.offers.queue[i].maker - account", Account.unwrap(maker));

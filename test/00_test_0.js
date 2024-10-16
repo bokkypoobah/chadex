@@ -60,7 +60,7 @@ describe("Chadex", function () {
     // }
     console.log("        WETH deployed: " + weth.target);
 
-    const chadex = await Chadex.deploy({ gasLimit: 6_000_000 });
+    const chadex = await Chadex.deploy({ gasLimit: 7_000_000 });
     // await chadex.deployed();
     await data.setChadex(chadex);
     // const chadexReceipt = await data.chadex.deployTransaction.wait();
